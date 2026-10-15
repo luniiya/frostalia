@@ -273,7 +273,7 @@ Singleton {
       property string middleClickAction: "none"
       property bool middleClickFollowMouse: false
       property string middleClickCommand: ""
-      property string rightClickAction: "controlCenter"
+      property string rightClickAction: "none"
       property bool rightClickFollowMouse: true
       property string rightClickCommand: ""
       // Per-screen overrides for position and widgets

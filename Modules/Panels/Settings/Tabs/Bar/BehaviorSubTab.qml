@@ -12,7 +12,7 @@ ColumnLayout {
 
   readonly property string effectiveWheelAction: Settings.data.bar.mouseWheelAction || "none"
   readonly property string effectiveMiddleClickAction: Settings.data.bar.middleClickAction || "none"
-  readonly property string effectiveRightClickAction: Settings.data.bar.rightClickAction || "controlCenter"
+  readonly property string effectiveRightClickAction: Settings.data.bar.rightClickAction || "none"
 
   NComboBox {
     Layout.fillWidth: true

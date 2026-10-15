@@ -76,7 +76,7 @@
     "middleClickAction": "none",
     "middleClickFollowMouse": false,
     "middleClickCommand": "",
-    "rightClickAction": "controlCenter",
+    "rightClickAction": "none",
     "rightClickFollowMouse": true,
     "rightClickCommand": "",
     "screenOverrides": []
