@@ -1,0 +1,38 @@
+{
+  "panel": {
+    "countdown": "Countdown",
+    "pause": "Pause",
+    "reset": "Reset",
+    "resume": "Resume",
+    "settings": "Widget Settings",
+    "start": "Start",
+    "stopwatch": "Stopwatch",
+    "title": "Timer",
+    "pomodoro": "Pomodoro"
+  },
+  "settings": {
+    "compact-mode": "Compact Mode",
+    "compact-mode-desc": "Hide the circular progress bar for a cleaner look"
+  },
+  "toast": {
+    "finished": "Timer finished!",
+    "title": "Timer"
+  },
+  "pomodoro": {
+    "work": "Work",
+    "break": "Break",
+    "work-duration-label": "Work (minutes)",
+    "break-duration-label": "Break (minutes)",
+    "work-started": "Time to work!",
+    "break-started": "Time for a break!"
+  },
+  "stats": {
+    "today": "Today’s focus",
+    "total": "Lifetime focus",
+    "streak": "Day streak 🔥",
+    "best": "Best day 🏆",
+    "xp": "Focus XP ⚡",
+    "days": "Days leveled up",
+    "summary": "Today {today} · Total {total} · 🔥{streak} · ⚡{xp}"
+  }
+}
