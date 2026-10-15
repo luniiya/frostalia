@@ -12,7 +12,7 @@ RowLayout {
   property string icon: ""
   property bool checked: false
   property bool hovering: false
-  property int baseSize: Math.round(Style.baseWidgetSize * 0.8 * Style.uiScaleRatio)
+  property int baseSize: Math.round(Style.baseWidgetSize * Style.toggleStyle.sizeRatio * Style.uiScaleRatio)
   property var defaultValue: undefined
   property string settingsPath: ""
 
@@ -45,8 +45,8 @@ RowLayout {
     opacity: enabled ? 1.0 : 0.6
     Layout.alignment: Qt.AlignVCenter
     Layout.margins: Style.borderS
-    implicitWidth: Math.round(root.baseSize * .85) * 2
-    implicitHeight: Math.round(root.baseSize * .5) * 2
+    implicitWidth: Math.round(root.baseSize * Style.toggleStyle.widthRatio) * 2
+    implicitHeight: Math.round(root.baseSize * Style.toggleStyle.heightRatio) * 2
     radius: Math.min(Style.iRadiusL, height / 2)
     color: root.checked ? Color.mPrimary : Color.mSurface
     border.color: Color.mOutline
@@ -65,15 +65,15 @@ RowLayout {
     }
 
     Rectangle {
-      implicitWidth: Math.round(root.baseSize * 0.4) * 2
-      implicitHeight: Math.round(root.baseSize * 0.4) * 2
+      implicitWidth: Math.round(root.baseSize * Style.toggleStyle.handleRatio) * 2
+      implicitHeight: Math.round(root.baseSize * Style.toggleStyle.handleRatio) * 2
       radius: Math.min(Style.iRadiusL, height / 2)
       color: root.checked ? Color.mOnPrimary : Color.mPrimary
       border.color: root.checked ? Color.mSurface : Color.mSurface
       border.width: Style.borderM
       anchors.verticalCenter: parent.verticalCenter
       anchors.verticalCenterOffset: 0
-      x: root.checked ? switcher.width - width - 3 : 3
+      x: root.checked ? switcher.width - width - Style.toggleStyle.handleInset : Style.toggleStyle.handleInset
 
       Behavior on x {
         NumberAnimation {

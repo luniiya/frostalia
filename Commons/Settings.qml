@@ -318,6 +318,7 @@ Singleton {
 
     // ui
     property JsonObject ui: JsonObject {
+      property string style: "caelestia"
       property string fontDefault: ""
       property string fontFixed: ""
       property real fontDefaultScale: 1.0

@@ -8,6 +8,20 @@ ColumnLayout {
   id: root
   spacing: 0
 
+  NComboBox {
+    Layout.fillWidth: true
+    Layout.bottomMargin: Style.marginL
+    label: I18n.tr("panels.user-interface.ui-style-label")
+    description: I18n.tr("panels.user-interface.ui-style-description")
+    model: Style.uiStyleChoices.map(style => ({
+      "key": style.key,
+      "name": I18n.tr(style.labelKey)
+    }))
+    currentKey: Style.uiStyleId
+    defaultValue: Settings.getDefaultValue("ui.style")
+    onSelected: key => Settings.data.ui.style = key
+  }
+
   NTabBar {
     id: subTabBar
     Layout.fillWidth: true

@@ -2696,5 +2696,13 @@
     "tabLabel": "panels.user-interface.title",
     "subTab": 2,
     "subTabLabel": "common.screen-corners"
+  },
+  {
+    "labelKey": "panels.user-interface.ui-style-label",
+    "descriptionKey": "panels.user-interface.ui-style-description",
+    "widget": "NComboBox",
+    "tab": 1,
+    "tabLabel": "panels.user-interface.title",
+    "subTab": null
   }
 ]

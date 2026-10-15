@@ -5,58 +5,71 @@ import Quickshell
 import "../Helpers/BubbleLogic.js" as BubbleLogic
 import "../Helpers/NotchGeometry.js" as NotchGeometry
 import "../Helpers/OutlineStyle.js" as OutlineStyle
+import "../Helpers/UiStyles.js" as UiStyles
 import qs.Services.Power
 
 Singleton {
   id: root
 
+  readonly property string uiStyleId: UiStyles.resolveId(Settings.data.ui.style)
+  readonly property var uiStyleChoices: UiStyles.choices()
+  readonly property var uiStyleTokens: UiStyles.tokens(uiStyleId)
+  readonly property var sliderStyle: uiStyleTokens.slider
+  readonly property var toggleStyle: uiStyleTokens.toggle
+  readonly property string fontDefault: UiStyles.fontFamily(uiStyleId, Settings.data.ui.fontDefault, false, Qt.application.font.family)
+  readonly property string fontFixed: UiStyles.fontFamily(uiStyleId, Settings.data.ui.fontFixed, true, Qt.application.font.family)
+
+  function getSliderGeometry(heightRatio) {
+    return UiStyles.sliderGeometry(uiStyleId, baseWidgetSize, heightRatio, uiScaleRatio);
+  }
+
   // Font size
-  readonly property real fontSizeXXS: 8
-  readonly property real fontSizeXS: 9
-  readonly property real fontSizeS: 10
-  readonly property real fontSizeM: 11
-  readonly property real fontSizeL: 13
-  readonly property real fontSizeXL: 16
-  readonly property real fontSizeXXL: 18
-  readonly property real fontSizeXXXL: 24
+  readonly property real fontSizeXXS: uiStyleTokens.fontSizes.XXS
+  readonly property real fontSizeXS: uiStyleTokens.fontSizes.XS
+  readonly property real fontSizeS: uiStyleTokens.fontSizes.S
+  readonly property real fontSizeM: uiStyleTokens.fontSizes.M
+  readonly property real fontSizeL: uiStyleTokens.fontSizes.L
+  readonly property real fontSizeXL: uiStyleTokens.fontSizes.XL
+  readonly property real fontSizeXXL: uiStyleTokens.fontSizes.XXL
+  readonly property real fontSizeXXXL: uiStyleTokens.fontSizes.XXXL
 
   // Font weight
-  readonly property int fontWeightRegular: 400
-  readonly property int fontWeightMedium: 500
-  readonly property int fontWeightSemiBold: 600
-  readonly property int fontWeightBold: 700
+  readonly property int fontWeightRegular: uiStyleTokens.fontWeights.Regular
+  readonly property int fontWeightMedium: uiStyleTokens.fontWeights.Medium
+  readonly property int fontWeightSemiBold: uiStyleTokens.fontWeights.SemiBold
+  readonly property int fontWeightBold: uiStyleTokens.fontWeights.Bold
 
   // Container Radii: major layout sections (sidebars, cards, content panels)
-  readonly property int radiusXXXS: Math.round(3 * Settings.data.general.radiusRatio)
-  readonly property int radiusXXS: Math.round(4 * Settings.data.general.radiusRatio)
-  readonly property int radiusXS: Math.round(8 * Settings.data.general.radiusRatio)
-  readonly property int radiusS: Math.round(12 * Settings.data.general.radiusRatio)
-  readonly property int radiusM: Math.round(16 * Settings.data.general.radiusRatio)
-  readonly property int radiusL: Math.round(20 * Settings.data.general.radiusRatio)
+  readonly property int radiusXXXS: Math.round(uiStyleTokens.radii.XXXS * Settings.data.general.radiusRatio)
+  readonly property int radiusXXS: Math.round(uiStyleTokens.radii.XXS * Settings.data.general.radiusRatio)
+  readonly property int radiusXS: Math.round(uiStyleTokens.radii.XS * Settings.data.general.radiusRatio)
+  readonly property int radiusS: Math.round(uiStyleTokens.radii.S * Settings.data.general.radiusRatio)
+  readonly property int radiusM: Math.round(uiStyleTokens.radii.M * Settings.data.general.radiusRatio)
+  readonly property int radiusL: Math.round(uiStyleTokens.radii.L * Settings.data.general.radiusRatio)
 
   // Input radii: interactive elements (buttons, toggles, text fields)
-  readonly property int iRadiusXXXS: Math.round(3 * Settings.data.general.iRadiusRatio)
-  readonly property int iRadiusXXS: Math.round(4 * Settings.data.general.iRadiusRatio)
-  readonly property int iRadiusXS: Math.round(8 * Settings.data.general.iRadiusRatio)
-  readonly property int iRadiusS: Math.round(12 * Settings.data.general.iRadiusRatio)
-  readonly property int iRadiusM: Math.round(16 * Settings.data.general.iRadiusRatio)
-  readonly property int iRadiusL: Math.round(20 * Settings.data.general.iRadiusRatio)
+  readonly property int iRadiusXXXS: Math.round(uiStyleTokens.inputRadii.XXXS * Settings.data.general.iRadiusRatio)
+  readonly property int iRadiusXXS: Math.round(uiStyleTokens.inputRadii.XXS * Settings.data.general.iRadiusRatio)
+  readonly property int iRadiusXS: Math.round(uiStyleTokens.inputRadii.XS * Settings.data.general.iRadiusRatio)
+  readonly property int iRadiusS: Math.round(uiStyleTokens.inputRadii.S * Settings.data.general.iRadiusRatio)
+  readonly property int iRadiusM: Math.round(uiStyleTokens.inputRadii.M * Settings.data.general.iRadiusRatio)
+  readonly property int iRadiusL: Math.round(uiStyleTokens.inputRadii.L * Settings.data.general.iRadiusRatio)
 
-  readonly property int screenRadius: Math.round(20 * Settings.data.general.screenRadiusRatio)
+  readonly property int screenRadius: Math.round(uiStyleTokens.screenRadius * Settings.data.general.screenRadiusRatio)
 
   // Border
-  readonly property int borderS: Math.max(1, Math.round(1 * uiScaleRatio))
-  readonly property int borderM: Math.max(1, Math.round(2 * uiScaleRatio))
-  readonly property int borderL: Math.max(1, Math.round(3 * uiScaleRatio))
+  readonly property int borderS: Math.max(1, Math.round(uiStyleTokens.borders.S * uiScaleRatio))
+  readonly property int borderM: Math.max(1, Math.round(uiStyleTokens.borders.M * uiScaleRatio))
+  readonly property int borderL: Math.max(1, Math.round(uiStyleTokens.borders.L * uiScaleRatio))
 
   // Margins (for margins and spacing)
-  readonly property int marginXXXS: Math.round(1 * uiScaleRatio)
-  readonly property int marginXXS: Math.round(2 * uiScaleRatio)
-  readonly property int marginXS: Math.round(4 * uiScaleRatio)
-  readonly property int marginS: Math.round(6 * uiScaleRatio)
-  readonly property int marginM: Math.round(9 * uiScaleRatio)
-  readonly property int marginL: Math.round(13 * uiScaleRatio)
-  readonly property int marginXL: Math.round(18 * uiScaleRatio)
+  readonly property int marginXXXS: Math.round(uiStyleTokens.margins.XXXS * uiScaleRatio)
+  readonly property int marginXXS: Math.round(uiStyleTokens.margins.XXS * uiScaleRatio)
+  readonly property int marginXS: Math.round(uiStyleTokens.margins.XS * uiScaleRatio)
+  readonly property int marginS: Math.round(uiStyleTokens.margins.S * uiScaleRatio)
+  readonly property int marginM: Math.round(uiStyleTokens.margins.M * uiScaleRatio)
+  readonly property int marginL: Math.round(uiStyleTokens.margins.L * uiScaleRatio)
+  readonly property int marginXL: Math.round(uiStyleTokens.margins.XL * uiScaleRatio)
 
   // Double margins, for proper container sizing only (e.g. height: id.implicitHeight + Style.margin2M)
   readonly property int margin2XXXS: marginXXXS * 2
@@ -86,11 +99,11 @@ Singleton {
   readonly property real shadowVerticalOffset: Settings.data.general.shadowOffsetY
 
   // Animation duration (ms)
-  readonly property int animationFaster: (Settings.data.general.animationDisabled || PowerProfileService.frostaliaPerformanceMode) ? 0 : Math.round(75 / Settings.data.general.animationSpeed)
-  readonly property int animationFast: (Settings.data.general.animationDisabled || PowerProfileService.frostaliaPerformanceMode) ? 0 : Math.round(150 / Settings.data.general.animationSpeed)
-  readonly property int animationNormal: (Settings.data.general.animationDisabled || PowerProfileService.frostaliaPerformanceMode) ? 0 : Math.round(300 / Settings.data.general.animationSpeed)
-  readonly property int animationSlow: (Settings.data.general.animationDisabled || PowerProfileService.frostaliaPerformanceMode) ? 0 : Math.round(450 / Settings.data.general.animationSpeed)
-  readonly property int animationSlowest: (Settings.data.general.animationDisabled || PowerProfileService.frostaliaPerformanceMode) ? 0 : Math.round(750 / Settings.data.general.animationSpeed)
+  readonly property int animationFaster: (Settings.data.general.animationDisabled || PowerProfileService.frostaliaPerformanceMode) ? 0 : Math.round(uiStyleTokens.animations.Faster / Settings.data.general.animationSpeed)
+  readonly property int animationFast: (Settings.data.general.animationDisabled || PowerProfileService.frostaliaPerformanceMode) ? 0 : Math.round(uiStyleTokens.animations.Fast / Settings.data.general.animationSpeed)
+  readonly property int animationNormal: (Settings.data.general.animationDisabled || PowerProfileService.frostaliaPerformanceMode) ? 0 : Math.round(uiStyleTokens.animations.Normal / Settings.data.general.animationSpeed)
+  readonly property int animationSlow: (Settings.data.general.animationDisabled || PowerProfileService.frostaliaPerformanceMode) ? 0 : Math.round(uiStyleTokens.animations.Slow / Settings.data.general.animationSpeed)
+  readonly property int animationSlowest: (Settings.data.general.animationDisabled || PowerProfileService.frostaliaPerformanceMode) ? 0 : Math.round(uiStyleTokens.animations.Slowest / Settings.data.general.animationSpeed)
 
   // Delays
   readonly property int tooltipDelay: 300
@@ -98,8 +111,8 @@ Singleton {
   readonly property int pillDelay: 500
 
   // Widgets base size
-  readonly property real baseWidgetSize: 33
-  readonly property real sliderWidth: 200
+  readonly property real baseWidgetSize: uiStyleTokens.baseWidgetSize
+  readonly property real sliderWidth: uiStyleTokens.sliderWidth
 
   readonly property real uiScaleRatio: Settings.data.general.scaleRatio
 

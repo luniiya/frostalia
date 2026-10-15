@@ -13,7 +13,7 @@ ColumnLayout {
   property bool readOnly: false
   property color labelColor: Color.mOnSurface
   property color descriptionColor: Color.mOnSurfaceVariant
-  property string fontFamily: Settings.data.ui.fontDefault
+  property string fontFamily: Style.fontDefault
   property real fontSize: Style.fontSizeS
   property int fontWeight: Style.fontWeightRegular
   property var defaultValue: undefined

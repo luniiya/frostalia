@@ -9,11 +9,11 @@ Text {
 
   property bool richTextEnabled: false
   property bool markdownTextEnabled: false
-  property string family: Settings.data.ui.fontDefault
+  property string family: Style.fontDefault
   property real pointSize: Style.fontSizeM
   property bool applyUiScale: true
   property real fontScale: {
-    const fontScale = (root.family === Settings.data.ui.fontDefault ? Settings.data.ui.fontDefaultScale : Settings.data.ui.fontFixedScale);
+    const fontScale = (root.family === Style.fontDefault ? Settings.data.ui.fontDefaultScale : Settings.data.ui.fontFixedScale);
     if (applyUiScale) {
       return fontScale * Style.uiScaleRatio;
     }

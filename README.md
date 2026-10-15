@@ -124,6 +124,12 @@ python3 Scripts/dev/build-settings-search-index.py
 
 Tests require Rust/Cargo, Qt 6's `qmltestrunner` (on Arch, `qt6-declarative`) and Python 3. Pure JS helpers live in `Helpers/`; QML tests live in `Tests/`, and repository checks in `Tests/python/`. Rust helpers and their unit tests live in `Tools/settings/` and `Tools/theming/`. See [CLAUDE.md](CLAUDE.md) for conventions and the settings checklist.
 
+### UI styles
+
+**Settings → User Interface → UI style** selects the shell's visual style. Caelestia is the initial style and preserves the current appearance. Color schemes remain separate. Saved fonts, UI scale, container rounding and control rounding take precedence over the style's defaults.
+
+Styles are registered in `Helpers/UiStyles.js`. Each entry has a translated label key and tokens for typography, radii, spacing, borders, animations, sliders and toggles. `Commons/Style.qml` exposes the active tokens to shared widgets; use it when adding controls instead of hardcoding style values. An unknown saved style falls back to Caelestia for rendering without rewriting the saved choice. Add a complete registry entry, its English label in `Assets/Translations/en.json`, and tests in `Tests/tst_uistyles.qml` when implementing another style. Distinct control renderers can be added to the shared widgets when a style needs more than different tokens.
+
 ## Credits and license
 
 Frostalia builds on Noctalia and its contributors' work. The inherited artwork remains credited to its original creators; see [CREDITS.md](CREDITS.md). A fresh Git history does not change that attribution.

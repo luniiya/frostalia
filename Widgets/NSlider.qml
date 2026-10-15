@@ -11,17 +11,18 @@ Slider {
   property color fillColor: Color.mPrimary
   property var cutoutColor: Color.mSurface
   property bool snapAlways: true
-  property real heightRatio: 0.7
+  property real heightRatio: Style.sliderStyle.heightRatio
   property var tooltipText
   property string tooltipDirection: "auto"
   property bool hovering: false
 
   readonly property color effectiveFillColor: enabled ? fillColor : Color.mOutline
 
-  readonly property real knobDiameter: Math.round((Style.baseWidgetSize * heightRatio * Style.uiScaleRatio) / 2) * 2
-  readonly property real trackHeight: Math.round((knobDiameter * 0.4 * Style.uiScaleRatio) / 2) * 2
+  readonly property var sliderGeometry: Style.getSliderGeometry(heightRatio)
+  readonly property real knobDiameter: sliderGeometry.knobDiameter
+  readonly property real trackHeight: sliderGeometry.trackHeight
   readonly property real trackRadius: Math.min(Style.iRadiusL, trackHeight / 2)
-  readonly property real cutoutExtra: Math.round((Style.baseWidgetSize * 0.1 * Style.uiScaleRatio) / 2) * 2
+  readonly property real cutoutExtra: sliderGeometry.cutoutExtra
 
   padding: cutoutExtra / 2
 
@@ -48,9 +49,9 @@ Slider {
 
       ShapePath {
         id: bgPath
-        strokeColor: Qt.alpha(Color.mOutline, 0.5)
+        strokeColor: Qt.alpha(Color.mOutline, Style.sliderStyle.trackOpacity)
         strokeWidth: Style.borderS
-        fillColor: Qt.alpha(Color.mSurface, 0.5)
+        fillColor: Qt.alpha(Color.mSurface, Style.sliderStyle.trackOpacity)
 
         readonly property real w: bgContainer.width
         readonly property real h: bgContainer.height
@@ -110,7 +111,7 @@ Slider {
       y2: 0
       GradientStop {
         position: 0.0
-        color: Qt.darker(effectiveFillColor, 1.2)
+        color: Qt.darker(effectiveFillColor, Style.sliderStyle.gradientDarkening)
       }
       GradientStop {
         position: 1.0

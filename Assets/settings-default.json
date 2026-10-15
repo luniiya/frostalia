@@ -130,6 +130,7 @@
     "smoothScrollEnabled": true
   },
   "ui": {
+    "style": "caelestia",
     "fontDefault": "",
     "fontFixed": "",
     "fontDefaultScale": 1,

@@ -746,6 +746,9 @@
     }
   },
   "options": {
+    "ui-style": {
+      "caelestia": "Caelestia"
+    },
     "bar": {
       "density-comfortable": "Comfortable",
       "density-compact": "Compact",
@@ -1766,6 +1769,8 @@
       "warning-color-label": "Warning color"
     },
     "user-interface": {
+      "ui-style-label": "UI style",
+      "ui-style-description": "Choose the look of interface controls, shapes, and typography.",
       "allow-panels-without-bar-description": "When enabled, panels can open on any screen. When disabled, panels will only open on screens that have a bar, which can reduce memory usage.",
       "allow-panels-without-bar-label": "Allow panels on screens without a bar",
       "animation-disable-description": "Disable all animations for a faster, more responsive experience.",
