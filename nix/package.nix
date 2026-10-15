@@ -46,6 +46,7 @@ let
       path: type:
       !(builtins.any (prefix: lib.path.hasPrefix (../. + prefix) (/. + path)) [
         /Tools/settings/target
+        /Tools/theming/target
         /.github
         /.gitignore
         /Assets/Screenshots
@@ -69,6 +70,14 @@ let
     cargoRoot = "Tools/settings";
     buildAndTestSubdir = "Tools/settings";
     cargoLock.lockFile = ../Tools/settings/Cargo.lock;
+  };
+
+  themingHelper = rustPlatform.buildRustPackage {
+    pname = "frostalia-theming";
+    inherit version src;
+    cargoRoot = "Tools/theming";
+    buildAndTestSubdir = "Tools/theming";
+    cargoLock.lockFile = ../Tools/theming/Cargo.lock;
   };
 
   giTypelibPath = lib.makeSearchPath "lib/girepository-1.0" [
@@ -98,6 +107,7 @@ stdenvNoCC.mkDerivation {
     cp -r . $out/share/frostalia
     ln -s ${quickshell}/bin/qs $out/bin/frostalia
     install -m 755 ${settingsHelper}/bin/frostalia-settings $out/bin/frostalia-settings
+    install -m 755 ${themingHelper}/bin/frostalia-theming $out/bin/frostalia-theming
   '';
 
   preFixup = ''
@@ -106,6 +116,7 @@ stdenvNoCC.mkDerivation {
       --prefix XDG_DATA_DIRS : ${wayland-scanner}/share
       --set-default QS_CONFIG_PATH "$out/share/frostalia"
       --set FROSTALIA_SETTINGS_HELPER "$out/bin/frostalia-settings"
+      --set FROSTALIA_THEMING_HELPER "$out/bin/frostalia-theming"
       ${lib.optionalString calendarSupport "--prefix GI_TYPELIB_PATH : ${giTypelibPath}"}
     )
   '';

@@ -12,3 +12,4 @@ build
 .envrc
 
 /Tools/settings/target/
+/Tools/theming/target/

@@ -38,22 +38,24 @@ if [ -e /etc/xdg/quickshell/frostalia ]; then
 fi
 
 # Build before changing the installation, so a failed build leaves it intact.
-HELPER_DIR="$REPO_DIR/Tools/settings"
-HELPER_BIN="$HELPER_DIR/target/release/frostalia-settings"
-NEEDS_BUILD=0
-if [ ! -x "$HELPER_BIN" ]; then
-  NEEDS_BUILD=1
-elif find "$HELPER_DIR/src" "$HELPER_DIR/Cargo.toml" "$HELPER_DIR/Cargo.lock" -type f -newer "$HELPER_BIN" -print -quit | grep -q .; then
-  NEEDS_BUILD=1
-fi
-if [ "$NEEDS_BUILD" -eq 1 ]; then
-  if ! command -v cargo >/dev/null 2>&1; then
-    echo "Rust and Cargo are required to build Frostalia's TOML settings helper. Install your distribution's rust/cargo packages or use 'nix develop'." >&2
-    exit 1
+for helper in settings theming; do
+  HELPER_DIR="$REPO_DIR/Tools/$helper"
+  HELPER_BIN="$HELPER_DIR/target/release/frostalia-$helper"
+  NEEDS_BUILD=0
+  if [ ! -x "$HELPER_BIN" ]; then
+    NEEDS_BUILD=1
+  elif find "$HELPER_DIR/src" "$HELPER_DIR/Cargo.toml" "$HELPER_DIR/Cargo.lock" -type f -newer "$HELPER_BIN" -print -quit | grep -q .; then
+    NEEDS_BUILD=1
   fi
-  echo "Building Frostalia's TOML settings helper..."
-  CARGO_TARGET_DIR="$HELPER_DIR/target" cargo build --release --locked --manifest-path "$HELPER_DIR/Cargo.toml"
-fi
+  if [ "$NEEDS_BUILD" -eq 1 ]; then
+    if ! command -v cargo >/dev/null 2>&1; then
+      echo "Rust and Cargo are required to build Frostalia's helpers. Install your distribution's rust/cargo packages or use 'nix develop'." >&2
+      exit 1
+    fi
+    echo "Building Frostalia's $helper helper..."
+    CARGO_TARGET_DIR="$HELPER_DIR/target" cargo build --release --locked --manifest-path "$HELPER_DIR/Cargo.toml"
+  fi
+done
 
 mkdir -p "$(dirname "$TARGET")"
 
@@ -72,9 +74,11 @@ if [ ! -e "$TARGET" ]; then
     echo "Linked $TARGET -> $REPO_DIR"
   else
     mkdir -p "$TARGET"
-    tar -C "$REPO_DIR" --exclude=.git --exclude=./Tools/settings/target -cf - . | tar -C "$TARGET" -xf -
-    mkdir -p "$TARGET/Tools/settings/target/release"
-    install -m 755 "$HELPER_BIN" "$TARGET/Tools/settings/target/release/frostalia-settings"
+    tar -C "$REPO_DIR" --exclude=.git --exclude=./Tools/settings/target --exclude=./Tools/theming/target -cf - . | tar -C "$TARGET" -xf -
+    for helper in settings theming; do
+      mkdir -p "$TARGET/Tools/$helper/target/release"
+      install -m 755 "$REPO_DIR/Tools/$helper/target/release/frostalia-$helper" "$TARGET/Tools/$helper/target/release/frostalia-$helper"
+    done
     echo "Copied $REPO_DIR -> $TARGET"
   fi
 fi

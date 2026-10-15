@@ -1,18 +1,23 @@
 #!/usr/bin/env -S bash
 set -euo pipefail
 
-# Test runner - Rust settings helper, QML unit tests, and Python repo checks.
+# Test runner - Rust helpers, QML unit tests, and Python repo checks.
 # Usage: Scripts/dev/run-tests.sh [extra qmltestrunner args, e.g. -functions or a test name]
 
 cd "$(dirname "${BASH_SOURCE[0]}")/../.."
 
 if ! command -v cargo >/dev/null 2>&1; then
-    echo "Cargo is required for the Rust TOML settings helper tests (install rust/cargo or use nix develop)." >&2
+    echo "Cargo is required for the Rust helper tests (install rust/cargo or use nix develop)." >&2
     exit 1
 fi
 
 echo "==> Rust settings helper tests"
 cargo test --locked --manifest-path Tools/settings/Cargo.toml
+
+echo "==> Rust theming helper tests"
+CARGO_TARGET_DIR="$PWD/Tools/theming/target" cargo test --locked --manifest-path Tools/theming/Cargo.toml
+CARGO_TARGET_DIR="$PWD/Tools/theming/target" cargo build --locked --manifest-path Tools/theming/Cargo.toml
+export FROSTALIA_THEMING_HELPER="$PWD/Tools/theming/target/debug/frostalia-theming"
 
 RUNNER=""
 for path in "/usr/lib64/qt6/bin/qmltestrunner" "/usr/lib/qt6/bin/qmltestrunner"; do

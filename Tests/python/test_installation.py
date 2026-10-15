@@ -19,21 +19,27 @@ class InstallationTests(unittest.TestCase):
         self.checkout = self.root / "checkout"
         self.checkout.mkdir()
         shutil.copy2(REPO / "install.sh", self.checkout / "install.sh")
-        self.tools = self.checkout / "Tools/settings"
-        (self.tools / "src").mkdir(parents=True)
-        (self.tools / "Cargo.toml").write_text("manifest")
-        (self.tools / "Cargo.lock").write_text("lock")
-        (self.tools / "src/main.rs").write_text("source")
-        self.helper = self.tools / "target/release/frostalia-settings"
+        self.crates = {}
+        self.helpers = {}
+        for name in ("settings", "theming"):
+            tools = self.checkout / "Tools" / name
+            (tools / "src").mkdir(parents=True)
+            (tools / "Cargo.toml").write_text("manifest")
+            (tools / "Cargo.lock").write_text("lock")
+            (tools / "src/main.rs").write_text("source")
+            self.crates[name] = tools
+            self.helpers[name] = tools / f"target/release/frostalia-{name}"
         self.bin = self.root / "bin"
         self.bin.mkdir()
         self.executable("qs", "#!/bin/sh\nexit 0\n")
         self.executable("cargo", '''#!/bin/sh
 printf '%s\\n' "$*" >> "$BUILD_LOG"
 [ "${FAIL_BUILD:-0}" = 0 ] || exit 9
+name="$(basename "$(dirname "$CARGO_TARGET_DIR")")"
+[ "${FAIL_HELPER:-}" != "$name" ] || exit 9
 mkdir -p "$CARGO_TARGET_DIR/release"
-printf '#!/bin/sh\\nexit 0\\n' > "$CARGO_TARGET_DIR/release/frostalia-settings"
-chmod +x "$CARGO_TARGET_DIR/release/frostalia-settings"
+printf '#!/bin/sh\\nexit 0\\n' > "$CARGO_TARGET_DIR/release/frostalia-$name"
+chmod +x "$CARGO_TARGET_DIR/release/frostalia-$name"
 ''')
         self.config = self.root / "config"
         self.target = self.config / "quickshell/frostalia"
@@ -52,9 +58,12 @@ chmod +x "$CARGO_TARGET_DIR/release/frostalia-settings"
     def test_first_install_builds_before_linking(self):
         result = self.run_install()
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertTrue(self.helper.is_file())
+        for helper in self.helpers.values():
+            self.assertTrue(helper.is_file())
         self.assertEqual(self.target.resolve(), self.checkout)
-        self.assertIn("build --release --locked --manifest-path", (self.root / "build.log").read_text())
+        log = (self.root / "build.log").read_text()
+        for name in self.crates:
+            self.assertIn(f"build --release --locked --manifest-path {self.crates[name]}/Cargo.toml", log)
 
     def test_current_helper_does_not_rebuild(self):
         self.assertEqual(self.run_install().returncode, 0)
@@ -62,13 +71,20 @@ chmod +x "$CARGO_TARGET_DIR/release/frostalia-settings"
         self.assertEqual(self.run_install().returncode, 0)
         self.assertFalse((self.root / "build.log").exists())
 
-    def test_changed_source_rebuilds(self):
+    def test_changed_source_rebuilds_only_changed_helper(self):
         self.assertEqual(self.run_install().returncode, 0)
-        (self.root / "build.log").unlink()
-        newer = self.helper.stat().st_mtime + 10
-        os.utime(self.tools / "src/main.rs", (newer, newer))
-        self.assertEqual(self.run_install().returncode, 0)
-        self.assertTrue((self.root / "build.log").exists())
+        for name, helper in self.helpers.items():
+            with self.subTest(helper=name):
+                (self.root / "build.log").unlink()
+                source = self.crates[name] / "src/main.rs"
+                newer = helper.stat().st_mtime + 10
+                os.utime(source, (newer, newer))
+                self.assertEqual(self.run_install().returncode, 0)
+                log = (self.root / "build.log").read_text().splitlines()
+                self.assertEqual(len(log), 1)
+                self.assertIn(str(self.crates[name] / "Cargo.toml"), log[0])
+                # The fake build completes immediately, so reset the future timestamp.
+                os.utime(source, (0, 0))
 
     def test_failed_build_preserves_existing_installation(self):
         self.target.mkdir(parents=True)
@@ -80,16 +96,29 @@ chmod +x "$CARGO_TARGET_DIR/release/frostalia-settings"
         self.assertEqual(marker.read_text(), "keep")
         self.assertEqual(list(self.target.parent.glob("frostalia.bak-*")), [])
 
-    def test_copy_includes_helper_without_git_or_cargo_cache(self):
+    def test_failed_theming_build_preserves_existing_installation(self):
+        self.target.mkdir(parents=True)
+        marker = self.target / "keep.txt"
+        marker.write_text("keep")
+        self.env["FAIL_HELPER"] = "theming"
+        result = self.run_install()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertTrue(self.helpers["settings"].exists())
+        self.assertEqual(marker.read_text(), "keep")
+        self.assertEqual(list(self.target.parent.glob("frostalia.bak-*")), [])
+
+    def test_copy_includes_helpers_without_git_or_cargo_caches(self):
         self.assertEqual(self.run_install().returncode, 0)
         (self.checkout / ".git").mkdir()
         (self.checkout / ".git/config").write_text("private")
-        (self.tools / "target/release/cache").write_text("cache")
+        for tools in self.crates.values():
+            (tools / "target/release/cache").write_text("cache")
         result = self.run_install("--copy")
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertFalse(self.target.is_symlink())
-        self.assertTrue((self.target / "Tools/settings/target/release/frostalia-settings").is_file())
-        self.assertFalse((self.target / "Tools/settings/target/release/cache").exists())
+        for name in self.crates:
+            self.assertTrue((self.target / f"Tools/{name}/target/release/frostalia-{name}").is_file())
+            self.assertFalse((self.target / f"Tools/{name}/target/release/cache").exists())
         self.assertFalse((self.target / ".git").exists())
 
 

@@ -13,7 +13,7 @@ Scripts/dev/run-tests.sh          # Rust helper tests + QML unit tests + Python 
 Scripts/dev/run-tests.sh -silent  # quieter; this is what the pre-commit hook runs
 ```
 
-- **Rust settings helper tests** live in `Tools/settings/` and run with `cargo test --locked --manifest-path Tools/settings/Cargo.toml`.
+- **Rust helper tests** live in `Tools/settings/` and `Tools/theming/`. Run `cargo test --locked --manifest-path Tools/<helper>/Cargo.toml` for either crate. The test runner builds the native theming executable and sets `FROSTALIA_THEMING_HELPER` for Python integration tests.
 - **QML/JS unit tests** live in `Tests/tst_*.qml` and run headless with Qt Quick Test (`qmltestrunner`). Each file is a `TestCase` with `test_*` functions; use `_data()` functions for table-driven cases.
 - **Repository consistency tests** live in `Tests/python/` (stdlib `unittest`): translation keys used in QML exist in `en.json`, the settings search index is up to date, settings options match the UI.
 - **Make logic testable.** QML files that import `qs.*` singletons or Quickshell types can't be loaded by `qmltestrunner`. Put non-trivial logic (geometry, parsing, state decisions) in a `.pragma library` JS file under `Helpers/` (see `Helpers/NotchGeometry.js`), call it from QML, and test the JS directly.

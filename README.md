@@ -29,8 +29,8 @@ The shell config is `frostalia`, user data lives in `~/.config/frostalia`, cache
 
 - A Wayland compositor. Hyprland is my daily setup. Niri, Sway, Scroll, Labwc and MangoWC integrations are inherited and may need work.
 - [noctalia-qs](https://github.com/noctalia-dev/noctalia-qs), the Quickshell build used by this shell. Its dependency name stays unchanged.
-- Rust and Cargo to build the TOML settings helper during installation. Nix builds and supplies it automatically. The shell itself remains QML and JavaScript.
-- Python 3 for theming scripts.
+- Rust and Cargo to build the settings and theming helpers during installation. Nix builds and supplies them automatically. The shell itself remains QML and JavaScript.
+- Python 3 for theme generation and template rendering, plus optional calendar integration. Rust handles wallpaper pixel extraction, color quantization and palette generation.
 - Feature-specific tools such as `brightnessctl`, `ddcutil`, `wl-clipboard`, `cliphist`, `wlsunset` and ImageMagick. The Nix package supplies its runtime dependencies; see [nix/package.nix](nix/package.nix).
 
 ## Install
@@ -41,7 +41,7 @@ cd frostalia
 ./install.sh
 ```
 
-The installer builds the Rust settings helper before changing your installation, then symlinks `~/.config/quickshell/frostalia` to your checkout and starts or restarts Frostalia in a Wayland session. Existing files at that install path are backed up. Use `--copy` for a standalone copy or `--no-restart` to install without restarting.
+The installer builds both Rust helpers before changing your installation, then symlinks `~/.config/quickshell/frostalia` to your checkout and starts or restarts Frostalia in a Wayland session. Existing files at that install path are backed up. Use `--copy` for a standalone copy or `--no-restart` to install without restarting.
 
 Add this to your Hyprland config to launch on login:
 
@@ -91,6 +91,7 @@ The settings window updates TOML through the Rust helper, preserving comments. I
 | `FROSTALIA_CACHE_DIR` | Cache directory |
 | `FROSTALIA_SETTINGS_FILE` | Explicit TOML settings file |
 | `FROSTALIA_SETTINGS_HELPER` | Path to the Rust settings helper |
+| `FROSTALIA_THEMING_HELPER` | Path to the Rust image and color helper |
 | `FROSTALIA_DEBUG=1` | Debug logging |
 
 The defaults respect `XDG_CONFIG_HOME` and `XDG_CACHE_HOME`.
@@ -121,7 +122,7 @@ Scripts/dev/run-tests.sh             # Rust helper tests, headless QML tests and
 python3 Scripts/dev/build-settings-search-index.py
 ```
 
-Tests require Rust/Cargo, Qt 6's `qmltestrunner` (on Arch, `qt6-declarative`) and Python 3. Pure JS helpers live in `Helpers/`; QML tests live in `Tests/`, and repository checks in `Tests/python/`. The Rust settings helper and its unit tests live in `Tools/settings/`. See [CLAUDE.md](CLAUDE.md) for conventions and the settings checklist.
+Tests require Rust/Cargo, Qt 6's `qmltestrunner` (on Arch, `qt6-declarative`) and Python 3. Pure JS helpers live in `Helpers/`; QML tests live in `Tests/`, and repository checks in `Tests/python/`. Rust helpers and their unit tests live in `Tools/settings/` and `Tools/theming/`. See [CLAUDE.md](CLAUDE.md) for conventions and the settings checklist.
 
 ## Credits and license
 
