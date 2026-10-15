@@ -6,6 +6,7 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Widgets
+import "../../../Helpers/SessionMenuLayout.js" as SessionMenuLayout
 import qs.Commons
 import qs.Modules.MainScreen
 import qs.Services.Compositor
@@ -16,7 +17,7 @@ SmartPanel {
   id: root
 
   readonly property bool largeButtonsStyle: Settings.data.sessionMenu.largeButtonsStyle || false
-  readonly property bool largeButtonsLayout: Settings.data.sessionMenu.largeButtonsLayout || "grid"
+  readonly property var tileGeometry: SessionMenuLayout.geometry(powerOptions.length, Settings.data.sessionMenu.largeButtonsLayout, screen?.width || width || 1920, Style.uiScaleRatio)
 
   // Large buttons style is fullscreen — disable blur behind it
   blurEnabled: !largeButtonsStyle
@@ -299,62 +300,8 @@ SmartPanel {
     }
   }
 
-  function getGridInfo() {
-    let columns, rows;
-    if (Settings.data.sessionMenu.largeButtonsLayout === "single-row") {
-      columns = powerOptions.length;
-      rows = 1;
-    } else {
-      columns = Math.min(3, Math.ceil(Math.sqrt(powerOptions.length)));
-      rows = Math.ceil(powerOptions.length / columns);
-    }
-
-    return {
-      columns,
-      rows,
-      currentRow: selectedIndex >= 0 ? Math.floor(selectedIndex / columns) : -1,
-      currentCol: selectedIndex >= 0 ? selectedIndex % columns : -1,
-      itemsInRow: row => Math.min(columns, powerOptions.length - row * columns)
-    };
-  }
-
-  // Unified navigation function
   function navigateGrid(direction) {
-    if (powerOptions.length === 0)
-      return;
-
-    const grid = getGridInfo();
-    // If no selection, start at first item
-    let newRow = grid.currentRow >= 0 ? grid.currentRow : 0;
-    let newCol = grid.currentCol >= 0 ? grid.currentCol : 0;
-
-    switch (direction) {
-    case "left":
-      newCol = newCol - 1 < 0 ? grid.itemsInRow(newRow) - 1 : newCol - 1;
-      break;
-    case "right":
-      // We already moved to newCol to 0 if grid.currentCol was negative
-      newCol = grid.currentCol < 0 ? newRow : newCol + 1 >= grid.itemsInRow(newRow) ? 0 : newCol + 1;
-      break;
-    case "up":
-      newRow = newRow - 1 < 0 ? grid.rows - 1 : newRow - 1;
-      break;
-    case "down":
-      // We already moved to newRow to 0 if grid.currentRow was negative
-      newRow = grid.currentRow < 0 ? newRow : newRow + 1 >= grid.rows ? 0 : newRow + 1;
-      break;
-    }
-
-    // For vertical movement, clamp column if row has fewer items
-    if (direction === "up" || direction === "down") {
-      const itemsInNewRow = grid.itemsInRow(newRow);
-      newCol = Math.min(newCol, itemsInNewRow - 1);
-    }
-
-    const newIndex = newRow * grid.columns + newCol;
-    if (newIndex < powerOptions.length) {
-      selectedIndex = newIndex;
-    }
+    selectedIndex = SessionMenuLayout.navigate(powerOptions.length, tileGeometry.columns, selectedIndex, direction);
   }
 
   function activate() {
@@ -573,67 +520,145 @@ SmartPanel {
       }
     }
 
-    // Timer text for large buttons style, positioned absolutely with background
+    // One surface keeps the fullscreen menu readable over busy desktops.
     Rectangle {
-      id: timerTextContainer
-      visible: largeButtonsStyle && timerActive
-      anchors.bottom: largeButtonsContainer.top
-      anchors.horizontalCenter: largeButtonsContainer.horizontalCenter
-      anchors.bottomMargin: Style.marginM
-      width: timerText.width + Style.margin2XL
-      height: timerText.height + Style.margin2L
-      radius: Style.radiusM
-      color: Color.mSurfaceVariant
-      border.color: Color.mOutline
-      border.width: Style.borderS
-      z: 1000
-
-      NText {
-        id: timerText
-        anchors.centerIn: parent
-        text: I18n.tr("session-menu.action-in-seconds", {
-                        "action": root.actionMetadata[pendingAction] ? root.actionMetadata[pendingAction].title : "",
-                        "seconds": Math.ceil(timeRemaining / 1000)
-                      })
-        font.weight: Style.fontWeightBold
-        pointSize: Style.fontSizeL
-        color: Color.mOnSurfaceVariant
-      }
-    }
-
-    // Large buttons style layout container
-    ColumnLayout {
       id: largeButtonsContainer
       visible: largeButtonsStyle
       anchors.centerIn: parent
+      width: root.tileGeometry.width
+      height: Math.min(largeContent.implicitHeight + root.tileGeometry.padding * 2, panelContent.height - Style.margin2L)
+      radius: Style.radiusL
+      color: Color.mSurface
+      border.color: Color.mOutline
+      border.width: Style.borderS
 
-      // Large buttons style layout (grid)
-      GridLayout {
-        id: largeButtonsGrid
-        Layout.alignment: Qt.AlignHCenter
-        columns: Settings.data.sessionMenu.largeButtonsLayout === "single-row" ? powerOptions.length : Math.min(3, Math.ceil(Math.sqrt(powerOptions.length)))
-        rowSpacing: Style.marginXL
-        columnSpacing: Style.marginXL
-        width: columns * 200 * Style.uiScaleRatio + (columns - 1) * Style.marginXL
-        height: Math.ceil(powerOptions.length / columns) * 200 * Style.uiScaleRatio + (Math.ceil(powerOptions.length / columns) - 1) * Style.marginXL
+      // Absorb clicks inside the card, including gaps between actions.
+      MouseArea {
+        anchors.fill: parent
+        acceptedButtons: Qt.AllButtons
+      }
 
-        Repeater {
-          model: powerOptions
-          delegate: LargeButton {
-            Layout.preferredWidth: Math.round(200 * Style.uiScaleRatio)
-            Layout.preferredHeight: Math.round(200 * Style.uiScaleRatio)
-            icon: modelData.icon
-            title: modelData.title
-            isShutdown: modelData.isShutdown || false
-            isSelected: index === selectedIndex
-            number: index + 1
-            buttonIndex: index
-            onClicked: {
-              selectedIndex = index;
-              startTimer(modelData.action);
+      ColumnLayout {
+        id: largeContent
+        anchors.fill: parent
+        anchors.margins: root.tileGeometry.padding
+        spacing: Style.marginL
+
+        RowLayout {
+          Layout.fillWidth: true
+          spacing: Style.marginM
+
+          NIcon {
+            icon: "shutdown"
+            pointSize: Style.fontSizeXXL
+            color: Color.mPrimary
+          }
+
+          ColumnLayout {
+            Layout.fillWidth: true
+            spacing: Style.marginXS
+            NText {
+              Layout.fillWidth: true
+              text: I18n.tr("session-menu.title")
+              pointSize: Style.fontSizeXL
+              font.weight: Style.fontWeightBold
             }
-            pending: timerActive && pendingAction === modelData.action
-            keybind: modelData.keybind || ""
+            NText {
+              Layout.fillWidth: true
+              text: I18n.tr("session-menu.choose-action")
+              color: Color.mOnSurfaceVariant
+              pointSize: Style.fontSizeS
+              wrapMode: Text.WordWrap
+            }
+          }
+
+          NIconButton {
+            icon: "close"
+            tooltipText: I18n.tr("common.close")
+            baseSize: Style.baseWidgetSize * 0.8
+            onClicked: root.close()
+          }
+        }
+
+        NDivider {
+          Layout.fillWidth: true
+        }
+
+        Flickable {
+          id: actionScroll
+          Layout.fillWidth: true
+          Layout.fillHeight: true
+          Layout.preferredHeight: largeButtonsGrid.implicitHeight
+          Layout.minimumHeight: 0
+          contentHeight: largeButtonsGrid.implicitHeight
+          clip: true
+          boundsBehavior: Flickable.StopAtBounds
+          ScrollBar.vertical: ScrollBar {}
+
+          function revealSelection() {
+            if (root.selectedIndex < 0)
+              return;
+            const top = Math.floor(root.selectedIndex / root.tileGeometry.columns) * (root.tileGeometry.tileHeight + root.tileGeometry.gap);
+            contentY = Math.max(0, Math.min(top, Math.max(contentY, top + root.tileGeometry.tileHeight - height)));
+          }
+          Connections {
+            target: root
+            function onSelectedIndexChanged() {
+              actionScroll.revealSelection();
+            }
+          }
+
+          GridLayout {
+            id: largeButtonsGrid
+            width: parent.width
+            columns: root.tileGeometry.columns
+            rowSpacing: root.tileGeometry.gap
+            columnSpacing: root.tileGeometry.gap
+
+            Repeater {
+              model: powerOptions
+              delegate: LargeButton {
+                Layout.fillWidth: true
+                Layout.preferredWidth: root.tileGeometry.tileWidth
+                Layout.preferredHeight: root.tileGeometry.tileHeight
+                icon: modelData.icon
+                title: modelData.title
+                isShutdown: modelData.isShutdown || false
+                isSelected: index === selectedIndex
+                buttonIndex: index
+                onClicked: {
+                  selectedIndex = index;
+                  startTimer(modelData.action);
+                }
+                pending: timerActive && pendingAction === modelData.action
+                keybind: modelData.keybind || ""
+              }
+            }
+          }
+        }
+
+        NDivider {
+          Layout.fillWidth: true
+        }
+
+        RowLayout {
+          Layout.fillWidth: true
+          spacing: Style.marginM
+          NText {
+            Layout.fillWidth: true
+            text: timerActive ? I18n.tr("session-menu.action-in-seconds", {
+                                          "action": root.actionMetadata[pendingAction] ? root.actionMetadata[pendingAction].title : "",
+                                          "seconds": Math.ceil(timeRemaining / 1000)
+                                        }) : I18n.tr("session-menu.dismiss-hint")
+            color: timerActive ? Color.mPrimary : Color.mOnSurfaceVariant
+            pointSize: Style.fontSizeS
+            wrapMode: Text.WordWrap
+          }
+          NButton {
+            visible: timerActive
+            text: I18n.tr("common.cancel")
+            outlined: true
+            onClicked: cancelTimer()
           }
         }
       }
@@ -937,38 +962,22 @@ SmartPanel {
 
     // Effective hover state that respects ignoreMouseHover
     readonly property bool effectiveHover: !root.ignoreMouseHover && mouseArea.containsMouse
-    readonly property real hoveredScale: 1.05
 
     signal clicked
 
-    property real hoverScale: (isSelected || effectiveHover) ? hoveredScale : 1.0
-
-    radius: Style.radiusL
+    radius: Style.radiusM
     color: {
       if (pending) {
-        return Qt.alpha(Color.mPrimary, 1.0);
+        return Qt.alpha(Color.mPrimary, 0.18);
       }
       if (isSelected || effectiveHover) {
-        return Qt.alpha(Color.mPrimary, 1.0);
+        return Qt.alpha(Color.mPrimary, 0.18);
       }
-      return Color.mSurface;
+      return Color.mSurfaceVariant;
     }
 
     border.width: Style.borderS
-    border.color: Color.mOutline
-
-    // Always enable layer to fix nvidia bug, render at 2x size to avoid blur when scaling up
-    layer.enabled: true
-    layer.smooth: true
-    layer.textureSize: Qt.size(Math.ceil(width * 2), Math.ceil(height * 2))
-
-    // Scale transform for hover effect
-    transform: Scale {
-      origin.x: largeButtonRoot.width / 2
-      origin.y: largeButtonRoot.height / 2
-      xScale: hoverScale
-      yScale: hoverScale
-    }
+    border.color: (pending || isSelected || effectiveHover) ? (isShutdown ? Color.mError : Color.mPrimary) : Qt.alpha(Color.mOutline, 0.5)
 
     Behavior on color {
       ColorAnimation {
@@ -977,60 +986,31 @@ SmartPanel {
       }
     }
 
-    Behavior on border.width {
-      NumberAnimation {
-        duration: Style.animationFast
-        easing.type: Easing.OutCirc
-      }
-    }
-
-    Behavior on hoverScale {
-      NumberAnimation {
-        duration: Style.animationNormal
-        easing.type: Easing.OutBack
-        easing.overshoot: 0.5
-      }
-    }
-
     ColumnLayout {
-      anchors.centerIn: parent
-      anchors.margins: Style.marginL
+      anchors.fill: parent
+      anchors.margins: Style.marginM
+      anchors.topMargin: Style.marginL
       spacing: Style.marginM
 
-      // Large icon with scale animation
+      // Keep the icon steady while the surface responds to focus.
       NIcon {
         id: iconElement
         Layout.alignment: Qt.AlignHCenter
         icon: largeButtonRoot.icon
         color: {
           if (largeButtonRoot.pending)
-            return Color.mOnPrimary;
-          if (largeButtonRoot.isShutdown && !largeButtonRoot.isSelected && !largeButtonRoot.effectiveHover)
+            return largeButtonRoot.isShutdown ? Color.mError : Color.mPrimary;
+          if (largeButtonRoot.isShutdown)
             return Color.mError;
           if (largeButtonRoot.isSelected || largeButtonRoot.effectiveHover)
-            return Color.mOnPrimary;
+            return Color.mPrimary;
           return Color.mOnSurface;
         }
-        pointSize: Style.fontSizeXXXL * 2.25
-        width: 90 * Style.uiScaleRatio
-        height: 90 * Style.uiScaleRatio
+        pointSize: Style.fontSizeXXXL * 1.25
+        width: 48 * Style.uiScaleRatio
+        height: 48 * Style.uiScaleRatio
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
-
-        readonly property real hoveredIconScale: 1.15
-        property real iconScale: (largeButtonRoot.isSelected || largeButtonRoot.effectiveHover) ? hoveredIconScale : 1.0
-
-        // Always enable layer to fix nvidia bug, render at 2x size to avoid blur when scaling up
-        layer.enabled: true
-        layer.smooth: true
-        layer.textureSize: Qt.size(Math.ceil(width * 2), Math.ceil(height * 2))
-
-        transform: Scale {
-          origin.x: iconElement.width / 2
-          origin.y: iconElement.height / 2
-          xScale: iconElement.iconScale
-          yScale: iconElement.iconScale
-        }
 
         Behavior on color {
           ColorAnimation {
@@ -1038,29 +1018,25 @@ SmartPanel {
             easing.type: Easing.OutCirc
           }
         }
-
-        Behavior on iconScale {
-          NumberAnimation {
-            duration: Style.animationNormal
-            easing.type: Easing.OutBack
-            easing.overshoot: 0.6
-          }
-        }
       }
 
       // Title text
       NText {
         Layout.alignment: Qt.AlignHCenter
+        Layout.fillWidth: true
+        horizontalAlignment: Text.AlignHCenter
+        wrapMode: Text.WordWrap
+        maximumLineCount: 2
         text: largeButtonRoot.title
         font.weight: Style.fontWeightMedium
-        pointSize: Style.fontSizeL
+        pointSize: Style.fontSizeM
         color: {
           if (largeButtonRoot.pending)
-            return Color.mOnPrimary;
-          if (largeButtonRoot.isShutdown && !largeButtonRoot.isSelected && !largeButtonRoot.effectiveHover)
+            return largeButtonRoot.isShutdown ? Color.mError : Color.mPrimary;
+          if (largeButtonRoot.isShutdown)
             return Color.mError;
           if (largeButtonRoot.isSelected || largeButtonRoot.effectiveHover)
-            return Color.mOnPrimary;
+            return Color.mPrimary;
           return Color.mOnSurface;
         }
 
@@ -1081,9 +1057,9 @@ SmartPanel {
       width: largeNumberText.implicitWidth + Style.margin2M
       height: largeNumberText.implicitHeight + Style.margin2XS
       radius: Math.min(Style.radiusM, height / 2)
-      color: (largeButtonRoot.isSelected || largeButtonRoot.effectiveHover) ? Color.mOnPrimary : Qt.alpha(Color.mSurfaceVariant, 0.7)
+      color: (largeButtonRoot.isSelected || largeButtonRoot.effectiveHover) ? Color.mPrimary : Qt.alpha(Color.mSurfaceVariant, 0.7)
       border.width: Style.borderS
-      border.color: (largeButtonRoot.isSelected || largeButtonRoot.effectiveHover) ? Color.mOnPrimary : Color.mOutline
+      border.color: (largeButtonRoot.isSelected || largeButtonRoot.effectiveHover) ? Color.mPrimary : Color.mOutline
       visible: Settings.data.sessionMenu.showKeybinds && (largeButtonRoot.keybind !== "") && !largeButtonRoot.pending
       z: 10
 
@@ -1094,7 +1070,7 @@ SmartPanel {
         pointSize: Style.fontSizeS
         color: {
           if (largeButtonRoot.isSelected || largeButtonRoot.effectiveHover)
-            return Color.mPrimary;
+            return Color.mOnPrimary;
           return Color.mOnSurfaceVariant;
         }
 

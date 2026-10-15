@@ -1981,7 +1981,9 @@
   "session-menu": {
     "action-in-seconds": "{action} in {seconds} seconds...",
     "cancel-timer": "Cancel timer",
-    "title": "Session Menu"
+    "title": "Session Menu",
+    "choose-action": "What would you like to do?",
+    "dismiss-hint": "Use your navigation keys to select, or close to go back."
   },
   "setup": {
     "all-done": "All Done!",

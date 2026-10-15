@@ -355,34 +355,39 @@
         "keybind": "1"
       },
       {
-        "action": "suspend",
+        "action": "shutdown",
         "enabled": true,
         "keybind": "2"
       },
       {
-        "action": "hibernate",
+        "action": "reboot",
         "enabled": true,
         "keybind": "3"
       },
       {
-        "action": "reboot",
+        "action": "rebootToUefi",
         "enabled": true,
         "keybind": "4"
       },
       {
+        "action": "suspend",
+        "enabled": false,
+        "keybind": ""
+      },
+      {
+        "action": "hibernate",
+        "enabled": false,
+        "keybind": ""
+      },
+      {
         "action": "logout",
-        "enabled": true,
-        "keybind": "5"
+        "enabled": false,
+        "keybind": ""
       },
       {
-        "action": "shutdown",
-        "enabled": true,
-        "keybind": "6"
-      },
-      {
-        "action": "rebootToUefi",
-        "enabled": true,
-        "keybind": "7"
+        "action": "userspaceReboot",
+        "enabled": false,
+        "keybind": ""
       }
     ]
   },

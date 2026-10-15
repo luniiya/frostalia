@@ -22,13 +22,13 @@ ColumnLayout {
     {
       "id": "suspend",
       "text": I18n.tr("common.suspend"),
-      "enabled": true,
+      "enabled": false,
       "required": false
     },
     {
       "id": "hibernate",
       "text": I18n.tr("common.hibernate"),
-      "enabled": true,
+      "enabled": false,
       "required": false
     },
     {
@@ -52,7 +52,7 @@ ColumnLayout {
     {
       "id": "logout",
       "text": I18n.tr("common.logout"),
-      "enabled": true,
+      "enabled": false,
       "required": false
     },
     {

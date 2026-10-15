@@ -92,6 +92,22 @@ class SettingsDefaultsTests(unittest.TestCase):
                 mismatched.append(f"{path}: qml={value!r} json={actual!r}")
         self.assertEqual(mismatched, [])
 
+    def test_session_menu_default_actions(self):
+        options = lookup(self.defaults, "sessionMenu.powerOptions")
+        enabled = [option for option in options if option["enabled"]]
+        self.assertEqual([option["action"] for option in enabled],
+                         ["lock", "shutdown", "reboot", "rebootToUefi"])
+        self.assertEqual([option["keybind"] for option in enabled], ["1", "2", "3", "4"])
+        self.assertTrue(all(option["keybind"] == "" for option in options if not option["enabled"]))
+        self.assertEqual(len({option["action"] for option in options}), 8)
+        text = SETTINGS_QML.read_text(encoding="utf-8")
+        literal = re.search(r"property list<var> powerOptions: (\[[\s\S]*?\n      \])", text)
+        self.assertIsNotNone(literal)
+        self.assertEqual(json.loads(literal.group(1)), options)
+        ui = (ROOT / "Modules/Panels/Settings/Tabs/SessionMenu/SessionMenuTab.qml").read_text(encoding="utf-8")
+        ui_defaults = dict(re.findall(r'"id": "([^"\n]+)",\s*"text": [^\n]+\n\s*"enabled": (true|false)', ui))
+        self.assertEqual(ui_defaults, {option["action"]: str(option["enabled"]).lower() for option in options})
+
     def test_screen_corners_black_by_default(self):
         self.assertIs(lookup(self.defaults, "general.forceBlackScreenCorners"), True)
         self.assertIn(("general.forceBlackScreenCorners", "bool", True), self.qml)
