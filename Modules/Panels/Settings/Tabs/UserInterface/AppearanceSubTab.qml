@@ -2,12 +2,39 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import qs.Commons
+import qs.Services.System
 import qs.Widgets
 
 ColumnLayout {
   id: root
   spacing: Style.marginL
   Layout.fillWidth: true
+
+  NSearchableComboBox {
+    label: I18n.tr("panels.general.fonts-default-label")
+    description: I18n.tr("panels.general.fonts-default-description")
+    model: FontService.availableFonts
+    currentKey: Settings.data.ui.fontDefault
+    placeholder: I18n.tr("panels.general.fonts-default-placeholder")
+    searchPlaceholder: I18n.tr("panels.general.fonts-default-search-placeholder")
+    popupHeight: 420
+    defaultValue: Settings.getDefaultValue("ui.fontDefault")
+    settingsPath: "ui.fontDefault"
+    onSelected: key => Settings.data.ui.fontDefault = key
+  }
+
+  NSearchableComboBox {
+    label: I18n.tr("panels.general.fonts-monospace-label")
+    description: I18n.tr("panels.general.fonts-monospace-description")
+    model: FontService.monospaceFonts
+    currentKey: Settings.data.ui.fontFixed
+    placeholder: I18n.tr("panels.general.fonts-monospace-placeholder")
+    searchPlaceholder: I18n.tr("panels.general.fonts-monospace-search-placeholder")
+    popupHeight: 320
+    defaultValue: Settings.getDefaultValue("ui.fontFixed")
+    settingsPath: "ui.fontFixed"
+    onSelected: key => Settings.data.ui.fontFixed = key
+  }
 
   NToggle {
     label: I18n.tr("panels.user-interface.tooltips-label")
@@ -196,24 +223,6 @@ ColumnLayout {
         Settings.data.general.shadowOffsetY = opt.p.y;
       }
     }
-  }
-
-  NDivider {
-    Layout.fillWidth: true
-  }
-
-  NValueSlider {
-    Layout.fillWidth: true
-    label: I18n.tr("panels.user-interface.scaling-label")
-    description: I18n.tr("panels.user-interface.scaling-description")
-    from: 0.8
-    to: 1.2
-    stepSize: 0.05
-    showReset: true
-    value: Settings.data.general.scaleRatio
-    defaultValue: Settings.getDefaultValue("general.scaleRatio")
-    onMoved: value => Settings.data.general.scaleRatio = value
-    text: Math.floor(Settings.data.general.scaleRatio * 100) + "%"
   }
 
   NDivider {

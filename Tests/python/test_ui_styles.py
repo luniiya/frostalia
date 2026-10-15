@@ -31,8 +31,53 @@ class UiStyleTests(unittest.TestCase):
         tab = (ROOT / "Modules/Panels/Settings/Tabs/UserInterface/UserInterfaceTab.qml").read_text()
         self.assertLess(tab.index('label: I18n.tr("panels.user-interface.ui-style-label")'), tab.index("NTabBar {"))
         self.assertIn('defaultValue: Settings.getDefaultValue("ui.style")', tab)
-        self.assertIn("Settings.data.ui.style = key", tab)
+        self.assertIn("Settings.setUiStyle(key)", tab)
         self.assertIn("Style.uiStyleChoices", tab)
+
+    def test_style_defaults_match_the_reference_defaults(self):
+        source = (ROOT / "Helpers/UiStyleSettings.js").read_text()
+        appearance = json.loads(re.search(r"var defaults = (\{.*?\n\});", source, re.S).group(1))
+        reference = json.loads((ROOT / "Assets/settings-default.json").read_text())
+        for section, fields in appearance.items():
+            for key, value in fields.items():
+                with self.subTest(path=f"{section}.{key}"):
+                    self.assertEqual(value, reference[section][key])
+        self.assertNotIn("scaleRatio", appearance["general"])
+        self.assertNotIn("fontDefaultScale", appearance["ui"])
+        self.assertNotIn("fontFixedScale", appearance["ui"])
+        # Every control in the UI subtabs must persist with its style.
+        tabs = ROOT / "Modules/Panels/Settings/Tabs/UserInterface"
+        for name in ("AppearanceSubTab.qml", "PanelsSubTab.qml"):
+            for section, key in re.findall(r"Settings.data.(general|ui).(\w+)", (tabs / name).read_text()):
+                self.assertIn(key, appearance[section], f"{name}: {section}.{key}")
+
+    def test_screen_corners_are_host_settings_in_general(self):
+        source = (ROOT / "Helpers/UiStyleSettings.js").read_text()
+        for key in ("showScreenCorners", "forceBlackScreenCorners", "screenRadiusRatio"):
+            self.assertNotIn(f'"{key}"', source)
+        index = json.loads((ROOT / "Assets/settings-search-index.json").read_text())
+        corners = [entry for entry in index if entry["labelKey"].startswith("panels.general.screen-corners-")]
+        self.assertEqual(len(corners), 3)
+        for entry in corners:
+            self.assertEqual(entry["tabLabel"], "common.general")
+            self.assertEqual(entry["subTab"], 2)
+        self.assertFalse((ROOT / "Modules/Panels/Settings/Tabs/UserInterface/ScreenCornersSubTab.qml").exists())
+
+    def test_font_selectors_import_their_service(self):
+        tab = (ROOT / "Modules/Panels/Settings/Tabs/UserInterface/AppearanceSubTab.qml").read_text()
+        self.assertIn("import qs.Services.System", tab)
+        self.assertIn("FontService.availableFonts", tab)
+        self.assertIn("FontService.monospaceFonts", tab)
+        service = (ROOT / "Services/System/FontService.qml").read_text()
+        self.assertIn("for (const family of UiStyles.fontFamilies())", service)
+
+    def test_font_families_are_in_ui_and_scales_remain_general(self):
+        index = json.loads((ROOT / "Assets/settings-search-index.json").read_text())
+        for field in ("default", "monospace"):
+            family = next(entry for entry in index if entry["labelKey"] == f"panels.general.fonts-{field}-label")
+            scale = next(entry for entry in index if entry["labelKey"] == f"panels.general.fonts-{field}-scale-label")
+            self.assertEqual(family["tabLabel"], "panels.user-interface.title")
+            self.assertEqual(scale["tabLabel"], "common.general")
 
     def test_style_selector_is_searchable(self):
         index = json.loads((ROOT / "Assets/settings-search-index.json").read_text())

@@ -27,12 +27,12 @@ Rectangle {
   Layout.fillHeight: true
   implicitWidth: contentLayout.implicitWidth + Style.margin2M
 
-  topLeftRadius: isFirst ? Style.iRadiusM : Style.iRadiusXXXS
-  bottomLeftRadius: isFirst ? Style.iRadiusM : Style.iRadiusXXXS
-  topRightRadius: isLast ? Style.iRadiusM : Style.iRadiusXXXS
-  bottomRightRadius: isLast ? Style.iRadiusM : Style.iRadiusXXXS
+  topLeftRadius: Style.materialControls ? Style.iRadiusL : (isFirst ? Style.iRadiusM : Style.iRadiusXXXS)
+  bottomLeftRadius: Style.materialControls ? Style.iRadiusL : (isFirst ? Style.iRadiusM : Style.iRadiusXXXS)
+  topRightRadius: Style.materialControls ? Style.iRadiusL : (isLast ? Style.iRadiusM : Style.iRadiusXXXS)
+  bottomRightRadius: Style.materialControls ? Style.iRadiusL : (isLast ? Style.iRadiusM : Style.iRadiusXXXS)
 
-  color: root.isHovered ? Color.mHover : (root.checked ? Color.mPrimary : Color.smartAlpha(Color.mSurface))
+  color: root.isHovered && !Style.materialControls ? Color.mHover : (root.checked ? Color.mPrimary : Color.smartAlpha(Color.mSurface))
   border.color: root.checked ? Color.mPrimary : Color.mOutline
   border.width: Style.borderS
 
@@ -42,6 +42,13 @@ Rectangle {
       duration: Style.animationFast
       easing.type: Easing.OutCubic
     }
+  }
+
+  NMaterialStateLayer {
+    radius: Style.iRadiusL
+    hovered: root.isHovered
+    pressed: tabMouse.pressed
+    tint: root.checked ? Color.mOnPrimary : Color.mPrimary
   }
 
   // Content
@@ -56,7 +63,7 @@ Rectangle {
       Layout.alignment: Qt.AlignVCenter
       icon: root.icon
       pointSize: root.pointSize * 1.2
-      color: root.isHovered ? Color.mOnHover : (root.checked ? Color.mOnPrimary : Color.mOnSurface)
+      color: root.isHovered && !Style.materialControls ? Color.mOnHover : (root.checked ? Color.mOnPrimary : Color.mOnSurface)
 
       Behavior on color {
         enabled: !Color.isTransitioning
@@ -74,7 +81,7 @@ Rectangle {
       text: root.text
       pointSize: root.pointSize
       font.weight: Style.fontWeightSemiBold
-      color: root.isHovered ? Color.mOnHover : (root.checked ? Color.mOnPrimary : Color.mOnSurface)
+      color: root.isHovered && !Style.materialControls ? Color.mOnHover : (root.checked ? Color.mOnPrimary : Color.mOnSurface)
       horizontalAlignment: Text.AlignHCenter
       verticalAlignment: Text.AlignVCenter
 
@@ -100,6 +107,7 @@ Rectangle {
   }
 
   MouseArea {
+    id: tabMouse
     anchors.fill: parent
     hoverEnabled: true
     cursorShape: Qt.PointingHandCursor

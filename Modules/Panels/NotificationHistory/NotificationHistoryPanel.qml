@@ -699,12 +699,12 @@ SmartPanel {
 
                     Rectangle {
                       anchors.fill: parent
-                      radius: Style.radiusM
+                      radius: Style.materialControls ? Math.round(24 * Style.uiScaleRatio) : Style.radiusM
                       color: Color.mSurfaceVariant
                       border.color: {
                         if (notificationDelegate.isFocused)
                           return Color.mPrimary;
-                        if (Settings.data.ui.boxBorderEnabled)
+                        if (!Style.materialControls && Settings.data.ui.boxBorderEnabled)
                           return Qt.alpha(Style.boxBorderColor, Style.boxBorderColor.a * Style.opacityHeavy);
                         return "transparent";
                       }
@@ -852,7 +852,7 @@ SmartPanel {
                           anchors.verticalCenter: notificationDelegate.isExpanded ? undefined : parent.verticalCenter
                           width: notificationDelegate.iconSize
                           height: notificationDelegate.iconSize
-                          radius: Math.min(Style.radiusL, width / 2)
+                          radius: Style.materialControls ? width / 2 : Math.min(Style.radiusL, width / 2)
                           imagePath: model.cachedImage || model.originalImage || ""
                           borderColor: "transparent"
                           borderWidth: 0
@@ -891,7 +891,7 @@ SmartPanel {
                               text: model.appName || "Unknown App"
                               pointSize: Style.fontSizeXS
                               font.weight: Style.fontWeightBold
-                              color: Color.mSecondary
+                              color: Style.materialControls ? Color.mPrimary : Color.mSecondary
                             }
 
                             NText {

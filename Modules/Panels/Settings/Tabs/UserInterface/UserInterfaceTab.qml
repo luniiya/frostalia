@@ -7,6 +7,7 @@ import qs.Widgets
 ColumnLayout {
   id: root
   spacing: 0
+  enabled: !Settings.uiStyleSwitching
 
   NComboBox {
     Layout.fillWidth: true
@@ -19,7 +20,7 @@ ColumnLayout {
     }))
     currentKey: Style.uiStyleId
     defaultValue: Settings.getDefaultValue("ui.style")
-    onSelected: key => Settings.data.ui.style = key
+    onSelected: key => Settings.setUiStyle(key)
   }
 
   NTabBar {
@@ -39,11 +40,6 @@ ColumnLayout {
       tabIndex: 1
       checked: subTabBar.currentIndex === 1
     }
-    NTabButton {
-      text: I18n.tr("common.screen-corners")
-      tabIndex: 2
-      checked: subTabBar.currentIndex === 2
-    }
   }
 
   Item {
@@ -57,6 +53,5 @@ ColumnLayout {
 
     AppearanceSubTab {}
     PanelsSubTab {}
-    ScreenCornersSubTab {}
   }
 }

@@ -16,6 +16,8 @@ RowLayout {
   property var defaultValue: undefined
   property string settingsPath: ""
 
+  readonly property var geometry: Style.getToggleGeometry(baseSize, checked, toggleMouse.pressed)
+
   signal toggled(bool checked)
   signal entered
   signal exited
@@ -45,12 +47,12 @@ RowLayout {
     opacity: enabled ? 1.0 : 0.6
     Layout.alignment: Qt.AlignVCenter
     Layout.margins: Style.borderS
-    implicitWidth: Math.round(root.baseSize * Style.toggleStyle.widthRatio) * 2
-    implicitHeight: Math.round(root.baseSize * Style.toggleStyle.heightRatio) * 2
+    implicitWidth: root.geometry.width
+    implicitHeight: root.geometry.height
     radius: Math.min(Style.iRadiusL, height / 2)
-    color: root.checked ? Color.mPrimary : Color.mSurface
-    border.color: Color.mOutline
-    border.width: Style.borderS
+    color: root.checked ? Color.mPrimary : (Style.materialControls ? Color.mSurfaceVariant : Color.mSurface)
+    border.color: Style.materialControls && root.checked ? Color.mPrimary : Color.mOutline
+    border.width: Style.materialControls ? Style.toggleStyle.border * root.baseSize / 26 : Style.borderS
 
     Behavior on color {
       ColorAnimation {
@@ -65,15 +67,38 @@ RowLayout {
     }
 
     Rectangle {
-      implicitWidth: Math.round(root.baseSize * Style.toggleStyle.handleRatio) * 2
-      implicitHeight: Math.round(root.baseSize * Style.toggleStyle.handleRatio) * 2
+      implicitWidth: root.geometry.handle
+      implicitHeight: root.geometry.handle
       radius: Math.min(Style.iRadiusL, height / 2)
-      color: root.checked ? Color.mOnPrimary : Color.mPrimary
+      color: root.checked ? Color.mOnPrimary : (Style.materialControls ? Color.mOutline : Color.mPrimary)
       border.color: root.checked ? Color.mSurface : Color.mSurface
-      border.width: Style.borderM
+      border.width: Style.materialControls ? 0 : Style.borderM
       anchors.verticalCenter: parent.verticalCenter
       anchors.verticalCenterOffset: 0
-      x: root.checked ? switcher.width - width - Style.toggleStyle.handleInset : Style.toggleStyle.handleInset
+      x: root.geometry.x
+
+      NIcon {
+        anchors.centerIn: parent
+        visible: Style.materialControls && root.checked
+        icon: "check"
+        pointSize: parent.width * 0.55 / Style.uiScaleRatio
+        color: Color.mPrimary
+      }
+
+      Behavior on implicitWidth {
+        enabled: Style.materialControls
+        NumberAnimation {
+          duration: Style.animationFast
+          easing.type: Easing.OutCubic
+        }
+      }
+      Behavior on implicitHeight {
+        enabled: Style.materialControls
+        NumberAnimation {
+          duration: Style.animationFast
+          easing.type: Easing.OutCubic
+        }
+      }
 
       Behavior on x {
         NumberAnimation {
@@ -84,6 +109,7 @@ RowLayout {
     }
 
     MouseArea {
+      id: toggleMouse
       enabled: root.enabled
       anchors.fill: parent
       cursorShape: Qt.PointingHandCursor

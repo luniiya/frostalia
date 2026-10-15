@@ -11,16 +11,38 @@ import qs.Services.Power
 Singleton {
   id: root
 
+  // Register the preset fonts before shared widgets resolve their families.
+  property FontLoader caelestiaFont: FontLoader {
+    source: Qt.resolvedUrl("../Assets/Fonts/rubik/Rubik.ttf")
+  }
+  property FontLoader materialFont: FontLoader {
+    source: Qt.resolvedUrl("../Assets/Fonts/roboto/Roboto.ttf")
+  }
+
   readonly property string uiStyleId: UiStyles.resolveId(Settings.data.ui.style)
   readonly property var uiStyleChoices: UiStyles.choices()
   readonly property var uiStyleTokens: UiStyles.tokens(uiStyleId)
+  readonly property bool materialControls: uiStyleTokens.controls.renderer === "material"
   readonly property var sliderStyle: uiStyleTokens.slider
   readonly property var toggleStyle: uiStyleTokens.toggle
   readonly property string fontDefault: UiStyles.fontFamily(uiStyleId, Settings.data.ui.fontDefault, false, Qt.application.font.family)
   readonly property string fontFixed: UiStyles.fontFamily(uiStyleId, Settings.data.ui.fontFixed, true, Qt.application.font.family)
 
+  function surfaceUrl(surface) {
+    const path = UiStyles.view(uiStyleId, surface);
+    return path ? Quickshell.shellDir + "/" + path : "";
+  }
+
   function getSliderGeometry(heightRatio) {
     return UiStyles.sliderGeometry(uiStyleId, baseWidgetSize, heightRatio, uiScaleRatio);
+  }
+
+  function getToggleGeometry(baseSize, checked, pressed) {
+    return UiStyles.toggleGeometry(uiStyleId, baseSize, checked, pressed);
+  }
+
+  function splitSliderTrack(width, hitWidth, position, gap, mirrored) {
+    return UiStyles.splitSliderTrack(width, hitWidth, position, gap, mirrored);
   }
 
   // Font size

@@ -11,6 +11,8 @@ type Result<T> = std::result::Result<T, Box<dyn Error>>;
 
 #[derive(Deserialize)]
 pub struct Request {
+    #[serde(default)]
+    pub ui_profiles: Option<UiProfiles>,
     pub settings: Value,
     pub baseline: Option<Value>,
 }
@@ -183,7 +185,7 @@ fn write_document(path: &Path, document: &DocumentMut) -> Result<()> {
     Ok(())
 }
 
-pub fn load(path: &Path, seeds: &[PathBuf], request: Request) -> Result<Response> {
+fn load_document(path: &Path, seeds: &[PathBuf], request: Request) -> Result<Response> {
     validate_request(&request)?;
     let path = config_path(path)?;
     let mut settings = request.settings;
@@ -220,7 +222,7 @@ pub fn load(path: &Path, seeds: &[PathBuf], request: Request) -> Result<Response
     Ok(Response { settings, fresh })
 }
 
-pub fn save(path: &Path, request: Request) -> Result<Response> {
+fn save_document(path: &Path, request: Request) -> Result<Response> {
     validate_request(&request)?;
     let path = config_path(path)?;
     let mut document = if path.exists() {
@@ -242,3 +244,6 @@ pub fn save(path: &Path, request: Request) -> Result<Response> {
         fresh: false,
     })
 }
+
+mod ui_profiles;
+pub use ui_profiles::{UiProfiles, load, save};

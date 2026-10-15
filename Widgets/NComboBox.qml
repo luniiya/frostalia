@@ -195,9 +195,9 @@ RowLayout {
     background: Rectangle {
       implicitWidth: Math.round(Style.baseWidgetSize * 3.75 * Style.uiScaleRatio)
       implicitHeight: Math.round(root.preferredHeight * Style.uiScaleRatio)
-      color: Color.mSurface
-      border.color: combo.activeFocus ? Color.mSecondary : Color.mOutline
-      border.width: Style.borderS
+      color: Style.materialControls ? Color.mSurfaceVariant : Color.mSurface
+      border.color: combo.activeFocus ? (Style.materialControls ? Color.mPrimary : Color.mSecondary) : Color.mOutline
+      border.width: Style.materialControls && combo.activeFocus ? Style.borderM : Style.borderS
       radius: Style.iRadiusM
 
       Behavior on border.color {

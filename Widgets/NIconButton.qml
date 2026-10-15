@@ -19,8 +19,8 @@ Item {
 
   property color colorBg: Color.smartAlpha(Color.mSurfaceVariant)
   property color colorFg: Color.mPrimary
-  property color colorBgHover: Color.mHover
-  property color colorFgHover: Color.mOnHover
+  property color colorBgHover: Style.materialControls ? colorBg : Color.mHover
+  property color colorFgHover: Style.materialControls ? colorFg : Color.mOnHover
   property color colorBorder: Color.mOutline
   property color colorBorderHover: Color.mOutline
   property real customRadius: -1 // -1 means use default (iRadiusL), otherwise use this value
@@ -57,7 +57,7 @@ Item {
     color: root.enabled && root.hovering ? colorBgHover : colorBg
     radius: Math.min((customRadius >= 0 ? customRadius : Style.iRadiusL), width / 2)
     border.color: root.enabled && root.hovering ? colorBorderHover : colorBorder
-    border.width: Style.borderS
+    border.width: Style.materialControls ? 0 : Style.borderS
 
     Behavior on color {
       enabled: !Color.isTransitioning
@@ -65,6 +65,12 @@ Item {
         duration: Style.animationFast
         easing.type: Easing.InOutQuad
       }
+    }
+
+    NMaterialStateLayer {
+      hovered: root.hovering
+      pressed: iconMouse.pressed && root.enabled
+      tint: root.colorFg
     }
 
     NIcon {
@@ -88,6 +94,7 @@ Item {
 
   // MouseArea fills root (extends beyond visual button for bar click area)
   MouseArea {
+    id: iconMouse
     // Always enabled to allow hover/tooltip even when the button is disabled
     enabled: true
     anchors.fill: parent

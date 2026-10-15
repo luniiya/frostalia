@@ -5,6 +5,7 @@ import Quickshell
 import Quickshell.Services.Notifications
 import Quickshell.Wayland
 import Quickshell.Widgets
+import "../../Helpers/NotificationMotion.js" as NotificationMotion
 import qs.Commons
 import qs.Services.System
 import qs.Widgets
@@ -69,16 +70,19 @@ Variants {
 
       color: "transparent"
 
-      // Make shadow area click-through, only notification content is clickable
-      mask: Region {
+      // Only the transformed card surfaces accept input. The larger Material
+      // canvas remains click-through, including gaps between notifications.
+      mask: notifWindow.material ? materialInputMask : legacyInputMask
+      property Region materialInputMask: Region {
+        regions: notificationRepeater.inputRegions
+      }
+      property Region legacyInputMask: Region {
         x: 0
         y: 0
         width: notifWindow.width
         height: notifWindow.height
         intersection: Intersection.Xor
-
         Region {
-          // The clickable content area is inset by shadowPadding from all edges
           x: notifWindow.shadowPadding
           y: notifWindow.shadowPadding
           width: notifWindow.notifWidth
@@ -102,9 +106,12 @@ Variants {
       readonly property bool isFramed: Settings.data.bar.barType === "framed"
       readonly property real frameThickness: Settings.data.bar.frameThickness ?? 8
 
+      readonly property bool material: Style.materialControls
       readonly property bool isCompact: Settings.data.notifications.density === "compact"
       readonly property int notifWidth: Math.round((isCompact ? 320 : 440) * Style.uiScaleRatio)
-      readonly property int shadowPadding: Style.shadowBlurMax + Style.marginL
+      readonly property int baseShadowPadding: Style.shadowBlurMax + Style.marginL
+      readonly property int motionPadding: material ? Math.round(160 * Style.uiScaleRatio) : 0
+      readonly property int shadowPadding: baseShadowPadding + motionPadding
 
       // Calculate bar and frame offsets for each edge separately
       readonly property int barOffsetTop: {
@@ -211,6 +218,18 @@ Variants {
         Repeater {
           id: notificationRepeater
           model: notificationModel
+          property var inputRegions: []
+          function updateInputRegions() {
+            const regions = [];
+            for (let i = 0; i < count; i++) {
+              const card = itemAt(i);
+              if (card)
+                regions.push(card.inputRegion);
+            }
+            inputRegions = regions;
+          }
+          onItemAdded: Qt.callLater(updateInputRegions)
+          onItemRemoved: Qt.callLater(updateInputRegions)
 
           delegate: Item {
             id: card
@@ -220,11 +239,11 @@ Variants {
             property bool isHovered: false
             property bool isRemoving: false
 
-            readonly property int animationDelay: index * 100
+            readonly property int animationDelay: index * (notifWindow.material ? 45 : 100)
             readonly property int slideDistance: 300
 
             Layout.preferredWidth: notifWidth + notifWindow.shadowPadding * 2
-            Layout.preferredHeight: (notifWindow.isCompact ? compactContent.implicitHeight : notificationContent.implicitHeight) + Style.margin2M + notifWindow.shadowPadding * 2
+            Layout.preferredHeight: notificationContentLoader.implicitHeight + (notifWindow.material ? 2 * Style.marginL : 0) + notifWindow.shadowPadding * 2
             Layout.maximumHeight: Layout.preferredHeight
 
             // Animation properties
@@ -233,6 +252,32 @@ Variants {
             property real slideOffset: 0
             property real swipeOffset: 0
             property real swipeOffsetY: 0
+            property real rawDragX: 0
+            property real rawDragY: 0
+            property real velocityX: 0
+            property real velocityY: 0
+            property real sampleTime: 0
+            property real springTime: 0
+            readonly property real dragLimit: Math.max(8, notifWindow.motionPadding)
+            readonly property real edgeLimit: Math.max(2, Style.marginS)
+            function dragBound(delta, horizontal) {
+              const towardEdge = horizontal ? (delta > 0 ? notifWindow.isRight : notifWindow.isLeft) : (delta > 0 ? notifWindow.isBottom : notifWindow.isTop);
+              return towardEdge ? edgeLimit : dragLimit;
+            }
+            // Explicit dependencies keep the Wayland input mask aligned while
+            // drag and entry animations transform the visual card.
+            readonly property point inputOrigin: {
+              const origin = card.parent.mapToItem(null, card.x, card.y);
+              const point = NotificationMotion.inputOrigin(origin.x, origin.y, card.width, card.height, displayedCard.x, displayedCard.y, card.scale, card.swipeOffset, card.slideOffset + card.swipeOffsetY);
+              return Qt.point(point.x, point.y);
+            }
+            readonly property Region inputRegion: Region {
+              x: Math.floor(card.inputOrigin.x)
+              y: Math.floor(card.inputOrigin.y)
+              width: Math.ceil(displayedCard.width * card.scale)
+              height: Math.ceil(displayedCard.height * card.scale)
+              radius: Math.round(cardBackground.radius * card.scale)
+            }
             property real pressGlobalX: 0
             property real pressGlobalY: 0
             property bool isSwiping: false
@@ -270,6 +315,7 @@ Variants {
 
             // Animation setup
             function triggerEntryAnimation() {
+              reboundTimer.stop();
               animInDelayTimer.stop();
               removalTimer.stop();
               resumeTimer.stop();
@@ -312,6 +358,7 @@ Variants {
             function animateOut() {
               if (isRemoving)
                 return;
+              reboundTimer.stop();
               animInDelayTimer.stop();
               resumeTimer.stop();
               isRemoving = true;
@@ -328,6 +375,7 @@ Variants {
             function dismissBySwipe() {
               if (isRemoving)
                 return;
+              reboundTimer.stop();
               animInDelayTimer.stop();
               resumeTimer.stop();
               isRemoving = true;
@@ -348,6 +396,39 @@ Variants {
               }
             }
 
+            function dismissByMaterialThrow() {
+              if (isRemoving)
+                return;
+              reboundTimer.stop();
+              animInDelayTimer.stop();
+              resumeTimer.stop();
+              isRemoving = true;
+              isSwiping = false;
+              if (!Settings.data.general.animationDisabled) {
+                materialThrowAnimation.start();
+                scaleValue = 0.94;
+                opacityValue = 0;
+              }
+            }
+
+            ParallelAnimation {
+              id: materialThrowAnimation
+              NumberAnimation {
+                target: card
+                property: "swipeOffset"
+                to: Math.sign(card.rawDragX) * card.dragBound(card.rawDragX, true)
+                duration: Style.animationFast
+                easing.type: Easing.OutCubic
+              }
+              NumberAnimation {
+                target: card
+                property: "swipeOffsetY"
+                to: Math.sign(card.rawDragY) * card.dragBound(card.rawDragY, false)
+                duration: Style.animationFast
+                easing.type: Easing.OutCubic
+              }
+            }
+
             function runAction(actionId, isDismissed) {
               if (!isDismissed) {
                 if (NotificationService.invokeActionAndSuppressClose(notificationId, actionId))
@@ -361,7 +442,7 @@ Variants {
 
             Timer {
               id: removalTimer
-              interval: Style.animationSlow
+              interval: Settings.data.general.animationDisabled ? 0 : Style.animationSlow
               repeat: false
               onTriggered: {
                 NotificationService.dismissPopup(notificationId);
@@ -403,7 +484,7 @@ Variants {
             }
 
             Behavior on swipeOffset {
-              enabled: !Settings.data.general.animationDisabled && !card.isSwiping
+              enabled: !notifWindow.material && !Settings.data.general.animationDisabled && !card.isSwiping
               NumberAnimation {
                 duration: Style.animationFast
                 easing.type: Easing.OutCubic
@@ -411,10 +492,47 @@ Variants {
             }
 
             Behavior on swipeOffsetY {
-              enabled: !Settings.data.general.animationDisabled && !card.isSwiping
+              enabled: !notifWindow.material && !Settings.data.general.animationDisabled && !card.isSwiping
               NumberAnimation {
                 duration: Style.animationFast
                 easing.type: Easing.OutCubic
+              }
+            }
+
+            function rebound() {
+              if (Settings.data.general.animationDisabled) {
+                swipeOffset = 0;
+                swipeOffsetY = 0;
+                return;
+              }
+              velocityX *= 0.16;
+              velocityY *= 0.16;
+              springTime = Date.now();
+              reboundTimer.start();
+            }
+
+            Timer {
+              id: reboundTimer
+              interval: 16
+              repeat: true
+              onTriggered: {
+                const now = Date.now();
+                const elapsed = now - card.springTime;
+                card.springTime = now;
+                const x = NotificationMotion.springStep(card.swipeOffset, card.velocityX, elapsed, card.dragLimit, Settings.data.general.animationDisabled, {
+                                                          negative: card.dragBound(-1, true),
+                                                          positive: card.dragBound(1, true)
+                                                        });
+                const y = NotificationMotion.springStep(card.swipeOffsetY, card.velocityY, elapsed, card.dragLimit, Settings.data.general.animationDisabled, {
+                                                          negative: card.dragBound(-1, false),
+                                                          positive: card.dragBound(1, false)
+                                                        });
+                card.swipeOffset = x.position;
+                card.swipeOffsetY = y.position;
+                card.velocityX = x.velocity;
+                card.velocityY = y.velocity;
+                if (x.settled && y.settled)
+                  stop();
               }
             }
 
@@ -444,7 +562,7 @@ Variants {
                 interval: 50
                 repeat: false
                 onTriggered: {
-                  if (!isHovered) {
+                  if (NotificationMotion.shouldResumeTimeout(isHovered, cardDragArea.pressed)) {
                     NotificationService.resumeTimeout(notificationId);
                   }
                 }
@@ -459,6 +577,13 @@ Variants {
                 onPressed: mouse => {
                   if (mouse.button === Qt.LeftButton) {
                     const globalPoint = cardDragArea.mapToGlobal(mouse.x, mouse.y);
+                    reboundTimer.stop();
+                    card.rawDragX = 0;
+                    card.rawDragY = 0;
+                    card.velocityX = 0;
+                    card.velocityY = 0;
+                    card.sampleTime = Date.now();
+                    NotificationService.pauseTimeout(notificationId);
                     card.pressGlobalX = globalPoint.x;
                     card.pressGlobalY = globalPoint.y;
                     card.isSwiping = false;
@@ -471,6 +596,22 @@ Variants {
                   const globalPoint = cardDragArea.mapToGlobal(mouse.x, mouse.y);
                   const rawDeltaX = globalPoint.x - card.pressGlobalX;
                   const rawDeltaY = globalPoint.y - card.pressGlobalY;
+                  if (notifWindow.material) {
+                    const now = Date.now();
+                    card.velocityX = NotificationMotion.sampleVelocity(card.velocityX, rawDeltaX - card.rawDragX, now - card.sampleTime);
+                    card.velocityY = NotificationMotion.sampleVelocity(card.velocityY, rawDeltaY - card.rawDragY, now - card.sampleTime);
+                    card.rawDragX = rawDeltaX;
+                    card.rawDragY = rawDeltaY;
+                    card.sampleTime = now;
+                    if (!card.isSwiping && Math.hypot(rawDeltaX, rawDeltaY) < card.swipeStartThreshold)
+                      return;
+                    card.isSwiping = true;
+                    if (!Settings.data.general.animationDisabled) {
+                      card.swipeOffset = NotificationMotion.dragOffset(rawDeltaX, card.dragBound(rawDeltaX, true));
+                      card.swipeOffsetY = NotificationMotion.dragOffset(rawDeltaY, card.dragBound(rawDeltaY, false));
+                    }
+                    return;
+                  }
                   const deltaX = card.clampSwipeDelta(rawDeltaX);
                   const deltaY = card.clampVerticalSwipeDelta(rawDeltaY);
                   if (!card.isSwiping) {
@@ -505,6 +646,21 @@ Variants {
                     return;
 
                   if (card.isSwiping) {
+                    if (notifWindow.material) {
+                      // A held card is no longer a flick, even if the last move was fast.
+                      const fresh = Date.now() - card.sampleTime <= 120;
+                      if (NotificationMotion.shouldDismiss(card.rawDragX, card.rawDragY, fresh ? card.velocityX : 0, fresh ? card.velocityY : 0, cardBackground.width, cardBackground.height)) {
+                        card.dismissByMaterialThrow();
+                        if (Settings.data.notifications.clearDismissed)
+                          NotificationService.removeFromHistory(notificationId);
+                      } else {
+                        card.rebound();
+                        resumeTimer.restart();
+                      }
+                      card.suppressClick = true;
+                      card.isSwiping = false;
+                      return;
+                    }
                     const dismissDistance = card.useVerticalSwipe ? Math.abs(card.swipeOffsetY) : Math.abs(card.swipeOffset);
                     const threshold = card.useVerticalSwipe ? card.verticalSwipeDismissThreshold : card.swipeDismissThreshold;
                     if (dismissDistance >= threshold) {
@@ -541,6 +697,7 @@ Variants {
                   card.isSwiping = false;
                   card.swipeOffset = 0;
                   card.swipeOffsetY = 0;
+                  resumeTimer.restart();
                 }
               }
 
@@ -548,17 +705,18 @@ Variants {
               Rectangle {
                 id: cardBackground
                 anchors.fill: parent
-                radius: Style.radiusL
+                radius: notifWindow.material ? Math.round(28 * Style.uiScaleRatio) : Style.radiusL
                 border.color: Qt.alpha(Color.mOutline, Color.adaptiveOpacity(Settings.data.notifications.backgroundOpacity) || 1.0)
-                border.width: Style.borderS
-                color: Qt.alpha(Color.mSurface, Color.adaptiveOpacity(Settings.data.notifications.backgroundOpacity) || 1.0)
+                border.width: notifWindow.material ? 0 : Style.borderS
+                color: Qt.alpha(notifWindow.material ? Color.mSurfaceVariant : Color.mSurface, Color.adaptiveOpacity(Settings.data.notifications.backgroundOpacity) || 1.0)
 
                 // Progress bar
                 Rectangle {
                   anchors.top: parent.top
                   anchors.left: parent.left
                   anchors.right: parent.right
-                  height: 2
+                  height: notifWindow.material ? 3 : 2
+                  anchors.topMargin: notifWindow.material ? Style.marginS : 0
                   color: "transparent"
 
                   Rectangle {
@@ -600,207 +758,26 @@ Variants {
                 autoPaddingEnabled: true
               }
 
-              // Content
-              ColumnLayout {
-                id: notificationContent
-                visible: !notifWindow.isCompact
-                anchors.fill: cardBackground
-                anchors.margins: Style.marginM
-                spacing: Style.marginM
-
-                RowLayout {
-                  Layout.fillWidth: true
-                  spacing: Style.marginL
-                  Layout.leftMargin: Style.marginM
-                  Layout.rightMargin: Style.marginM
-                  Layout.topMargin: Style.marginM
-                  Layout.bottomMargin: Style.marginM
-
-                  NImageRounded {
-                    Layout.preferredWidth: Math.round(40 * Style.uiScaleRatio)
-                    Layout.preferredHeight: Math.round(40 * Style.uiScaleRatio)
-                    Layout.alignment: Qt.AlignVCenter
-                    radius: Math.min(Style.radiusL, Layout.preferredWidth / 2)
-                    imagePath: model.originalImage || ""
-                    borderColor: "transparent"
-                    borderWidth: 0
-                    fallbackIcon: "bell"
-                    fallbackIconSize: 24
-                  }
-
-                  ColumnLayout {
-                    Layout.fillWidth: true
-                    spacing: Style.marginS
-
-                    // Header with urgency indicator
-                    RowLayout {
-                      Layout.fillWidth: true
-                      spacing: Style.marginS
-
-                      Rectangle {
-                        Layout.preferredWidth: 6
-                        Layout.preferredHeight: 6
-                        Layout.alignment: Qt.AlignVCenter
-                        radius: Style.radiusXS
-                        color: model.urgency === 2 ? Color.mError : model.urgency === 0 ? Color.mOnSurface : Color.mPrimary
-                      }
-
-                      NText {
-                        text: model.appName || "Unknown App"
-                        pointSize: Style.fontSizeXS
-                        font.weight: Style.fontWeightBold
-                        color: Color.mSecondary
-                      }
-
-                      NText {
-                        textFormat: Text.PlainText
-                        text: " " + Time.formatRelativeTime(model.timestamp)
-                        pointSize: Style.fontSizeXXS
-                        color: Color.mOnSurfaceVariant
-                        Layout.alignment: Qt.AlignBottom
-                      }
-
-                      Item {
-                        Layout.fillWidth: true
-                      }
-                    }
-
-                    NText {
-                      text: model.summary || I18n.tr("common.no-summary")
-                      pointSize: Style.fontSizeM
-                      font.weight: Style.fontWeightMedium
-                      color: Color.mOnSurface
-                      textFormat: Text.StyledText
-                      wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                      maximumLineCount: 3
-                      elide: Text.ElideRight
-                      visible: text.length > 0
-                      Layout.fillWidth: true
-                      Layout.rightMargin: Style.marginM
-                    }
-
-                    NText {
-                      text: model.body || ""
-                      pointSize: Style.fontSizeM
-                      color: Color.mOnSurface
-                      textFormat: Text.StyledText
-                      wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-
-                      maximumLineCount: 5
-                      elide: Text.ElideRight
-                      visible: text.length > 0
-                      Layout.fillWidth: true
-                      Layout.rightMargin: Style.marginXL
-                    }
-
-                    // Actions
-                    Flow {
-                      Layout.fillWidth: true
-                      spacing: Style.marginS
-                      Layout.topMargin: Style.marginM
-                      flow: Flow.LeftToRight
-
-                      property string parentNotificationId: notificationId
-                      property var parsedActions: {
-                        try {
-                          return model.actionsJson ? JSON.parse(model.actionsJson) : [];
-                        } catch (e) {
-                          return [];
-                        }
-                      }
-                      visible: parsedActions.length > 0
-
-                      Repeater {
-                        model: parent.parsedActions
-
-                        delegate: NButton {
-                          property var actionData: modelData
-
-                          text: {
-                            var actionText = actionData.text || "Open";
-                            if (actionText.includes(",")) {
-                              return actionText.split(",")[1] || actionText;
-                            }
-                            return actionText;
-                          }
-                          fontSize: Style.fontSizeS
-                          backgroundColor: Color.mPrimary
-                          textColor: hovered ? Color.mOnHover : Color.mOnPrimary
-                          hoverColor: Color.mHover
-                          outlined: false
-                          implicitHeight: 24
-                          onClicked: {
-                            card.runAction(actionData.identifier, false);
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-
-              // Close button
-              NIconButton {
-                visible: !notifWindow.isCompact
-                icon: "close"
-                tooltipText: I18n.tr("tooltips.dismiss-notification")
-                baseSize: Style.baseWidgetSize * 0.6
-                anchors.top: cardBackground.top
-                anchors.topMargin: Style.marginXL
+              Loader {
+                id: notificationContentLoader
+                source: Style.surfaceUrl("notificationContent")
+                anchors.left: cardBackground.left
                 anchors.right: cardBackground.right
-                anchors.rightMargin: Style.marginXL
-
-                onClicked: {
-                  card.runAction("", true);
+                anchors.top: cardBackground.top
+                anchors.margins: notifWindow.material ? Style.marginL : 0
+                onLoaded: {
+                  item.notificationData = Qt.binding(() => card.notificationData);
+                  item.compact = Qt.binding(() => notifWindow.isCompact);
                 }
               }
 
-              // Compact content
-              RowLayout {
-                id: compactContent
-                visible: notifWindow.isCompact
-                anchors.fill: cardBackground
-                anchors.margins: Style.marginM
-                spacing: Style.marginS
-
-                NImageRounded {
-                  Layout.preferredWidth: Math.round(24 * Style.uiScaleRatio)
-                  Layout.preferredHeight: Math.round(24 * Style.uiScaleRatio)
-                  Layout.alignment: Qt.AlignVCenter
-                  radius: Style.radiusXS
-                  imagePath: model.originalImage || ""
-                  borderColor: "transparent"
-                  borderWidth: 0
-                  fallbackIcon: "bell"
-                  fallbackIconSize: 16
+              Connections {
+                target: notificationContentLoader.item
+                function onActionRequested(identifier) {
+                  card.runAction(identifier, false);
                 }
-
-                ColumnLayout {
-                  Layout.fillWidth: true
-                  spacing: Style.marginXS
-
-                  NText {
-                    text: model.summary || I18n.tr("common.no-summary")
-                    pointSize: Style.fontSizeM
-                    font.weight: Style.fontWeightMedium
-                    color: Color.mOnSurface
-                    textFormat: Text.StyledText
-                    maximumLineCount: 1
-                    elide: Text.ElideRight
-                    Layout.fillWidth: true
-                  }
-
-                  NText {
-                    visible: model.body && model.body.length > 0
-                    Layout.fillWidth: true
-                    text: model.body || ""
-                    pointSize: Style.fontSizeS
-                    color: Color.mOnSurfaceVariant
-                    textFormat: Text.StyledText
-                    wrapMode: Text.Wrap
-                    maximumLineCount: 2
-                    elide: Text.ElideRight
-                  }
+                function onDismissRequested() {
+                  card.runAction("", true);
                 }
               }
             }

@@ -49,6 +49,18 @@ ColumnLayout {
       "text": "Media and System Monitor",
       "enabled": true,
       "required": false
+    },
+    {
+      "id": "notification-card",
+      "text": I18n.tr("common.notifications"),
+      "enabled": true,
+      "required": false
+    },
+    {
+      "id": "calendar-month-card",
+      "text": I18n.tr("common.calendar"),
+      "enabled": true,
+      "required": false
     }
   ]
 

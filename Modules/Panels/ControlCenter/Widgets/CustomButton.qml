@@ -7,6 +7,8 @@ import qs.Widgets
 Item {
   id: root
 
+  readonly property alias actionButton: button
+
   property string widgetId: "CustomButton"
   property var widgetSettings: null
 

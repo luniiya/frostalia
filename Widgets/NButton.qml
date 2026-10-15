@@ -13,14 +13,14 @@ Item {
   property var tooltipText
   property color backgroundColor: Color.mPrimary
   property color textColor: Color.mOnPrimary
-  property color hoverColor: Color.mHover
-  property color textHoverColor: Color.mOnHover
+  property color hoverColor: Style.materialControls ? backgroundColor : Color.mHover
+  property color textHoverColor: Style.materialControls ? (outlined ? backgroundColor : textColor) : Color.mOnHover
   property real fontSize: Style.fontSizeM
   property int fontWeight: Style.fontWeightSemiBold
   property real iconSize: Style.fontSizeL
   property bool outlined: false
   property int horizontalAlignment: Qt.AlignHCenter
-  property real buttonRadius: Style.iRadiusS
+  property real buttonRadius: Style.materialControls ? Style.iRadiusL : Style.iRadiusS
 
   // Signals
   signal clicked
@@ -49,6 +49,14 @@ Item {
   implicitHeight: bg.implicitHeight + 2 * Style.borderS
 
   opacity: enabled ? 1.0 : 0.6
+  scale: Style.materialControls && mouseArea.pressed ? 0.97 : 1
+  Behavior on scale {
+    enabled: Style.materialControls
+    NumberAnimation {
+      duration: Style.animationFast
+      easing.type: Easing.OutCubic
+    }
+  }
 
   Rectangle {
     id: bg
@@ -90,6 +98,12 @@ Item {
         duration: Style.animationFast
         easing.type: Easing.OutCubic
       }
+    }
+
+    NMaterialStateLayer {
+      hovered: root.hovered
+      pressed: mouseArea.pressed
+      tint: root.outlined ? root.backgroundColor : root.textColor
     }
 
     // Content

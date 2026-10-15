@@ -11,6 +11,8 @@ Item {
   required property var widgetScreen
   required property var widgetProps
 
+  readonly property var action: loader.item?.actionButton || loader.item
+
   property string section: widgetProps && widgetProps.section || ""
   property int sectionIndex: widgetProps && widgetProps.sectionWidgetIndex || 0
 

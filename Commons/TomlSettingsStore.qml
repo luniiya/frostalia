@@ -12,6 +12,17 @@ Item {
   required property var adapter
   required property string configFile
   property list<string> seedFiles: []
+  property var uiProfiles: null
+  property bool switchingStyle: false
+  property string requestedStyle: ""
+  property string sentStyle: ""
+  readonly property string profileFile: {
+    if (!uiProfiles || !initialized)
+      return "";
+    const selected = adapter.ui.style;
+    const style = Object.prototype.hasOwnProperty.call(uiProfiles.defaults, selected) ? selected : uiProfiles.default_style;
+    return uiProfiles.directory + "/" + style + ".toml";
+  }
   property string helper: Quickshell.env("FROSTALIA_SETTINGS_HELPER") || (Quickshell.shellDir + "/Tools/settings/target/release/frostalia-settings")
   property bool active: false
   property bool componentReady: false
@@ -47,6 +58,17 @@ Item {
     pump();
   }
 
+  function switchStyle(style) {
+    if (!initialized || switchingStyle || !uiProfiles || !Object.prototype.hasOwnProperty.call(uiProfiles.defaults, style))
+      return false;
+    if (adapter.ui.style === style)
+      return true;
+    switchingStyle = true;
+    requestedStyle = style;
+    save();
+    return true;
+  }
+
   function pump() {
     if (!componentReady || !active || process.running)
       return;
@@ -63,6 +85,12 @@ Item {
         settings: sentSettings,
         baseline: settingsBaseline
       };
+      sentStyle = requestedStyle;
+      requestedStyle = "";
+      if (sentStyle) {
+        input.settings = JSON.parse(JSON.stringify(sentSettings));
+        input.settings.ui.style = sentStyle;
+      }
       process.command = [helper, "save", configFile];
     } else if (loadPending) {
       loadPending = false;
@@ -75,6 +103,8 @@ Item {
     } else {
       return;
     }
+    if (uiProfiles)
+      input.ui_profiles = uiProfiles;
     process.running = true;
   }
 
@@ -118,6 +148,20 @@ Item {
     onFileChanged: reloadTimer.restart()
   }
 
+  FileView {
+    path: root.profileFile
+    printErrors: false
+    watchChanges: true
+    onFileChanged: reloadTimer.restart()
+  }
+
+  FileView {
+    path: root.initialized && root.uiProfiles ? root.uiProfiles.directory + "/" : ""
+    printErrors: false
+    watchChanges: true
+    onFileChanged: reloadTimer.restart()
+  }
+
   Process {
     id: process
     stdinEnabled: true
@@ -130,6 +174,8 @@ Item {
     onStarted: write(JSON.stringify(root.input) + "\n")
     onExited: function (exitCode) {
       if (exitCode !== 0) {
+        root.switchingStyle = false;
+        root.requestedStyle = "";
         root.error = errors.text.trim() || "Settings helper failed (exit " + exitCode + ")";
         root.loadPending = false;
         root.savePending = false;
@@ -152,6 +198,23 @@ Item {
           root.loaded(result.settings, result.fresh);
           if (Object.keys(edits).length > 0)
             root.changed();
+        } else if (root.sentStyle) {
+          // Keep the old style live until both files are committed. In-flight host
+          // edits survive, while the new style loads its own appearance values.
+          const current = root.snapshot();
+          const edits = SettingsObject.changes(root.sentSettings, current);
+          const baseline = SettingsObject.resolve(root.defaults, result.settings);
+          const desired = SettingsObject.resolve(baseline, edits);
+          root.applying = true;
+          SettingsObject.apply(root.adapter, SettingsObject.changes(current, desired));
+          root.settingsBaseline = baseline;
+          root.applying = false;
+          root.sentStyle = "";
+          root.switchingStyle = false;
+          root.saved();
+          root.loaded(result.settings, false);
+          if (Object.keys(edits).length > 0)
+            root.changed();
         } else {
           root.settingsBaseline = root.sentSettings;
           // Read the merged document, including manual edits retained by the helper.
@@ -160,6 +223,7 @@ Item {
         }
       } catch (e) {
         root.applying = false;
+        root.switchingStyle = false;
         root.error = "Could not load settings: " + e;
         root.failed(root.error);
       }

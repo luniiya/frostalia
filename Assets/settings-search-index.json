@@ -1430,7 +1430,8 @@
     "widget": "NTextInputButton",
     "tab": 0,
     "tabLabel": "common.general",
-    "subTab": null
+    "subTab": 0,
+    "subTabLabel": "panels.general.tab-basics"
   },
   {
     "labelKey": "panels.general.external-lock-command-label",
@@ -1438,23 +1439,17 @@
     "widget": "NTextInput",
     "tab": 0,
     "tabLabel": "common.general",
-    "subTab": null
+    "subTab": 0,
+    "subTabLabel": "panels.general.tab-basics"
   },
   {
-    "labelKey": "panels.general.fonts-default-label",
-    "descriptionKey": "panels.general.fonts-default-description",
-    "widget": "NSearchableComboBox",
+    "labelKey": "panels.user-interface.scaling-label",
+    "descriptionKey": "panels.user-interface.scaling-description",
+    "widget": "NValueSlider",
     "tab": 0,
     "tabLabel": "common.general",
-    "subTab": null
-  },
-  {
-    "labelKey": "panels.general.fonts-monospace-label",
-    "descriptionKey": "panels.general.fonts-monospace-description",
-    "widget": "NSearchableComboBox",
-    "tab": 0,
-    "tabLabel": "common.general",
-    "subTab": null
+    "subTab": 0,
+    "subTabLabel": "panels.general.tab-basics"
   },
   {
     "labelKey": "panels.general.fonts-default-scale-label",
@@ -1462,7 +1457,8 @@
     "widget": "NValueSlider",
     "tab": 0,
     "tabLabel": "common.general",
-    "subTab": null
+    "subTab": 0,
+    "subTabLabel": "panels.general.tab-basics"
   },
   {
     "labelKey": "panels.general.fonts-monospace-scale-label",
@@ -1470,7 +1466,8 @@
     "widget": "NValueSlider",
     "tab": 0,
     "tabLabel": "common.general",
-    "subTab": null
+    "subTab": 0,
+    "subTabLabel": "panels.general.tab-basics"
   },
   {
     "labelKey": "panels.general.smooth-scrolling-label",
@@ -1478,7 +1475,8 @@
     "widget": "NToggle",
     "tab": 0,
     "tabLabel": "common.general",
-    "subTab": null
+    "subTab": 0,
+    "subTabLabel": "panels.general.tab-basics"
   },
   {
     "labelKey": "panels.general.keybinds-title",
@@ -1486,7 +1484,35 @@
     "widget": "NLabel",
     "tab": 0,
     "tabLabel": "common.general",
-    "subTab": null
+    "subTab": 1,
+    "subTabLabel": "panels.general.tab-keybinds"
+  },
+  {
+    "labelKey": "panels.general.screen-corners-show-corners-label",
+    "descriptionKey": "panels.general.screen-corners-show-corners-description",
+    "widget": "NToggle",
+    "tab": 0,
+    "tabLabel": "common.general",
+    "subTab": 2,
+    "subTabLabel": "common.screen-corners"
+  },
+  {
+    "labelKey": "panels.general.screen-corners-solid-black-label",
+    "descriptionKey": "panels.general.screen-corners-solid-black-description",
+    "widget": "NToggle",
+    "tab": 0,
+    "tabLabel": "common.general",
+    "subTab": 2,
+    "subTabLabel": "common.screen-corners"
+  },
+  {
+    "labelKey": "panels.general.screen-corners-radius-label",
+    "descriptionKey": "panels.general.screen-corners-radius-description",
+    "widget": "NValueSlider",
+    "tab": 0,
+    "tabLabel": "common.general",
+    "subTab": 2,
+    "subTabLabel": "common.screen-corners"
   },
   {
     "labelKey": "panels.hooks.system-hooks-enable-label",
@@ -2461,6 +2487,24 @@
     "subTabLabel": "common.performance"
   },
   {
+    "labelKey": "panels.general.fonts-default-label",
+    "descriptionKey": "panels.general.fonts-default-description",
+    "widget": "NSearchableComboBox",
+    "tab": 1,
+    "tabLabel": "panels.user-interface.title",
+    "subTab": 0,
+    "subTabLabel": "common.appearance"
+  },
+  {
+    "labelKey": "panels.general.fonts-monospace-label",
+    "descriptionKey": "panels.general.fonts-monospace-description",
+    "widget": "NSearchableComboBox",
+    "tab": 1,
+    "tabLabel": "panels.user-interface.title",
+    "subTab": 0,
+    "subTabLabel": "common.appearance"
+  },
+  {
     "labelKey": "panels.user-interface.tooltips-label",
     "descriptionKey": "panels.user-interface.tooltips-description",
     "widget": "NToggle",
@@ -2575,15 +2619,6 @@
     ]
   },
   {
-    "labelKey": "panels.user-interface.scaling-label",
-    "descriptionKey": "panels.user-interface.scaling-description",
-    "widget": "NValueSlider",
-    "tab": 1,
-    "tabLabel": "panels.user-interface.title",
-    "subTab": 0,
-    "subTabLabel": "common.appearance"
-  },
-  {
     "labelKey": "panels.user-interface.box-border-radius-label",
     "descriptionKey": "panels.user-interface.box-border-radius-description",
     "widget": "NValueSlider",
@@ -2669,33 +2704,6 @@
     "tabLabel": "panels.user-interface.title",
     "subTab": 1,
     "subTabLabel": "common.panels"
-  },
-  {
-    "labelKey": "panels.general.screen-corners-show-corners-label",
-    "descriptionKey": "panels.general.screen-corners-show-corners-description",
-    "widget": "NToggle",
-    "tab": 1,
-    "tabLabel": "panels.user-interface.title",
-    "subTab": 2,
-    "subTabLabel": "common.screen-corners"
-  },
-  {
-    "labelKey": "panels.general.screen-corners-solid-black-label",
-    "descriptionKey": "panels.general.screen-corners-solid-black-description",
-    "widget": "NToggle",
-    "tab": 1,
-    "tabLabel": "panels.user-interface.title",
-    "subTab": 2,
-    "subTabLabel": "common.screen-corners"
-  },
-  {
-    "labelKey": "panels.general.screen-corners-radius-label",
-    "descriptionKey": "panels.general.screen-corners-radius-description",
-    "widget": "NValueSlider",
-    "tab": 1,
-    "tabLabel": "panels.user-interface.title",
-    "subTab": 2,
-    "subTabLabel": "common.screen-corners"
   },
   {
     "labelKey": "panels.user-interface.ui-style-label",

@@ -11,6 +11,7 @@ ColumnLayout {
   property string description: ""
   property string inputIconName: ""
   property bool readOnly: false
+  property bool outlined: true
   property color labelColor: Color.mOnSurface
   property color descriptionColor: Color.mOnSurfaceVariant
   property string fontFamily: Style.fontDefault
@@ -67,9 +68,9 @@ ColumnLayout {
       id: frame
 
       radius: root.radius
-      color: Color.mSurface
-      border.color: input.activeFocus ? Color.mSecondary : Color.mOutline
-      border.width: Style.borderS
+      color: Style.materialControls ? Color.mSurfaceVariant : Color.mSurface
+      border.color: input.activeFocus ? (Style.materialControls ? Color.mPrimary : Color.mSecondary) : Color.mOutline
+      border.width: root.outlined ? (Style.materialControls && input.activeFocus ? Style.borderM : Style.borderS) : 0
 
       Behavior on border.color {
         ColorAnimation {

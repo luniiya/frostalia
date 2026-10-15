@@ -4,6 +4,7 @@ import QtQuick
 import QtQuick.Controls
 import Quickshell
 import Quickshell.Io
+import "../../Helpers/UiStyles.js" as UiStyles
 import qs.Commons
 
 Singleton {
@@ -49,6 +50,8 @@ Singleton {
     // Parse all fonts - split comma-separated family names
     var allLines = allFontsText.split('\n');
     var fontSet = {}; // Deduplicate font families
+    for (const family of UiStyles.fontFamilies())
+      fontSet[family] = true;
 
     for (var j = 0; j < allLines.length; j++) {
       var line = allLines[j].trim();

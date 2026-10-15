@@ -27,7 +27,7 @@ Slider {
   padding: cutoutExtra / 2
 
   snapMode: snapAlways ? Slider.SnapAlways : Slider.SnapOnRelease
-  implicitHeight: Math.max(trackHeight, knobDiameter)
+  implicitHeight: Math.max(trackHeight, Style.materialControls ? sliderGeometry.handleHeight : knobDiameter)
 
   background: Item {
     id: bgContainer
@@ -43,7 +43,7 @@ Slider {
     // Background track
     Shape {
       anchors.fill: parent
-      visible: bgContainer.width > 0 && bgContainer.height > 0
+      visible: !Style.materialControls && bgContainer.width > 0 && bgContainer.height > 0
       preferredRendererType: Shape.CurveRenderer
       asynchronous: true
 
@@ -123,7 +123,7 @@ Slider {
     Shape {
       width: bgContainer.fillWidth
       height: bgContainer.height
-      visible: bgContainer.fillWidth > 0 && bgContainer.height > 0
+      visible: !Style.materialControls && bgContainer.fillWidth > 0 && bgContainer.height > 0
       preferredRendererType: Shape.CurveRenderer
       asynchronous: true
       clip: true
@@ -183,9 +183,41 @@ Slider {
       }
     }
 
+    // Material tracks leave actual empty space around the vertical handle.
+    Item {
+      anchors.fill: parent
+      visible: Style.materialControls
+      readonly property var segments: Style.splitSliderTrack(width, root.knobDiameter, root.visualPosition, root.sliderGeometry.gap || 0, root.mirrored)
+
+      Rectangle {
+        x: parent.segments.activeX
+        width: parent.segments.activeWidth
+        height: parent.height
+        radius: Math.min(root.trackRadius, width / 2)
+        color: root.effectiveFillColor
+      }
+      Rectangle {
+        x: parent.segments.inactiveX
+        width: parent.segments.inactiveWidth
+        height: parent.height
+        radius: Math.min(root.trackRadius, width / 2)
+        color: root.enabled ? Qt.tint(Color.mSurfaceVariant, Qt.alpha(root.fillColor, 0.18)) : Qt.alpha(Color.mOutline, 0.25)
+      }
+      Rectangle {
+        width: 4 * Style.uiScaleRatio
+        height: width
+        radius: width / 2
+        x: (root.mirrored ? parent.segments.start : parent.segments.end) - width / 2
+        anchors.verticalCenter: parent.verticalCenter
+        visible: parent.segments.inactiveWidth > width * 2
+        color: root.enabled ? Color.mOnSurfaceVariant : Color.mOutline
+      }
+    }
+
     // Circular cutout
     Rectangle {
       id: knobCutout
+      visible: !Style.materialControls
       implicitWidth: root.knobDiameter + root.cutoutExtra
       implicitHeight: root.knobDiameter + root.cutoutExtra
       radius: Math.min(Style.iRadiusL, width / 2)
@@ -197,18 +229,26 @@ Slider {
 
   handle: Item {
     implicitWidth: knobDiameter
-    implicitHeight: knobDiameter
-    x: root.leftPadding + root.visualPosition * (root.availableWidth - width)
+    implicitHeight: Style.materialControls ? root.sliderGeometry.handleHeight : knobDiameter
+    x: root.leftPadding + (Style.materialControls ? Style.splitSliderTrack(root.availableWidth, width, root.visualPosition, root.sliderGeometry.gap, root.mirrored).center - width / 2 : root.visualPosition * (root.availableWidth - width))
     anchors.verticalCenter: parent.verticalCenter
 
     Rectangle {
       id: knob
-      implicitWidth: knobDiameter
-      implicitHeight: knobDiameter
+      implicitWidth: Style.materialControls ? (root.pressed ? root.sliderGeometry.pressedHandleWidth : root.sliderGeometry.handleWidth) : knobDiameter
+      implicitHeight: Style.materialControls ? root.sliderGeometry.handleHeight : knobDiameter
       radius: Math.min(Style.iRadiusL, width / 2)
-      color: root.pressed ? Color.mHover : Color.mSurface
+      color: Style.materialControls ? root.effectiveFillColor : (root.pressed ? Color.mHover : Color.mSurface)
       border.color: effectiveFillColor
-      border.width: Style.borderL
+      border.width: Style.materialControls ? 0 : Style.borderL
+
+      Behavior on implicitWidth {
+        enabled: Style.materialControls
+        NumberAnimation {
+          duration: Style.animationFast
+          easing.type: Easing.OutCubic
+        }
+      }
       anchors.centerIn: parent
 
       Behavior on color {

@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
+import "../../../Helpers/SettingsWindowLayout.js" as SettingsWindowLayout
 import qs.Commons
 import qs.Modules.Panels.Settings.Tabs
 import qs.Modules.Panels.Settings.Tabs.About
@@ -62,7 +63,28 @@ Item {
   property real _lastMouseY: 0
   property bool _mouseInitialized: false
 
-  readonly property bool sidebarCardStyle: Settings.data.ui.settingsPanelSideBarCardStyle
+  readonly property bool material: Style.materialControls
+  property bool homeVisible: true
+  SettingsPageTransition {
+    id: pageTransition
+    pageVisible: !root.homeVisible
+    duration: Style.animationNormal
+  }
+
+  function showHome() {
+    homeVisible = true;
+    searchInput.text = "";
+    clearHighlightImmediately();
+  }
+
+  function openTabIndex(index) {
+    if (index < 0 || index >= tabsModel.length)
+      return;
+    homeVisible = false;
+    currentTabIndex = index;
+  }
+  readonly property var materialRail: SettingsWindowLayout.materialRail(sidebarExpanded, Style.uiScaleRatio)
+  readonly property bool sidebarCardStyle: !material && Settings.data.ui.settingsPanelSideBarCardStyle
 
   onSearchResultsChanged: {
     searchSelectedIndex = 0;
@@ -83,6 +105,8 @@ Item {
       }
       return;
     }
+
+    homeVisible = false;
 
     // Auto-expand sidebar when searching
     if (!root.sidebarExpanded) {
@@ -140,6 +164,7 @@ Item {
   property int _pendingSubTab: -1
 
   function navigateToResult(entry) {
+    homeVisible = false;
     if (entry.tab < 0 || entry.tab >= tabsModel.length)
       return;
 
@@ -168,6 +193,7 @@ Item {
 
   // Navigate to a tab and optionally a subtab (simpler than navigateToResult, no highlighting)
   function navigateToTab(tabId, subTabIndex) {
+    homeVisible = false;
     // Find the tab index by tab ID
     let tabIndex = -1;
     for (let i = 0; i < tabsModel.length; i++) {
@@ -651,6 +677,7 @@ Item {
     updateTabsModel();
     _pendingSubTab = savedPendingSubTab;
     selectTabById(requestedTab);
+    homeVisible = false;
     // Skip auto-focus on Nvidia GPUs - cursor blink causes UI choppiness
     const isNvidia = SystemStatService.gpuType === "nvidia";
     if (sidebarExpanded && !isNvidia) {
@@ -692,6 +719,7 @@ Item {
 
   // Scroll functions
   function scrollDown() {
+    const activeScrollView = root.homeVisible ? homePane : root.activeScrollView;
     if (activeScrollView && activeScrollView.ScrollBar.vertical) {
       const scrollBar = activeScrollView.ScrollBar.vertical;
       const stepSize = activeScrollView.height * 0.1;
@@ -700,6 +728,7 @@ Item {
   }
 
   function scrollUp() {
+    const activeScrollView = root.homeVisible ? homePane : root.activeScrollView;
     if (activeScrollView && activeScrollView.ScrollBar.vertical) {
       const scrollBar = activeScrollView.ScrollBar.vertical;
       const stepSize = activeScrollView.height * 0.1;
@@ -708,6 +737,7 @@ Item {
   }
 
   function scrollPageDown() {
+    const activeScrollView = root.homeVisible ? homePane : root.activeScrollView;
     if (activeScrollView && activeScrollView.ScrollBar.vertical) {
       const scrollBar = activeScrollView.ScrollBar.vertical;
       const pageSize = activeScrollView.height * 0.9;
@@ -716,6 +746,7 @@ Item {
   }
 
   function scrollPageUp() {
+    const activeScrollView = root.homeVisible ? homePane : root.activeScrollView;
     if (activeScrollView && activeScrollView.ScrollBar.vertical) {
       const scrollBar = activeScrollView.ScrollBar.vertical;
       const pageSize = activeScrollView.height * 0.9;
@@ -725,34 +756,79 @@ Item {
 
   // Tab navigation functions
   function selectNextTab() {
-    if (tabsModel.length > 0) {
-      currentTabIndex = (currentTabIndex + 1) % tabsModel.length;
-    }
+    openTabIndex(SettingsWindowLayout.adjacentTab(currentTabIndex, tabsModel.length, homeVisible, 1));
   }
 
   function selectPreviousTab() {
-    if (tabsModel.length > 0) {
-      currentTabIndex = (currentTabIndex - 1 + tabsModel.length) % tabsModel.length;
-    }
+    openTabIndex(SettingsWindowLayout.adjacentTab(currentTabIndex, tabsModel.length, homeVisible, -1));
   }
 
   // Main UI
   ColumnLayout {
     anchors.fill: parent
-    anchors.margins: Style.marginL
-    spacing: 0
+    anchors.margins: root.material ? Math.round(8 * Style.uiScaleRatio) : Style.marginL
+    spacing: root.material ? Math.round(8 * Style.uiScaleRatio) : 0
+
+    // Shared toolbar keeps navigation controls and search in a fixed place.
+    Item {
+      id: settingsToolbar
+      Layout.fillWidth: true
+      Layout.preferredHeight: Math.max(searchInput.implicitHeight, sidebarToggle.implicitHeight, toolbarClose.implicitHeight)
+
+      NIconButton {
+        id: sidebarToggle
+        anchors.left: parent.left
+        anchors.verticalCenter: parent.verticalCenter
+        visible: pageTransition.progress > 0
+        enabled: !root.homeVisible
+        opacity: pageTransition.progress
+        icon: root.sidebarExpanded ? "layout-sidebar-right-expand" : "layout-sidebar-left-expand"
+        tooltipText: root.sidebarExpanded ? I18n.tr("tooltips.collapse") : I18n.tr("tooltips.expand")
+        onClicked: root.sidebarExpanded = !root.sidebarExpanded
+      }
+
+      NTextInput {
+        id: searchInput
+        anchors.centerIn: parent
+        width: SettingsWindowLayout.searchWidth(parent.width, Math.max(sidebarToggle.width, toolbarClose.width), Style.uiScaleRatio)
+        placeholderText: I18n.tr("common.search")
+        inputIconName: "search"
+        outlined: !root.material
+        radius: root.material ? Math.round(20 * Style.uiScaleRatio) : Style.iRadiusM
+        onTextChanged: root.searchText = text
+        onEditingFinished: {
+          if (root.searchText.trim() !== "")
+            root.searchActivate();
+        }
+      }
+
+      NIconButton {
+        id: toolbarClose
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+        icon: "close"
+        tooltipText: I18n.tr("common.close")
+        onClicked: root.closeRequested()
+      }
+    }
 
     RowLayout {
       Layout.fillWidth: true
       Layout.fillHeight: true
-      spacing: Style.marginL
+      spacing: root.material ? Math.round(8 * Style.uiScaleRatio) : Style.marginL
 
       // Sidebar
       NBox {
         id: sidebar
+        visible: pageTransition.progress > 0
+        enabled: !root.homeVisible
+        opacity: pageTransition.progress
 
         clip: true
-        Layout.preferredWidth: Math.round(root.sidebarExpanded ? 200 * Style.uiScaleRatio : sidebarToggle.width + (root.sidebarCardStyle ? Style.margin2M : 0) + (sidebarList.verticalScrollBarActive ? Style.marginM : 0))
+        Layout.minimumWidth: 0
+        Layout.maximumWidth: Layout.preferredWidth
+        property real expandedWidth: root.material ? root.materialRail.width : Math.round(root.sidebarExpanded ? 200 * Style.uiScaleRatio : sidebarToggle.width + (root.sidebarCardStyle ? Style.margin2M : 0) + (sidebarList.verticalScrollBarActive ? Style.marginM : 0))
+        Layout.preferredWidth: pageTransition.progress * expandedWidth
         Layout.fillHeight: true
         Layout.alignment: Qt.AlignTop
 
@@ -760,7 +836,7 @@ Item {
         color: root.sidebarCardStyle ? Color.mSurfaceVariant : "transparent"
         border.color: root.sidebarCardStyle ? Style.boxBorderColor : "transparent"
 
-        Behavior on Layout.preferredWidth {
+        Behavior on expandedWidth {
           NumberAnimation {
             duration: Style.animationFast
             easing.type: Easing.InOutQuad
@@ -770,161 +846,16 @@ Item {
         // Sidebar content
         ColumnLayout {
           anchors.fill: parent
-          spacing: Style.marginS
+          spacing: root.material ? Style.marginL : Style.marginS
           anchors.margins: root.sidebarCardStyle ? Style.marginM : 0
 
-          // Sidebar toggle button
-          Item {
-            id: toggleContainer
+          NButton {
             Layout.fillWidth: true
-            Layout.preferredHeight: Math.round(toggleRow.implicitHeight + Style.margin2S)
-
-            Rectangle {
-              id: sidebarToggle
-              width: Math.round(toggleRow.implicitWidth + Style.margin2S)
-              height: parent.height
-              anchors.left: parent.left
-              radius: Style.radiusS
-              color: toggleMouseArea.containsMouse ? Color.mHover : "transparent"
-
-              Behavior on color {
-                enabled: !Color.isTransitioning
-                ColorAnimation {
-                  duration: Style.animationFast
-                  easing.type: Easing.InOutQuad
-                }
-              }
-
-              RowLayout {
-                id: toggleRow
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.left: parent.left
-                anchors.leftMargin: Style.marginS
-                spacing: 0
-
-                NIcon {
-                  icon: root.sidebarExpanded ? "layout-sidebar-right-expand" : "layout-sidebar-left-expand"
-                  color: toggleMouseArea.containsMouse ? Color.mOnHover : Color.mOnSurface
-                  pointSize: Style.fontSizeXL
-                }
-              }
-
-              MouseArea {
-                id: toggleMouseArea
-                anchors.fill: parent
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                onEntered: {
-                  TooltipService.show(sidebarToggle, root.sidebarExpanded ? I18n.tr("tooltips.collapse") : I18n.tr("tooltips.expand"));
-                }
-                onExited: {
-                  TooltipService.hide();
-                }
-                onClicked: {
-                  TooltipService.hide();
-                  root.sidebarExpanded = !root.sidebarExpanded;
-                }
-              }
-            }
-          }
-
-          // Search container wrapper to prevent layout jumps
-          Item {
-            id: searchContainerWrapper
-            Layout.fillWidth: true
-            Layout.preferredHeight: searchInput.implicitHeight > 0 ? searchInput.implicitHeight : (Style.fontSizeXL + Style.margin2M)
-
-            // Search input
-            NTextInput {
-              id: searchInput
-              anchors.left: parent.left
-              anchors.right: parent.right
-              anchors.verticalCenter: parent.verticalCenter
-              placeholderText: I18n.tr("common.search")
-              inputIconName: "search"
-              visible: opacity > 0
-              opacity: root.sidebarExpanded ? 1.0 : 0.0
-
-              Behavior on opacity {
-                NumberAnimation {
-                  duration: Style.animationFast
-                  easing.type: Easing.InOutQuad
-                }
-              }
-
-              onTextChanged: root.searchText = text
-              onEditingFinished: {
-                if (root.searchText.trim() !== "")
-                  root.searchActivate();
-              }
-            }
-
-            // Search button for collapsed sidebar
-            Item {
-              id: searchCollapsedContainer
-              anchors.left: parent.left
-              anchors.right: parent.right
-              anchors.verticalCenter: parent.verticalCenter
-              height: Math.round(searchCollapsedRow.implicitHeight + Style.margin2S)
-              visible: opacity > 0
-              opacity: !root.sidebarExpanded ? 1.0 : 0.0
-
-              Behavior on opacity {
-                NumberAnimation {
-                  duration: Style.animationFast
-                  easing.type: Easing.InOutQuad
-                }
-              }
-
-              Rectangle {
-                id: searchCollapsedButton
-                width: Math.round(searchCollapsedRow.implicitWidth + Style.margin2S)
-                height: parent.height
-                anchors.left: parent.left
-                radius: Style.radiusS
-                color: searchCollapsedMouseArea.containsMouse ? Color.mHover : "transparent"
-
-                Behavior on color {
-                  enabled: !Color.isTransitioning
-                  ColorAnimation {
-                    duration: Style.animationFast
-                    easing.type: Easing.InOutQuad
-                  }
-                }
-
-                RowLayout {
-                  id: searchCollapsedRow
-                  anchors.verticalCenter: parent.verticalCenter
-                  anchors.left: parent.left
-                  anchors.leftMargin: Style.marginS
-                  spacing: 0
-
-                  NIcon {
-                    icon: "search"
-                    color: searchCollapsedMouseArea.containsMouse ? Color.mOnHover : Color.mOnSurface
-                    pointSize: Style.fontSizeXL
-                  }
-                }
-
-                MouseArea {
-                  id: searchCollapsedMouseArea
-                  anchors.fill: parent
-                  hoverEnabled: true
-                  cursorShape: Qt.PointingHandCursor
-                  onClicked: {
-                    root.sidebarExpanded = true;
-                    root.wasCollapsedBeforeSearch = false; // Expanding manually resets this
-                    Qt.callLater(() => searchInput.inputItem.forceActiveFocus());
-                  }
-                  onEntered: {
-                    TooltipService.show(searchCollapsedButton, I18n.tr("common.search"));
-                  }
-                  onExited: {
-                    TooltipService.hide();
-                  }
-                }
-              }
-            }
+            text: root.sidebarExpanded ? I18n.tr("panels.settings.home") : ""
+            icon: "home"
+            backgroundColor: root.homeVisible ? Color.mPrimary : "transparent"
+            textColor: root.homeVisible ? Color.mOnPrimary : Color.mOnSurface
+            onClicked: root.showHome()
           }
 
           Item {
@@ -1037,22 +968,39 @@ Item {
               visible: root.searchText.trim() === ""
               anchors.fill: parent
               model: root.tabsModel
-              spacing: Style.marginXS
+              spacing: root.material ? 0 : Style.marginXS
               currentIndex: root.currentTabIndex
               horizontalPolicy: ScrollBar.AlwaysOff
-              verticalPolicy: ScrollBar.AlwaysOff
+              verticalPolicy: root.material ? ScrollBar.AsNeeded : ScrollBar.AlwaysOff
               gradientColor: "transparent"
               reserveScrollbarSpace: false
 
               delegate: Rectangle {
                 id: tabItem
                 width: sidebarList.width
-                height: tabEntryRow.implicitHeight + Style.margin2XS
-                radius: Style.iRadiusS
-                color: selected ? Color.mPrimary : (tabItem.hovering ? Color.mHover : "transparent")
-                readonly property bool selected: index === root.currentTabIndex
+                height: root.material ? root.materialRail.rowHeight : tabEntryRow.implicitHeight + Style.margin2XS
+                radius: root.material ? height / 2 : Style.iRadiusS
+                color: root.material ? "transparent" : selected ? Color.mPrimary : (tabItem.hovering ? Color.mHover : "transparent")
+                readonly property bool selected: !root.homeVisible && index === root.currentTabIndex
                 property bool hovering: false
-                property color tabTextColor: selected ? Color.mOnPrimary : (tabItem.hovering ? Color.mOnHover : Color.mOnSurface)
+                property color tabTextColor: root.material ? Color.mOnSurface : selected ? Color.mOnPrimary : (tabItem.hovering ? Color.mOnHover : Color.mOnSurface)
+
+                Rectangle {
+                  id: railIndicator
+                  visible: root.material
+                  x: 0
+                  y: 0
+                  width: parent.width
+                  height: parent.height
+                  radius: height / 2
+                  color: tabItem.selected ? Qt.tint(Color.mSurfaceVariant, Qt.alpha(Color.mSecondary, 0.22)) : "transparent"
+
+                  NMaterialStateLayer {
+                    hovered: tabItem.hovering
+                    pressed: tabMouseArea.pressed
+                    tint: Color.mOnSurface
+                  }
+                }
 
                 Behavior on color {
                   enabled: !Color.isTransitioning
@@ -1073,8 +1021,8 @@ Item {
                 RowLayout {
                   id: tabEntryRow
                   anchors.fill: parent
-                  anchors.leftMargin: Style.marginS
-                  anchors.rightMargin: Style.marginS
+                  anchors.leftMargin: root.material ? Style.marginL : Style.marginS
+                  anchors.rightMargin: root.material ? Style.marginL : Style.marginS
                   spacing: Style.marginM
 
                   NIcon {
@@ -1104,6 +1052,7 @@ Item {
                 }
 
                 MouseArea {
+                  id: tabMouseArea
                   anchors.fill: parent
                   hoverEnabled: true
                   acceptedButtons: Qt.LeftButton
@@ -1129,7 +1078,7 @@ Item {
                     }
                   }
                   onClicked: {
-                    root.currentTabIndex = index;
+                    root.openTabIndex(index);
                     // Hide tooltip on click
                     if (!root.sidebarExpanded) {
                       TooltipService.hide();
@@ -1139,7 +1088,7 @@ Item {
               }
 
               onCurrentIndexChanged: {
-                if (currentIndex !== root.currentTabIndex) {
+                if (currentIndex >= 0 && currentIndex !== root.currentTabIndex) {
                   root.currentTabIndex = currentIndex;
                 }
               }
@@ -1147,10 +1096,9 @@ Item {
               Connections {
                 target: root
                 function onCurrentTabIndexChanged() {
-                  if (sidebarList.currentIndex !== root.currentTabIndex) {
+                  if (sidebarList.currentIndex !== root.currentTabIndex)
                     sidebarList.currentIndex = root.currentTabIndex;
-                    sidebarList.positionViewAtIndex(root.currentTabIndex, ListView.Contain);
-                  }
+                  sidebarList.positionViewAtIndex(root.currentTabIndex, ListView.Contain);
                 }
               }
             }
@@ -1166,14 +1114,28 @@ Item {
         Layout.alignment: Qt.AlignTop
         radius: Style.radiusM
         color: Color.mSurfaceVariant
+        border.width: root.material ? 0 : Style.boxBorderWidth
+
+        SettingsHome {
+          id: homePane
+          anchors.fill: parent
+          visible: pageTransition.progress < 1
+          enabled: root.homeVisible
+          opacity: 1 - pageTransition.progress
+          tabs: root.tabsModel
+          onTabRequested: index => root.openTabIndex(index)
+        }
 
         ColumnLayout {
           id: contentLayout
+          visible: pageTransition.progress > 0
+          enabled: !root.homeVisible
+          opacity: pageTransition.progress
           anchors.top: parent.top
           anchors.bottom: parent.bottom
           anchors.horizontalCenter: parent.horizontalCenter
           anchors.margins: Style.marginL
-          width: Math.min(parent.width - Style.marginL * 2, 780 * Style.uiScaleRatio)
+          width: Math.min(parent.width - Style.marginL * 2, (root.material ? 640 : 780) * Style.uiScaleRatio)
           spacing: Style.marginS
 
           // Header row
@@ -1182,26 +1144,26 @@ Item {
             Layout.fillWidth: true
             spacing: Style.marginS
 
+            NIconButton {
+              icon: "arrow-left"
+              tooltipText: I18n.tr("common.back")
+              onClicked: root.showHome()
+            }
+
             NIcon {
               icon: root.tabsModel[currentTabIndex]?.icon ?? ""
+              visible: !root.material
               color: Color.mPrimary
               pointSize: Style.fontSizeXXL
             }
 
             NText {
               text: root.tabsModel[root.currentTabIndex]?.label ? I18n.tr(root.tabsModel[root.currentTabIndex].label) : ""
-              pointSize: Style.fontSizeXL
-              font.weight: Style.fontWeightBold
-              color: Color.mPrimary
+              pointSize: root.material ? Style.fontSizeXXXL : Style.fontSizeXL
+              font.weight: root.material ? Style.fontWeightRegular : Style.fontWeightBold
+              color: root.material ? Color.mOnSurface : Color.mPrimary
               Layout.fillWidth: true
               Layout.alignment: Qt.AlignVCenter
-            }
-
-            NIconButton {
-              icon: "close"
-              tooltipText: I18n.tr("common.close")
-              Layout.alignment: Qt.AlignVCenter
-              onClicked: root.closeRequested()
             }
           }
 
@@ -1219,7 +1181,7 @@ Item {
               model: root.tabsModel
               delegate: Loader {
                 anchors.fill: parent
-                active: index === root.currentTabIndex
+                active: contentLayout.visible && index === root.currentTabIndex
                 opacity: 0
 
                 NumberAnimation on opacity {

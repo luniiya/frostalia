@@ -3,6 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
+import "../../../Helpers/SettingsWindowLayout.js" as SettingsWindowLayout
 import qs.Commons
 import qs.Services.UI
 import qs.Widgets
@@ -11,9 +12,10 @@ FloatingWindow {
   id: root
 
   title: "Frostalia"
-  minimumSize: Qt.size(840 * Style.uiScaleRatio, 910 * Style.uiScaleRatio)
-  implicitWidth: Math.round(840 * Style.uiScaleRatio)
-  implicitHeight: Math.round(910 * Style.uiScaleRatio)
+  readonly property var windowMetrics: SettingsWindowLayout.windowMetrics(Style.materialControls, Style.uiScaleRatio)
+  minimumSize: Qt.size(windowMetrics.minimumWidth, windowMetrics.minimumHeight)
+  implicitWidth: windowMetrics.width
+  implicitHeight: windowMetrics.height
   // Paint the window surface itself, so the compositor's corner rounding is the only one
   color: Qt.alpha(Color.mSurface, Settings.data.ui.panelBackgroundOpacity)
 
@@ -25,6 +27,16 @@ FloatingWindow {
   }
 
   property bool isInitialized: false
+
+  function navigateHome() {
+    if (!isInitialized) {
+      settingsContent.requestedTab = SettingsPanel.Tab.General;
+      settingsContent._pendingSubTab = -1;
+      settingsContent.initialize();
+      isInitialized = true;
+    }
+    settingsContent.showHome();
+  }
 
   // Navigate to a specific tab and optional subtab.
   // Works whether the window is already visible or just becoming visible.

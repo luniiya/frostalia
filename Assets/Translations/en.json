@@ -592,6 +592,12 @@
     "yes": "Yes"
   },
   "control-center": {
+    "audio-output": "Audio output",
+    "media-title": "Media",
+    "choose-player": "Choose media player",
+    "microphone": "Microphone",
+    "edit-shortcuts": "Edit quick settings",
+    "notification-count": "{count} notifications",
     "power-profile": {
       "tooltip-action": "Power Profile",
       "tooltip-disabled": "Install power-profiles-daemon to use power profiles"
@@ -599,7 +605,8 @@
     "wifi": {
       "label-disconnected": "Wi-Fi disconnected",
       "label-ethernet": "Ethernet"
-    }
+    },
+    "seek": "Playback position"
   },
   "display-modes": {
     "always-hide": "Always hide",
@@ -747,7 +754,8 @@
   },
   "options": {
     "ui-style": {
-      "caelestia": "Caelestia"
+      "caelestia": "Caelestia",
+      "material": "Material UI"
     },
     "bar": {
       "density-comfortable": "Comfortable",
@@ -803,6 +811,15 @@
     }
   },
   "panels": {
+    "settings": {
+      "home": "Home",
+      "os": "Operating system",
+      "feedback": "Feedback",
+      "interface": "Interface",
+      "system": "System",
+      "appearance": "Appearance",
+      "advanced": "Advanced"
+    },
     "about": {
       "become-supporter": "Become a supporter",
       "changelog": "View changelog",
@@ -1770,7 +1787,7 @@
     },
     "user-interface": {
       "ui-style-label": "UI style",
-      "ui-style-description": "Choose the look of interface controls, shapes, and typography.",
+      "ui-style-description": "Choose the look of interface controls, shapes, and typography. Each style keeps its own appearance settings.",
       "allow-panels-without-bar-description": "When enabled, panels can open on any screen. When disabled, panels will only open on screens that have a bar, which can reduce memory usage.",
       "allow-panels-without-bar-label": "Allow panels on screens without a bar",
       "animation-disable-description": "Disable all animations for a faster, more responsive experience.",

@@ -66,6 +66,16 @@ class SettingsSearchIndexTests(unittest.TestCase):
             index.write_bytes(before)
         self.assertEqual(before, after, "run Scripts/dev/build-settings-search-index.py and commit the result")
 
+    def test_interface_scaling_is_in_general_basics(self):
+        entries = json.loads((ROOT / "Assets" / "settings-search-index.json").read_text(encoding="utf-8"))
+        scaling = [entry for entry in entries
+                   if entry["labelKey"] == "panels.user-interface.scaling-label"]
+        self.assertEqual(len(scaling), 1)
+        self.assertEqual(scaling[0]["tabLabel"], "common.general")
+        self.assertEqual(scaling[0]["tab"], 0)
+        self.assertEqual(scaling[0]["subTab"], 0)
+        self.assertEqual(scaling[0]["widget"], "NValueSlider")
+
     def test_index_keys_exist_in_english(self):
         en = json.loads(EN.read_text(encoding="utf-8"))
         entries = json.loads((ROOT / "Assets" / "settings-search-index.json").read_text(encoding="utf-8"))
@@ -141,6 +151,19 @@ class IpcTests(unittest.TestCase):
         block = ipc_handlers()["modelUsage"]
         self.assertIn('getPanel("modelUsagePanel"', block)
         self.assertRegex(block, r"function refresh\(\)")
+
+    def test_plain_settings_ipc_opens_home_and_explicit_tabs_remain_available(self):
+        block = ipc_handlers()["settings"]
+        self.assertIn("SettingsPanelService.openHome()", block)
+        self.assertIn("SettingsPanelService.toggleHome()", block)
+        self.assertIn("root._settingsOpen(parsed.tab, parsed.subTab)", block)
+
+    def test_ui_style_ipc_uses_the_profile_switch_path(self):
+        block = ipc_handlers()["uiStyle"]
+        self.assertIn("return Settings.setUiStyle(style)", block)
+        self.assertIn("function get(): string", block)
+        self.assertIn("function list(): string", block)
+        self.assertNotIn("Settings.data.ui.style =", block)
 
     def test_dark_mode_handlers_still_exist(self):
         block = ipc_handlers()["darkMode"]

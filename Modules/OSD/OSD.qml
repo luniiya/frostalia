@@ -3,6 +3,7 @@ import QtQuick.Effects
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
+import "../../Helpers/OsdGeometry.js" as OsdGeometry
 import qs.Commons
 import qs.Services.Hardware
 import qs.Services.Keyboard
@@ -400,6 +401,8 @@ Variants {
       readonly property bool isLeft: location.includes("_left") || location === "left"
       readonly property bool isRight: location.includes("_right") || location === "right"
       readonly property bool verticalMode: location === "left" || location === "right"
+      readonly property bool material: Style.materialControls
+      readonly property var materialDimensions: OsdGeometry.dimensions(verticalMode, isShortMode, Style.uiScaleRatio)
 
       // Hidden text element for measuring lock key text width
       NText {
@@ -520,8 +523,8 @@ Variants {
       margins.left: calculateMargin(anchors.left, "left")
       margins.right: calculateMargin(anchors.right, "right")
 
-      implicitWidth: verticalMode ? longVWidth : (isShortMode ? lockKeyHWidth : longHWidth)
-      implicitHeight: verticalMode ? (isShortMode ? lockKeyVHeight : longVHeight) : longHHeight
+      implicitWidth: material ? materialDimensions.width : verticalMode ? longVWidth : (isShortMode ? lockKeyHWidth : longHWidth)
+      implicitHeight: material ? materialDimensions.height : verticalMode ? (isShortMode ? lockKeyVHeight : longVHeight) : longHHeight
       color: "transparent"
 
       WlrLayershell.namespace: "frostalia-osd-" + (screen?.name || "unknown")
@@ -549,7 +552,7 @@ Variants {
         Behavior on scale {
           NumberAnimation {
             duration: Style.animationNormal
-            easing.type: Easing.InOutQuad
+            easing.type: panel.material ? Easing.OutCubic : Easing.InOutQuad
           }
         }
 
@@ -573,11 +576,13 @@ Variants {
         Rectangle {
           id: background
           anchors.fill: parent
-          anchors.margins: Style.marginM * 1.5
-          radius: Style.radiusL
+          anchors.margins: panel.material ? 6 * Style.uiScaleRatio : Style.marginM * 1.5
+          radius: panel.material ? 32 * Style.uiScaleRatio : Style.radiusL
           color: Qt.alpha(Color.mSurface, Color.adaptiveOpacity(Settings.data.osd.backgroundOpacity) || 1.0)
           border.color: Qt.alpha(Color.mOutline, Color.adaptiveOpacity(Settings.data.osd.backgroundOpacity) || 1.0)
           border.width: {
+            if (panel.material)
+              return 0;
             const bw = Math.max(2, Style.borderM);
             return bw % 2 === 0 ? bw : bw + 1;
           }
@@ -592,233 +597,27 @@ Variants {
         Loader {
           id: contentLoader
           anchors.fill: background
-          anchors.margins: Style.marginM
-          active: true
-          sourceComponent: panel.verticalMode ? verticalContent : horizontalContent
+          anchors.margins: panel.material ? 0 : Style.marginM
+          source: Style.surfaceUrl("osd")
         }
 
-        Component {
-          id: horizontalContent
-          RowLayout {
-            anchors.fill: parent
-            anchors.leftMargin: Style.marginL
-            anchors.rightMargin: Style.marginL
-            spacing: Style.marginM
-
-            TextMetrics {
-              id: percentageMetrics
-              font.family: Settings.data.ui.fontFixed
-              font.pointSize: Style.fontSizeS * (Settings.data.ui.fontFixedScale * Style.uiScaleRatio)
-              text: "150%"
-            }
-
-            // Common Icon for all types
-            NIcon {
-              icon: root.getIcon()
-              color: root.getIconColor()
-              pointSize: Style.fontSizeXL
-              Layout.alignment: Qt.AlignVCenter
-
-              Behavior on color {
-                ColorAnimation {
-                  duration: Style.animationNormal
-                  easing.type: Easing.InOutQuad
-                }
-              }
-            }
-
-            // Lock Key Status Text (replaces progress bar)
-            NText {
-              visible: root.currentOSDType === OSD.Type.LockKey
-              text: root.getDisplayPercentage()
-              color: root.getProgressColor()
-              pointSize: Style.fontSizeS
-              elide: Text.ElideNone
-              Layout.fillWidth: true
-              horizontalAlignment: Text.AlignHCenter
-              Layout.alignment: Qt.AlignVCenter
-            }
-
-            // Progress Bar for Volume/Brightness
-            Rectangle {
-              visible: root.currentOSDType !== OSD.Type.LockKey
-              Layout.fillWidth: true
-              Layout.alignment: Qt.AlignVCenter
-              height: panel.barThickness
-              radius: Math.min(Style.iRadiusL, panel.barThickness / 2)
-              color: Color.mSurfaceVariant
-
-              Rectangle {
-                anchors.left: parent.left
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                width: parent.width * Math.min(1.0, root.getCurrentValue() / root.getMaxValue())
-                radius: parent.radius
-                color: root.getProgressColor()
-
-                Behavior on width {
-                  NumberAnimation {
-                    duration: Style.animationNormal
-                    easing.type: Easing.InOutQuad
-                  }
-                }
-                Behavior on color {
-                  ColorAnimation {
-                    duration: Style.animationNormal
-                    easing.type: Easing.InOutQuad
-                  }
-                }
-              }
-            }
-
-            // Percentage Text for Volume/Brightness
-            NText {
-              visible: root.currentOSDType !== OSD.Type.LockKey
-              text: root.getDisplayPercentage()
-              color: Color.mOnSurface
-              pointSize: Style.fontSizeS
-              family: Settings.data.ui.fontFixed
-              Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
-              horizontalAlignment: Text.AlignRight
-              verticalAlignment: Text.AlignVCenter
-              Layout.fillWidth: false
-              Layout.preferredWidth: Math.ceil(percentageMetrics.width) + Math.round(8 * Style.uiScaleRatio)
-              Layout.maximumWidth: Math.ceil(percentageMetrics.width) + Math.round(8 * Style.uiScaleRatio)
-              Layout.minimumWidth: Math.ceil(percentageMetrics.width)
-            }
-          }
-        }
-
-        Component {
-          id: verticalContent
-          ColumnLayout {
-            anchors.fill: parent
-            anchors.topMargin: Style.marginL
-            anchors.bottomMargin: Style.marginL
-            spacing: root.currentOSDType === OSD.Type.LockKey ? Style.marginM : Style.marginS
-            clip: root.currentOSDType !== OSD.Type.LockKey
-
-            ColumnLayout {
-              id: textVerticalLayout
-              visible: root.currentOSDType === OSD.Type.LockKey
-              Layout.fillWidth: true
-              Layout.fillHeight: false
-              Layout.alignment: Qt.AlignHCenter
-              spacing: 0
-
-              property var verticalTextChars: []
-
-              function updateVerticalTextChars() {
-                const text = root.getDisplayPercentage();
-                const chars = [];
-                for (let i = 0; i < text.length; i++) {
-                  chars.push(text[i]);
-                }
-                verticalTextChars = chars;
-              }
-
-              Component.onCompleted: updateVerticalTextChars()
-
-              Connections {
-                target: root
-                function onLastLockKeyChangedChanged() {
-                  if (root.currentOSDType === OSD.Type.LockKey) {
-                    textVerticalLayout.updateVerticalTextChars();
-                  }
-                }
-                function onCurrentOSDTypeChanged() {
-                  if (root.currentOSDType === OSD.Type.LockKey) {
-                    textVerticalLayout.updateVerticalTextChars();
-                  }
-                }
-              }
-
-              Repeater {
-                model: textVerticalLayout.verticalTextChars
-
-                NText {
-                  text: modelData || ""
-                  color: root.getProgressColor()
-                  pointSize: Style.fontSizeS
-                  family: Settings.data.ui.fontFixed
-                  Layout.fillWidth: true
-                  Layout.preferredHeight: {
-                    const fontSize = Style.fontSizeS * Settings.data.ui.fontFixedScale * Style.uiScaleRatio;
-                    return Math.round(fontSize * 1.3);
-                  }
-                  Layout.alignment: Qt.AlignHCenter
-                  horizontalAlignment: Text.AlignHCenter
-                  verticalAlignment: Text.AlignVCenter
-                }
-              }
-            }
-
-            NText {
-              visible: root.currentOSDType !== OSD.Type.LockKey
-              text: root.getDisplayPercentage()
-              color: Color.mOnSurface
-              pointSize: Style.fontSizeS
-              family: Settings.data.ui.fontFixed
-              Layout.fillWidth: true
-              Layout.alignment: Qt.AlignHCenter
-              horizontalAlignment: Text.AlignHCenter
-              verticalAlignment: Text.AlignVCenter
-              Layout.preferredHeight: Math.round(20 * Style.uiScaleRatio)
-            }
-
-            Item {
-              visible: root.currentOSDType !== OSD.Type.LockKey
-              Layout.fillWidth: true
-              Layout.fillHeight: root.currentOSDType !== OSD.Type.LockKey
-
-              Rectangle {
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                width: panel.barThickness
-                radius: Math.min(Style.iRadiusL, panel.barThickness / 2)
-                color: Color.mSurfaceVariant
-
-                Rectangle {
-                  anchors.left: parent.left
-                  anchors.right: parent.right
-                  anchors.bottom: parent.bottom
-                  height: parent.height * Math.min(1.0, root.getCurrentValue() / root.getMaxValue())
-                  radius: parent.radius
-                  color: root.getProgressColor()
-
-                  Behavior on height {
-                    NumberAnimation {
-                      duration: Style.animationNormal
-                      easing.type: Easing.InOutQuad
-                    }
-                  }
-                  Behavior on color {
-                    ColorAnimation {
-                      duration: Style.animationNormal
-                      easing.type: Easing.InOutQuad
-                    }
-                  }
-                }
-              }
-            }
-
-            NIcon {
-              icon: root.getIcon()
-              color: root.getIconColor()
-              pointSize: root.currentOSDType === OSD.Type.LockKey ? Style.fontSizeXL : Style.fontSizeL
-              Layout.alignment: root.currentOSDType === OSD.Type.LockKey ? Qt.AlignHCenter : (Qt.AlignHCenter | Qt.AlignBottom)
-              Layout.preferredHeight: root.currentOSDType === OSD.Type.LockKey ? (Style.fontSizeXL * Style.uiScaleRatio * 1.5) : -1
-              Layout.minimumHeight: root.currentOSDType === OSD.Type.LockKey ? (Style.fontSizeXL * Style.uiScaleRatio) : 0
-
-              Behavior on color {
-                ColorAnimation {
-                  duration: Style.animationNormal
-                  easing.type: Easing.InOutQuad
-                }
-              }
-            }
-          }
+        Binding {
+          target: contentLoader.item
+          property: "viewModel"
+          when: contentLoader.item !== null
+          value: ({
+                    vertical: panel.verticalMode,
+                    lockKey: panel.isShortMode,
+                    icon: root.getIcon(),
+                    iconColor: root.getIconColor(),
+                    label: root.currentOSDType === OSD.Type.Brightness ? I18n.tr("common.brightness") : root.currentOSDType === OSD.Type.InputVolume ? I18n.tr("common.input") : I18n.tr("common.volume"),
+                    valueText: root.getDisplayPercentage(),
+                    value: root.getCurrentValue(),
+                    maximum: root.getMaxValue(),
+                    accentColor: root.getProgressColor(),
+                    onAccentColor: root.getProgressColor() === Color.mError ? Color.mOnError : Color.mOnPrimary,
+                    barThickness: panel.barThickness
+                  })
         }
 
         // Delay showing the OSD to allow the layout to settle after activation.

@@ -65,6 +65,43 @@ class SettingsStoreTests(unittest.TestCase):
     def test_full_production_settings_model_generates_and_reloads(self):
         self.run_store(full_model=True)
 
+    def test_live_style_switches_and_external_profile_edits(self):
+        target = pathlib.Path(os.environ.get("CARGO_TARGET_DIR", ROOT / "Tools/settings/target"))
+        with tempfile.TemporaryDirectory(prefix="frostalia-ui-profiles-") as directory:
+            temp = pathlib.Path(directory)
+            (temp / "Commons").mkdir()
+            (temp / "Helpers").mkdir()
+            (temp / "run").mkdir(mode=0o700)
+            shutil.copy2(ROOT / "Commons/TomlSettingsStore.qml", temp / "Commons/TomlSettingsStore.qml")
+            for name in ("QtObj2JS.js", "SettingsObject.js", "UiStyleSettings.js", "UiStyles.js"):
+                shutil.copy2(ROOT / "Helpers" / name, temp / "Helpers" / name)
+            harness = (ROOT / "Tests/integration/ui-style-store.qml").read_text().replace('"../../Commons"', '"Commons"').replace('"../../Helpers/', '"Helpers/')
+            # Exercise the production IPC methods against the real store in this
+            # isolated shell, without starting unrelated system services.
+            ipc_source = (ROOT / "Services/Control/IPCService.qml").read_text()
+            handler = ipc_source.split('  IpcHandler {\n    target: "uiStyle"', 1)[1].split('\n  IpcHandler {', 1)[0]
+            handler = '  IpcHandler {\n    target: "uiStyle"' + handler
+            handler = handler.replace("Settings.setUiStyle(style)", "store.switchStyle(style)").replace("Settings.data.ui.style", "model.ui.style").replace("Style.uiStyleChoices", "[{key: 'caelestia'}, {key: 'material'}]")
+            harness = harness.replace("  JsonAdapter {", handler + "\n  JsonAdapter {", 1)
+            (temp / "shell.qml").write_text(harness)
+            config = temp / "settings/moon.toml"
+            env = dict(os.environ, QT_QPA_PLATFORM="offscreen", XDG_RUNTIME_DIR=str(temp / "run"),
+                       XDG_CACHE_HOME=str(temp / "cache"), FROSTALIA_TEST_CONFIG=str(config),
+                       FROSTALIA_SETTINGS_HELPER=str((target / "debug/frostalia-settings").resolve()))
+            env.pop("WAYLAND_DISPLAY", None)
+            result = subprocess.run(["qs", "--no-color", "-p", str(temp / "shell.qml")],
+                                    env=env, capture_output=True, text=True, timeout=12)
+            output = result.stdout + result.stderr
+            self.assertIn("STORE_SUCCESS", output, output)
+            for failure in ("STORE_FAILURE", "TypeError", "ReferenceError", "Unable to assign"):
+                self.assertNotIn(failure, output, output)
+            host = tomllib.loads(config.read_text())
+            self.assertNotIn("radiusRatio", host["general"])
+            self.assertNotIn("fontDefault", host["ui"])
+            self.assertEqual(host["general"]["scaleRatio"], 1.15)
+            self.assertEqual(host["general"]["screenRadiusRatio"], 1.3)
+            self.assertIn("# manual profile edit", (config.parent / "UI/material.toml").read_text())
+
     def test_real_settings_singleton_generates_hostname_config_on_first_install(self):
         root = ROOT
         with tempfile.TemporaryDirectory(prefix='frostalia-first-install-') as d:
@@ -84,7 +121,7 @@ class SettingsStoreTests(unittest.TestCase):
         import qs.Commons
         ShellRoot {
          Connections { target: Settings; function onSettingsSaved() {
-          if (Settings.isLoaded && Settings.isFreshInstall && Settings.shouldOpenSetupWizard && Settings.data.settingsVersion === 65) console.log("FIRST_INSTALL_SUCCESS", Settings.settingsFile);
+          if (Settings.isLoaded && Settings.isFreshInstall && Settings.shouldOpenSetupWizard && Settings.data.settingsVersion === 67) console.log("FIRST_INSTALL_SUCCESS", Settings.settingsFile);
           else console.error("FIRST_INSTALL_FAILURE");
           Qt.quit();
          } }
@@ -97,5 +134,5 @@ class SettingsStoreTests(unittest.TestCase):
          self.assertNotIn('FIRST_INSTALL_FAILURE', r.stdout+r.stderr)
          generated = list((p/'config/settings').glob('*.toml'))
          self.assertEqual(len(generated), 1)
-         self.assertEqual(tomllib.loads(generated[0].read_text())['settingsVersion'], 65)
+         self.assertEqual(tomllib.loads(generated[0].read_text())['settingsVersion'], 67)
          self.assertGreater(len(tomllib.loads(generated[0].read_text())), 20)

@@ -55,6 +55,10 @@ TestCase {
               {
                 key: "caelestia",
                 labelKey: "options.ui-style.caelestia"
+              },
+              {
+                key: "material",
+                labelKey: "options.ui-style.material"
               }
             ]);
     // A caller changing a menu model must not change the registry.
@@ -197,10 +201,10 @@ TestCase {
             expected: "Iosevka"
           },
           {
-            tag: "application fallback",
+            tag: "Caelestia preset font",
             family: "",
             fixed: false,
-            expected: "System Font"
+            expected: "Rubik"
           },
           {
             tag: "style monospace fallback",
@@ -213,6 +217,197 @@ TestCase {
 
   function test_fontFamily(data) {
     compare(UiStyles.fontFamily("caelestia", data.family, data.fixed, "System Font"), data.expected);
+  }
+
+  function test_materialStyleSwitchIsReversible() {
+    const original = JSON.stringify(UiStyles.tokens("caelestia"));
+    try {
+      compare(UiStyles.resolveId("material"), "material");
+      consumer.selectedStyle = "material";
+      compare(consumer.tokens.controls.renderer, "material");
+      compare(consumer.tokens.radii.M, 24);
+      compare(consumer.slider.trackHeight, 16);
+      compare(consumer.slider.handleHeight, 44);
+      compare(UiStyles.fontFamily("material", "", false, "System"), "Roboto");
+      compare(UiStyles.fontFamily("material", "My Font", false, "System"), "My Font");
+      consumer.selectedStyle = "caelestia";
+      compare(consumer.tokens.controls.renderer, "caelestia");
+      compare(consumer.slider.trackHeight, 10);
+      compare(JSON.stringify(consumer.tokens), original);
+    } finally {
+      consumer.selectedStyle = "caelestia";
+    }
+  }
+
+  function test_materialSliderScalesOnce_data() {
+    return [
+          {
+            tag: "small",
+            scale: 0.8
+          },
+          {
+            tag: "default",
+            scale: 1
+          },
+          {
+            tag: "large",
+            scale: 1.5
+          },
+          {
+            tag: "double",
+            scale: 2
+          }
+        ];
+  }
+
+  function test_materialSliderScalesOnce(data) {
+    const g = UiStyles.sliderGeometry("material", 33, 0.7, data.scale);
+    compare(g.knobDiameter, Math.round(40 * data.scale));
+    compare(g.trackHeight, Math.round(16 * data.scale));
+    compare(g.handleHeight, Math.round(44 * data.scale));
+    compare(g.handleWidth, 4 * data.scale);
+    compare(g.gap, 12 * data.scale);
+    const custom = UiStyles.sliderGeometry("material", 33, 0.35, data.scale);
+    compare(custom.handleHeight, Math.round(22 * data.scale));
+  }
+
+  function test_sliderGeometryHasCompleteShapeDuringStyleSwitches() {
+    // QML bindings may observe the renderer and dimensions in either order.
+    // Both styles must supply finite dimensions throughout a live switch.
+    for (const style of ["caelestia", "material", "unknown"]) {
+      const g = UiStyles.sliderGeometry(style, 33, 0.7, 1);
+      for (const key of ["knobDiameter", "handleHeight", "handleWidth", "pressedHandleWidth", "trackHeight", "gap", "cutoutExtra"]) {
+        verify(Number.isFinite(g[key]), style + ":" + key);
+      }
+    }
+  }
+
+  function test_splitTrackBounds_data() {
+    const rows = [];
+    for (const width of [0, 12, 40, 41, 200]) {
+      for (const position of [0, 0.01, 0.5, 0.99, 1]) {
+        for (const mirrored of [false, true]) {
+          rows.push({
+                      tag: width + ":" + position + ":" + mirrored,
+                      width: width,
+                      position: position,
+                      mirrored: mirrored
+                    });
+        }
+      }
+    }
+    return rows;
+  }
+
+  function test_splitTrackBounds(data) {
+    const g = UiStyles.splitSliderTrack(data.width, 40, data.position, 12, data.mirrored);
+    verify(g.activeWidth >= 0);
+    verify(g.inactiveWidth >= 0);
+    verify(g.activeX >= g.start);
+    verify(g.inactiveX >= g.start);
+    verify(g.activeX + g.activeWidth <= g.end + 0.001);
+    verify(g.inactiveX + g.inactiveWidth <= g.end + 0.001);
+    const reflected = UiStyles.splitSliderTrack(data.width, 40, 1 - data.position, 12, !data.mirrored);
+    fuzzyCompare(g.activeWidth, reflected.activeWidth, 0.001);
+    fuzzyCompare(g.inactiveWidth, reflected.inactiveWidth, 0.001);
+  }
+
+  function test_splitTrackEndpoints() {
+    compare(UiStyles.splitSliderTrack(200, 40, 0, 12, false).activeWidth, 0);
+    compare(UiStyles.splitSliderTrack(200, 40, 1, 12, false).inactiveWidth, 0);
+    const middle = UiStyles.splitSliderTrack(200, 40, 0.5, 12, false);
+    compare(middle.activeX + middle.activeWidth, 94);
+    compare(middle.inactiveX, 106);
+  }
+
+  function test_toggleGeometry_data() {
+    return [
+          {
+            tag: "legacy off",
+            style: "caelestia",
+            checked: false,
+            pressed: false,
+            width: 44,
+            height: 26,
+            handle: 20,
+            x: 3
+          },
+          {
+            tag: "legacy on",
+            style: "caelestia",
+            checked: true,
+            pressed: false,
+            width: 44,
+            height: 26,
+            handle: 20,
+            x: 21
+          },
+          {
+            tag: "legacy pressed",
+            style: "caelestia",
+            checked: true,
+            pressed: true,
+            width: 44,
+            height: 26,
+            handle: 20,
+            x: 21
+          },
+          {
+            tag: "material off",
+            style: "material",
+            checked: false,
+            pressed: false,
+            width: 52,
+            height: 32,
+            handle: 16,
+            x: 8
+          },
+          {
+            tag: "material on",
+            style: "material",
+            checked: true,
+            pressed: false,
+            width: 52,
+            height: 32,
+            handle: 24,
+            x: 24
+          },
+          {
+            tag: "material off pressed",
+            style: "material",
+            checked: false,
+            pressed: true,
+            width: 52,
+            height: 32,
+            handle: 28,
+            x: 2
+          },
+          {
+            tag: "material on pressed",
+            style: "material",
+            checked: true,
+            pressed: true,
+            width: 52,
+            height: 32,
+            handle: 28,
+            x: 22
+          }
+        ];
+  }
+
+  function test_toggleGeometry(data) {
+    const geometry = UiStyles.toggleGeometry(data.style, 26, data.checked, data.pressed);
+    compare(geometry.width, data.width);
+    compare(geometry.height, data.height);
+    compare(geometry.handle, data.handle);
+    compare(geometry.x, data.x);
+    if (data.style === "material") {
+      const scaled = UiStyles.toggleGeometry(data.style, 52, data.checked, data.pressed);
+      compare(scaled.width, geometry.width * 2);
+      compare(scaled.height, geometry.height * 2);
+      compare(scaled.handle, geometry.handle * 2);
+      compare(scaled.x, geometry.x * 2);
+    }
   }
 
   function test_switchingStylesUpdatesBindings() {

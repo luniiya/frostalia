@@ -52,8 +52,27 @@ Singleton {
     }
   }
 
+  function openHome() {
+    if (settingsWindow) {
+      settingsWindow.visible = true;
+      isWindowOpen = true;
+      windowOpened();
+      settingsWindow.navigateHome();
+    }
+  }
+
+  function toggleHome() {
+    if (isWindowOpen)
+      closeWindow();
+    else
+      openHome();
+  }
+
   function openWindow(tab) {
-    openToTab(tab, -1);
+    if (tab === undefined)
+      openHome();
+    else
+      openToTab(tab, -1);
   }
 
   function closeWindow() {

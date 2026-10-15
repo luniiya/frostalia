@@ -142,7 +142,7 @@ Singleton {
     target: "settings"
 
     function toggle() {
-      root._settingsToggle(SettingsPanel.Tab.General, -1);
+      SettingsPanelService.toggleHome();
     }
 
     function toggleTab(tab: string) {
@@ -151,7 +151,7 @@ Singleton {
     }
 
     function open() {
-      root._settingsOpen(SettingsPanel.Tab.General, -1);
+      SettingsPanelService.openHome();
     }
 
     function openTab(tab: string) {
@@ -441,6 +441,19 @@ Singleton {
     }
     function off() {
       CompositorService.turnOffMonitors();
+    }
+  }
+
+  IpcHandler {
+    target: "uiStyle"
+    function set(style: string): bool {
+      return Settings.setUiStyle(style);
+    }
+    function get(): string {
+      return Settings.data.ui.style;
+    }
+    function list(): string {
+      return JSON.stringify(Style.uiStyleChoices.map(style => style.key));
     }
   }
 

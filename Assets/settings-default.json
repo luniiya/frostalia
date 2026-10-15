@@ -131,13 +131,13 @@
   },
   "ui": {
     "style": "caelestia",
-    "fontDefault": "",
+    "fontDefault": "Rubik",
     "fontFixed": "",
     "fontDefaultScale": 1,
     "fontFixedScale": 1,
     "tooltipsEnabled": true,
     "scrollbarAlwaysVisible": true,
-    "boxBorderEnabled": false,
+    "boxBorderEnabled": true,
     "boxBorderWidth": 1,
     "boxBorderColor": "outline",
     "boxBorderBrightness": 0,
@@ -260,6 +260,14 @@
       {
         "enabled": true,
         "id": "media-sysmon-card"
+      },
+      {
+        "id": "notification-card",
+        "enabled": true
+      },
+      {
+        "id": "calendar-month-card",
+        "enabled": true
       }
     ]
   },

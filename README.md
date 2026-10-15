@@ -71,7 +71,7 @@ Frostalia migrates saved performance widget IDs, Battery widget toggles, the per
 
 ## Configuration
 
-Settings are stored in `~/.config/frostalia/settings/<hostname>.toml`. On first launch, Frostalia creates the host file automatically from `defaults.toml` when present, or from the defaults. Existing per-host JSON and legacy `settings.json` files migrate to TOML automatically; the original JSON files remain untouched. Each host keeps its own file. `defaults.toml` is only a starting configuration for new hosts; edit `settings/<hostname>.toml` to change an existing machine.
+Settings are stored in `~/.config/frostalia/settings/<hostname>.toml`. On first launch, Frostalia creates the host file automatically from `defaults.toml` when present, or from the defaults. Existing per-host JSON and legacy `settings.json` files migrate to TOML automatically; the original JSON files remain untouched. Each host keeps its own file for host settings, including interface and font scaling. Appearance preferences and font families are shared per UI style in `settings/UI/<style>.toml`; the selected style stays in the host file. On migration, existing appearance values move into the active style’s file, while other styles start from their own defaults. `defaults.toml` is only a starting configuration for new hosts; edit `settings/<hostname>.toml` to change an existing machine.
 
 ```toml
 [bar]
@@ -80,8 +80,19 @@ floating = true
 backgroundOpacity = 0.95
 
 [general]
-animationSpeed = 1.5
+scaleRatio = 1.1
 ```
+
+Scripts can switch styles through IPC:
+
+```sh
+qs -c frostalia ipc call uiStyle set material
+qs -c frostalia ipc call uiStyle set caelestia
+qs -c frostalia ipc call uiStyle get
+qs -c frostalia ipc call uiStyle list
+```
+
+`set` returns whether the switch was accepted. Unknown IDs or requests during another switch return `false`; saving and loading finish asynchronously. Screen corners, interface scaling, and font scaling stay per host under General. Font families belong to the selected UI style.
 
 The settings window updates TOML through the Rust helper, preserving comments. Internal defaults, theme colors and plugin metadata still use JSON. Rust handles settings parsing, migration and safe file writes; the desktop UI continues to use QML and JavaScript.
 
@@ -126,9 +137,11 @@ Tests require Rust/Cargo, Qt 6's `qmltestrunner` (on Arch, `qt6-declarative`) an
 
 ### UI styles
 
-**Settings → User Interface → UI style** selects the shell's visual style. Caelestia is the initial style and preserves the current appearance. Color schemes remain separate. Saved fonts, UI scale, container rounding and control rounding take precedence over the style's defaults.
+**Settings → User Interface → UI style** selects the shell's visual style. Caelestia preserves the original appearance. Material UI adds rounded surfaces, pill buttons with interaction feedback, thick split slider tracks with vertical handles, and animated switches with checkmarks. Caelestia defaults to bundled Rubik with container outlines enabled; Material defaults to bundled Roboto with outlines disabled and opaque panels. Color schemes remain separate. Saved appearance preferences take precedence over each style’s defaults; use the reset controls to restore them. Interface and font scaling remain per host.
 
-Styles are registered in `Helpers/UiStyles.js`. Each entry has a translated label key and tokens for typography, radii, spacing, borders, animations, sliders and toggles. `Commons/Style.qml` exposes the active tokens to shared widgets; use it when adding controls instead of hardcoding style values. An unknown saved style falls back to Caelestia for rendering without rewriting the saved choice. Add a complete registry entry, its English label in `Assets/Translations/en.json`, and tests in `Tests/tst_uistyles.qml` when implementing another style. Distinct control renderers can be added to the shared widgets when a style needs more than different tokens.
+Shared panels load their style’s registered `views` through `NStyleView`: control center, media cards/player, OSD, and notification content each have separate renderers. Shared services retain playback, notification lifetime, settings, and panel behavior. Material uses Android-inspired quick tiles, an artwork-backed media card with a playback wave, and elastic notification dragging. Both styles have a settings home with category cards; the navigation sidebar appears inside categories.
+
+Styles are registered in `Helpers/UiStyles.js`. Each entry has a translated label key and tokens for typography, radii, spacing, borders, animations, sliders and toggles. `Commons/Style.qml` exposes the active tokens to shared widgets; use it when adding controls instead of hardcoding style values. An unknown saved style falls back to Caelestia for rendering without rewriting the saved choice. Add a complete registry entry, its English label in `Assets/Translations/en.json`, and tests in `Tests/tst_uistyles.qml` when implementing another style. The `controls.renderer` token selects the control rendering path; Material-specific rendering stays separate from Caelestia. Styles change live, saving pending appearance edits to the previous style and loading the selected style’s preferences. `Helpers/UiStyleSettings.js` defines the appearance fields and shared defaults; a registry entry can override them with `settingsDefaults` (for example, zero radius ratios for square corners). Reset buttons use the active style’s defaults. Material UI is an original implementation with Clavis Shell used as a visual reference; no Clavis source or assets are bundled.
 
 ## Credits and license
 

@@ -6,6 +6,7 @@ import Quickshell.Io
 import "../Helpers/BubbleLogic.js" as BubbleLogic
 import "../Helpers/QtObj2JS.js" as QtObj2JS
 import "../Helpers/SettingsPaths.js" as SettingsPaths
+import "../Helpers/UiStyleSettings.js" as UiStyleSettings
 import qs.Commons
 import qs.Commons.Migrations
 import qs.Modules.OSD
@@ -27,9 +28,10 @@ Singleton {
   - Default config directory: ~/.config/frostalia
   - Default cache directory: ~/.cache/frostalia
   - Settings: ~/.config/frostalia/settings/<hostname>.toml (FROSTALIA_SETTINGS_FILE overrides)
+  - Appearance: ~/.config/frostalia/settings/UI/<style>.toml
   */
   readonly property alias data: adapter  // Used to access via Settings.data.xxx.yyy
-  readonly property int settingsVersion: 65
+  readonly property int settingsVersion: 67
   property bool isDebug: Quickshell.env("FROSTALIA_DEBUG") === "1"
   readonly property string shellName: "frostalia"
   readonly property string configDir: ensureTrailingSlash(Quickshell.env("FROSTALIA_CONFIG_DIR") || (Quickshell.env("XDG_CONFIG_HOME") || Quickshell.env("HOME") + "/.config") + "/" + shellName + "/")
@@ -40,6 +42,7 @@ Singleton {
   property string hostName: ""
   readonly property string settingsFile: SettingsPaths.resolveSettingsFile(settingsEnvOverride, configDir, hostName)
   readonly property string settingsError: settingsStore.error
+  readonly property bool uiStyleSwitching: settingsStore.switchingStyle
   readonly property string defaultAvatar: Quickshell.env("HOME") + "/.face"
   readonly property string defaultVideosDirectory: Quickshell.env("HOME") + "/Videos"
 
@@ -71,8 +74,6 @@ Singleton {
 
     // Patch-in the local default, resolved to user's home
     adapter.general.avatarImage = defaultAvatar;
-    adapter.ui.fontDefault = Qt.application.font.family;
-    adapter.ui.fontFixed = "monospace";
   }
 
   // Don't write settings to disk immediately
@@ -102,6 +103,7 @@ Singleton {
   TomlSettingsStore {
     id: settingsStore
     adapter: root.data
+    uiProfiles: UiStyleSettings.configuration(root.settingsDir + "UI")
     configFile: root.settingsFile
     active: root.settingsPathReady
     seedFiles: root.settingsEnvOverride ? [] : SettingsPaths.seedFiles(root.configDir, root.hostName)
@@ -319,13 +321,13 @@ Singleton {
     // ui
     property JsonObject ui: JsonObject {
       property string style: "caelestia"
-      property string fontDefault: ""
+      property string fontDefault: "Rubik"
       property string fontFixed: ""
       property real fontDefaultScale: 1.0
       property real fontFixedScale: 1.0
       property bool tooltipsEnabled: true
       property bool scrollbarAlwaysVisible: true
-      property bool boxBorderEnabled: false
+      property bool boxBorderEnabled: true
       property int boxBorderWidth: 1 // 1-6, scaled with the UI
       property string boxBorderColor: "outline" // "outline", "primary", "secondary", "tertiary", "error"
       property int boxBorderBrightness: 0 // -100 (black) to 100 (white)
@@ -459,6 +461,14 @@ Singleton {
         },
         {
           "id": "media-sysmon-card",
+          "enabled": true
+        },
+        {
+          "id": "notification-card",
+          "enabled": true
+        },
+        {
+          "id": "calendar-month-card",
           "enabled": true
         }
       ]
@@ -772,6 +782,9 @@ Singleton {
   // Get default value for a setting path (e.g., "general.scaleRatio" or "bar.position")
   // Returns undefined if not found
   function getDefaultValue(path) {
+    const styleDefault = UiStyleSettings.defaultValue(data.ui.style, path);
+    if (styleDefault !== undefined)
+      return styleDefault;
     if (!root._defaultSettings) {
       return undefined;
     }
@@ -1038,6 +1051,11 @@ Singleton {
   }
 
   // -----------------------------------------------------
+  // Switch through the store so pending edits belong to the previous style.
+  function setUiStyle(style) {
+    return settingsStore.switchStyle(style);
+  }
+
   // Public function to trigger immediate settings saving
   function saveImmediate() {
     settingsStore.save();

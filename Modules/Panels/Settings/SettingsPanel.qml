@@ -41,7 +41,11 @@ SmartPanel {
   property var requestedEntry: null
 
   // Forward the requested tab, subtab or search entry to the settings window
-  function openInWindow() {
+  function openInWindow(home) {
+    if (home) {
+      SettingsPanelService.openHome();
+      return;
+    }
     const request = SettingsWindowRequest.resolve(requestedTab, requestedSubTab, requestedEntry);
     requestedSubTab = -1;
     requestedEntry = null;
@@ -55,11 +59,11 @@ SmartPanel {
     if (SettingsPanelService.isWindowOpen)
       SettingsPanelService.closeWindow();
     else
-      openInWindow();
+      openInWindow(true);
   }
 
   function open(buttonItem, buttonName) {
-    openInWindow();
+    openInWindow(true);
   }
 
   // Open to a specific tab and optionally a subtab

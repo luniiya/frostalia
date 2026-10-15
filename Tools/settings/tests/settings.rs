@@ -6,7 +6,11 @@ use std::path::Path;
 use tempfile::tempdir;
 
 fn request(settings: Value, baseline: Option<Value>) -> Request {
-    Request { settings, baseline }
+    Request {
+        settings,
+        baseline,
+        ui_profiles: None,
+    }
 }
 
 fn read(path: &Path) -> String {
