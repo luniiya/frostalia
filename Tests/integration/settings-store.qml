@@ -7,6 +7,19 @@ ShellRoot {
   id: root
   property int loads: 0
   property int phase: 0
+  property int positionChanges: 0
+  property int changesBeforeReload: 0
+
+  Connections {
+    target: model.bar
+    function onPositionChanged() {
+      root.positionChanges++;
+      if (root.phase > 0 && model.bar.position === "top") {
+        console.error("STORE_FAILURE: transient default bar position during reload");
+        Qt.quit();
+      }
+    }
+  }
 
   JsonAdapter {
     id: model
@@ -58,6 +71,15 @@ ShellRoot {
         externalEdit.contents = "# keep my comment\n[bar]\nposition = 'right'\n[general]\nanimationDisabled = false\n";
         externalEdit.running = true;
       } else if (root.phase === 4 && model.bar.position === "right") {
+        root.phase = 5;
+        root.changesBeforeReload = root.positionChanges;
+        Qt.callLater(store.reload);
+      } else if (root.phase === 5) {
+        if (root.positionChanges !== root.changesBeforeReload) {
+          console.error("STORE_FAILURE: unchanged reload notified the bar");
+          Qt.quit();
+          return;
+        }
         console.log("STORE_SUCCESS");
         Qt.quit();
       }

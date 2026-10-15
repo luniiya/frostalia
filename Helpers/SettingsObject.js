@@ -1,5 +1,12 @@
 .pragma library
 
+// Resolve omitted keys before touching the live model, avoiding transient defaults.
+function resolve(defaults, stored) {
+  var result = JSON.parse(JSON.stringify(defaults));
+  apply(result, stored);
+  return result;
+}
+
 // Apply only declared settings to the QML model. Unknown TOML keys stay on disk.
 function apply(target, values) {
   if (!values || typeof values !== "object")

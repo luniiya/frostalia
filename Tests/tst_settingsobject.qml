@@ -5,6 +5,77 @@ import "../Helpers/SettingsObject.js" as SettingsObject
 TestCase {
   name: "SettingsObject"
 
+  function test_reloadResolvesDefaultsWithoutChangingLiveSettings() {
+    var defaults = {
+      bar: {
+        position: "top",
+        widgets: []
+      },
+      darkMode: false
+    };
+    var current = {
+      bar: {
+        position: "bottom",
+        widgets: [
+          {
+            id: "Clock"
+          }
+        ]
+      },
+      darkMode: true
+    };
+    var stored = {
+      bar: {
+        position: "bottom",
+        widgets: [
+          {
+            id: "Clock"
+          }
+        ]
+      },
+      darkMode: true,
+      unknown: 42
+    };
+    var resolved = SettingsObject.resolve(defaults, stored);
+    compare(resolved, current);
+    compare(SettingsObject.changes(current, resolved), {});
+    compare(defaults.bar.position, "top");
+    compare(defaults.darkMode, false);
+  }
+
+  function test_removedSettingReturnsToDefaultAndPreservesInFlightEdit() {
+    var defaults = {
+      bar: {
+        position: "top"
+      },
+      darkMode: false
+    };
+    var current = {
+      bar: {
+        position: "bottom"
+      },
+      darkMode: true
+    };
+    var baseline = SettingsObject.resolve(defaults, {
+                                            darkMode: true
+                                          });
+    var desired = SettingsObject.resolve(baseline, {
+                                           darkMode: false
+                                         });
+    compare(baseline, {
+              bar: {
+                position: "top"
+              },
+              darkMode: true
+            });
+    compare(SettingsObject.changes(current, desired), {
+              bar: {
+                position: "top"
+              },
+              darkMode: false
+            });
+  }
+
   function test_applyDeclaredNestedSettings() {
     var target = {
       bar: {

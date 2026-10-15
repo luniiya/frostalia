@@ -140,12 +140,13 @@ Item {
         const result = JSON.parse(output.text);
         root.error = "";
         if (root.operation === "load") {
-          const edits = SettingsObject.changes(root.sentSettings, root.snapshot());
+          const current = root.snapshot();
+          const edits = SettingsObject.changes(root.sentSettings, current);
+          const baseline = SettingsObject.resolve(root.defaults, result.settings);
+          const desired = SettingsObject.resolve(baseline, edits);
           root.applying = true;
-          SettingsObject.apply(root.adapter, root.defaults);
-          SettingsObject.apply(root.adapter, result.settings);
-          root.settingsBaseline = root.snapshot();
-          SettingsObject.apply(root.adapter, edits);
+          SettingsObject.apply(root.adapter, SettingsObject.changes(current, desired));
+          root.settingsBaseline = baseline;
           root.applying = false;
           root.initialized = true;
           root.loaded(result.settings, result.fresh);
