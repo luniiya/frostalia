@@ -119,6 +119,6 @@ TestCase {
   }
 
   function test_seedFilesPreferHostJson() {
-    compare(SettingsPaths.seedFiles("/cfg/", "laptop"), ["/cfg/settings/laptop.json", "/cfg/settings.toml", "/cfg/settings.json"]);
+    compare(SettingsPaths.seedFiles("/cfg/", "laptop"), ["/cfg/settings/laptop.json", "/cfg/defaults.toml", "/cfg/settings.json"]);
   }
 }

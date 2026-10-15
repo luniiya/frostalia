@@ -71,7 +71,7 @@ Frostalia migrates saved performance widget IDs, Battery widget toggles, the per
 
 ## Configuration
 
-Settings are stored in `~/.config/frostalia/settings/<hostname>.toml`. On first launch, Frostalia creates the host file automatically from `settings.toml` when present, or from the defaults. Existing per-host JSON and legacy `settings.json` files migrate to TOML automatically; the original JSON files remain untouched. Each host keeps its own file.
+Settings are stored in `~/.config/frostalia/settings/<hostname>.toml`. On first launch, Frostalia creates the host file automatically from `defaults.toml` when present, or from the defaults. Existing per-host JSON and legacy `settings.json` files migrate to TOML automatically; the original JSON files remain untouched. Each host keeps its own file. `defaults.toml` is only a starting configuration for new hosts; edit `settings/<hostname>.toml` to change an existing machine.
 
 ```toml
 [bar]
@@ -104,7 +104,7 @@ nix run github:luniiya/frostalia
 nix develop
 ```
 
-Add `frostalia.url = "github:luniiya/frostalia"` to your flake inputs. Import `inputs.frostalia.homeModules.default` for `programs.frostalia`, or `inputs.frostalia.nixosModules.default` for `services.frostalia`. Home Manager’s `programs.frostalia.settings` accepts a Nix attribute set, raw TOML or a TOML file path. It writes `~/.config/frostalia/settings.toml` as a seed for new hosts; existing per-host settings take precedence and remain editable. Colors and plugin settings continue to use JSON.
+Add `frostalia.url = "github:luniiya/frostalia"` to your flake inputs. Import `inputs.frostalia.homeModules.default` for `programs.frostalia`, or `inputs.frostalia.nixosModules.default` for `services.frostalia`. Home Manager’s `programs.frostalia.settings` accepts a Nix attribute set, raw TOML or a TOML file path. It writes `~/.config/frostalia/defaults.toml` as a seed for new hosts; existing per-host settings take precedence and remain editable. Colors and plugin settings continue to use JSON.
 
 The inherited modules discourage running the shell as a systemd service; launching from your compositor is preferred.
 

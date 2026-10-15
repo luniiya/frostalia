@@ -33,7 +33,7 @@ Scripts/dev/run-tests.sh -silent  # quieter; this is what the pre-commit hook ru
 
 ## Conventions
 
-- User settings are per host: `~/.config/frostalia/settings/<hostname>.toml` (path logic in `Helpers/SettingsPaths.js`). A new host is seeded once from `settings.toml`, existing per-host JSON or legacy `settings.json`, otherwise from defaults; JSON originals are preserved. `FROSTALIA_SETTINGS_FILE` overrides the TOML path.
+- User settings are per host: `~/.config/frostalia/settings/<hostname>.toml` (path logic in `Helpers/SettingsPaths.js`). A new host is seeded once from `defaults.toml`, existing per-host JSON or legacy `settings.json`, otherwise from defaults; JSON originals are preserved. `FROSTALIA_SETTINGS_FILE` overrides the TOML path.
 - Settings live in `Commons/Settings.qml` and use the Rust TOML helper (`Tools/settings/`); every new setting needs a default there. Renaming, moving or changing the meaning of a saved setting needs a migration in `Commons/Migrations/` and a bump of `settingsVersion`, so the maintainer's saved per-host settings keep working. Keep migrations small: they only need to handle configs that actually exist, not every upstream variant.
 
 ## Checklist: adding or changing a setting

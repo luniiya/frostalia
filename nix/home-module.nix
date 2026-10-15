@@ -66,7 +66,7 @@ in
       '';
       description = ''
         Frostalia shell configuration settings as an attribute set, string
-        or filepath, to be written to ~/.config/frostalia/settings.toml.
+        or filepath, to be written to ~/.config/frostalia/defaults.toml.
         This is a seed copied when a host has no settings file yet. Existing
         ~/.config/frostalia/settings/<hostname>.toml files take precedence;
         subsequent changes to this seed do not overwrite per-host settings.
@@ -208,7 +208,7 @@ in
         PartOf = [ config.wayland.systemd.target ];
         After = [ config.wayland.systemd.target ];
         X-Restart-Triggers =
-          lib.optional (cfg.settings != { }) "${config.xdg.configFile."frostalia/settings.toml".source}"
+          lib.optional (cfg.settings != { }) "${config.xdg.configFile."frostalia/defaults.toml".source}"
           ++ lib.optional (cfg.colors != { }) "${config.xdg.configFile."frostalia/colors.json".source}"
           ++ lib.optional (cfg.plugins != { }) "${config.xdg.configFile."frostalia/plugins.json".source}"
           ++ lib.optional (
@@ -230,8 +230,8 @@ in
     home.packages = lib.optional (cfg.package != null) cfg.package;
 
     xdg.configFile = {
-      "frostalia/settings.toml" = lib.mkIf (cfg.settings != { }) {
-        source = generateToml "settings" cfg.settings;
+      "frostalia/defaults.toml" = lib.mkIf (cfg.settings != { }) {
+        source = generateToml "defaults" cfg.settings;
       };
       "frostalia/colors.json" = lib.mkIf (cfg.colors != { }) {
         source = generateJson "colors" cfg.colors;

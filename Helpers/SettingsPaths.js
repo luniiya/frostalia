@@ -5,7 +5,7 @@
 //
 // Layout:
 //   <configDir>/settings/<hostname>.toml   per-host settings (default)
-//   <configDir>/settings.toml              shared seed for new hosts
+//   <configDir>/defaults.toml              shared seed for new hosts
 //   <configDir>/settings.json              legacy JSON seed
 
 var fallbackHostName = "default";
@@ -46,7 +46,7 @@ function resolveSettingsFile(envOverride, configDir, hostName) {
 function seedFiles(configDir, hostName) {
   return [
     settingsDir(configDir) + sanitizeHostName(hostName) + ".json",
-    ensureTrailingSlash(configDir) + "settings.toml",
+    ensureTrailingSlash(configDir) + "defaults.toml",
     legacySettingsFile(configDir)
   ];
 }

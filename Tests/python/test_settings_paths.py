@@ -25,7 +25,7 @@ class SettingsPathTests(unittest.TestCase):
         self.assertEqual(call_helper("resolveSettingsFile", "/custom.toml", "/cfg", "laptop"), "/custom.toml")
 
     def test_migration_prefers_host_json(self):
-        self.assertEqual(call_helper("seedFiles", "/cfg", "laptop"), ["/cfg/settings/laptop.json", "/cfg/settings.toml", "/cfg/settings.json"])
+        self.assertEqual(call_helper("seedFiles", "/cfg", "laptop"), ["/cfg/settings/laptop.json", "/cfg/defaults.toml", "/cfg/settings.json"])
 
     def test_hostile_hostname_stays_inside_settings_directory(self):
         path = pathlib.Path(call_helper("resolveSettingsFile", "", "/cfg", "../../evil'; touch pwned; '"))
