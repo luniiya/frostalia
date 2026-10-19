@@ -9,21 +9,21 @@ TestCase {
     return [
           {
             tag: "git checkout",
-            version: "v4.7.8-git",
+            version: "v4.7.9-git",
             commit: "3b7dd76",
             expected: "3b7dd76"
           },
           {
             tag: "commit loading",
-            version: "v4.7.8-git",
+            version: "v4.7.9-git",
             commit: "",
-            expected: "v4.7.8-git"
+            expected: "v4.7.9-git"
           },
           {
             tag: "release",
-            version: "v4.7.8",
+            version: "v4.7.9",
             commit: "",
-            expected: "v4.7.8"
+            expected: "v4.7.9"
           }
         ];
   }
