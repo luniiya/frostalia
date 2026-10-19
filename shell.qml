@@ -114,7 +114,6 @@ ShellRoot {
           HostService.init();
           NotificationRulesService.init();
           GitHubService.init();
-          SupporterService.init();
           CustomButtonIPCService.init();
           KdeConnectService.init();
           IPCService.init(screenDetector);
@@ -192,10 +191,8 @@ ShellRoot {
   }
 
   function showSetupWizard() {
-    if (!Settings.shouldOpenSetupWizard) {
-      TelemetryService.init();
+    if (!Settings.shouldOpenSetupWizard)
       return;
-    }
 
     var targetScreen = PanelService.findScreenForPanels();
     if (!targetScreen) {
@@ -210,7 +207,6 @@ ShellRoot {
       return;
     }
 
-    setupPanel.telemetryOnlyMode = false;
     setupPanel.open();
   }
 }

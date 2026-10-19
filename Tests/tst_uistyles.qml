@@ -46,25 +46,26 @@ TestCase {
   }
 
   function test_resolveId(data) {
-    compare(UiStyles.resolveId(data.value), "caelestia");
-    compare(UiStyles.tokens(data.value), UiStyles.tokens("caelestia"));
+    const expected = data.value === "caelestia" ? "caelestia" : "material";
+    compare(UiStyles.resolveId(data.value), expected);
+    compare(UiStyles.tokens(data.value), UiStyles.tokens(expected));
   }
 
   function test_choices() {
     compare(UiStyles.choices(), [
               {
-                key: "caelestia",
-                labelKey: "options.ui-style.caelestia"
-              },
-              {
                 key: "material",
                 labelKey: "options.ui-style.material"
+              },
+              {
+                key: "caelestia",
+                labelKey: "options.ui-style.caelestia"
               }
             ]);
     // A caller changing a menu model must not change the registry.
     const choices = UiStyles.choices();
     choices[0].key = "changed";
-    compare(UiStyles.choices()[0].key, "caelestia");
+    compare(UiStyles.choices()[0].key, "material");
   }
 
   function test_currentAppearanceIsPreserved() {

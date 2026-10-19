@@ -31,7 +31,7 @@ Singleton {
   - Appearance: ~/.config/frostalia/settings/UI/<style>.toml
   */
   readonly property alias data: adapter  // Used to access via Settings.data.xxx.yyy
-  readonly property int settingsVersion: 69
+  readonly property int settingsVersion: 70
   property bool isDebug: Quickshell.env("FROSTALIA_DEBUG") === "1"
   readonly property string shellName: "frostalia"
   readonly property string configDir: ensureTrailingSlash(Quickshell.env("FROSTALIA_CONFIG_DIR") || (Quickshell.env("XDG_CONFIG_HOME") || Quickshell.env("HOME") + "/.config") + "/" + shellName + "/")
@@ -305,7 +305,6 @@ Singleton {
       property int shadowOffsetY: 3
       property string language: ""
       property bool allowPanelsOnScreenWithoutBar: true
-      property bool telemetryEnabled: false
       property JsonObject keybinds: JsonObject {
         property list<string> keyUp: ["Up"]
         property list<string> keyDown: ["Down"]
@@ -321,21 +320,21 @@ Singleton {
 
     // ui
     property JsonObject ui: JsonObject {
-      property string style: "caelestia"
-      property string fontDefault: "Rubik"
+      property string style: "material"
+      property string fontDefault: "Roboto"
       property string fontFixed: ""
       property real fontDefaultScale: 1.0
       property real fontFixedScale: 1.0
       property bool tooltipsEnabled: true
       property bool scrollbarAlwaysVisible: true
-      property bool boxBorderEnabled: true
+      property bool boxBorderEnabled: false
       property int boxBorderWidth: 1 // 1-6, scaled with the UI
       property string boxBorderColor: "outline" // "outline", "primary", "secondary", "tertiary", "error"
       property int boxBorderBrightness: 0 // -100 (black) to 100 (white)
       property int boxBorderOpacity: 100 // percent
-      property real panelBackgroundOpacity: 0.93
+      property real panelBackgroundOpacity: 1.0
       property bool translucentWidgets: false
-      property bool frostedGlass: false
+      property bool frostedGlass: true
       property real glassPanelOpacity: 0.85
       property real glassSurfaceOpacity: 0.7
       property bool panelsAttachedToBar: true

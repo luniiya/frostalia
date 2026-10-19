@@ -2,10 +2,11 @@
 
 // Style tokens and default appearance preferences are independent of colors.
 // Add a complete entry here to offer another style in Settings.
-var defaultStyle = "caelestia";
+var defaultStyle = "material";
 var definitions = {
   "caelestia": {
     "labelKey": "options.ui-style.caelestia",
+    "settingsDefaults": { "ui": { "fontDefault": "Rubik", "boxBorderEnabled": true, "panelBackgroundOpacity": 0.93, "frostedGlass": false } },
     "views": {
       "controlCenter": "Modules/Panels/ControlCenter/CaelestiaControlCenter.qml",
       "mediaCard": "Modules/Cards/CaelestiaMediaCard.qml",
@@ -173,7 +174,7 @@ function resolveId(id) {
 }
 
 function choices() {
-  return Object.keys(definitions).map(id => ({ "key": id, "labelKey": definitions[id].labelKey }));
+  return Object.keys(definitions).sort((a, b) => a === defaultStyle ? -1 : b === defaultStyle ? 1 : 0).map(id => ({ "key": id, "labelKey": definitions[id].labelKey }));
 }
 
 // Consumers treat tokens as read-only. Editable preferences live in each style’s TOML file.

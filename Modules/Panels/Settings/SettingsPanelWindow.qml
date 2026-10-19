@@ -94,7 +94,7 @@ FloatingWindow {
   Shortcut {
     sequence: "Escape"
     enabled: !PanelService.isKeybindRecording
-    onActivated: SettingsPanelService.closeWindow()
+    onActivated: settingsContent.handleEscape()
   }
 
   Shortcut {

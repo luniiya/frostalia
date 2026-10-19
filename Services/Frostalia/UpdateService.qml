@@ -13,7 +13,6 @@ Singleton {
   readonly property bool isDevelopment: true
   readonly property string developmentSuffix: "-git"
   readonly property string currentVersion: `v${!isDevelopment ? baseVersion : baseVersion + developmentSuffix}`
-  readonly property string releasesUrl: "https://github.com/luniiya/frostalia/releases"
 
   function init() {
     Logger.i("UpdateService", "Version:", root.currentVersion);
@@ -21,10 +20,5 @@ Singleton {
 
   function compareVersions(a, b) {
     return VersionComparison.compareVersions(a, b);
-  }
-
-  // Release notes are opened only by an explicit user action.
-  function viewChangelog() {
-    Quickshell.execDetached(["xdg-open", releasesUrl]);
   }
 }

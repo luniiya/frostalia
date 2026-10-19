@@ -12,6 +12,7 @@ class UiStyleTests(unittest.TestCase):
         defaults = json.loads((ROOT / "Assets/settings-default.json").read_text())
         helper = (ROOT / "Helpers/UiStyles.js").read_text()
         default = re.search(r'var defaultStyle = "([^"]+)"', helper).group(1)
+        self.assertEqual(default, "material")
         self.assertEqual(defaults["ui"]["style"], default)
         self.assertRegex(helper, r'"' + default + r'":\s*\{')
 

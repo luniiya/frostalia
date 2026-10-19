@@ -122,7 +122,7 @@ The inherited modules discourage running the shell as a systemd service; launchi
 
 ## Privacy
 
-Frostalia has no default telemetry endpoint and sends no telemetry unless you configure `FROSTALIA_TELEMETRY_ENDPOINT` and explicitly enable the setting. The inherited upstream changelog popup has been removed; Frostalia does not show Noctalia release notes. The supporter service is disabled by default. Release checks and contributor links point to this repository.
+Frostalia does not collect or send telemetry. The inherited changelog popup and upstream donation actions have been removed. Release checks and contributor links point to this repository.
 
 Some optional integrations still use upstream services: the Noctalia plugin and color scheme registries, location search/IP geolocation, and the Noctalia VS Code theme extension. Weather and other online features also contact their respective providers. These are external dependencies, not Frostalia-hosted services. The About page retains an explicitly labeled link to support upstream Noctalia.
 

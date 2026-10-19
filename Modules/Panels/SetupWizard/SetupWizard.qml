@@ -13,15 +13,10 @@ import qs.Widgets
 SmartPanel {
   id: root
 
-  // When true, only shows step 0 with modified text for returning users (telemetry notification)
-  property bool telemetryOnlyMode: false
-
-  signal telemetryWizardCompleted
-
   preferredWidth: Math.round(preferredWidthRatio * 2560 * Style.uiScaleRatio)
   preferredHeight: Math.round(preferredHeightRatio * 1440 * Style.uiScaleRatio)
   preferredWidthRatio: 0.4
-  preferredHeightRatio: root.telemetryOnlyMode ? 0.45 : 0.6
+  preferredHeightRatio: 0.6
 
   panelAnchorHorizontalCenter: true
   panelAnchorVerticalCenter: true
@@ -33,7 +28,7 @@ SmartPanel {
 
     // Wizard state (lazy-loaded with panelContent)
     property int currentStep: 0
-    readonly property int totalSteps: root.telemetryOnlyMode ? 1 : 4
+    readonly property int totalSteps: 4
     property bool isCompleting: false
 
     // Setup wizard data
@@ -75,26 +70,15 @@ SmartPanel {
       }
 
       try {
-        Logger.i("SetupWizard", root.telemetryOnlyMode ? "Completing telemetry wizard" : "Completing setup with selected options");
+        Logger.i("SetupWizard", "Completing setup with selected options");
         isCompleting = true;
 
-        // In telemetry-only mode, we only need to save the telemetry setting
-        if (!root.telemetryOnlyMode) {
-          Settings.data.general.scaleRatio = selectedScaleRatio;
-          Settings.data.bar.position = selectedBarPosition;
-        }
-
-        // Initialize telemetry now that user has made their choice
-        TelemetryService.init();
+        Settings.data.general.scaleRatio = selectedScaleRatio;
+        Settings.data.bar.position = selectedBarPosition;
 
         // Save settings immediately and wait for settingsSaved signal before closing
         Settings.saveImmediate();
         Logger.i("SetupWizard", "Setup completed successfully, waiting for settings save confirmation");
-
-        // Notify listeners when the telemetry choice has been saved
-        if (root.telemetryOnlyMode) {
-          root.telemetryWizardCompleted();
-        }
 
         // Fallback: if settingsSaved signal doesn't fire within 2 seconds, close anyway
         closeTimer.start();
@@ -200,7 +184,7 @@ SmartPanel {
                 spacing: Style.marginM
 
                 NText {
-                  text: root.telemetryOnlyMode ? I18n.tr("setup.telemetry-wizard-title") : I18n.tr("setup.welcome-title")
+                  text: I18n.tr("setup.welcome-title")
                   pointSize: Style.fontSizeXXL * 1.4
                   font.weight: Style.fontWeightBold
                   color: Color.mOnSurface
@@ -209,7 +193,7 @@ SmartPanel {
                 }
 
                 NText {
-                  text: root.telemetryOnlyMode ? I18n.tr("setup.telemetry-wizard-subtitle") : I18n.tr("setup.welcome-subtitle")
+                  text: I18n.tr("setup.welcome-subtitle")
                   pointSize: Style.fontSizeL
                   color: Color.mOnSurfaceVariant
                   Layout.fillWidth: true
@@ -228,23 +212,12 @@ SmartPanel {
                   NText {
                     anchors.centerIn: parent
                     width: parent.width - Style.margin2L
-                    text: root.telemetryOnlyMode ? I18n.tr("setup.telemetry-wizard-note") : I18n.tr("setup.welcome-note")
+                    text: I18n.tr("setup.welcome-note")
                     pointSize: Style.fontSizeM
                     color: Color.mOnSurfaceVariant
                     horizontalAlignment: Text.AlignHCenter
                     wrapMode: Text.WordWrap
                   }
-                }
-
-                // Telemetry toggle
-                NToggle {
-                  Layout.fillWidth: true
-                  Layout.topMargin: Style.marginM
-                  label: I18n.tr("panels.about.telemetry-enabled")
-                  description: I18n.tr("panels.about.telemetry-desc")
-                  enabled: !!TelemetryService.telemetryEndpoint
-                  checked: Settings.data.general.telemetryEnabled
-                  onToggled: checked => Settings.data.general.telemetryEnabled = checked
                 }
               }
             }
@@ -283,14 +256,12 @@ SmartPanel {
         Layout.preferredHeight: 1
         color: Color.mOutline
         opacity: 0.2
-        visible: !root.telemetryOnlyMode
       }
 
       // Modern progress indicator with labels
       Item {
         Layout.fillWidth: true
         Layout.preferredHeight: 32
-        visible: !root.telemetryOnlyMode
 
         RowLayout {
           anchors.centerIn: parent
@@ -385,7 +356,6 @@ SmartPanel {
           NButton {
             text: I18n.tr("setup.skip-setup")
             outlined: true
-            visible: !root.telemetryOnlyMode
             Layout.preferredHeight: 44
             onClicked: {
               panelContent.completeSetup();
@@ -399,7 +369,7 @@ SmartPanel {
           NButton {
             text: "← " + I18n.tr("common.back")
             outlined: true
-            visible: currentStep > 0 && !root.telemetryOnlyMode
+            visible: currentStep > 0
             Layout.preferredHeight: 44
             onClicked: {
               if (currentStep > 0) {
@@ -409,7 +379,7 @@ SmartPanel {
           }
 
           NButton {
-            text: root.telemetryOnlyMode ? I18n.tr("setup.telemetry-wizard-done") : (currentStep === totalSteps - 1 ? I18n.tr("setup.all-done") : I18n.tr("common.continue") + " →")
+            text: currentStep === totalSteps - 1 ? I18n.tr("setup.all-done") : I18n.tr("common.continue") + " →"
             Layout.preferredHeight: 44
             onClicked: {
               if (currentStep < totalSteps - 1) {

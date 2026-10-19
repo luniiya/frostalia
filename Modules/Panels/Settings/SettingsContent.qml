@@ -14,7 +14,6 @@ import qs.Modules.Panels.Settings.Tabs.Connections
 import qs.Modules.Panels.Settings.Tabs.ControlCenter
 import qs.Modules.Panels.Settings.Tabs.Display
 import qs.Modules.Panels.Settings.Tabs.Dock
-import qs.Modules.Panels.Settings.Tabs.Hooks
 import qs.Modules.Panels.Settings.Tabs.Idle
 import qs.Modules.Panels.Settings.Tabs.Launcher
 import qs.Modules.Panels.Settings.Tabs.Notifications
@@ -77,13 +76,33 @@ Item {
     clearHighlightImmediately();
   }
 
+  function handleEscape() {
+    const action = SettingsWindowLayout.escapeAction(searchText, homeVisible);
+    if (action === "clearSearch") {
+      searchInput.text = "";
+      root.forceActiveFocus();
+    } else if (action === "home") {
+      showHome();
+      root.forceActiveFocus();
+    } else {
+      closeRequested();
+    }
+  }
+
   function openTabIndex(index) {
     if (index < 0 || index >= tabsModel.length)
       return;
     homeVisible = false;
     currentTabIndex = index;
   }
-  readonly property var materialRail: SettingsWindowLayout.materialRail(sidebarExpanded, Style.uiScaleRatio, sidebarList.verticalScrollBarActive ? sidebarList.handleWidth + Style.marginXS : 0)
+  property real sidebarExpansion: sidebarExpanded ? 1 : 0
+  Behavior on sidebarExpansion {
+    NumberAnimation {
+      duration: Style.animationNormal
+      easing.type: Easing.OutCubic
+    }
+  }
+  readonly property var materialRail: SettingsWindowLayout.materialRail(sidebarExpansion, Style.uiScaleRatio, sidebarList.verticalScrollBarActive ? sidebarList.handleWidth + Style.marginXS : 0)
   readonly property bool sidebarCardStyle: !material && Settings.data.ui.settingsPanelSideBarCardStyle
 
   onSearchResultsChanged: {
@@ -484,10 +503,6 @@ Item {
     AboutTab {}
   }
   Component {
-    id: hooksTab
-    HooksTab {}
-  }
-  Component {
     id: idleTab
     IdleTab {}
   }
@@ -639,12 +654,6 @@ Item {
             "label": "panels.plugins.title",
             "icon": "plugin",
             "source": pluginsTab
-          },
-          {
-            "id": SettingsPanel.Tab.Hooks,
-            "label": "panels.hooks.title",
-            "icon": "settings-hooks",
-            "source": hooksTab
           },
           {
             "id": SettingsPanel.Tab.About,
@@ -837,6 +846,7 @@ Item {
         border.color: root.sidebarCardStyle ? Style.boxBorderColor : "transparent"
 
         Behavior on expandedWidth {
+          enabled: !root.material
           NumberAnimation {
             duration: Style.animationFast
             easing.type: Easing.InOutQuad
@@ -850,13 +860,38 @@ Item {
           anchors.margins: root.sidebarCardStyle ? Style.marginM : 0
 
           NButton {
+            id: homeButton
             Layout.fillWidth: true
             Layout.rightMargin: root.material && sidebarList.verticalScrollBarActive ? sidebarList.handleWidth + Style.marginXS : 0
-            Layout.preferredHeight: root.material && !root.sidebarExpanded ? root.materialRail.rowHeight : implicitHeight
+            Layout.preferredHeight: root.material ? root.materialRail.rowHeight : implicitHeight
             buttonRadius: root.material ? height / 2 : Style.iRadiusS
             iconSize: root.material ? Style.fontSizeXL : Style.fontSizeL
-            text: root.sidebarExpanded ? I18n.tr("panels.settings.home") : ""
-            icon: "home"
+            text: !root.material && root.sidebarExpanded ? I18n.tr("panels.settings.home") : ""
+            icon: root.material ? "" : "home"
+            clip: true
+
+            NIcon {
+              id: homeIcon
+              visible: root.material
+              icon: "home"
+              pointSize: Style.fontSizeXL
+              color: homeButton.contentColor
+              x: SettingsWindowLayout.railIconInset(root.sidebarExpansion, root.materialRail.rowHeight, width, Style.marginL)
+              anchors.verticalCenter: parent.verticalCenter
+            }
+
+            NText {
+              visible: root.material && opacity > 0
+              opacity: root.sidebarExpansion
+              anchors.left: homeIcon.right
+              anchors.leftMargin: Style.marginM
+              anchors.right: parent.right
+              anchors.rightMargin: Style.marginL
+              anchors.verticalCenter: parent.verticalCenter
+              text: I18n.tr("panels.settings.home")
+              color: homeButton.contentColor
+              font.weight: Style.fontWeightSemiBold
+            }
             backgroundColor: root.homeVisible ? Color.mPrimary : "transparent"
             textColor: root.homeVisible ? Color.mOnPrimary : Color.mOnSurface
             onClicked: root.showHome()
@@ -972,7 +1007,7 @@ Item {
               visible: root.searchText.trim() === ""
               anchors.fill: parent
               model: root.tabsModel
-              spacing: root.material ? 0 : Style.marginXS
+              spacing: root.material ? root.materialRail.rowSpacing : Style.marginXS
               currentIndex: root.currentTabIndex
               horizontalPolicy: ScrollBar.AlwaysOff
               verticalPolicy: root.material ? ScrollBar.AsNeeded : ScrollBar.AlwaysOff
@@ -1022,32 +1057,37 @@ Item {
                   }
                 }
 
-                RowLayout {
+                Item {
                   id: tabEntryRow
                   anchors.fill: parent
-                  anchors.leftMargin: root.material ? (root.sidebarExpanded ? Style.marginL : 0) : Style.marginS
-                  anchors.rightMargin: root.material ? (root.sidebarExpanded ? Style.marginL : 0) : Style.marginS
-                  spacing: Style.marginM
+                  implicitHeight: Math.max(tabIcon.implicitHeight, tabLabel.implicitHeight)
+                  clip: true
 
                   NIcon {
-                    Layout.fillWidth: root.material && !root.sidebarExpanded
+                    id: tabIcon
                     icon: modelData.icon
                     color: tabTextColor
                     pointSize: Style.fontSizeXL
-                    Layout.alignment: Qt.AlignVCenter
+                    x: root.material ? SettingsWindowLayout.railIconInset(root.sidebarExpansion, root.materialRail.rowHeight, width, Style.marginL) : Style.marginS
+                    anchors.verticalCenter: parent.verticalCenter
                   }
 
                   NText {
+                    id: tabLabel
                     text: I18n.tr(modelData.label)
                     color: tabTextColor
                     pointSize: Style.fontSizeM
                     font.weight: Style.fontWeightSemiBold
-                    Layout.fillWidth: true
-                    Layout.alignment: Qt.AlignVCenter
-                    visible: root.sidebarExpanded
-                    opacity: root.sidebarExpanded ? 1.0 : 0.0
+                    anchors.left: tabIcon.right
+                    anchors.leftMargin: Style.marginM
+                    anchors.right: parent.right
+                    anchors.rightMargin: root.material ? Style.marginL : Style.marginS
+                    anchors.verticalCenter: parent.verticalCenter
+                    visible: opacity > 0
+                    opacity: root.material ? root.sidebarExpansion : (root.sidebarExpanded ? 1 : 0)
 
                     Behavior on opacity {
+                      enabled: !root.material
                       NumberAnimation {
                         duration: Style.animationFast
                         easing.type: Easing.InOutQuad

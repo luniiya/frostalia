@@ -93,7 +93,6 @@ Singleton {
                                             "display": SettingsPanel.Tab.Display,
                                             "dock": SettingsPanel.Tab.Dock,
                                             "general": SettingsPanel.Tab.General,
-                                            "hooks": SettingsPanel.Tab.Hooks,
                                             "launcher": SettingsPanel.Tab.Launcher,
                                             "location": SettingsPanel.Tab.Location,
                                             "connections": SettingsPanel.Tab.Connections,

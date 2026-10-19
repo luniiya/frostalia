@@ -77,111 +77,6 @@ ColumnLayout {
     return root.systemInfo.find(m => m.type === type);
   }
 
-  function getMonitorsText(separator) {
-    const sep = separator || "\n";
-    const screens = Quickshell.screens || [];
-    const scales = CompositorService.displayScales || {};
-    let lines = [];
-    for (let i = 0; i < screens.length; i++) {
-      const screen = screens[i];
-      const name = screen.name || "Unknown";
-      const scaleData = scales[name];
-      const scaleValue = (typeof scaleData === "object" && scaleData !== null) ? (scaleData.scale || 1.0) : (scaleData || 1.0);
-      lines.push(name + ": " + screen.width + "x" + screen.height + " @ " + scaleValue + "x");
-    }
-    return lines.join(sep);
-  }
-
-  function getTelemetryPayload() {
-    const screens = Quickshell.screens || [];
-    const scales = CompositorService.displayScales || {};
-    const monitors = [];
-    for (let i = 0; i < screens.length; i++) {
-      const screen = screens[i];
-      const name = screen.name || "Unknown";
-      const scaleData = scales[name];
-      const scaleValue = (typeof scaleData === "object" && scaleData !== null) ? (scaleData.scale || 1.0) : (scaleData || 1.0);
-      monitors.push({
-                      width: screen.width || 0,
-                      height: screen.height || 0,
-                      scale: scaleValue
-                    });
-    }
-    return {
-      instanceId: TelemetryService.getInstanceId(),
-      version: UpdateService.currentVersion,
-      compositor: TelemetryService.getCompositorType(),
-      os: HostService.osPretty || "Unknown",
-      ramGb: Math.round((root.getModule("Memory")?.result?.total || 0) / root.gigaB),
-      monitors: monitors,
-      ui: {
-        scaleRatio: Settings.data.general.scaleRatio,
-        fontDefaultScale: Settings.data.ui.fontDefaultScale,
-        fontFixedScale: Settings.data.ui.fontFixedScale
-      }
-    };
-  }
-
-  function copyTelemetryData() {
-    const payload = getTelemetryPayload();
-    const json = JSON.stringify(payload, null, 2);
-    Quickshell.execDetached(["wl-copy", json]);
-    ToastService.showNotice(I18n.tr("panels.about.telemetry-title"), I18n.tr("panels.about.telemetry-data-copied"));
-  }
-
-  function copyInfoToClipboard() {
-    let info = "Frostalia Shell: " + root.installedVersion + "\n";
-
-    if (root.qsVersion) {
-      let qsV = root.qsVersion.startsWith("v") ? root.qsVersion : "v" + root.qsVersion;
-      info += "Frostalia QS: " + qsV;
-      if (root.qsRevision) {
-        info += " (" + root.qsRevision + ")";
-      }
-      info += "\n";
-    }
-
-    info += "\nSystem Information\n";
-    info += "==================\n";
-    if (root.systemInfo) {
-      const os = root.getModule("OS");
-      const kernel = root.getModule("Kernel");
-      const title = root.getModule("Title");
-      const product = root.getModule("Host");
-      const board = root.getModule("Board");
-      const cpu = root.getModule("CPU");
-      const gpu = root.getModule("GPU");
-      const mem = root.getModule("Memory");
-      const wm = root.getModule("WM");
-      info += "OS: " + (os?.result?.prettyName || "N/A") + "\n";
-      info += "Kernel: " + (kernel?.result?.release || "N/A") + "\n";
-      info += "Host: " + (title?.result?.hostName || "N/A") + "\n";
-      info += "Product: " + (product?.result?.name || "N/A") + "\n";
-      info += "Board: " + (board?.result?.name || "N/A") + "\n";
-      info += "CPU: " + (cpu?.result?.cpu || "N/A") + "\n";
-      if (gpu?.result && Array.isArray(gpu.result) && gpu.result.length > 0) {
-        info += "GPU: " + gpu.result.map(g => g.name || "Unknown").join(", ") + "\n";
-      }
-      if (mem?.result) {
-        info += "Memory: " + (mem.result.total / root.gigaB).toFixed(1) + " GB \n";
-      }
-      if (wm?.result) {
-        info += "WM: " + (wm.result.prettyName || wm.result.processName || "N/A") + "\n";
-      }
-    }
-    const monitors = getMonitorsText("\n").split("\n");
-    for (const mon of monitors) {
-      info += "Monitor: " + mon + "\n";
-    }
-    info += "\nSettings\n";
-    info += "========\n";
-    info += "UI Scale: " + Settings.data.general.scaleRatio + "\n";
-    info += "Default Font: " + (Settings.data.ui.fontDefault || "default") + " @ " + Settings.data.ui.fontDefaultScale + "x\n";
-    info += "Fixed Font: " + (Settings.data.ui.fontFixed || "default") + " @ " + Settings.data.ui.fontFixedScale + "x\n";
-    Quickshell.execDetached(["wl-copy", info]);
-    ToastService.showNotice(I18n.tr("panels.about.title"), I18n.tr("panels.about.info-copied"));
-  }
-
   Component.onCompleted: {
     // Check if fastfetch is available before trying to run it
     checkFastfetchProcess.running = true;
@@ -562,47 +457,6 @@ ColumnLayout {
     }
   }
 
-  GridLayout {
-    id: actionsGrid
-    Layout.alignment: Qt.AlignHCenter
-    Layout.topMargin: Style.marginM
-    Layout.bottomMargin: Style.marginM
-    rowSpacing: Style.marginM
-    columnSpacing: Style.marginM
-
-    columns: (changelogBtn.implicitWidth + copyBtn.implicitWidth + supportBtn.implicitWidth + 2 * columnSpacing) < root.width ? 3 : 1
-
-    NButton {
-      id: changelogBtn
-      icon: "sparkles"
-      text: I18n.tr("panels.about.changelog")
-      outlined: true
-      Layout.alignment: Qt.AlignHCenter
-      onClicked: UpdateService.viewChangelog()
-    }
-
-    NButton {
-      id: copyBtn
-      icon: "copy"
-      text: I18n.tr("panels.about.copy-info")
-      outlined: true
-      Layout.alignment: Qt.AlignHCenter
-      onClicked: root.copyInfoToClipboard()
-    }
-
-    NButton {
-      id: supportBtn
-      icon: "heart"
-      text: I18n.tr("panels.about.support")
-      outlined: true
-      Layout.alignment: Qt.AlignHCenter
-      onClicked: {
-        Quickshell.execDetached(["xdg-open", "https://buymeacoffee.com/noctalia"]);
-        ToastService.showNotice(I18n.tr("panels.about.support"), I18n.tr("toast.donation-opened"));
-      }
-    }
-  }
-
   // System Information Section
   NDivider {
     Layout.fillWidth: true
@@ -922,43 +776,6 @@ ColumnLayout {
         Layout.fillWidth: !isLabel
         wrapMode: Text.Wrap
       }
-    }
-  }
-
-  // Telemetry Section
-  NDivider {
-    Layout.fillWidth: true
-    Layout.topMargin: Style.marginL
-  }
-
-  NHeader {
-    label: I18n.tr("panels.about.telemetry-title")
-  }
-
-  NToggle {
-    Layout.fillWidth: true
-    label: I18n.tr("panels.about.telemetry-enabled")
-    description: I18n.tr("panels.about.telemetry-desc")
-    enabled: !!TelemetryService.telemetryEndpoint
-    checked: Settings.data.general.telemetryEnabled
-    onToggled: checked => Settings.data.general.telemetryEnabled = checked
-  }
-
-  RowLayout {
-    spacing: Style.marginM
-
-    NButton {
-      icon: "eye"
-      text: I18n.tr("panels.about.telemetry-show-data")
-      outlined: true
-      onClicked: root.copyTelemetryData()
-    }
-
-    NButton {
-      icon: "shield-lock"
-      text: I18n.tr("panels.about.privacy-policy")
-      outlined: true
-      onClicked: Quickshell.execDetached(["xdg-open", "https://github.com/luniiya/frostalia#privacy"])
     }
   }
 }

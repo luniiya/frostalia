@@ -101,7 +101,6 @@
     "shadowOffsetY": 3,
     "language": "",
     "allowPanelsOnScreenWithoutBar": true,
-    "telemetryEnabled": false,
     "keybinds": {
       "keyUp": [
         "Up"
@@ -130,21 +129,21 @@
     "smoothScrollEnabled": true
   },
   "ui": {
-    "style": "caelestia",
-    "fontDefault": "Rubik",
+    "style": "material",
+    "fontDefault": "Roboto",
     "fontFixed": "",
     "fontDefaultScale": 1,
     "fontFixedScale": 1,
     "tooltipsEnabled": true,
     "scrollbarAlwaysVisible": true,
-    "boxBorderEnabled": true,
+    "boxBorderEnabled": false,
     "boxBorderWidth": 1,
     "boxBorderColor": "outline",
     "boxBorderBrightness": 0,
     "boxBorderOpacity": 100,
-    "panelBackgroundOpacity": 0.93,
+    "panelBackgroundOpacity": 1.0,
     "translucentWidgets": false,
-    "frostedGlass": false,
+    "frostedGlass": true,
     "glassPanelOpacity": 0.85,
     "glassSurfaceOpacity": 0.7,
     "panelsAttachedToBar": true,

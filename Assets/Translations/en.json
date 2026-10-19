@@ -396,25 +396,6 @@
       "signal-text-very-poor": "Signal: Very poor"
     }
   },
-  "changelog": {
-    "error": {
-      "fetch-failed": "Unable to load changelog data. Please try again later.",
-      "rate-limit": "GitHub rate limit exceeded. Please try again in a few minutes."
-    },
-    "panel": {
-      "buttons-discord": "Join our Discord",
-      "buttons-dismiss": "OK",
-      "buttons-feedback": "Give feedback",
-      "empty": "Release notes are not available yet.",
-      "highlight-title": "Highlights",
-      "released": "Released on {date}",
-      "subtitle-fresh": "Thanks for installing Frostalia! Here is what’s included in this build.",
-      "subtitle-updated": "Updated from {previousVersion}",
-      "title": "What's new in {version}",
-      "version": "Version {version}",
-      "version-new-user": "Fresh install"
-    }
-  },
   "common": {
     "actions": "Actions",
     "active": "Active",
@@ -943,16 +924,10 @@
       "advanced": "Advanced"
     },
     "about": {
-      "become-supporter": "Become a supporter",
-      "changelog": "View changelog",
-      "changelog-on-startup": "Show changelog on update",
-      "changelog-on-startup-desc": "Automatically show the changelog when Frostalia is updated",
       "contributors-description": "Shout-out to our {count} <b>awesome</b> contributor!",
       "contributors-description-plural": "Shout-out to our {count} <b>awesome</b> contributors!",
-      "copy-info": "Copy info",
       "debug-disabled": "Debug mode disabled",
       "debug-enabled": "Debug mode enabled",
-      "info-copied": "Info copied to clipboard",
       "noctalia-qs-version": "Noctalia QS version:",
       "frostalia-available": "Available:",
       "frostalia-desc": "A sleek and minimal desktop shell thoughtfully crafted for Wayland, built with Quickshell.",
@@ -960,12 +935,6 @@
       "frostalia-installed-version": "Installed version:",
       "frostalia-latest-version": "Latest version:",
       "frostalia-title": "Frostalia Shell",
-      "privacy-policy": "Privacy policy",
-      "support": "Support upstream Noctalia",
-      "supporter-badge": "Supporter",
-      "supporters-desc": "A huge thank you to our amazing supporter!",
-      "supporters-desc-plural": "A huge thank you to our <b>{count} amazing</b> supporters!",
-      "supporters-loading": "Loading supporters...",
       "system-board": "Board:",
       "system-cpu": "CPU:",
       "system-disk": "Disk:",
@@ -983,11 +952,6 @@
       "system-title": "System Information",
       "system-uptime": "Uptime:",
       "system-wm": "WM:",
-      "telemetry-data-copied": "Telemetry data copied to clipboard",
-      "telemetry-desc": "Send anonymous usage data only when a custom FROSTALIA_TELEMETRY_ENDPOINT is configured. Disabled by default.",
-      "telemetry-enabled": "Send anonymous system information",
-      "telemetry-show-data": "View data",
-      "telemetry-title": "Privacy",
       "title": "About",
       "up-to-date": "You're up to date!",
       "update-available": "Update available",
@@ -2196,10 +2160,6 @@
       "subheader": "Adjust bar position, density, scaling and more."
     },
     "skip-setup": "Skip Setup",
-    "telemetry-wizard-done": "Got it!",
-    "telemetry-wizard-note": "You're in control — enable or disable this anytime in settings",
-    "telemetry-wizard-subtitle": "We've added anonymous analytics to help improve Frostalia",
-    "telemetry-wizard-title": "Privacy Update",
     "wallpaper": {
       "choose-dir": "Choose a directory containing your wallpaper images",
       "dir-browse": "Browse for wallpaper folder",
@@ -2288,7 +2248,6 @@
       "enabled": "Do Not Disturb enabled",
       "enabled-desc": "You'll find these notifications in your history"
     },
-    "donation-opened": "Donation page opened in your browser",
     "internet-limited": "Connected without internet",
     "keyboard-layout": {
       "changed": "Keyboard layout changed to {layout}",

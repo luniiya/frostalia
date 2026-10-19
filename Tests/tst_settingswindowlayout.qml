@@ -62,8 +62,8 @@ TestCase {
             tag: "compact",
             expanded: false,
             scale: 1,
-            width: 56,
-            height: 56
+            width: 44,
+            height: 44
           },
           {
             tag: "expanded",
@@ -76,8 +76,8 @@ TestCase {
             tag: "compact scaled",
             expanded: false,
             scale: 1.5,
-            width: 84,
-            height: 84
+            width: 66,
+            height: 66
           },
           {
             tag: "expanded scaled",
@@ -93,6 +93,8 @@ TestCase {
     const rail = SettingsWindowLayout.materialRail(data.expanded, data.scale);
     compare(rail.width, data.width);
     compare(rail.rowHeight, data.height);
+    compare(rail.rowSpacing, Math.round(5 * data.scale));
+    verify(rail.rowSpacing > 0 && rail.rowSpacing < rail.rowHeight / 5);
     if (!data.expanded)
       compare(rail.width, rail.rowHeight, "compact buttons are square");
   }
@@ -134,6 +136,48 @@ TestCase {
     if (!data.expanded)
       compare(scrolling.width - data.gutter, scrolling.rowHeight, "scrollbar does not distort compact buttons");
     compare(SettingsWindowLayout.materialRail(data.expanded, data.scale, 0).width, base.width);
+  }
+
+  function test_railTransition_data() {
+    return [
+          {
+            tag: "compact",
+            progress: 0,
+            width: 44
+          },
+          {
+            tag: "opening",
+            progress: 0.25,
+            width: 89
+          },
+          {
+            tag: "midpoint",
+            progress: 0.5,
+            width: 134
+          },
+          {
+            tag: "expanded",
+            progress: 1,
+            width: 224
+          }
+        ];
+  }
+
+  function test_railTransition(data) {
+    const rail = SettingsWindowLayout.materialRail(data.progress, 1, 10);
+    compare(rail.width, data.width + 10);
+    compare(rail.rowHeight, 44);
+    const inset = SettingsWindowLayout.railIconInset(data.progress, 44, 24, 16);
+    compare(inset, 10 + 6 * data.progress);
+  }
+
+  function test_compactIconIsCenteredAtEveryScale() {
+    for (const scale of [1, 1.25, 1.5, 2]) {
+      const rail = SettingsWindowLayout.materialRail(false, scale);
+      const iconWidth = 24 * scale;
+      const inset = SettingsWindowLayout.railIconInset(0, rail.rowHeight, iconWidth, 16 * scale);
+      compare(inset * 2 + iconWidth, rail.width);
+    }
   }
 
   function test_search_data() {
@@ -398,16 +442,113 @@ TestCase {
     compare(grid.columns, data.columns);
     verify(grid.cardWidth >= 0);
     compare(grid.cardWidth * grid.columns + grid.spacing * (grid.columns - 1), data.width);
+    const span = Math.min(2, grid.columns);
+    compare(grid.profileWidth, grid.cardWidth * span + grid.spacing * (span - 1));
+    verify(grid.profileWidth <= data.width);
+    if (grid.columns <= 2)
+      compare(grid.profileWidth, data.width);
+  }
+
+  function test_escapeAction_data() {
+    return [
+          {
+            tag: "search on home",
+            search: "weather",
+            home: true,
+            action: "clearSearch"
+          },
+          {
+            tag: "search in category",
+            search: "weather",
+            home: false,
+            action: "clearSearch"
+          },
+          {
+            tag: "whitespace search",
+            search: " ",
+            home: false,
+            action: "clearSearch"
+          },
+          {
+            tag: "category returns home",
+            search: "",
+            home: false,
+            action: "home"
+          },
+          {
+            tag: "home closes",
+            search: "",
+            home: true,
+            action: "close"
+          }
+        ];
+  }
+
+  function test_escapeAction(data) {
+    compare(SettingsWindowLayout.escapeAction(data.search, data.home), data.action);
+  }
+
+  function test_homeCategories_data() {
+    return [
+          {
+            tag: "wide",
+            wide: true,
+            missingAbout: false,
+            promoted: true
+          },
+          {
+            tag: "narrow keeps every category",
+            wide: false,
+            missingAbout: false,
+            promoted: false
+          },
+          {
+            tag: "missing side category",
+            wide: true,
+            missingAbout: true,
+            promoted: false
+          }
+        ];
+  }
+
+  function test_homeCategories(data) {
+    const tabs = [
+            {
+              id: 20
+            },
+            {
+              id: 9
+            },
+            {
+              id: 4
+            }
+          ];
+    if (!data.missingAbout)
+      tabs.push({
+                  id: 0
+                });
+    const snapshot = JSON.stringify(tabs);
+    const result = SettingsWindowLayout.homeCategories(tabs, 9, 0, data.wide);
+    compare(result.promoted, data.promoted);
+    compare(result.general.index, 1);
+    if (data.promoted) {
+      compare(result.about.index, 3);
+      compare(result.grid.map(entry => entry.index), [0, 2]);
+      compare(result.grid.map(entry => entry.tab.id), [20, 4]);
+    } else {
+      compare(result.grid.map(entry => entry.tab), tabs);
+    }
+    compare(JSON.stringify(tabs), snapshot);
   }
 
   function test_profile_data() {
     return [
           {
-            tag: "real name and OS",
+            tag: "username takes precedence",
             displayName: "Aya",
             username: "ayaya",
             os: "CachyOS",
-            name: "Aya",
+            name: "ayaya",
             expectedOs: "CachyOS"
           },
           {
@@ -423,7 +564,7 @@ TestCase {
             displayName: "  Aya  ",
             username: "user",
             os: "  Linux  ",
-            name: "Aya",
+            name: "user",
             expectedOs: "Linux"
           },
           {
@@ -438,8 +579,10 @@ TestCase {
   }
 
   function test_profile(data) {
-    const profile = SettingsWindowLayout.profile(data.displayName, data.username, data.os, "Operating system");
+    const profile = SettingsWindowLayout.profile(data.displayName, data.username, data.os, "Operating system", "  moonmelon  ");
     compare(profile.name, data.name);
     compare(profile.os, data.expectedOs);
+    compare(profile.hostname, "moonmelon");
+    compare(SettingsWindowLayout.profile("", "", "", "Operating system").hostname, "");
   }
 }

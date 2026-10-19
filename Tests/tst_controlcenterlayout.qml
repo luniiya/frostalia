@@ -155,7 +155,7 @@ TestCase {
       verify(UiStyles.view("caelestia", surface).length > 0);
       verify(UiStyles.view("material", surface).length > 0);
       verify(UiStyles.view("caelestia", surface) !== UiStyles.view("material", surface));
-      compare(UiStyles.view("unknown", surface), UiStyles.view("caelestia", surface));
+      compare(UiStyles.view("unknown", surface), UiStyles.view("material", surface));
     }
     compare(UiStyles.view("material", "unknown"), "");
   }

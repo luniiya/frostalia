@@ -11,7 +11,8 @@ NScrollView {
   required property var tabs
   readonly property bool material: Style.materialControls
   readonly property var homeMetrics: SettingsWindowLayout.homeMetrics(availableWidth, Style.uiScaleRatio, material)
-  readonly property var profile: SettingsWindowLayout.profile(HostService.displayName, HostService.username, HostService.osPretty, I18n.tr("panels.settings.os"))
+  readonly property var profile: SettingsWindowLayout.profile(HostService.displayName, HostService.username, HostService.osPretty, I18n.tr("panels.settings.os"), HostService.hostName)
+  readonly property var homeTabs: SettingsWindowLayout.homeCategories(tabs, SettingsPanel.Tab.General, SettingsPanel.Tab.About, categories.geometry.columns >= 3)
   signal tabRequested(int index)
 
   horizontalPolicy: ScrollBar.AlwaysOff
@@ -21,6 +22,60 @@ NScrollView {
   userRightPadding: leftPadding
   topPadding: leftPadding
   bottomPadding: leftPadding
+
+  component CategoryCard: Rectangle {
+    id: category
+    required property var entry
+    property bool compact: false
+    signal chosen(int tabIndex)
+    implicitHeight: compact ? root.homeMetrics.avatarSize + Style.margin2L : Math.round((root.material ? 112 : 100) * Style.uiScaleRatio)
+    radius: Style.radiusM
+    color: root.material ? Qt.tint(Color.mSurfaceVariant, Qt.alpha(Color.mOnSurface, 0.035)) : categoryMouse.containsMouse ? Color.mHover : Color.mSurface
+    border.width: root.material ? 0 : Style.boxBorderWidth
+    border.color: Style.boxBorderColor
+
+    NMaterialStateLayer {
+      hovered: categoryMouse.containsMouse
+      pressed: categoryMouse.pressed
+      tint: Color.mOnSurface
+    }
+
+    ColumnLayout {
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.top: category.compact ? undefined : parent.top
+      anchors.bottom: category.compact ? undefined : parent.bottom
+      anchors.verticalCenter: category.compact ? parent.verticalCenter : undefined
+      anchors.margins: Style.marginL
+      spacing: Style.marginS
+      NIcon {
+        Layout.alignment: category.compact ? Qt.AlignHCenter : Qt.AlignLeft
+        icon: category.entry ? category.entry.tab.icon : ""
+        color: root.material ? Color.mOnSurface : categoryMouse.containsMouse ? Color.mOnHover : Color.mPrimary
+        pointSize: Style.fontSizeXXL
+      }
+      NText {
+        Layout.fillWidth: true
+        horizontalAlignment: category.compact ? Text.AlignHCenter : Text.AlignLeft
+        text: category.entry ? I18n.tr(category.entry.tab.label) : ""
+        pointSize: Style.fontSizeM
+        font.weight: root.material ? Style.fontWeightRegular : Style.fontWeightSemiBold
+        color: root.material ? Color.mOnSurface : categoryMouse.containsMouse ? Color.mOnHover : Color.mOnSurface
+        elide: Text.ElideRight
+      }
+    }
+
+    MouseArea {
+      id: categoryMouse
+      anchors.fill: parent
+      hoverEnabled: true
+      cursorShape: Qt.PointingHandCursor
+      onClicked: {
+        if (category.entry)
+          category.chosen(category.entry.index);
+      }
+    }
+  }
 
   ColumnLayout {
     id: homeColumn
@@ -39,48 +94,109 @@ NScrollView {
       }
     }
 
-    Rectangle {
+    RowLayout {
       Layout.fillWidth: true
-      implicitHeight: profileRow.implicitHeight + Style.margin2L
-      radius: Style.radiusM
-      color: root.material ? Qt.tint(Color.mSurfaceVariant, Qt.alpha(Color.mOnSurface, 0.035)) : Color.mSurface
-      border.width: root.material ? 0 : Style.boxBorderWidth
-      border.color: Style.boxBorderColor
+      spacing: categories.geometry.spacing
 
-      RowLayout {
-        id: profileRow
-        anchors.fill: parent
-        anchors.margins: Style.marginL
-        spacing: Style.marginL
+      CategoryCard {
+        visible: root.homeTabs.promoted
+        entry: root.homeTabs.general
+        compact: true
+        Layout.fillWidth: true
+        Layout.preferredWidth: 1
+        Layout.fillHeight: true
+        onChosen: tabIndex => root.tabRequested(tabIndex)
+      }
 
-        NImageRounded {
-          Layout.preferredWidth: root.homeMetrics.avatarSize
-          Layout.preferredHeight: width
-          radius: width / 2
-          imagePath: Settings.preprocessPath(Settings.data.general.avatarImage || Settings.defaultAvatar)
-          fallbackIcon: "person"
-          borderColor: root.material ? "transparent" : Color.mPrimary
-          borderWidth: root.material ? 0 : Style.borderS
-        }
-        ColumnLayout {
-          Layout.fillWidth: true
-          spacing: Style.marginS
+      Rectangle {
+        Layout.preferredWidth: categories.geometry.profileWidth
+        Layout.alignment: Qt.AlignHCenter
+        Layout.fillHeight: true
+        implicitHeight: profileRow.implicitHeight + Style.margin2L
+        radius: Style.radiusM
+        color: root.material ? Qt.tint(Color.mSurfaceVariant, Qt.alpha(Color.mOnSurface, 0.035)) : Color.mSurface
+        border.width: root.material ? 0 : Style.boxBorderWidth
+        border.color: Style.boxBorderColor
+
+        Item {
+          id: profileRow
+          anchors.fill: parent
+          anchors.margins: Style.marginL
+          implicitHeight: root.homeMetrics.avatarSize
+
+          NImageRounded {
+            id: profileAvatar
+            anchors.left: parent.left
+            anchors.verticalCenter: parent.verticalCenter
+            width: root.homeMetrics.avatarSize
+            height: width
+            radius: width / 2
+            imagePath: Settings.preprocessPath(Settings.data.general.avatarImage || Settings.defaultAvatar)
+            fallbackIcon: "person"
+            borderColor: root.material ? "transparent" : Color.mPrimary
+            borderWidth: root.material ? 0 : Style.borderS
+          }
+
           NText {
-            Layout.fillWidth: true
+            id: profileName
+            anchors.left: profileAvatar.right
+            anchors.leftMargin: Style.marginL
+            anchors.verticalCenter: parent.verticalCenter
+            width: Math.max(0, parent.width / 3 - profileAvatar.width - Style.marginL)
             text: root.profile.name
             pointSize: Style.fontSizeXL
             font.weight: root.material ? Style.fontWeightRegular : Style.fontWeightSemiBold
             color: Color.mOnSurface
             elide: Text.ElideRight
           }
+
           NText {
-            Layout.fillWidth: true
-            text: root.profile.os
-            pointSize: Style.fontSizeM
-            color: Color.mOnSurfaceVariant
+            anchors.centerIn: parent
+            width: parent.width / 3
+            horizontalAlignment: Text.AlignHCenter
+            text: root.profile.hostname
+            font: profileName.font
+            color: profileName.color
             elide: Text.ElideRight
           }
+
+          RowLayout {
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            width: parent.width / 3
+            spacing: Style.marginM
+
+            NText {
+              Layout.fillWidth: true
+              horizontalAlignment: Text.AlignRight
+              text: root.profile.os
+              font: profileName.font
+              color: profileName.color
+              elide: Text.ElideRight
+            }
+
+            Image {
+              visible: HostService.osLogo !== ""
+              source: HostService.osLogo
+              Layout.preferredWidth: profileAvatar.width
+              Layout.preferredHeight: profileAvatar.height
+              fillMode: Image.PreserveAspectFit
+              sourceSize.width: width
+              sourceSize.height: height
+              asynchronous: true
+            }
+          }
         }
+      }
+
+      CategoryCard {
+        visible: root.homeTabs.promoted
+        entry: root.homeTabs.about
+        compact: true
+        Layout.fillWidth: true
+        Layout.preferredWidth: 1
+        Layout.fillHeight: true
+        onChosen: tabIndex => root.tabRequested(tabIndex)
       }
     }
 
@@ -93,51 +209,13 @@ NScrollView {
       columnSpacing: geometry.spacing
 
       Repeater {
-        model: root.tabs
-        delegate: Rectangle {
-          id: category
-          required property int index
+        model: root.homeTabs.grid
+        delegate: CategoryCard {
           required property var modelData
+          entry: modelData
           Layout.preferredWidth: categories.geometry.cardWidth
           Layout.fillWidth: true
-          implicitHeight: Math.round((root.material ? 112 : 100) * Style.uiScaleRatio)
-          radius: Style.radiusM
-          color: root.material ? Qt.tint(Color.mSurfaceVariant, Qt.alpha(Color.mOnSurface, 0.035)) : categoryMouse.containsMouse ? Color.mHover : Color.mSurface
-          border.width: root.material ? 0 : Style.boxBorderWidth
-          border.color: Style.boxBorderColor
-
-          NMaterialStateLayer {
-            hovered: categoryMouse.containsMouse
-            pressed: categoryMouse.pressed
-            tint: Color.mOnSurface
-          }
-
-          ColumnLayout {
-            anchors.fill: parent
-            anchors.margins: Style.marginL
-            spacing: Style.marginS
-            NIcon {
-              icon: category.modelData.icon
-              color: root.material ? Color.mOnSurface : categoryMouse.containsMouse ? Color.mOnHover : Color.mPrimary
-              pointSize: Style.fontSizeXXL
-            }
-            NText {
-              Layout.fillWidth: true
-              text: I18n.tr(category.modelData.label)
-              pointSize: Style.fontSizeM
-              font.weight: root.material ? Style.fontWeightRegular : Style.fontWeightSemiBold
-              color: root.material ? Color.mOnSurface : categoryMouse.containsMouse ? Color.mOnHover : Color.mOnSurface
-              elide: Text.ElideRight
-            }
-          }
-
-          MouseArea {
-            id: categoryMouse
-            anchors.fill: parent
-            hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
-            onClicked: root.tabRequested(category.index)
-          }
+          onChosen: tabIndex => root.tabRequested(tabIndex)
         }
       }
     }

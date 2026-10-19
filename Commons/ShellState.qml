@@ -61,11 +61,6 @@ Singleton {
                           settingsSidebarExpanded: true
                         })
 
-      // Telemetry state
-      property var telemetry: ({
-                                 instanceId: ""
-                               })
-
       // Launcher app usage counts
       property var launcherUsage: ({})
     }
@@ -212,28 +207,6 @@ Singleton {
 
   function getSettingsSidebarExpanded() {
     return getUiState().settingsSidebarExpanded !== false; // default to true
-  }
-
-  // Telemetry state
-  function setTelemetryState(stateData) {
-    adapter.telemetry = stateData;
-    save();
-  }
-
-  function getTelemetryState() {
-    return adapter.telemetry || {
-      instanceId: ""
-    };
-  }
-
-  function getTelemetryInstanceId() {
-    return getTelemetryState().instanceId || "";
-  }
-
-  function setTelemetryInstanceId(instanceId) {
-    let state = getTelemetryState();
-    state.instanceId = instanceId;
-    setTelemetryState(state);
   }
 
   // -----------------------------------------------------

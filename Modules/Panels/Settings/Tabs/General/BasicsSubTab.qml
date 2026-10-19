@@ -186,13 +186,11 @@ ColumnLayout {
         }
         var setupPanel = PanelService.getPanel("setupWizardPanel", targetScreen);
         if (setupPanel) {
-          setupPanel.telemetryOnlyMode = false;
           setupPanel.open();
         } else {
           Qt.callLater(() => {
             var sp = PanelService.getPanel("setupWizardPanel", targetScreen);
             if (sp) {
-              sp.telemetryOnlyMode = false;
               sp.open();
             }
           });

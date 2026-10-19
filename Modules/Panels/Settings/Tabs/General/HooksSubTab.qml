@@ -9,9 +9,31 @@ import qs.Widgets
 
 ColumnLayout {
   id: root
-  enabled: Settings.data.hooks.enabled
   spacing: Style.marginL
   width: parent.width
+
+  // Enable/Disable Toggle
+  NToggle {
+    label: I18n.tr("panels.hooks.system-hooks-enable-label")
+    description: I18n.tr("panels.hooks.system-hooks-enable-description")
+    checked: Settings.data.hooks.enabled
+    onToggled: checked => Settings.data.hooks.enabled = checked
+  }
+
+  NDivider {
+    Layout.fillWidth: true
+  }
+
+  // Info section
+  ColumnLayout {
+    spacing: Style.marginM
+    Layout.fillWidth: true
+
+    NLabel {
+      label: I18n.tr("panels.hooks.info-parameters-label")
+      description: I18n.tr("panels.hooks.info-parameters-description")
+    }
+  }
 
   // Shared Edit Popup
   HookEditPopup {
@@ -47,6 +69,7 @@ ColumnLayout {
 
   // Startup Hook
   HookRow {
+    enabled: Settings.data.hooks.enabled
     label: I18n.tr("panels.hooks.frostalia-started-label")
     description: I18n.tr("panels.hooks.frostalia-started-description")
     value: Settings.data.hooks.startup
@@ -60,6 +83,7 @@ ColumnLayout {
 
   // Color Generation Hook
   HookRow {
+    enabled: Settings.data.hooks.enabled
     label: I18n.tr("panels.hooks.color-generation-label")
     description: I18n.tr("panels.hooks.color-generation-description")
     value: Settings.data.hooks.colorGeneration
@@ -74,6 +98,7 @@ ColumnLayout {
 
   // Theme Hook
   HookRow {
+    enabled: Settings.data.hooks.enabled
     label: I18n.tr("panels.hooks.theme-changed-label")
     description: I18n.tr("panels.hooks.theme-changed-description")
     value: Settings.data.hooks.darkModeChange
@@ -88,6 +113,7 @@ ColumnLayout {
 
   // Performance Mode Enabled Hook
   HookRow {
+    enabled: Settings.data.hooks.enabled
     label: I18n.tr("panels.hooks.performance-mode-enabled-label")
     description: I18n.tr("panels.hooks.performance-mode-enabled-description")
     value: Settings.data.hooks.performanceModeEnabled
@@ -102,6 +128,7 @@ ColumnLayout {
 
   // Performance Mode Disabled Hook
   HookRow {
+    enabled: Settings.data.hooks.enabled
     label: I18n.tr("panels.hooks.performance-mode-disabled-label")
     description: I18n.tr("panels.hooks.performance-mode-disabled-description")
     value: Settings.data.hooks.performanceModeDisabled
@@ -116,6 +143,7 @@ ColumnLayout {
 
   // Session Hook
   HookRow {
+    enabled: Settings.data.hooks.enabled
     label: I18n.tr("panels.hooks.session-label")
     description: I18n.tr("panels.hooks.session-description")
     value: Settings.data.hooks.session

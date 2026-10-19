@@ -23,6 +23,70 @@ class StyleViewTests(unittest.TestCase):
         self.assertIn("id: toolbarClose", toolbar)
         self.assertNotIn("searchContainerWrapper", source)
 
+    def test_sidebar_transition_shares_one_animation(self):
+        source = (ROOT / "Modules/Panels/Settings/SettingsContent.qml").read_text()
+        self.assertIn("Behavior on sidebarExpansion", source)
+        self.assertIn("spacing: root.material ? root.materialRail.rowSpacing : Style.marginXS", source)
+        self.assertIn("SettingsWindowLayout.materialRail(sidebarExpansion,", source)
+        self.assertEqual(source.count("SettingsWindowLayout.railIconInset(root.sidebarExpansion,"), 2)
+        self.assertIn("opacity: root.material ? root.sidebarExpansion", source)
+        self.assertIn("enabled: !root.material", source)
+
+    def test_home_profile_places_host_in_center_and_distribution_on_right(self):
+        source = (ROOT / "Modules/Panels/Settings/SettingsHome.qml").read_text()
+        profile = source[source.index("id: profileRow"):source.index("id: categories")]
+        self.assertIn("HostService.hostName", source)
+        self.assertIn("text: root.profile.name", profile)
+        self.assertIn("anchors.centerIn: parent", profile)
+        self.assertIn("text: root.profile.hostname", profile)
+        self.assertIn("anchors.right: parent.right", profile)
+        self.assertIn("text: root.profile.os", profile)
+        self.assertIn("source: HostService.osLogo", profile)
+
+    def test_home_profile_matches_username_font_and_avatar_size(self):
+        source = (ROOT / "Modules/Panels/Settings/SettingsHome.qml").read_text()
+        profile = source[source.index("id: profileRow"):source.index("id: categories")]
+        self.assertIn("id: profileName", profile)
+        self.assertEqual(profile.count("font: profileName.font"), 2)
+        self.assertEqual(profile.count("color: profileName.color"), 2)
+        self.assertIn("Layout.preferredWidth: profileAvatar.width", profile)
+        self.assertIn("Layout.preferredHeight: profileAvatar.height", profile)
+
+    def test_home_profile_spans_two_category_columns(self):
+        source = (ROOT / "Modules/Panels/Settings/SettingsHome.qml").read_text()
+        self.assertIn("Layout.preferredWidth: categories.geometry.profileWidth", source)
+        self.assertRegex(source, r"Layout.preferredWidth: categories\.geometry\.profileWidth\s+Layout.alignment: Qt.AlignHCenter")
+
+    def test_home_profile_has_no_dot_separators(self):
+        source = (ROOT / "Modules/Panels/Settings/SettingsHome.qml").read_text()
+        profile = source[source.index("id: profileRow"):source.index("id: categories")]
+        self.assertNotIn("model: [1 / 3, 2 / 3]", profile)
+        self.assertEqual(profile.count("width: parent.width / 3"), 2)
+
+
+    def test_home_promotes_general_and_about_with_centered_contents(self):
+        source = (ROOT / "Modules/Panels/Settings/SettingsHome.qml").read_text()
+        self.assertIn("entry: root.homeTabs.general", source)
+        self.assertIn("entry: root.homeTabs.about", source)
+        self.assertIn("model: root.homeTabs.grid", source)
+        self.assertIn("SettingsPanel.Tab.General, SettingsPanel.Tab.About", source)
+        self.assertIn("onChosen: tabIndex => root.tabRequested(tabIndex)", source)
+        self.assertIn("category.compact ? Qt.AlignHCenter : Qt.AlignLeft", source)
+        self.assertIn("category.compact ? Text.AlignHCenter : Text.AlignLeft", source)
+        self.assertIn("category.compact ? parent.verticalCenter : undefined", source)
+
+    def test_escape_uses_settings_navigation_before_closing(self):
+        window = (ROOT / "Modules/Panels/Settings/SettingsPanelWindow.qml").read_text()
+        shortcut = window[window.index('sequence: "Escape"'):].split("Shortcut {", 1)[0]
+        self.assertIn("onActivated: settingsContent.handleEscape()", shortcut)
+        self.assertNotIn("closeWindow()", shortcut)
+        content = (ROOT / "Modules/Panels/Settings/SettingsContent.qml").read_text()
+        handler = content[content.index("function handleEscape()"):content.index("function openTabIndex(")]
+        self.assertIn("SettingsWindowLayout.escapeAction(searchText, homeVisible)", handler)
+        self.assertIn('searchInput.text = ""', handler)
+        self.assertIn("showHome()", handler)
+        self.assertIn("closeRequested()", handler)
+
     def test_registered_views_exist(self):
         source = (ROOT / "Helpers/UiStyles.js").read_text()
         paths = re.findall(r'"(?:controlCenter|mediaCard|mediaPlayer|osd|notificationContent|kdeConnectHome)": "([^"]+\.qml)"', source)
