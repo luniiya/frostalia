@@ -1,6 +1,6 @@
 .pragma library
 
-// Five-cell rows mix compact toggles with labeled Bluetooth/power tiles.
+// Five-cell rows mix compact toggles with labeled Bluetooth/power/phone tiles.
 var columns = 5;
 function shortcutRows(left, right) {
   const rows = [];
@@ -11,7 +11,7 @@ function shortcutRows(left, right) {
     const settings = shortcuts[index];
     if (!settings || !settings.id)
       continue;
-    const span = ["Bluetooth", "PowerProfile"].includes(settings.id) ? 2 : 1;
+    const span = ["Bluetooth", "PowerProfile", "KdeConnect"].includes(settings.id) ? 2 : 1;
     if (used + span > columns) {
       rows.push(row);
       row = [];

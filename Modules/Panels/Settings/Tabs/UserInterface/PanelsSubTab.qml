@@ -31,6 +31,7 @@ ColumnLayout {
 
   NValueSlider {
     Layout.fillWidth: true
+    enabled: Style.glass === null
     label: I18n.tr("panels.user-interface.panel-background-opacity-label")
     description: I18n.tr("panels.user-interface.panel-background-opacity-description")
     from: 0

@@ -29,6 +29,7 @@ var defaults = {
     "boxBorderOpacity": 100,
     "panelBackgroundOpacity": 0.93,
     "translucentWidgets": false,
+    "frostedGlass": false,
     "panelsAttachedToBar": true,
     "settingsPanelSideBarCardStyle": false
   }

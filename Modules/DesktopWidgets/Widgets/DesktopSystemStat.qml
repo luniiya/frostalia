@@ -240,7 +240,7 @@ DraggableDesktopWidget {
             text: modelData.text
             color: modelData.color
             pointSize: Style.fontSizeS * root.widgetScale
-            font.family: Settings.data.ui.fontFixed
+            font.family: Style.fontFixed
             font.weight: modelData.bold ? Style.fontWeightBold : Style.fontWeightRegular
             opacity: modelData.opacity !== undefined ? modelData.opacity : 1.0
             elide: modelData.elide ? Text.ElideMiddle : Text.ElideNone
@@ -298,7 +298,7 @@ DraggableDesktopWidget {
             text: modelData.text
             color: modelData.color
             pointSize: Style.fontSizeS * root.widgetScale
-            font.family: Settings.data.ui.fontFixed
+            font.family: Style.fontFixed
             font.weight: modelData.bold ? Style.fontWeightBold : Style.fontWeightRegular
             opacity: modelData.opacity !== undefined ? modelData.opacity : 1.0
             elide: modelData.elide ? Text.ElideMiddle : Text.ElideNone

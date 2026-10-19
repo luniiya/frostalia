@@ -297,6 +297,8 @@ Item {
     id: container
     anchors.fill: parent
     radius: root.roundedCorners ? Math.min(Math.round(Style.radiusL * root.widgetScale), Style.radiusL, width / 2, height / 2) : 0
+    // Not frosted: desktop widgets get no compositor blur, and a translucent
+    // background would show its own drop shadow through.
     color: Qt.alpha(Color.mSurface, Settings.data.ui.panelBackgroundOpacity)
     border {
       width: 1

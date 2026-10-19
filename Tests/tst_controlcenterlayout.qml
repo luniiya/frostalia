@@ -42,6 +42,18 @@ TestCase {
                                              ]), []);
   }
 
+  function test_phoneTileIsWide() {
+    const rows = ControlCenterLayout.shortcutRows([
+                                                    {
+                                                      id: "KdeConnect"
+                                                    },
+                                                    {
+                                                      id: "DarkMode"
+                                                    }
+                                                  ], []);
+    compare(rows.map(row => row.map(entry => entry.span)), [[2, 1]]);
+  }
+
   function test_gridWidthsDoNotOverflow_data() {
     return [
           {

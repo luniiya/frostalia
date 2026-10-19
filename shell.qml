@@ -116,6 +116,7 @@ ShellRoot {
           GitHubService.init();
           SupporterService.init();
           CustomButtonIPCService.init();
+          KdeConnectService.init();
           IPCService.init(screenDetector);
 
           // Force ClipboardService initialization so clipboard watchers

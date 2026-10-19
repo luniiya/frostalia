@@ -107,7 +107,7 @@ ColumnLayout {
       valueCustomFont = key;
       saveSettings();
     }
-    defaultValue: Settings.data.ui.fontDefault
+    defaultValue: Style.fontDefault
   }
 
   NDivider {
@@ -249,7 +249,7 @@ ColumnLayout {
               delegate: NText {
                 visible: text !== ""
                 text: modelData
-                family: valueUseCustomFont && valueCustomFont ? valueCustomFont : Settings.data.ui.fontDefault
+                family: valueUseCustomFont && valueCustomFont ? valueCustomFont : Style.fontDefault
                 pointSize: Style.fontSizeM
                 font.weight: Style.fontWeightBold
                 color: textColor
@@ -280,7 +280,7 @@ ColumnLayout {
               delegate: NText {
                 visible: text !== ""
                 text: modelData
-                family: valueUseCustomFont && valueCustomFont ? valueCustomFont : Settings.data.ui.fontDefault
+                family: valueUseCustomFont && valueCustomFont ? valueCustomFont : Style.fontDefault
                 pointSize: Style.fontSizeM
                 font.weight: Style.fontWeightBold
                 color: textColor

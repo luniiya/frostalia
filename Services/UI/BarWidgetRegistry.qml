@@ -21,6 +21,7 @@ Singleton {
                            "ControlCenter": controlCenterComponent,
                            "CustomButton": customButtonComponent,
                            "DarkMode": darkModeComponent,
+                           "KdeConnect": kdeConnectComponent,
                            "KeepAwake": keepAwakeComponent,
                            "KeyboardLayout": keyboardLayoutComponent,
                            "LockKeys": lockKeysComponent,
@@ -54,6 +55,7 @@ Singleton {
                                      "ControlCenter": "WidgetSettings/ControlCenterSettings.qml",
                                      "CustomButton": "WidgetSettings/CustomButtonSettings.qml",
                                      "DarkMode": "WidgetSettings/DarkModeSettings.qml",
+                                     "KdeConnect": "WidgetSettings/KdeConnectSettings.qml",
                                      "KeepAwake": "WidgetSettings/KeepAwakeSettings.qml",
                                      "KeyboardLayout": "WidgetSettings/KeyboardLayoutSettings.qml",
                                      "Launcher": "WidgetSettings/LauncherSettings.qml",
@@ -287,6 +289,13 @@ Singleton {
                                     "iconColor": "none",
                                     "textColor": "none"
                                   },
+                                  "KdeConnect": {
+                                    "displayMode": "alwaysShow",
+                                    "hideWhenOffline": true,
+                                    "showUnread": false,
+                                    "iconColor": "none",
+                                    "textColor": "none"
+                                  },
                                   "NightLight": {
                                     "iconColor": "none"
                                   },
@@ -350,6 +359,9 @@ Singleton {
   }
   property Component darkModeComponent: Component {
     DarkMode {}
+  }
+  property Component kdeConnectComponent: Component {
+    KdeConnect {}
   }
   property Component keyboardLayoutComponent: Component {
     KeyboardLayout {}

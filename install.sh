@@ -38,7 +38,7 @@ if [ -e /etc/xdg/quickshell/frostalia ]; then
 fi
 
 # Build before changing the installation, so a failed build leaves it intact.
-for helper in settings theming; do
+for helper in settings theming kdeconnect; do
   HELPER_DIR="$REPO_DIR/Tools/$helper"
   HELPER_BIN="$HELPER_DIR/target/release/frostalia-$helper"
   NEEDS_BUILD=0
@@ -74,8 +74,8 @@ if [ ! -e "$TARGET" ]; then
     echo "Linked $TARGET -> $REPO_DIR"
   else
     mkdir -p "$TARGET"
-    tar -C "$REPO_DIR" --exclude=.git --exclude=./Tools/settings/target --exclude=./Tools/theming/target -cf - . | tar -C "$TARGET" -xf -
-    for helper in settings theming; do
+    tar -C "$REPO_DIR" --exclude=.git --exclude=./Tools/settings/target --exclude=./Tools/theming/target --exclude=./Tools/kdeconnect/target -cf - . | tar -C "$TARGET" -xf -
+    for helper in settings theming kdeconnect; do
       mkdir -p "$TARGET/Tools/$helper/target/release"
       install -m 755 "$REPO_DIR/Tools/$helper/target/release/frostalia-$helper" "$TARGET/Tools/$helper/target/release/frostalia-$helper"
     done

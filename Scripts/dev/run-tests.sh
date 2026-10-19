@@ -19,6 +19,9 @@ CARGO_TARGET_DIR="$PWD/Tools/theming/target" cargo test --locked --manifest-path
 CARGO_TARGET_DIR="$PWD/Tools/theming/target" cargo build --locked --manifest-path Tools/theming/Cargo.toml
 export FROSTALIA_THEMING_HELPER="$PWD/Tools/theming/target/debug/frostalia-theming"
 
+echo "==> Rust KDE Connect helper tests"
+cargo test --locked --manifest-path Tools/kdeconnect/Cargo.toml
+
 RUNNER=""
 for path in "/usr/lib64/qt6/bin/qmltestrunner" "/usr/lib/qt6/bin/qmltestrunner"; do
     if [ -x "$path" ]; then

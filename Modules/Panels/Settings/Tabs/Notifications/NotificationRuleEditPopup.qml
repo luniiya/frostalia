@@ -65,7 +65,7 @@ Popup {
         Layout.fillWidth: true
         label: I18n.tr("panels.notifications.rules-pattern-label")
         placeholderText: I18n.tr("panels.notifications.rules-pattern-placeholder")
-        fontFamily: Settings.data.ui.fontFixed
+        fontFamily: Style.fontFixed
       }
 
       NComboBox {

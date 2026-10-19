@@ -17,7 +17,8 @@ Item {
   property bool handleWheel: false
   property bool hovering: false
 
-  property color colorBg: Color.smartAlpha(Color.mSurfaceVariant)
+  // Material: filled tonal icon button that stays visible on surface-variant pages
+  property color colorBg: Style.materialControls ? Color.mTonalContainer : Color.smartAlpha(Color.mSurfaceVariant)
   property color colorFg: Color.mPrimary
   property color colorBgHover: Style.materialControls ? colorBg : Color.mHover
   property color colorFgHover: Style.materialControls ? colorFg : Color.mOnHover

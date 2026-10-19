@@ -86,6 +86,13 @@
     "DarkMode": {
       "iconColor": "none"
     },
+    "KdeConnect": {
+      "displayMode": "alwaysShow",
+      "hideWhenOffline": true,
+      "showUnread": false,
+      "iconColor": "none",
+      "textColor": "none"
+    },
     "KeepAwake": {
       "iconColor": "none",
       "textColor": "none"

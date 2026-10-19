@@ -872,6 +872,27 @@
     ]
   },
   {
+    "labelKey": "panels.connections.kdeconnect-enabled-label",
+    "descriptionKey": "panels.connections.kdeconnect-enabled-description",
+    "widget": "NToggle",
+    "tab": 15,
+    "tabLabel": "panels.connections.title",
+    "subTab": 2,
+    "subTabLabel": "kdeconnect.title"
+  },
+  {
+    "labelKey": "panels.connections.kdeconnect-touchpad-sensitivity-label",
+    "descriptionKey": "panels.connections.kdeconnect-touchpad-sensitivity-description",
+    "widget": "NValueSlider",
+    "tab": 15,
+    "tabLabel": "panels.connections.title",
+    "subTab": 2,
+    "subTabLabel": "kdeconnect.title",
+    "visibleWhen": [
+      "Settings.data.kdeConnect.enabled"
+    ]
+  },
+  {
     "labelKey": "common.wifi",
     "descriptionKey": null,
     "widget": "NToggle",
@@ -2274,15 +2295,6 @@
     "subTabLabel": "common.location"
   },
   {
-    "labelKey": "panels.location.weather-talia-mascot-always-label",
-    "descriptionKey": "panels.location.weather-talia-mascot-always-description",
-    "widget": "NToggle",
-    "tab": 16,
-    "tabLabel": "panels.region.title",
-    "subTab": 0,
-    "subTabLabel": "common.location"
-  },
-  {
     "labelKey": "panels.location.weather-hide-city-label",
     "descriptionKey": "panels.location.weather-hide-city-description",
     "widget": "NToggle",
@@ -2364,45 +2376,9 @@
     ]
   },
   {
-    "labelKey": "panels.system.ai-usage-claude-label",
-    "descriptionKey": "panels.system.ai-usage-claude-description",
-    "widget": "NToggle",
-    "tab": 17,
-    "tabLabel": "panels.system.title",
-    "subTab": 3,
-    "subTabLabel": "panels.system.ai-usage-title"
-  },
-  {
-    "labelKey": "panels.system.ai-usage-codex-label",
-    "descriptionKey": "panels.system.ai-usage-codex-description",
-    "widget": "NToggle",
-    "tab": 17,
-    "tabLabel": "panels.system.title",
-    "subTab": 3,
-    "subTabLabel": "panels.system.ai-usage-title"
-  },
-  {
-    "labelKey": "panels.system.ai-usage-copilot-label",
-    "descriptionKey": "panels.system.ai-usage-copilot-description",
-    "widget": "NToggle",
-    "tab": 17,
-    "tabLabel": "panels.system.title",
-    "subTab": 3,
-    "subTabLabel": "panels.system.ai-usage-title"
-  },
-  {
-    "labelKey": "panels.system.ai-usage-gemini-label",
-    "descriptionKey": "panels.system.ai-usage-gemini-description",
-    "widget": "NToggle",
-    "tab": 17,
-    "tabLabel": "panels.system.title",
-    "subTab": 3,
-    "subTabLabel": "panels.system.ai-usage-title"
-  },
-  {
-    "labelKey": "panels.system.ai-usage-openrouter-label",
-    "descriptionKey": "panels.system.ai-usage-openrouter-description",
-    "widget": "NToggle",
+    "labelKey": "panels.system.ai-usage-providers-label",
+    "descriptionKey": "panels.system.ai-usage-providers-description",
+    "widget": "NLabel",
     "tab": 17,
     "tabLabel": "panels.system.title",
     "subTab": 3,
@@ -2419,15 +2395,6 @@
     "visibleWhen": [
       "Settings.data.modelUsage.openrouterEnabled"
     ]
-  },
-  {
-    "labelKey": "panels.system.ai-usage-zen-label",
-    "descriptionKey": "panels.system.ai-usage-zen-description",
-    "widget": "NToggle",
-    "tab": 17,
-    "tabLabel": "panels.system.title",
-    "subTab": 3,
-    "subTabLabel": "panels.system.ai-usage-title"
   },
   {
     "labelKey": "panels.system.ai-usage-zen-key-label",
@@ -2591,6 +2558,15 @@
   {
     "labelKey": "panels.user-interface.blur-behind-label",
     "descriptionKey": "panels.user-interface.blur-behind-description",
+    "widget": "NToggle",
+    "tab": 1,
+    "tabLabel": "panels.user-interface.title",
+    "subTab": 0,
+    "subTabLabel": "common.appearance"
+  },
+  {
+    "labelKey": "panels.user-interface.frosted-glass-label",
+    "descriptionKey": "panels.user-interface.frosted-glass-description",
     "widget": "NToggle",
     "tab": 1,
     "tabLabel": "panels.user-interface.title",

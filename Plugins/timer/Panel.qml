@@ -300,7 +300,7 @@ Item {
                 cursorDelegate: Item {}
                 readOnly: isPomodoroMode || isStopwatchMode || isRunning || totalSeconds > 0
                 enabled: !isRunning && !isStopwatchMode && !isPomodoroMode && totalSeconds === 0
-                font.family: Settings.data.ui.fontFixed
+                font.family: Style.fontFixed
 
                 readonly property bool showingHours: {
                   if (isStopwatchMode) {

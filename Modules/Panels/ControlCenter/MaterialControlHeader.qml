@@ -57,7 +57,7 @@ Item {
       RowLayout {
         id: actions
         anchors.centerIn: parent
-        spacing: 0
+        spacing: Style.marginXS
         NIconButton {
           icon: "pencil"
           baseSize: Style.baseWidgetSize

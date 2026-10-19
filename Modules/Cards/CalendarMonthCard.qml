@@ -399,7 +399,7 @@ NBox {
                         return `${startFormatted}-${endFormatted} ${event.summary}`;
                       }
                     }).join('\n');
-                    TooltipService.show(parent, summaries, "auto", Style.tooltipDelay, Settings.data.ui.fontFixed);
+                    TooltipService.show(parent, summaries, "auto", Style.tooltipDelay, Style.fontFixed);
                   }
                 }
 

@@ -22,7 +22,7 @@ Singleton {
     return d.getMonth() === root.taliaMascotWeatherMonth && d.getDate() === root.taliaMascotWeatherDay;
   }
 
-  readonly property bool taliaWeatherMascotActive: taliaWeatherMascotDayActive || Settings.data.location.weatherTaliaMascotAlways
+  readonly property bool taliaWeatherMascotActive: taliaWeatherMascotDayActive
 
   readonly property alias data: adapter
 

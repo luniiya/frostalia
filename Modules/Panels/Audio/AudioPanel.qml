@@ -294,7 +294,7 @@ SmartPanel {
                   NText {
                     text: Math.round((panelContent.outputVolumeGuard ? localOutputVolume : AudioService.volume) * 100) + "%"
                     pointSize: Style.fontSizeM
-                    family: Settings.data.ui.fontFixed
+                    family: Style.fontFixed
                     color: Color.mOnSurface
                     opacity: enabled ? 1.0 : 0.6
                     Layout.alignment: Qt.AlignVCenter
@@ -370,7 +370,7 @@ SmartPanel {
                   NText {
                     text: Math.round((panelContent.inputVolumeGuard ? localInputVolume : AudioService.inputVolume) * 100) + "%"
                     pointSize: Style.fontSizeM
-                    family: Settings.data.ui.fontFixed
+                    family: Style.fontFixed
                     color: Color.mOnSurface
                     opacity: enabled ? 1.0 : 0.6
                     Layout.alignment: Qt.AlignVCenter
@@ -694,7 +694,7 @@ SmartPanel {
                       NText {
                         text: Math.round((appBox.appVolume !== undefined ? appBox.appVolume : 0.0) * 100) + "%"
                         pointSize: Style.fontSizeM
-                        family: Settings.data.ui.fontFixed
+                        family: Style.fontFixed
                         color: Color.mOnSurface
                         opacity: enabled ? 1.0 : 0.6
                         Layout.alignment: Qt.AlignVCenter

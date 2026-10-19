@@ -103,7 +103,7 @@ ColumnLayout {
     description: I18n.tr("panels.bar.behavior-middle-click-command-description")
     placeholderText: I18n.tr("panels.bar.behavior-middle-click-command-placeholder")
     text: Settings.data.bar.middleClickCommand
-    fontFamily: Settings.data.ui.fontFixed
+    fontFamily: Style.fontFixed
     onTextChanged: Settings.data.bar.middleClickCommand = text
     visible: Settings.data.bar.middleClickAction === "command"
   }
@@ -155,7 +155,7 @@ ColumnLayout {
     description: I18n.tr("panels.bar.behavior-right-click-command-description")
     placeholderText: I18n.tr("panels.bar.behavior-right-click-command-placeholder")
     text: Settings.data.bar.rightClickCommand
-    fontFamily: Settings.data.ui.fontFixed
+    fontFamily: Style.fontFixed
     onTextChanged: Settings.data.bar.rightClickCommand = text
     visible: Settings.data.bar.rightClickAction === "command"
   }

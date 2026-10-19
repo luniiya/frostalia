@@ -195,10 +195,28 @@ RowLayout {
     background: Rectangle {
       implicitWidth: Math.round(Style.baseWidgetSize * 3.75 * Style.uiScaleRatio)
       implicitHeight: Math.round(root.preferredHeight * Style.uiScaleRatio)
-      color: Style.materialControls ? Color.mSurfaceVariant : Color.mSurface
-      border.color: combo.activeFocus ? (Style.materialControls ? Color.mPrimary : Color.mSecondary) : Color.mOutline
-      border.width: Style.materialControls && combo.activeFocus ? Style.borderM : Style.borderS
+      id: comboFrame
+      // Material: filled field with an active indicator instead of an outline
+      readonly property bool active: combo.activeFocus || combo.popup.visible
+      readonly property var fieldShape: Style.getFieldShape(active)
+
+      color: fieldShape ? (comboHover.containsMouse && !active ? Qt.alpha(Color.mOnSurface, 0.12) : Color.mTonalContainer) : Color.mSurface
+      border.color: combo.activeFocus ? Color.mSecondary : Color.mOutline
+      border.width: fieldShape ? 0 : Style.borderS
       radius: Style.iRadiusM
+      topLeftRadius: fieldShape ? fieldShape.topRadius : Style.iRadiusM
+      topRightRadius: topLeftRadius
+      bottomLeftRadius: fieldShape ? fieldShape.bottomRadius : Style.iRadiusM
+      bottomRightRadius: bottomLeftRadius
+
+      Rectangle {
+        visible: !!comboFrame.fieldShape
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        height: comboFrame.fieldShape ? comboFrame.fieldShape.indicator : 0
+        color: comboFrame.active ? Color.mPrimary : Color.mOnSurfaceVariant
+      }
 
       Behavior on border.color {
         ColorAnimation {
@@ -207,6 +225,7 @@ RowLayout {
       }
 
       MouseArea {
+        id: comboHover
         anchors.fill: parent
         hoverEnabled: true
         acceptedButtons: Qt.NoButton
@@ -244,13 +263,25 @@ RowLayout {
       y: combo.topPadding + (combo.availableHeight - height) / 2
       icon: "caret-down"
       pointSize: Style.fontSizeL
+      color: Style.materialControls ? (combo.popup.visible ? Color.mPrimary : Color.mOnSurfaceVariant) : Color.mOnSurface
+      rotation: Style.materialControls && combo.popup.visible ? 180 : 0
+
+      Behavior on rotation {
+        enabled: Style.materialControls
+        NumberAnimation {
+          duration: Style.animationFast
+          easing.type: Easing.OutCubic
+        }
+      }
     }
 
     popup: Popup {
-      y: combo.height + Style.marginS
+      readonly property var menu: Style.uiStyleTokens.menu
+
+      y: combo.height + (menu ? Style.marginXS : Style.marginS)
       implicitWidth: combo.width
-      implicitHeight: Math.min(Math.round(root.popupHeight * Style.uiScaleRatio), listView.contentHeight + Style.margin2M)
-      padding: Style.marginM
+      implicitHeight: Math.min(Math.round(root.popupHeight * Style.uiScaleRatio), listView.contentHeight + padding * 2)
+      padding: menu ? menu.padding : Style.marginM
 
       onOpened: {
         listView.currentIndex = combo.currentIndex;
@@ -270,9 +301,25 @@ RowLayout {
           property bool isHighlighted: listView.currentIndex === index
 
           width: listView.availableWidth
-          height: delegateText.implicitHeight + Style.margin2S
-          radius: Style.iRadiusS
-          color: isHighlighted ? Color.mHover : "transparent"
+          // Material menu: the chosen item is a primary pill, hover is a light state layer
+          property bool isSelected: Style.materialControls && combo.currentIndex === index
+
+          height: delegateText.implicitHeight + (Style.materialControls ? Style.margin2M : Style.margin2S)
+          radius: Style.materialControls ? height / 2 : Style.iRadiusS
+          color: {
+            if (!Style.materialControls)
+              return isHighlighted ? Color.mHover : "transparent";
+            if (isSelected)
+              return Color.mPrimary;
+            return isHighlighted ? Color.mTonalContainer : "transparent";
+          }
+
+          Behavior on color {
+            enabled: Style.materialControls
+            ColorAnimation {
+              duration: Style.animationFast
+            }
+          }
 
           NText {
             id: delegateText
@@ -282,7 +329,7 @@ RowLayout {
             verticalAlignment: Text.AlignVCenter
             elide: Text.ElideRight
             pointSize: Style.fontSizeM
-            color: delegateRect.isHighlighted ? Color.mOnHover : Color.mOnSurface
+            color: delegateRect.isSelected ? Color.mOnPrimary : (delegateRect.isHighlighted && !Style.materialControls ? Color.mOnHover : Color.mOnSurface)
             text: {
               var item = root.getItem(delegateRect.index);
               return item && item.name ? item.name : "";
@@ -310,10 +357,11 @@ RowLayout {
       }
 
       background: Rectangle {
-        color: Color.mSurfaceVariant
+        // Material menu: an opaque, slightly raised surface without an outline
+        color: combo.popup.menu ? Qt.tint(Color.mSurface, Qt.alpha(Color.mOnSurface, 0.05)) : Color.mSurfaceVariant
         border.color: Color.mOutline
-        border.width: Style.borderS
-        radius: Style.iRadiusM
+        border.width: combo.popup.menu ? 0 : Style.borderS
+        radius: combo.popup.menu ? combo.popup.menu.radius : Style.iRadiusM
       }
     }
 

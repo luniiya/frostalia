@@ -55,7 +55,7 @@ DraggableDesktopWidget {
         delegate: NText {
           visible: text !== ""
           text: modelData
-          family: root.useCustomFont && root.customFont ? root.customFont : Settings.data.ui.fontDefault
+          family: root.useCustomFont && root.customFont ? root.customFont : Style.fontDefault
           pointSize: {
             if (model.length == 1) {
               return Math.round(Style.fontSizeXXL * root.widgetScale);

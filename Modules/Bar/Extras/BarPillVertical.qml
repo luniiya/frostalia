@@ -149,7 +149,7 @@ Item {
       anchors.verticalCenterOffset: hasIcon ? (openDownward ? Style.marginXXS : -Style.marginXXS) : 0
       rotation: rotateText ? -90 : 0
       text: root.text + root.suffix
-      family: Settings.data.ui.fontFixed
+      family: Style.fontFixed
       pointSize: root.barFontSize
       applyUiScale: false
       horizontalAlignment: Text.AlignHCenter

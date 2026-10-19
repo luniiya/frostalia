@@ -116,7 +116,7 @@ Popup {
 
         NText {
           text: root.selectedColor.toString().toUpperCase()
-          family: Settings.data.ui.fontFixed
+          family: Style.fontFixed
           pointSize: Style.fontSizeL
           font.weight: Style.fontWeightMedium
           color: root.selectedColor.r + root.selectedColor.g + root.selectedColor.b > 1.5 ? "black" : "white"
@@ -125,7 +125,7 @@ Popup {
 
         NText {
           text: "RGB(" + Math.round(root.selectedColor.r * 255) + ", " + Math.round(root.selectedColor.g * 255) + ", " + Math.round(root.selectedColor.b * 255) + ")"
-          family: Settings.data.ui.fontFixed
+          family: Style.fontFixed
           pointSize: Style.fontSizeM
           color: root.selectedColor.r + root.selectedColor.g + root.selectedColor.b > 1.5 ? "black" : "white"
           Layout.alignment: Qt.AlignHCenter
@@ -377,7 +377,7 @@ Popup {
 
               NTextInput {
                 text: root.selectedColor.toString().toUpperCase()
-                fontFamily: Settings.data.ui.fontFixed
+                fontFamily: Style.fontFixed
                 Layout.fillWidth: true
                 Layout.minimumWidth: implicitWidth
                 onEditingFinished: {

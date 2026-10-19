@@ -60,7 +60,7 @@ Item {
   readonly property bool showDiskAvailable: (widgetSettings.showDiskAvailable !== undefined) ? widgetSettings.showDiskAvailable : widgetMetadata.showDiskAvailable
   readonly property bool showLoadAverage: (widgetSettings.showLoadAverage !== undefined) ? widgetSettings.showLoadAverage : widgetMetadata.showLoadAverage
   readonly property string diskPath: (widgetSettings.diskPath !== undefined) ? widgetSettings.diskPath : widgetMetadata.diskPath
-  readonly property string fontFamily: useMonospaceFont ? Settings.data.ui.fontFixed : Settings.data.ui.fontDefault
+  readonly property string fontFamily: useMonospaceFont ? Style.fontFixed : Style.fontDefault
 
   readonly property int paddingPercent: usePadding ? String("100%").length : 0
   readonly property int paddingTemp: usePadding ? String("999°").length : 0

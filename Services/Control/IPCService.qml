@@ -651,6 +651,29 @@ Singleton {
   }
 
   IpcHandler {
+    target: "kdeConnect"
+    function togglePanel() {
+      root.screenDetector.withCurrentScreen(screen => {
+        PanelService.getPanel("kdeConnectPanel", screen)?.toggle(null, "KdeConnect");
+      });
+    }
+    function messages() {
+      root.screenDetector.withCurrentScreen(screen => {
+        PanelService.getPanel("kdeConnectPanel", screen)?.openPage("messages", null);
+      });
+    }
+    function ring() {
+      KdeConnectService.ring();
+    }
+    function sendClipboard() {
+      KdeConnectService.sendClipboard();
+    }
+    function share(path: string) {
+      KdeConnectService.shareFiles([path]);
+    }
+  }
+
+  IpcHandler {
     target: "airplaneMode"
     function toggle() {
       NetworkService.setAirplaneMode(!NetworkService.airplaneModeEnabled);

@@ -25,8 +25,8 @@ class StyleViewTests(unittest.TestCase):
 
     def test_registered_views_exist(self):
         source = (ROOT / "Helpers/UiStyles.js").read_text()
-        paths = re.findall(r'"(?:controlCenter|mediaCard|mediaPlayer|osd|notificationContent)": "([^"]+\.qml)"', source)
-        self.assertEqual(len(paths), 10)
+        paths = re.findall(r'"(?:controlCenter|mediaCard|mediaPlayer|osd|notificationContent|kdeConnectHome)": "([^"]+\.qml)"', source)
+        self.assertEqual(len(paths), 12)
         for path in paths:
             with self.subTest(path=path):
                 self.assertTrue((ROOT / path).is_file())
@@ -34,7 +34,8 @@ class StyleViewTests(unittest.TestCase):
     def test_panel_entrypoints_load_registered_surfaces(self):
         for path, surface in (("Modules/Panels/ControlCenter/ControlCenterPanel.qml", "controlCenter"),
                               ("Modules/Panels/Media/MediaPlayerPanel.qml", "mediaPlayer"),
-                              ("Modules/Cards/MediaCard.qml", "mediaCard")):
+                              ("Modules/Cards/MediaCard.qml", "mediaCard"),
+                              ("Modules/Panels/KdeConnect/KdeConnectContent.qml", "kdeConnectHome")):
             with self.subTest(path=path):
                 source = (ROOT / path).read_text()
                 self.assertIn(f'surface: "{surface}"', source)
@@ -46,3 +47,11 @@ class StyleViewTests(unittest.TestCase):
         self.assertIn("sourceComponent: MaterialSystemMonitor", source)
         legacy = (ROOT / "Modules/Panels/ControlCenter/CaelestiaControlCenter.qml").read_text()
         self.assertIn("SystemMonitorCard", legacy)
+
+    def test_material_header_buttons_are_spaced(self):
+        # Material icon buttons have a filled background, so they need a gap.
+        for path in ("Modules/Panels/ControlCenter/MaterialControlHeader.qml", "Modules/Panels/KdeConnect/MaterialKdeConnectHome.qml"):
+            source = (ROOT / path).read_text()
+            row = re.search(r"id: actions\n(?:\s+.*\n)*?\s+spacing: (.+)", source)
+            self.assertIsNotNone(row, path)
+            self.assertNotEqual(row.group(1).strip(), "0", path)

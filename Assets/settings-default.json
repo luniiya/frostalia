@@ -144,6 +144,7 @@
     "boxBorderOpacity": 100,
     "panelBackgroundOpacity": 0.93,
     "translucentWidgets": false,
+    "frostedGlass": false,
     "panelsAttachedToBar": true,
     "settingsPanelSideBarCardStyle": false
   },
@@ -151,7 +152,6 @@
     "name": "",
     "weatherEnabled": true,
     "weatherShowEffects": true,
-    "weatherTaliaMascotAlways": false,
     "useFahrenheit": false,
     "use12hourFormat": false,
     "showWeekNumberInCalendar": false,
@@ -311,7 +311,8 @@
     "openrouterEnabled": false,
     "zenEnabled": false,
     "openrouterApiKey": "",
-    "zenApiKey": ""
+    "zenApiKey": "",
+    "providerOrder": ["claude", "codex", "copilot", "gemini", "openrouter", "zen"]
   },
   "frostaliaPerformance": {
     "disableDesktopWidgets": true
@@ -356,6 +357,11 @@
     "bluetoothHideUnnamedDevices": false,
     "disableDiscoverability": false,
     "bluetoothAutoConnect": true
+  },
+  "kdeConnect": {
+    "enabled": false,
+    "device": "",
+    "touchpadSensitivity": 1.5
   },
   "sessionMenu": {
     "enableCountdown": true,
@@ -474,7 +480,7 @@
   },
   "colorSchemes": {
     "useWallpaperColors": false,
-    "predefinedScheme": "Frostalia (default)",
+    "predefinedScheme": "Eldritch",
     "darkMode": true,
     "schedulingMode": "off",
     "manualSunrise": "06:30",

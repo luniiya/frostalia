@@ -168,7 +168,7 @@ Item {
           wrapMode: Settings.data.appLauncher.clipboardWrapText ? Text.Wrap : Text.NoWrap
           textFormat: Text.PlainText
           font.pointSize: Style.fontSizeM
-          font.family: Settings.data.ui.fontFixed
+          font.family: Style.fontFixed
           color: Color.mOnSurface
         }
       }

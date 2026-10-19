@@ -17,7 +17,7 @@ FloatingWindow {
   implicitWidth: windowMetrics.width
   implicitHeight: windowMetrics.height
   // Paint the window surface itself, so the compositor's corner rounding is the only one
-  color: Qt.alpha(Color.mSurface, Settings.data.ui.panelBackgroundOpacity)
+  color: Qt.alpha(Color.mSurface, Style.panelOpacity)
 
   visible: false
 

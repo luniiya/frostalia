@@ -105,7 +105,7 @@ Item {
           model: root.showVerticalTime ? TimerLogic.verticalLines(TimerLogic.displaySeconds(mainInstance)) : []
           delegate: NText {
             text: modelData
-            family: Settings.data.ui.fontFixed
+            family: Style.fontFixed
             pointSize: root.barFontSize
             applyUiScale: false
             font.weight: Style.fontWeightBold
@@ -117,7 +117,7 @@ Item {
 
       NText {
         visible: !isVertical && root.isActive
-        family: Settings.data.ui.fontFixed
+        family: Style.fontFixed
         pointSize: root.barFontSize
         font.weight: Style.fontWeightBold
         color: mouseArea.containsMouse ? Color.mOnHover : root.textColor

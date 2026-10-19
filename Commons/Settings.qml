@@ -31,7 +31,7 @@ Singleton {
   - Appearance: ~/.config/frostalia/settings/UI/<style>.toml
   */
   readonly property alias data: adapter  // Used to access via Settings.data.xxx.yyy
-  readonly property int settingsVersion: 68
+  readonly property int settingsVersion: 69
   property bool isDebug: Quickshell.env("FROSTALIA_DEBUG") === "1"
   readonly property string shellName: "frostalia"
   readonly property string configDir: ensureTrailingSlash(Quickshell.env("FROSTALIA_CONFIG_DIR") || (Quickshell.env("XDG_CONFIG_HOME") || Quickshell.env("HOME") + "/.config") + "/" + shellName + "/")
@@ -334,6 +334,7 @@ Singleton {
       property int boxBorderOpacity: 100 // percent
       property real panelBackgroundOpacity: 0.93
       property bool translucentWidgets: false
+      property bool frostedGlass: false
       property bool panelsAttachedToBar: true
       property bool settingsPanelSideBarCardStyle: false
     }
@@ -343,7 +344,6 @@ Singleton {
       property string name: ""
       property bool weatherEnabled: true
       property bool weatherShowEffects: true
-      property bool weatherTaliaMascotAlways: false
       property bool useFahrenheit: false
       property bool use12hourFormat: false
       property bool showWeekNumberInCalendar: false
@@ -518,6 +518,7 @@ Singleton {
       property bool zenEnabled: false
       property string openrouterApiKey: ""
       property string zenApiKey: ""
+      property list<string> providerOrder: ["claude", "codex", "copilot", "gemini", "openrouter", "zen"]
     }
 
     // performance
@@ -568,6 +569,13 @@ Singleton {
       property bool bluetoothHideUnnamedDevices: false
       property bool disableDiscoverability: false
       property bool bluetoothAutoConnect: true
+    }
+
+    // kde connect
+    property JsonObject kdeConnect: JsonObject {
+      property bool enabled: false
+      property string device: "" // id of the last phone picked in the panel
+      property real touchpadSensitivity: 1.5
     }
 
     // session menu
@@ -694,7 +702,7 @@ Singleton {
 
     property JsonObject colorSchemes: JsonObject {
       property bool useWallpaperColors: false
-      property string predefinedScheme: "Frostalia (default)"
+      property string predefinedScheme: "Eldritch"
       property bool darkMode: true
       property string schedulingMode: "off"
       property string manualSunrise: "06:30"

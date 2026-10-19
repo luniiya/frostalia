@@ -38,6 +38,18 @@ Singleton {
     return UiStyles.sliderGeometry(uiStyleId, baseWidgetSize, heightRatio, uiScaleRatio);
   }
 
+  function getFieldShape(focused) {
+    return UiStyles.fieldShape(uiStyleId, focused);
+  }
+
+  function getExpandableShape(expanded) {
+    return UiStyles.expandableShape(uiStyleId, expanded);
+  }
+
+  function getButtonGroupRadii(height, checked, isFirst, isLast) {
+    return UiStyles.buttonGroupRadii(uiStyleId, height, checked, isFirst, isLast);
+  }
+
   function getToggleGeometry(baseSize, checked, pressed) {
     return UiStyles.toggleGeometry(uiStyleId, baseSize, checked, pressed);
   }
@@ -111,7 +123,10 @@ Singleton {
   readonly property real opacityAlmost: 0.95
   readonly property real opacityFull: 1.0
 
-  readonly property real effectivePanelOpacity: PowerProfileService.frostaliaPerformanceMode ? 1.0 : Color.adaptiveOpacity(Settings.data.ui.panelBackgroundOpacity)
+  // Material frosted glass replaces the configured panel opacity with its own
+  readonly property var glass: UiStyles.glass(uiStyleId, Settings.data.ui.frostedGlass && !PowerProfileService.frostaliaPerformanceMode)
+  readonly property real panelOpacity: UiStyles.panelOpacity(uiStyleId, Settings.data.ui.panelBackgroundOpacity, glass !== null)
+  readonly property real effectivePanelOpacity: PowerProfileService.frostaliaPerformanceMode ? 1.0 : Color.adaptiveOpacity(panelOpacity)
   readonly property real effectiveBarOpacity: PowerProfileService.frostaliaPerformanceMode ? 1.0 : Settings.data.bar.backgroundOpacity
 
   // Shadows

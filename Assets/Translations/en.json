@@ -350,6 +350,13 @@
     },
     "weather": {
       "display-mode-description": "Show the temperature always, on hover, or only as a weather icon."
+    },
+    "kdeconnect": {
+      "display-mode-description": "Show the phone battery next to the icon.",
+      "hide-when-offline-label": "Hide when the phone is offline",
+      "hide-when-offline-description": "Only show the widget while a paired phone is connected.",
+      "show-unread-label": "Show unread messages",
+      "show-unread-description": "Add the number of unread SMS threads next to the battery."
     }
   },
   "battery": {
@@ -671,6 +678,123 @@
       "windows-search-description": "Search and focus open windows"
     }
   },
+  "kdeconnect": {
+    "title": "KDE Connect",
+    "open": "Open",
+    "pair-new-device": "Pair a new device",
+    "drop-to-send": "Drop to send to {device}",
+    "send-files": "Send files",
+    "unknown-caller": "Unknown caller",
+    "actions": {
+      "ring": "Ring",
+      "ping": "Ping",
+      "clipboard": "Clipboard",
+      "share": "Send file"
+    },
+    "status": {
+      "offline": "Offline",
+      "battery": "Battery {battery}",
+      "connected-to": "Connected to {device}",
+      "daemon-missing": "KDE Connect isn't running",
+      "daemon-missing-description": "Install kdeconnect and start it, then this panel connects on its own.",
+      "start-daemon": "Start KDE Connect",
+      "helper-missing": "The KDE Connect helper isn't running",
+      "helper-missing-description": "Build it with ./install.sh or cargo build --release in Tools/kdeconnect, then check the shell log.",
+      "no-device": "No phone paired yet",
+      "no-device-description": "Install KDE Connect on your phone and open it on the same network. It shows up below.",
+      "device-offline": "{device} is offline",
+      "device-offline-description": "Make sure the phone is on the same network and KDE Connect is open."
+    },
+    "messages": {
+      "title": "Messages",
+      "new": "New message",
+      "recent": "Recent messages",
+      "see-all": "See all",
+      "search": "Search conversations",
+      "loading": "Loading conversations…",
+      "empty": "No conversations",
+      "unread": "{count} unread",
+      "you": "You: {text}",
+      "attachment": "Attachment",
+      "placeholder": "Text message",
+      "sending": "Sending…",
+      "sent": "Message sent",
+      "today": "Today",
+      "recipient": "Name or phone number",
+      "no-contacts": "No contacts synced",
+      "no-contacts-description": "Type a phone number, or enable the Contacts plugin on the phone to pick people by name."
+    },
+    "notifications": {
+      "title": "Phone notifications",
+      "count": "{count} notifications",
+      "empty": "No notifications",
+      "reply": "Reply"
+    },
+    "media": {
+      "title": "Media",
+      "nothing-playing": "Nothing playing"
+    },
+    "remote": {
+      "title": "Remote input",
+      "subtitle": "Touchpad and keyboard",
+      "touchpad-hint": "Drag to move · tap to click · scroll to scroll",
+      "left-click": "Left",
+      "middle-click": "Middle",
+      "right-click": "Right",
+      "keyboard-hint": "Click here, then type on the phone",
+      "keyboard-active": "Typing on the phone · Esc to stop",
+      "keyboard-inactive": "Keyboard not open on the phone",
+      "unavailable": "Remote input is off",
+      "unavailable-description": "Enable the Remote control or Remote keyboard plugin in the device settings."
+    },
+    "files": {
+      "title": "Files",
+      "subtitle": "Browse the phone, send files",
+      "phone-storage": "Phone storage",
+      "not-mounted": "Not mounted",
+      "mounted": "Phone storage mounted",
+      "mount": "Mount",
+      "open": "Open",
+      "send-title": "Send to {device}",
+      "drop-hint": "You can also drop files anywhere on this panel.",
+      "send-text": "Send text or a link"
+    },
+    "device": {
+      "title": "Device",
+      "this-computer": "This computer",
+      "computer-name": "Name shown on the phone",
+      "nearby": "Pairing",
+      "plugins": "Plugins",
+      "plugins-offline": "Connect the phone to change its plugins.",
+      "commands": "Commands",
+      "commands-description": "Commands the phone can run on this computer.",
+      "command-name": "Name",
+      "command-line": "Command",
+      "details": "Details",
+      "id": "Device ID",
+      "addresses": "Addresses",
+      "verification-key": "Verification key",
+      "unpair-confirm": "Click again to unpair {device}"
+    },
+    "pairing": {
+      "available": "Available to pair",
+      "waiting": "Waiting for the phone to accept…",
+      "wants-to-pair": "Wants to pair",
+      "accept": "Accept",
+      "reject": "Reject",
+      "verification-key": "Key: {key}",
+      "none-nearby": "No other devices found. Open KDE Connect on the phone to make it visible."
+    },
+    "toast": {
+      "pairing-request": "Pairing request",
+      "pairing-request-description": "A device wants to pair. Open the KDE Connect panel to accept.",
+      "pairing-failed": "Pairing failed",
+      "file-received": "File received from phone",
+      "incoming-call": "Incoming call",
+      "missed-call": "Missed call",
+      "clipboard-sent": "Clipboard sent to phone"
+    }
+  },
   "model-usage": {
     "all-time": "All time",
     "cache-read": "Cache read",
@@ -753,7 +877,7 @@
   "options": {
     "ui-style": {
       "caelestia": "Caelestia",
-      "material": "Material UI"
+      "material": "Material"
     },
     "bar": {
       "density-comfortable": "Comfortable",
@@ -1087,7 +1211,12 @@
       "hide-unnamed-devices-label": "Hide unnamed devices",
       "pin-instructions": "Please enter the PIN code displayed on your device.",
       "title": "Connections",
-      "wifi-header-text": "Use Wi-Fi to see available networks and connect to the internet."
+      "wifi-header-text": "Use Wi-Fi to see available networks and connect to the internet.",
+      "kdeconnect-enabled-label": "KDE Connect",
+      "kdeconnect-enabled-description": "Show your phone in Frostalia: battery, SMS, notifications, media, files and remote input. Needs kdeconnect running.",
+      "kdeconnect-touchpad-sensitivity-label": "Touchpad sensitivity",
+      "kdeconnect-touchpad-sensitivity-description": "How far the phone's cursor moves when you drag on the remote touchpad.",
+      "kdeconnect-widgets-hint": "Add the KDE Connect widget to the bar or the control center shortcuts to open the panel."
     },
     "control-center": {
       "cards-desc": "Customize which controls appear in the control center and in what order.",
@@ -1506,9 +1635,7 @@
       "weather-show-effects-description": "Show additional visual effects (like rain, snow, or lightning) on the weather card.",
       "weather-show-effects-label": "Display weather effects",
       "weather-show-in-calendar-description": "Show the daily weather forecast directly in your calendar view.",
-      "weather-show-in-calendar-label": "Display weather in calendar",
-      "weather-talia-mascot-always-description": "Always use Talia emojis instead of tabler icons.",
-      "weather-talia-mascot-always-label": "Always show Talia weather emojis"
+      "weather-show-in-calendar-label": "Display weather in calendar"
     },
     "network": {
       "bluetooth-description": "Activate Bluetooth management.",
@@ -1748,6 +1875,8 @@
       "ai-usage-openrouter-key-label": "OpenRouter API key",
       "ai-usage-openrouter-label": "OpenRouter",
       "ai-usage-refresh-description": "How often usage is polled when file watching misses a change.",
+      "ai-usage-providers-description": "Check a provider to track it. Drag to change the tab order in the AI usage panel.",
+      "ai-usage-providers-label": "Providers",
       "ai-usage-refresh-label": "Refresh interval",
       "ai-usage-title": "AI usage",
       "ai-usage-zen-description": "Checks your OpenCode Zen API key. Zen does not report usage.",
@@ -1836,6 +1965,8 @@
       "title": "User Interface",
       "tooltips-description": "Enable or disable tooltips throughout the interface.",
       "tooltips-label": "Show tooltips",
+      "frosted-glass-description": "Material only. Make panels and cards translucent so the blurred background shows through. Overrides panel opacity and translucent widgets.",
+      "frosted-glass-label": "Frosted glass",
       "translucent-widgets-description": "Make buttons, tabs, and other widgets inside panels semi-transparent.",
       "translucent-widgets-label": "Translucent widgets"
     },

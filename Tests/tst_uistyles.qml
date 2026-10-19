@@ -319,6 +319,94 @@ TestCase {
     compare(middle.inactiveX, 106);
   }
 
+  function test_glass() {
+    compare(UiStyles.glass("material", true).panelOpacity, 0.85);
+    compare(UiStyles.glass("material", true).surfaceOpacity, 0.7);
+    compare(UiStyles.glass("material", false), null);
+    compare(UiStyles.glass("caelestia", true), null);
+  }
+
+  function test_panelOpacity_data() {
+    return [
+          { tag: "material glass", style: "material", glass: true, expected: 0.85 },
+          { tag: "material opaque", style: "material", glass: false, expected: 0.9 },
+          { tag: "caelestia ignores glass", style: "caelestia", glass: true, expected: 0.9 }
+        ];
+  }
+
+  function test_panelOpacity(data) {
+    compare(UiStyles.panelOpacity(data.style, 0.9, data.glass), data.expected);
+  }
+
+  function test_fieldShape_data() {
+    return [
+          { tag: "idle", focused: false, indicator: 1 },
+          { tag: "focused", focused: true, indicator: 2 }
+        ];
+  }
+
+  function test_fieldShape(data) {
+    const shape = UiStyles.fieldShape("material", data.focused);
+    compare(shape.topRadius, 12);
+    compare(shape.bottomRadius, 0);
+    compare(shape.indicator, data.indicator);
+  }
+
+  function test_fieldShapeOnlyForMaterial() {
+    compare(UiStyles.fieldShape("caelestia", true), null);
+  }
+
+  function test_menuTokens() {
+    compare(UiStyles.tokens("material").menu.radius, 16);
+    compare(UiStyles.tokens("caelestia").menu, undefined);
+  }
+
+  function test_expandableShape_data() {
+    return [
+          { tag: "collapsed", expanded: false, headerBottom: 24 },
+          { tag: "expanded", expanded: true, headerBottom: 4 }
+        ];
+  }
+
+  function test_expandableShape(data) {
+    const shape = UiStyles.expandableShape("material", data.expanded);
+    compare(shape.gap, 2);
+    compare(shape.headerTop, 24);
+    compare(shape.headerBottom, data.headerBottom);
+    compare(shape.contentTop, 4);
+    compare(shape.contentBottom, 24);
+  }
+
+  function test_expandableShapeOnlyForMaterial() {
+    compare(UiStyles.expandableShape("caelestia", true), null);
+  }
+
+  function test_buttonGroupRadii_data() {
+    return [
+          { tag: "first unselected", checked: false, isFirst: true, isLast: false, left: 16, right: 8 },
+          { tag: "middle unselected", checked: false, isFirst: false, isLast: false, left: 8, right: 8 },
+          { tag: "last unselected", checked: false, isFirst: false, isLast: true, left: 8, right: 16 },
+          { tag: "middle selected", checked: true, isFirst: false, isLast: false, left: 16, right: 16 },
+          { tag: "single", checked: false, isFirst: true, isLast: true, left: 16, right: 16 }
+        ];
+  }
+
+  function test_buttonGroupRadii(data) {
+    const radii = UiStyles.buttonGroupRadii("material", 32, data.checked, data.isFirst, data.isLast);
+    compare(radii.left, data.left);
+    compare(radii.right, data.right);
+  }
+
+  function test_buttonGroupRadiiClampsInnerRadius() {
+    const radii = UiStyles.buttonGroupRadii("material", 10, false, false, false);
+    compare(radii.left, 5);
+    compare(radii.right, 5);
+  }
+
+  function test_buttonGroupRadiiOnlyForMaterial() {
+    compare(UiStyles.buttonGroupRadii("caelestia", 32, true, true, true), null);
+  }
+
   function test_toggleGeometry_data() {
     return [
           {

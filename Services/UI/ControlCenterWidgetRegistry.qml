@@ -14,6 +14,7 @@ Singleton {
                            "Bluetooth": bluetoothComponent,
                            "CustomButton": customButtonComponent,
                            "DarkMode": darkModeComponent,
+                           "KdeConnect": kdeConnectComponent,
                            "KeepAwake": keepAwakeComponent,
                            "NightLight": nightLightComponent,
                            "Notifications": notificationsComponent,
@@ -49,6 +50,9 @@ Singleton {
   }
   property Component darkModeComponent: Component {
     DarkMode {}
+  }
+  property Component kdeConnectComponent: Component {
+    KdeConnect {}
   }
   property Component keepAwakeComponent: Component {
     KeepAwake {}

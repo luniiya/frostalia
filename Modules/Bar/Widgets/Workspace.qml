@@ -939,7 +939,7 @@ Item {
             return groupedContainer.workspaceModel.idx.toString();
           }
 
-          family: Settings.data.ui.fontFixed
+          family: Style.fontFixed
           font {
             pointSize: barFontSize * 0.75
             weight: fontWeight

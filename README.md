@@ -29,7 +29,7 @@ The shell config is `frostalia`, user data lives in `~/.config/frostalia`, cache
 
 - A Wayland compositor. Hyprland is my daily setup. Niri, Sway, Scroll, Labwc and MangoWC integrations are inherited and may need work.
 - [noctalia-qs](https://github.com/noctalia-dev/noctalia-qs), the Quickshell build used by this shell. Its dependency name stays unchanged.
-- Rust and Cargo to build the settings and theming helpers during installation. Nix builds and supplies them automatically. The shell itself remains QML and JavaScript.
+- Rust and Cargo to build the settings, theming and KDE Connect helpers during installation. Nix builds and supplies them automatically. The shell itself remains QML and JavaScript.
 - Python 3 for theme generation and template rendering, plus optional calendar integration. Rust handles wallpaper pixel extraction, color quantization and palette generation.
 - Feature-specific tools such as `brightnessctl`, `ddcutil`, `wl-clipboard`, `cliphist`, `wlsunset` and ImageMagick. The Nix package supplies its runtime dependencies; see [nix/package.nix](nix/package.nix).
 
@@ -133,7 +133,7 @@ Scripts/dev/run-tests.sh             # Rust helper tests, headless QML tests and
 python3 Scripts/dev/build-settings-search-index.py
 ```
 
-Tests require Rust/Cargo, Qt 6's `qmltestrunner` (on Arch, `qt6-declarative`) and Python 3. Pure JS helpers live in `Helpers/`; QML tests live in `Tests/`, and repository checks in `Tests/python/`. Rust helpers and their unit tests live in `Tools/settings/` and `Tools/theming/`. See [CLAUDE.md](CLAUDE.md) for conventions and the settings checklist.
+Tests require Rust/Cargo, Qt 6's `qmltestrunner` (on Arch, `qt6-declarative`) and Python 3. Pure JS helpers live in `Helpers/`; QML tests live in `Tests/`, and repository checks in `Tests/python/`. Rust helpers and their unit tests live in `Tools/settings/`, `Tools/theming/` and `Tools/kdeconnect/`. See [CLAUDE.md](CLAUDE.md) for conventions and the settings checklist.
 
 ### UI styles
 

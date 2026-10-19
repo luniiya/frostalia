@@ -153,6 +153,16 @@ ColumnLayout {
   }
 
   NToggle {
+    visible: Style.materialControls
+    label: I18n.tr("panels.user-interface.frosted-glass-label")
+    description: I18n.tr("panels.user-interface.frosted-glass-description")
+    checked: Settings.data.ui.frostedGlass
+    defaultValue: Settings.getDefaultValue("ui.frostedGlass")
+    onToggled: checked => Settings.data.ui.frostedGlass = checked
+  }
+
+  NToggle {
+    enabled: Style.glass === null
     label: I18n.tr("panels.user-interface.translucent-widgets-label")
     description: I18n.tr("panels.user-interface.translucent-widgets-description")
     checked: Settings.data.ui.translucentWidgets

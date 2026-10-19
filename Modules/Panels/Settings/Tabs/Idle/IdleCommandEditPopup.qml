@@ -96,7 +96,7 @@ Popup {
         Layout.fillWidth: true
         label: I18n.tr("panels.idle.custom-entry-command")
         placeholderText: "notify-send \"Idle\""
-        fontFamily: Settings.data.ui.fontFixed
+        fontFamily: Style.fontFixed
       }
 
       NTextInput {
@@ -104,7 +104,7 @@ Popup {
         Layout.fillWidth: true
         label: I18n.tr("panels.idle.resume-command-label")
         placeholderText: "notify-send \"Welcome back!\""
-        fontFamily: Settings.data.ui.fontFixed
+        fontFamily: Style.fontFixed
       }
     }
 

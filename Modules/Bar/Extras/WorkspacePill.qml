@@ -115,7 +115,7 @@ Item {
             }
             return workspace.idx.toString();
           }
-          family: Settings.data.ui.fontFixed
+          family: Style.fontFixed
           // Size based on the fixed dimension (cross-axis) of the visual pill
           pointSize: (isVertical ? pillContainer.pillWidth : pillContainer.pillHeight) * textRatio
           applyUiScale: false

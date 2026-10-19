@@ -410,7 +410,7 @@ Variants {
         visible: false
         text: root.getDisplayPercentage()
         pointSize: Style.fontSizeS
-        family: Settings.data.ui.fontFixed
+        family: Style.fontFixed
         elide: Text.ElideNone
         wrapMode: Text.NoWrap
       }

@@ -24,7 +24,7 @@ ColumnLayout {
       imagePath: Settings.preprocessPath(Settings.data.general.avatarImage)
       fallbackIcon: "person"
       borderColor: Color.mPrimary
-      borderWidth: Style.borderM
+      borderWidth: Style.materialControls ? 0 : Style.borderM
       Layout.alignment: Qt.AlignTop
     }
 
