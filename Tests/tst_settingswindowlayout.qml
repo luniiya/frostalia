@@ -63,7 +63,7 @@ TestCase {
             expanded: false,
             scale: 1,
             width: 56,
-            height: 44
+            height: 56
           },
           {
             tag: "expanded",
@@ -77,7 +77,7 @@ TestCase {
             expanded: false,
             scale: 1.5,
             width: 84,
-            height: 66
+            height: 84
           },
           {
             tag: "expanded scaled",
@@ -93,6 +93,47 @@ TestCase {
     const rail = SettingsWindowLayout.materialRail(data.expanded, data.scale);
     compare(rail.width, data.width);
     compare(rail.rowHeight, data.height);
+    if (!data.expanded)
+      compare(rail.width, rail.rowHeight, "compact buttons are square");
+  }
+
+  function test_railScrollbarGutter_data() {
+    return [
+          {
+            tag: "compact",
+            expanded: false,
+            scale: 1,
+            gutter: 10
+          },
+          {
+            tag: "expanded",
+            expanded: true,
+            scale: 1,
+            gutter: 10
+          },
+          {
+            tag: "compact scaled",
+            expanded: false,
+            scale: 1.5,
+            gutter: 15
+          },
+          {
+            tag: "expanded scaled",
+            expanded: true,
+            scale: 1.5,
+            gutter: 15
+          }
+        ];
+  }
+
+  function test_railScrollbarGutter(data) {
+    const base = SettingsWindowLayout.materialRail(data.expanded, data.scale);
+    const scrolling = SettingsWindowLayout.materialRail(data.expanded, data.scale, data.gutter);
+    compare(scrolling.width - data.gutter, base.width);
+    compare(scrolling.rowHeight, base.rowHeight);
+    if (!data.expanded)
+      compare(scrolling.width - data.gutter, scrolling.rowHeight, "scrollbar does not distort compact buttons");
+    compare(SettingsWindowLayout.materialRail(data.expanded, data.scale, 0).width, base.width);
   }
 
   function test_search_data() {

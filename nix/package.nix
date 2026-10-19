@@ -138,7 +138,7 @@ stdenvNoCC.mkDerivation {
   meta = {
     description = "A sleek and minimal desktop shell thoughtfully crafted for Wayland, built with Quickshell.";
     homepage = "https://github.com/luniiya/frostalia";
-    license = lib.licenses.mit;
+    license = lib.licenses.gpl3Only;
     mainProgram = "frostalia";
   };
 }

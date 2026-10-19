@@ -83,7 +83,7 @@ Item {
     homeVisible = false;
     currentTabIndex = index;
   }
-  readonly property var materialRail: SettingsWindowLayout.materialRail(sidebarExpanded, Style.uiScaleRatio)
+  readonly property var materialRail: SettingsWindowLayout.materialRail(sidebarExpanded, Style.uiScaleRatio, sidebarList.verticalScrollBarActive ? sidebarList.handleWidth + Style.marginXS : 0)
   readonly property bool sidebarCardStyle: !material && Settings.data.ui.settingsPanelSideBarCardStyle
 
   onSearchResultsChanged: {
@@ -851,6 +851,10 @@ Item {
 
           NButton {
             Layout.fillWidth: true
+            Layout.rightMargin: root.material && sidebarList.verticalScrollBarActive ? sidebarList.handleWidth + Style.marginXS : 0
+            Layout.preferredHeight: root.material && !root.sidebarExpanded ? root.materialRail.rowHeight : implicitHeight
+            buttonRadius: root.material ? height / 2 : Style.iRadiusS
+            iconSize: root.material ? Style.fontSizeXL : Style.fontSizeL
             text: root.sidebarExpanded ? I18n.tr("panels.settings.home") : ""
             icon: "home"
             backgroundColor: root.homeVisible ? Color.mPrimary : "transparent"
@@ -872,7 +876,7 @@ Item {
               visible: root.searchText.trim() !== ""
               verticalPolicy: ScrollBar.AsNeeded
               gradientColor: "transparent"
-              reserveScrollbarSpace: false
+              reserveScrollbarSpace: true
 
               HoverHandler {
                 onPointChanged: {
@@ -895,7 +899,7 @@ Item {
 
               delegate: Rectangle {
                 id: resultItem
-                width: searchResultsList.width - (searchResultsList.verticalScrollBarActive ? Style.marginM : 0)
+                width: searchResultsList.availableWidth
                 height: resultColumn.implicitHeight + Style.margin2M
                 radius: Style.iRadiusS
                 readonly property bool selected: index === root.searchSelectedIndex
@@ -973,11 +977,11 @@ Item {
               horizontalPolicy: ScrollBar.AlwaysOff
               verticalPolicy: root.material ? ScrollBar.AsNeeded : ScrollBar.AlwaysOff
               gradientColor: "transparent"
-              reserveScrollbarSpace: false
+              reserveScrollbarSpace: root.material && verticalScrollBarActive
 
               delegate: Rectangle {
                 id: tabItem
-                width: sidebarList.width
+                width: sidebarList.availableWidth
                 height: root.material ? root.materialRail.rowHeight : tabEntryRow.implicitHeight + Style.margin2XS
                 radius: root.material ? height / 2 : Style.iRadiusS
                 color: root.material ? "transparent" : selected ? Color.mPrimary : (tabItem.hovering ? Color.mHover : "transparent")
@@ -1021,11 +1025,12 @@ Item {
                 RowLayout {
                   id: tabEntryRow
                   anchors.fill: parent
-                  anchors.leftMargin: root.material ? Style.marginL : Style.marginS
-                  anchors.rightMargin: root.material ? Style.marginL : Style.marginS
+                  anchors.leftMargin: root.material ? (root.sidebarExpanded ? Style.marginL : 0) : Style.marginS
+                  anchors.rightMargin: root.material ? (root.sidebarExpanded ? Style.marginL : 0) : Style.marginS
                   spacing: Style.marginM
 
                   NIcon {
+                    Layout.fillWidth: root.material && !root.sidebarExpanded
                     icon: modelData.icon
                     color: tabTextColor
                     pointSize: Style.fontSizeXL

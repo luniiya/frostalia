@@ -38,8 +38,8 @@ Singleton {
     return UiStyles.sliderGeometry(uiStyleId, baseWidgetSize, heightRatio, uiScaleRatio);
   }
 
-  function getFieldShape(focused) {
-    return UiStyles.fieldShape(uiStyleId, focused);
+  function getFieldShape(focused, cornerRadius) {
+    return UiStyles.fieldShape(uiStyleId, focused, cornerRadius);
   }
 
   function getExpandableShape(expanded) {
@@ -124,8 +124,11 @@ Singleton {
   readonly property real opacityFull: 1.0
 
   // Material frosted glass replaces the configured panel opacity with its own
-  readonly property var glass: UiStyles.glass(uiStyleId, Settings.data.ui.frostedGlass && !PowerProfileService.frostaliaPerformanceMode)
-  readonly property real panelOpacity: UiStyles.panelOpacity(uiStyleId, Settings.data.ui.panelBackgroundOpacity, glass !== null)
+  readonly property var glass: UiStyles.glass(uiStyleId, Settings.data.ui.frostedGlass && !PowerProfileService.frostaliaPerformanceMode, {
+                                                "panelOpacity": Settings.data.ui.glassPanelOpacity,
+                                                "surfaceOpacity": Settings.data.ui.glassSurfaceOpacity
+                                              })
+  readonly property real panelOpacity: UiStyles.panelOpacity(uiStyleId, Settings.data.ui.panelBackgroundOpacity, glass !== null, glass)
   readonly property real effectivePanelOpacity: PowerProfileService.frostaliaPerformanceMode ? 1.0 : Color.adaptiveOpacity(panelOpacity)
   readonly property real effectiveBarOpacity: PowerProfileService.frostaliaPerformanceMode ? 1.0 : Settings.data.bar.backgroundOpacity
 

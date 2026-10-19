@@ -186,19 +186,12 @@ RowLayout {
       }
     }
 
-    background: Rectangle {
+    background: NFieldBackground {
+      id: comboFrame
       implicitWidth: Math.round(Style.baseWidgetSize * 3.75 * Style.uiScaleRatio)
       implicitHeight: Math.round(root.preferredHeight * Style.uiScaleRatio)
-      color: Color.mSurface
-      border.color: combo.activeFocus ? Color.mSecondary : Color.mOutline
-      border.width: Style.borderS
-      radius: Style.iRadiusM
-
-      Behavior on border.color {
-        ColorAnimation {
-          duration: Style.animationFast
-        }
-      }
+      active: combo.activeFocus || combo.popup.visible
+      hovered: combo.hovered
     }
 
     contentItem: NText {
@@ -221,22 +214,37 @@ RowLayout {
       y: combo.topPadding + (combo.availableHeight - height) / 2
       icon: "caret-down"
       pointSize: Style.fontSizeL
+      color: Style.materialControls ? (combo.popup.visible ? Color.mPrimary : Color.mOnSurfaceVariant) : Color.mOnSurface
+      rotation: Style.materialControls && combo.popup.visible ? 180 : 0
+
+      Behavior on rotation {
+        enabled: Style.materialControls
+        NumberAnimation {
+          duration: Style.animationFast
+          easing.type: Easing.OutCubic
+        }
+      }
     }
 
     popup: Popup {
-      y: combo.height + Style.marginS
+      readonly property var menu: Style.uiStyleTokens.menu
+
+      // Material: the menu opens over the field, so the field itself turns into the search box
+      y: menu ? 0 : combo.height + Style.marginS
       width: combo.width
       height: Math.round((root.popupHeight + 60) * Style.uiScaleRatio)
-      padding: Style.marginM
+      padding: menu ? 0 : Style.marginM
 
       contentItem: ColumnLayout {
-        spacing: Style.marginS
+        spacing: combo.popup.menu ? 0 : Style.marginS
 
         // Search input
         NTextInput {
           id: searchInput
           inputIconName: "search"
           Layout.fillWidth: true
+          Layout.preferredHeight: combo.popup.menu ? combo.height : -1
+          Layout.margins: combo.popup.menu ? 0 : Style.borderS
           placeholderText: root.searchPlaceholder
           text: root.searchText
           onTextChanged: root.searchText = text
@@ -289,6 +297,7 @@ RowLayout {
           id: listView
           Layout.fillWidth: true
           Layout.fillHeight: true
+          Layout.margins: combo.popup.menu ? combo.popup.menu.padding : 0
           // Use activeModel (source model when not filtering, filtered results when searching)
           model: combo.popup.visible ? root.activeModel : null
           horizontalPolicy: ScrollBar.AlwaysOff
@@ -312,6 +321,7 @@ RowLayout {
               bottomPadding: Style.marginS
               hoverEnabled: true
               highlighted: ListView.view.currentIndex === index
+              readonly property bool isSelected: listView.model.get(index).key === root.currentKey
 
               onHoveredChanged: {
                 if (hovered) {
@@ -320,9 +330,11 @@ RowLayout {
               }
 
               onClicked: {
-                var selectedKey = listView.model.get(index).key;
-                root.selected(selectedKey);
+                // Close before selecting: selecting can destroy this delegate
+                const selectedKey = listView.model.get(index).key;
+                const owner = root;
                 combo.popup.close();
+                owner.selected(selectedKey);
               }
 
               contentItem: RowLayout {
@@ -332,7 +344,7 @@ RowLayout {
                 NText {
                   text: name
                   pointSize: Style.fontSizeM
-                  color: highlighted ? Color.mOnHover : Color.mOnSurface
+                  color: itemBackground.contentColor
                   verticalAlignment: Text.AlignVCenter
                   elide: Text.ElideRight
                   Layout.fillWidth: true
@@ -379,7 +391,7 @@ RowLayout {
                         else
                           return Style.fontSizeXS;
                       }
-                      color: highlighted ? Color.mOnHover : (badgeData && badgeData.color ? badgeData.color : Color.mOnSurface)
+                      color: itemBackground.contentColor !== Color.mOnSurface ? itemBackground.contentColor : (badgeData && badgeData.color ? badgeData.color : Color.mOnSurface)
                       Layout.preferredWidth: Math.round(Style.baseWidgetSize * 0.6)
                       Layout.preferredHeight: Math.round(Style.baseWidgetSize * 0.6)
                       visible: badgeData && badgeData.icon !== undefined && badgeData.icon !== ""
@@ -387,22 +399,18 @@ RowLayout {
                   }
                 }
               }
-              background: Rectangle {
+              background: NMenuItemBackground {
+                id: itemBackground
                 anchors.fill: parent
-                color: highlighted ? Color.mHover : "transparent"
-                radius: Style.iRadiusS
+                highlighted: delegateRoot.highlighted
+                selected: delegateRoot.isSelected
               }
             }
           }
         }
       }
 
-      background: Rectangle {
-        color: Color.mSurfaceVariant
-        border.color: Color.mOutline
-        border.width: Style.borderS
-        radius: Style.iRadiusM
-      }
+      background: NMenuSurface {}
     }
 
     // Update the currentIndex if the currentKey is changed externally

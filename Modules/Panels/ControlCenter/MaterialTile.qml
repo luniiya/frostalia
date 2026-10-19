@@ -15,7 +15,6 @@ Rectangle {
   property bool available: true
   property bool interactive: true
   property bool showContent: true
-  property int badge: 0
   signal clicked(string button)
 
   readonly property color contentColor: active ? Color.mOnPrimary : Color.mOnSurface
@@ -67,25 +66,6 @@ Rectangle {
         color: root.active ? Color.mOnPrimary : Color.mOnSurfaceVariant
         elide: Text.ElideRight
       }
-    }
-  }
-
-  Rectangle {
-    visible: root.badge > 0
-    anchors.top: parent.top
-    anchors.right: parent.right
-    anchors.margins: Math.round(6 * Style.uiScaleRatio)
-    height: Math.round(18 * Style.uiScaleRatio)
-    width: Math.max(height, badgeText.implicitWidth + Style.marginS)
-    radius: height / 2
-    color: Color.mError
-    NText {
-      id: badgeText
-      anchors.centerIn: parent
-      text: root.badge > 99 ? "99+" : String(root.badge)
-      pointSize: Style.fontSizeXXS
-      font.weight: Style.fontWeightBold
-      color: Color.mOnError
     }
   }
 

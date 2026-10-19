@@ -24,85 +24,24 @@ ColumnLayout {
     Layout.preferredHeight: Math.round(48 * Style.uiScaleRatio)
     spacing: Style.marginS
 
-    Rectangle {
+    KdeConnectPill {
+      id: devicePill
       Layout.fillWidth: true
       Layout.fillHeight: true
-      radius: height / 2
-      color: Color.mSurfaceVariant
-      NMaterialStateLayer {
-        hovered: devicePointer.containsMouse
-        pressed: devicePointer.pressed
-        tint: Color.mOnSurface
-      }
-      RowLayout {
-        anchors.fill: parent
-        anchors.leftMargin: Style.marginL
-        anchors.rightMargin: Style.marginM
-        spacing: Style.marginS
-        NIcon {
-          icon: KdeConnect.deviceIcon(root.device)
-          pointSize: Style.fontSizeXL
-          color: root.online ? Color.mPrimary : Color.mOnSurfaceVariant
-        }
-        ColumnLayout {
-          Layout.fillWidth: true
-          Layout.minimumWidth: 0
-          spacing: 0
-          NText {
-            Layout.fillWidth: true
-            text: root.device ? root.device.name : I18n.tr("kdeconnect.title")
-            pointSize: Style.fontSizeS
-            font.weight: Style.fontWeightMedium
-            elide: Text.ElideRight
-          }
-          NText {
-            Layout.fillWidth: true
-            visible: text !== ""
-            text: root.nav.statusText
-            pointSize: Style.fontSizeXS
-            color: Color.mOnSurfaceVariant
-            elide: Text.ElideRight
-          }
-        }
-        NIcon {
-          visible: root.online && !!root.device.network
-          icon: KdeConnect.signalIcon(root.device?.network)
-          color: Color.mOnSurfaceVariant
-        }
-        NIcon {
-          visible: KdeConnectService.pairedDevices.length > 1
-          icon: "chevron-down"
-          color: Color.mOnSurfaceVariant
-        }
-      }
-      MouseArea {
-        id: devicePointer
-        anchors.fill: parent
-        hoverEnabled: true
-        cursorShape: Qt.PointingHandCursor
-        onClicked: KdeConnectService.pairedDevices.length > 1 ? root.nav.openDeviceMenu(parent) : root.nav.push("device")
-      }
+      onClicked: KdeConnectService.pairedDevices.length > 1 ? root.nav.openDeviceMenu(devicePill) : root.nav.push("device")
     }
 
-    Rectangle {
-      Layout.preferredWidth: actions.implicitWidth + Style.marginS
+    NPill {
       Layout.fillHeight: true
-      radius: height / 2
-      color: Color.mSurfaceVariant
-      RowLayout {
-        id: actions
-        anchors.centerIn: parent
-        spacing: Style.marginXS
-        NIconButton {
-          icon: "settings"
-          baseSize: Style.baseWidgetSize
-          onClicked: root.nav.push("device")
-        }
-        NIconButton {
-          icon: "close"
-          baseSize: Style.baseWidgetSize
-          onClicked: root.nav.close()
-        }
+      NIconButton {
+        icon: "settings"
+        baseSize: Style.baseWidgetSize
+        onClicked: root.nav.push("device")
+      }
+      NIconButton {
+        icon: "close"
+        baseSize: Style.baseWidgetSize
+        onClicked: root.nav.close()
       }
     }
   }
@@ -171,7 +110,6 @@ ColumnLayout {
             icon: modelData.icon
             title: root.nav.featureTitle(modelData.id)
             subtitle: root.nav.featureSubtitle(modelData.id)
-            badge: root.nav.featureBadge(modelData.id)
             active: modelData.id === "media" && !!root.device?.media?.playing
             onClicked: root.nav.push(modelData.id)
           }

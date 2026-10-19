@@ -178,6 +178,7 @@ Singleton {
         property string transition: "up"
         property int transitionDuration: 220
         property bool hideOnFullscreen: true
+        property bool reserveSpace: true
       }
     }
 
@@ -335,6 +336,8 @@ Singleton {
       property real panelBackgroundOpacity: 0.93
       property bool translucentWidgets: false
       property bool frostedGlass: false
+      property real glassPanelOpacity: 0.85
+      property real glassSurfaceOpacity: 0.7
       property bool panelsAttachedToBar: true
       property bool settingsPanelSideBarCardStyle: false
     }
@@ -344,6 +347,13 @@ Singleton {
       property string name: ""
       property bool weatherEnabled: true
       property bool weatherShowEffects: true
+      property bool weatherShowHourly: true
+      property bool weatherShowDaily: true
+      property bool weatherShowDetails: true
+      property int weatherHourlyCount: 24
+      property int weatherDailyCount: 7
+      property list<var> weatherDetails: [] // [{ id, enabled }] in display order; empty = every detail
+      property string windSpeedUnit: "kmh" // kmh, ms, mph, kn
       property bool useFahrenheit: false
       property bool use12hourFormat: false
       property bool showWeekNumberInCalendar: false
@@ -461,6 +471,10 @@ Singleton {
         },
         {
           "id": "brightness-card",
+          "enabled": false
+        },
+        {
+          "id": "kdeconnect-card",
           "enabled": false
         },
         {

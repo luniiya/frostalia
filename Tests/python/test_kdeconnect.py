@@ -63,6 +63,26 @@ class KdeConnectTests(unittest.TestCase):
         self.assertTrue(widgets["bar"]["KdeConnect"]["hideWhenOffline"])
         self.assertFalse(widgets["bar"]["KdeConnect"]["showUnread"], "bar widget shows only the battery by default")
 
+
+    def test_home_feature_tiles_have_no_count_badges(self):
+        # Counts are already in the subtitles ("34 unread"); badges were noise.
+        for path in ("Modules/Panels/KdeConnect/MaterialKdeConnectHome.qml", "Modules/Panels/KdeConnect/CaelestiaKdeConnectHome.qml", "Modules/Panels/ControlCenter/MaterialTile.qml"):
+            self.assertNotIn("badge", (ROOT / path).read_text(encoding="utf-8").lower(), path)
+
+    def test_control_center_card_is_registered_and_off_by_default(self):
+        settings = json.loads((ROOT / "Assets" / "settings-default.json").read_text(encoding="utf-8"))
+        cards = {c["id"]: c["enabled"] for c in settings["controlCenter"]["cards"]}
+        self.assertIs(cards.get("kdeconnect-card"), False)
+        order = [c["id"] for c in settings["controlCenter"]["cards"]]
+        self.assertEqual(order[order.index("brightness-card") + 1:order.index("weather-card")], ["kdeconnect-card"], "card sits between brightness and weather")
+        tab = (ROOT / "Modules/Panels/Settings/Tabs/ControlCenter/ControlCenterTab.qml").read_text(encoding="utf-8")
+        self.assertEqual(re.findall(r'"id": "([a-z-]+-card)"', tab), order, "settings list order matches the defaults")
+        for path, component in (("Modules/Panels/ControlCenter/MaterialControlCenter.qml", "KdeConnectPill"),
+                                ("Modules/Panels/ControlCenter/CaelestiaControlCenter.qml", "CaelestiaKdeConnectCard")):
+            source = (ROOT / path).read_text(encoding="utf-8")
+            self.assertIn('case "kdeconnect-card"', source, path)
+            self.assertIn(component, source, path)
+        self.assertIn('"kdeconnect-card"', (ROOT / "Modules/Panels/Settings/Tabs/ControlCenter/ControlCenterTab.qml").read_text(encoding="utf-8"))
     def test_helper_is_built_installed_and_tested(self):
         self.assertIn("Tools/kdeconnect/Cargo.toml", (ROOT / "Scripts" / "dev" / "run-tests.sh").read_text(encoding="utf-8"))
         self.assertIn("kdeconnect", (ROOT / "install.sh").read_text(encoding="utf-8"))

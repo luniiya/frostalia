@@ -64,41 +64,12 @@ ColumnLayout {
     focusPolicy: Qt.StrongFocus
     hoverEnabled: true
 
-    background: Rectangle {
+    background: NFieldBackground {
       id: frame
-
-      // Material: filled field with an active indicator instead of an outline
-      readonly property var fieldShape: Style.getFieldShape(input.activeFocus)
-
-      radius: root.radius
-      topLeftRadius: fieldShape ? fieldShape.topRadius : root.radius
-      topRightRadius: topLeftRadius
-      bottomLeftRadius: fieldShape ? fieldShape.bottomRadius : root.radius
-      bottomRightRadius: bottomLeftRadius
-      color: fieldShape ? (backgroundCapture.containsMouse && !input.activeFocus ? Qt.alpha(Color.mOnSurface, 0.12) : Color.mTonalContainer) : Color.mSurface
-      border.color: input.activeFocus ? Color.mSecondary : Color.mOutline
-      border.width: root.outlined && !fieldShape ? Style.borderS : 0
-
-      Behavior on border.color {
-        ColorAnimation {
-          duration: Style.animationFast
-        }
-      }
-
-      Rectangle {
-        visible: !!frame.fieldShape && root.outlined
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        height: frame.fieldShape ? frame.fieldShape.indicator : 0
-        color: input.activeFocus ? Color.mPrimary : Color.mOnSurfaceVariant
-
-        Behavior on color {
-          ColorAnimation {
-            duration: Style.animationFast
-          }
-        }
-      }
+      active: input.activeFocus
+      hovered: backgroundCapture.containsMouse
+      outlined: root.outlined
+      cornerRadius: root.radius
     }
 
     contentItem: Item {

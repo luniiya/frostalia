@@ -29,6 +29,12 @@ Singleton {
   readonly property var activeDevice: KdeConnect.activeDevice(devices, Settings.data.kdeConnect.device)
   readonly property string activeId: activeDevice ? activeDevice.id : ""
   readonly property bool online: KdeConnect.isOnline(activeDevice)
+  // "77% · LTE" line under the device name.
+  readonly property string statusText: KdeConnect.statusLine(activeDevice, {
+                                                               offline: I18n.tr("kdeconnect.status.offline"),
+                                                               charging: I18n.tr("common.charging"),
+                                                               connected: I18n.tr("common.connected")
+                                                             })
 
   // Messages for the active device
   property var conversations: []

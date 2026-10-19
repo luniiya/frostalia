@@ -25,6 +25,15 @@ Singleton {
   property Component weatherComponent: Component {
     DesktopWeather {}
   }
+  property Component weatherHourlyComponent: Component {
+    DesktopWeatherHourly {}
+  }
+  property Component weatherDailyComponent: Component {
+    DesktopWeatherDaily {}
+  }
+  property Component weatherDetailComponent: Component {
+    DesktopWeatherDetail {}
+  }
   property Component systemStatComponent: Component {
     DesktopSystemStat {}
   }
@@ -48,6 +57,9 @@ Singleton {
     widgetsObj["Clock"] = clockComponent;
     widgetsObj["MediaPlayer"] = mediaPlayerComponent;
     widgetsObj["Weather"] = weatherComponent;
+    widgetsObj["WeatherHourly"] = weatherHourlyComponent;
+    widgetsObj["WeatherDaily"] = weatherDailyComponent;
+    widgetsObj["WeatherDetail"] = weatherDetailComponent;
     widgetsObj["SystemStat"] = systemStatComponent;
     widgetsObj["AudioVisualizer"] = audioVisualizerComponent;
     widgets = widgetsObj;
@@ -56,6 +68,9 @@ Singleton {
     urlsObj["Clock"] = _widgetsDir + "DesktopClock.qml";
     urlsObj["MediaPlayer"] = _widgetsDir + "DesktopMediaPlayer.qml";
     urlsObj["Weather"] = _widgetsDir + "DesktopWeather.qml";
+    urlsObj["WeatherHourly"] = _widgetsDir + "DesktopWeatherHourly.qml";
+    urlsObj["WeatherDaily"] = _widgetsDir + "DesktopWeatherDaily.qml";
+    urlsObj["WeatherDetail"] = _widgetsDir + "DesktopWeatherDetail.qml";
     urlsObj["SystemStat"] = _widgetsDir + "DesktopSystemStat.qml";
     urlsObj["AudioVisualizer"] = _widgetsDir + "DesktopAudioVisualizer.qml";
     widgetUrls = urlsObj;
@@ -67,6 +82,9 @@ Singleton {
                                      "Clock": "WidgetSettings/ClockSettings.qml",
                                      "MediaPlayer": "WidgetSettings/MediaPlayerSettings.qml",
                                      "Weather": "WidgetSettings/WeatherSettings.qml",
+                                     "WeatherHourly": "WidgetSettings/WeatherHourlySettings.qml",
+                                     "WeatherDaily": "WidgetSettings/WeatherDailySettings.qml",
+                                     "WeatherDetail": "WidgetSettings/WeatherDetailSettings.qml",
                                      "SystemStat": "WidgetSettings/SystemStatSettings.qml",
                                      "AudioVisualizer": "WidgetSettings/AudioVisualizerSettings.qml"
                                    })
@@ -92,7 +110,30 @@ Singleton {
                                   },
                                   "Weather": {
                                     "showBackground": true,
-                                    "roundedCorners": true
+                                    "roundedCorners": true,
+                                    "animatedSky": false,
+                                    "showCondition": true,
+                                    "showHighLow": true,
+                                    "showFeelsLike": true,
+                                    "forecastDays": 0
+                                  },
+                                  "WeatherHourly": {
+                                    "showBackground": true,
+                                    "roundedCorners": true,
+                                    "hours": 12,
+                                    "showPrecipitation": true
+                                  },
+                                  "WeatherDaily": {
+                                    "showBackground": true,
+                                    "roundedCorners": true,
+                                    "days": 7,
+                                    "compact": false,
+                                    "showPrecipitation": true
+                                  },
+                                  "WeatherDetail": {
+                                    "showBackground": true,
+                                    "roundedCorners": true,
+                                    "detail": "wind"
                                   },
                                   "SystemStat": {
                                     "showBackground": true,
@@ -167,8 +208,9 @@ Singleton {
       var manifest = PluginRegistry.getPluginManifest(pluginId);
       return manifest ? manifest.name : pluginId;
     }
-    // Core widgets - return as-is (Clock, MediaPlayer, Weather, SystemStat)
-    return widgetId;
+    // Core widgets: translated where a name exists, the id otherwise
+    const key = "panels.desktop-widgets.names." + widgetId;
+    return I18n.hasTranslation(key) ? I18n.tr(key) : widgetId;
   }
 
   // Register a plugin desktop widget

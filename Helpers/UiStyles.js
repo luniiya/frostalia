@@ -147,9 +147,14 @@ var definitions = {
         "innerRadius": 4
       },
       "field": {
-        "topRadius": 12,
-        "indicator": 1,
-        "focusedIndicator": 2
+        "radius": 12,
+        "focusBorderWidth": 1
+      },
+      "weather": {
+        "radius": 28,
+        "tileRadius": 24,
+        "cookieLobes": 9,
+        "cookieDepth": 0.1
       },
       "menu": {
         "radius": 16,
@@ -252,27 +257,33 @@ function buttonGroupRadii(id, height, checked, isFirst, isLast) {
 }
 
 // Frosted glass: translucent panels and cards over the compositor blur.
-// Null when the style has no glass look or it is turned off.
-function glass(id, enabled) {
-  return enabled ? tokens(id).frostedGlass || null : null;
+// Null when the style has no glass look or it is turned off. `custom` holds the
+// user's panelOpacity and surfaceOpacity; missing or invalid values use the style's.
+function glass(id, enabled, custom) {
+  const frosted = enabled ? tokens(id).frostedGlass : null;
+  if (!frosted)
+    return null;
+  const pick = key => {
+    const value = custom ? Number(custom[key]) : NaN;
+    return isFinite(value) && custom[key] !== null && custom[key] !== "" ? Math.max(0, Math.min(1, value)) : frosted[key];
+  };
+  return { "panelOpacity": pick("panelOpacity"), "surfaceOpacity": pick("surfaceOpacity") };
 }
 
 // Panel background opacity before light-mode adaptation.
-function panelOpacity(id, configured, glassEnabled) {
-  const frosted = glass(id, glassEnabled);
+function panelOpacity(id, configured, glassEnabled, custom) {
+  const frosted = glass(id, glassEnabled, custom);
   return frosted ? frosted.panelOpacity : configured;
 }
 
-// Material 3 filled text field: rounded top, flat bottom with an active
-// indicator line that thickens on focus.
-function fieldShape(id, focused) {
+// Filled fields keep their rounded shape on focus and use an outline for feedback.
+function fieldShape(id, focused, cornerRadius) {
   const field = tokens(id).field;
   if (!field)
     return null;
   return {
-    "topRadius": field.topRadius,
-    "bottomRadius": 0,
-    "indicator": focused ? field.focusedIndicator : field.indicator
+    "radius": cornerRadius === undefined ? field.radius : cornerRadius,
+    "borderWidth": focused ? field.focusBorderWidth : 0
   };
 }
 

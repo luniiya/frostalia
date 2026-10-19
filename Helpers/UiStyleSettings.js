@@ -30,6 +30,8 @@ var defaults = {
     "panelBackgroundOpacity": 0.93,
     "translucentWidgets": false,
     "frostedGlass": false,
+    "glassPanelOpacity": 0.85,
+    "glassSurfaceOpacity": 0.7,
     "panelsAttachedToBar": true,
     "settingsPanelSideBarCardStyle": false
   }

@@ -1,146 +1,53 @@
 import QtQuick
 import QtQuick.Layouts
-import Quickshell
+import "../../../Helpers/WeatherWidget.js" as WeatherWidget
 import qs.Commons
 import qs.Modules.DesktopWidgets
+import qs.Modules.Weather
 import qs.Services.Location
-import qs.Widgets
 
+// Current conditions on the shared widget background (or the animated sky),
+// optionally with a daily strip.
 DraggableDesktopWidget {
   id: root
 
-  readonly property bool weatherReady: Settings.data.location.weatherEnabled && (LocationService.data.weather !== null)
-  readonly property int currentWeatherCode: weatherReady ? LocationService.data.weather.current_weather.weathercode : 0
-  readonly property real currentTemp: {
-    if (!weatherReady)
-      return 0;
-    var temp = LocationService.data.weather.current_weather.temperature;
-    if (Settings.data.location.useFahrenheit) {
-      temp = LocationService.celsiusToFahrenheit(temp);
-    }
-    return Math.round(temp);
-  }
-  readonly property real todayMax: {
-    if (!weatherReady || !LocationService.data.weather.daily || LocationService.data.weather.daily.temperature_2m_max.length === 0)
-      return 0;
-    var temp = LocationService.data.weather.daily.temperature_2m_max[0];
-    if (Settings.data.location.useFahrenheit) {
-      temp = LocationService.celsiusToFahrenheit(temp);
-    }
-    return Math.round(temp);
-  }
-  readonly property real todayMin: {
-    if (!weatherReady || !LocationService.data.weather.daily || LocationService.data.weather.daily.temperature_2m_min.length === 0)
-      return 0;
-    var temp = LocationService.data.weather.daily.temperature_2m_min[0];
-    if (Settings.data.location.useFahrenheit) {
-      temp = LocationService.celsiusToFahrenheit(temp);
-    }
-    return Math.round(temp);
-  }
-  readonly property string tempUnit: Settings.data.location.useFahrenheit ? "F" : "C"
-  readonly property string locationName: {
-    const chunks = Settings.data.location.name.split(",");
-    return chunks[0];
-  }
+  readonly property int forecastDays: widgetSetting("forecastDays") ?? 0
+  readonly property real padding: Math.round(Style.marginM * widgetScale)
 
-  implicitWidth: Math.round(Math.max(240 * widgetScale, contentLayout.implicitWidth + Style.margin2M * widgetScale))
-  implicitHeight: Math.round(64 * widgetScale + Style.margin2M * widgetScale)
+  implicitWidth: Math.round(WeatherWidget.desktopSize("Weather").width * widgetScale)
+  implicitHeight: column.implicitHeight
   width: implicitWidth
   height: implicitHeight
 
-  RowLayout {
-    id: contentLayout
-    anchors.fill: parent
-    anchors.margins: Math.round(Style.marginM * widgetScale)
-    spacing: Math.round(Style.marginM * widgetScale)
-    z: 2
+  ColumnLayout {
+    id: column
+    width: parent.width
+    spacing: 0
 
-    Item {
-      Layout.preferredWidth: Math.round(64 * widgetScale)
-      Layout.preferredHeight: Math.round(64 * widgetScale)
-      Layout.alignment: Qt.AlignVCenter
-
-      NIcon {
-        visible: !LocationService.taliaWeatherMascotActive || !weatherReady
-        anchors.centerIn: parent
-        icon: weatherReady ? LocationService.weatherSymbolFromCode(currentWeatherCode) : (LocationService.locationConfigured ? "weather-cloud-off" : "map-pin-off")
-        pointSize: Math.round(Style.fontSizeXXXL * 2 * widgetScale)
-        color: weatherReady ? Color.mPrimary : Color.mOnSurfaceVariant
-      }
-      Loader {
-        active: LocationService.taliaWeatherMascotActive && weatherReady
-        anchors.fill: parent
-        asynchronous: true
-        sourceComponent: Component {
-          Image {
-            anchors.fill: parent
-            fillMode: Image.PreserveAspectFit
-            smooth: true
-            mipmap: true
-            asynchronous: true
-            source: Qt.resolvedUrl(LocationService.taliaWeatherImageFromCode(currentWeatherCode))
-          }
-        }
-      }
-    }
-
-    NText {
-      text: weatherReady ? `${currentTemp}°${tempUnit}` : "--"
-      pointSize: Math.round(Style.fontSizeXXXL * widgetScale)
-      font.weight: Style.fontWeightBold
-      color: Color.mOnSurface
-    }
-
-    ColumnLayout {
+    WeatherCurrent {
       Layout.fillWidth: true
-      spacing: Math.round(Style.marginXXS * widgetScale)
-      Layout.alignment: Qt.AlignVCenter
+      Layout.preferredHeight: implicitHeight
+      scaleFactor: root.widgetScale
+      padding: root.padding
+      badgeSize: Math.round(64 * root.widgetScale)
+      temperatureSize: Style.fontSizeXXXL * 1.5 * root.widgetScale
+      radius: root.backgroundRadius
+      showSky: root.widgetSetting("animatedSky") ?? false
+      showCondition: root.widgetSetting("showCondition") ?? true
+      showHighLow: root.widgetSetting("showHighLow") ?? true
+      showFeelsLike: root.widgetSetting("showFeelsLike") ?? true
+    }
 
-      NText {
-        Layout.fillWidth: true
-        text: locationName || I18n.tr("common.weather-no-location")
-        pointSize: Math.round(Style.fontSizeS * widgetScale)
-        font.weight: Style.fontWeightRegular
-        color: Color.mOnSurfaceVariant
-        elide: Text.ElideRight
-        maximumLineCount: 1
-        visible: !Settings.data.location.hideWeatherCityName
-      }
-
-      RowLayout {
-        spacing: Math.round(Style.marginXS * widgetScale)
-        visible: weatherReady && todayMax > 0 && todayMin > 0
-
-        NText {
-          text: "H:"
-          pointSize: Math.round(Style.fontSizeXS * widgetScale)
-          color: Color.mOnSurfaceVariant
-        }
-        NText {
-          text: `${todayMax}°`
-          pointSize: Math.round(Style.fontSizeXS * widgetScale)
-          color: Color.mOnSurface
-        }
-
-        NText {
-          text: "•"
-          pointSize: Math.round(Style.fontSizeXXS * widgetScale)
-          color: Color.mOnSurfaceVariant
-          opacity: 0.5
-        }
-
-        NText {
-          text: "L:"
-          pointSize: Math.round(Style.fontSizeXS * widgetScale)
-          color: Color.mOnSurfaceVariant
-        }
-        NText {
-          text: `${todayMin}°`
-          pointSize: Math.round(Style.fontSizeXS * widgetScale)
-          color: Color.mOnSurfaceVariant
-        }
-      }
+    WeatherDaily {
+      Layout.fillWidth: true
+      Layout.leftMargin: root.padding
+      Layout.rightMargin: root.padding
+      Layout.bottomMargin: root.padding
+      visible: root.forecastDays > 0 && LocationService.weatherReady
+      compact: true
+      showTitle: false
+      count: root.forecastDays
+      scaleFactor: root.widgetScale
     }
   }
 }

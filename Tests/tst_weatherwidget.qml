@@ -191,4 +191,97 @@ TestCase {
   function test_conditions(data) {
     compare(WeatherWidget.conditionKey(data.code), "weather." + data.key);
   }
+
+  function test_desktopSize_data() {
+    return [
+          {
+            tag: "current",
+            kind: "Weather",
+            compact: false,
+            width: 240,
+            height: 0
+          },
+          {
+            tag: "hourly",
+            kind: "WeatherHourly",
+            compact: false,
+            width: 400,
+            height: 0
+          },
+          {
+            tag: "daily rows",
+            kind: "WeatherDaily",
+            compact: false,
+            width: 300,
+            height: 0
+          },
+          {
+            tag: "daily strip",
+            kind: "WeatherDaily",
+            compact: true,
+            width: 320,
+            height: 0
+          },
+          {
+            tag: "detail",
+            kind: "WeatherDetail",
+            compact: false,
+            width: 240,
+            height: 120
+          }
+        ];
+  }
+
+  function test_desktopSize(data) {
+    const size = WeatherWidget.desktopSize(data.kind, data.compact);
+    compare(size.width, data.width);
+    compare(size.height, data.height);
+  }
+
+  function test_precipitationLabel_data() {
+    return [
+          {
+            tag: "likely",
+            value: 83.4,
+            text: "83%",
+            dim: false
+          },
+          {
+            tag: "threshold",
+            value: 10,
+            text: "10%",
+            dim: false
+          },
+          {
+            tag: "low is shown dimmed",
+            value: 4,
+            text: "4%",
+            dim: true
+          },
+          {
+            tag: "zero",
+            value: 0,
+            text: "0%",
+            dim: true
+          },
+          {
+            tag: "missing",
+            value: null,
+            text: "--",
+            dim: true
+          },
+          {
+            tag: "undefined",
+            value: undefined,
+            text: "--",
+            dim: true
+          }
+        ];
+  }
+
+  function test_precipitationLabel(data) {
+    const label = WeatherWidget.precipitationLabel(data.value);
+    compare(label.text, data.text);
+    compare(label.dim, data.dim);
+  }
 }

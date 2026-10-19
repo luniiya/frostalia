@@ -192,37 +192,12 @@ RowLayout {
       combo.Keys.returnPressed(event);
     }
 
-    background: Rectangle {
+    background: NFieldBackground {
+      id: comboFrame
       implicitWidth: Math.round(Style.baseWidgetSize * 3.75 * Style.uiScaleRatio)
       implicitHeight: Math.round(root.preferredHeight * Style.uiScaleRatio)
-      id: comboFrame
-      // Material: filled field with an active indicator instead of an outline
-      readonly property bool active: combo.activeFocus || combo.popup.visible
-      readonly property var fieldShape: Style.getFieldShape(active)
-
-      color: fieldShape ? (comboHover.containsMouse && !active ? Qt.alpha(Color.mOnSurface, 0.12) : Color.mTonalContainer) : Color.mSurface
-      border.color: combo.activeFocus ? Color.mSecondary : Color.mOutline
-      border.width: fieldShape ? 0 : Style.borderS
-      radius: Style.iRadiusM
-      topLeftRadius: fieldShape ? fieldShape.topRadius : Style.iRadiusM
-      topRightRadius: topLeftRadius
-      bottomLeftRadius: fieldShape ? fieldShape.bottomRadius : Style.iRadiusM
-      bottomRightRadius: bottomLeftRadius
-
-      Rectangle {
-        visible: !!comboFrame.fieldShape
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        height: comboFrame.fieldShape ? comboFrame.fieldShape.indicator : 0
-        color: comboFrame.active ? Color.mPrimary : Color.mOnSurfaceVariant
-      }
-
-      Behavior on border.color {
-        ColorAnimation {
-          duration: Style.animationFast
-        }
-      }
+      active: combo.activeFocus || combo.popup.visible
+      hovered: comboHover.containsMouse
 
       MouseArea {
         id: comboHover
@@ -295,31 +270,14 @@ RowLayout {
         highlightMoveDuration: 0
         //showGradientMasks: false
 
-        delegate: Rectangle {
+        delegate: NMenuItemBackground {
           id: delegateRect
           required property int index
-          property bool isHighlighted: listView.currentIndex === index
 
           width: listView.availableWidth
-          // Material menu: the chosen item is a primary pill, hover is a light state layer
-          property bool isSelected: Style.materialControls && combo.currentIndex === index
-
+          highlighted: listView.currentIndex === index
+          selected: combo.currentIndex === index
           height: delegateText.implicitHeight + (Style.materialControls ? Style.margin2M : Style.margin2S)
-          radius: Style.materialControls ? height / 2 : Style.iRadiusS
-          color: {
-            if (!Style.materialControls)
-              return isHighlighted ? Color.mHover : "transparent";
-            if (isSelected)
-              return Color.mPrimary;
-            return isHighlighted ? Color.mTonalContainer : "transparent";
-          }
-
-          Behavior on color {
-            enabled: Style.materialControls
-            ColorAnimation {
-              duration: Style.animationFast
-            }
-          }
 
           NText {
             id: delegateText
@@ -329,7 +287,7 @@ RowLayout {
             verticalAlignment: Text.AlignVCenter
             elide: Text.ElideRight
             pointSize: Style.fontSizeM
-            color: delegateRect.isSelected ? Color.mOnPrimary : (delegateRect.isHighlighted && !Style.materialControls ? Color.mOnHover : Color.mOnSurface)
+            color: delegateRect.contentColor
             text: {
               var item = root.getItem(delegateRect.index);
               return item && item.name ? item.name : "";
@@ -345,24 +303,23 @@ RowLayout {
               }
             }
             onClicked: {
-              var item = root.getItem(delegateRect.index);
+              // Capture everything first: selecting can rebuild the model and
+              // destroy this delegate before the handler finishes.
+              const index = delegateRect.index;
+              const box = combo;
+              const owner = root;
+              const item = owner.getItem(index);
               if (item && item.key !== undefined) {
-                root.selected(item.key);
-                listView.comboBox.currentIndex = delegateRect.index;
-                listView.comboBox.popup.close();
+                box.currentIndex = index;
+                box.popup.close();
+                owner.selected(item.key);
               }
             }
           }
         }
       }
 
-      background: Rectangle {
-        // Material menu: an opaque, slightly raised surface without an outline
-        color: combo.popup.menu ? Qt.tint(Color.mSurface, Qt.alpha(Color.mOnSurface, 0.05)) : Color.mSurfaceVariant
-        border.color: Color.mOutline
-        border.width: combo.popup.menu ? 0 : Style.borderS
-        radius: combo.popup.menu ? combo.popup.menu.radius : Style.iRadiusM
-      }
+      background: NMenuSurface {}
     }
 
     Connections {

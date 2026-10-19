@@ -10,10 +10,10 @@ function windowMetrics(material, scale) {
   };
 }
 
-function materialRail(expanded, scale) {
+function materialRail(expanded, scale, scrollbarGutter) {
   return {
-    width: Math.round((expanded ? 224 : 56) * scale),
-    rowHeight: Math.round(44 * scale)
+    width: Math.round((expanded ? 224 : 56) * scale) + Math.max(0, scrollbarGutter || 0),
+    rowHeight: Math.round((expanded ? 44 : 56) * scale)
   };
 }
 

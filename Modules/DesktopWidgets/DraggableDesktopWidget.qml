@@ -27,6 +27,14 @@ Item {
   property bool roundedCorners: widgetData.roundedCorners !== undefined ? widgetData.roundedCorners : (_metadata?.roundedCorners ?? true)
 
   property real widgetScale: 1.0
+  readonly property real backgroundRadius: container.radius
+
+  // A per-widget setting, falling back to the registry default
+  function widgetSetting(key) {
+    if (widgetData && widgetData[key] !== undefined)
+      return widgetData[key];
+    return _metadata ? _metadata[key] : undefined;
+  }
   property real minScale: 0.5
   property real maxScale: 5.0
 

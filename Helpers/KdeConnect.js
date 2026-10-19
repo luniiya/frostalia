@@ -366,6 +366,21 @@ function reachablePages(stack, online) {
 // ---------------------------------------------------------------------------
 // Bar and control center
 
+// "77% · Charging · LTE" status line; labels holds the translated words
+// (offline, charging, connected).
+function statusLine(device, labels) {
+  if (!device)
+    return "";
+  if (!isOnline(device))
+    return labels.offline;
+  const parts = [];
+  if (device.battery && device.battery.charge >= 0)
+    parts.push(device.battery.charge + "%" + (device.battery.charging ? " · " + labels.charging : ""));
+  if (device.network && device.network.type && device.network.type !== "Unknown")
+    parts.push(device.network.type);
+  return parts.join(" · ") || labels.connected;
+}
+
 // Unread SMS count after the battery text; off unless the user enables it.
 function unreadSuffix(unread, showUnread) {
   return showUnread && unread > 0 ? " · " + unread : "";

@@ -161,6 +161,38 @@ ColumnLayout {
     onToggled: checked => Settings.data.ui.frostedGlass = checked
   }
 
+  NValueSlider {
+    Layout.fillWidth: true
+    visible: Style.materialControls && Settings.data.ui.frostedGlass
+    enabled: Style.glass !== null
+    label: I18n.tr("panels.user-interface.glass-panel-opacity-label")
+    description: I18n.tr("panels.user-interface.glass-panel-opacity-description")
+    from: 0
+    to: 1
+    stepSize: 0.01
+    showReset: true
+    value: Settings.data.ui.glassPanelOpacity
+    defaultValue: Settings.getDefaultValue("ui.glassPanelOpacity")
+    onMoved: value => Settings.data.ui.glassPanelOpacity = value
+    text: Math.round(Settings.data.ui.glassPanelOpacity * 100) + "%"
+  }
+
+  NValueSlider {
+    Layout.fillWidth: true
+    visible: Style.materialControls && Settings.data.ui.frostedGlass
+    enabled: Style.glass !== null
+    label: I18n.tr("panels.user-interface.glass-surface-opacity-label")
+    description: I18n.tr("panels.user-interface.glass-surface-opacity-description")
+    from: 0
+    to: 1
+    stepSize: 0.01
+    showReset: true
+    value: Settings.data.ui.glassSurfaceOpacity
+    defaultValue: Settings.getDefaultValue("ui.glassSurfaceOpacity")
+    onMoved: value => Settings.data.ui.glassSurfaceOpacity = value
+    text: Math.round(Settings.data.ui.glassSurfaceOpacity * 100) + "%"
+  }
+
   NToggle {
     enabled: Style.glass === null
     label: I18n.tr("panels.user-interface.translucent-widgets-label")

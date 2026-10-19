@@ -73,14 +73,6 @@ Item {
     return "";
   }
 
-  function featureBadge(id) {
-    if (id === "messages")
-      return KdeConnectService.unreadCount;
-    if (id === "notifications")
-      return KdeConnectService.activeDevice?.notifications.length || 0;
-    return 0;
-  }
-
   function actionTitle(id) {
     return I18n.tr("kdeconnect.actions." + id);
   }
@@ -108,21 +100,6 @@ Item {
            thread: thread.thread,
            addresses: thread.addresses
          });
-  }
-
-  // "Battery 77% · LTE" style status line for the header.
-  readonly property string statusText: {
-    const device = KdeConnectService.activeDevice;
-    if (!device)
-      return "";
-    if (!KdeConnectService.online)
-      return I18n.tr("kdeconnect.status.offline");
-    const parts = [];
-    if (device.battery && device.battery.charge >= 0)
-      parts.push(device.battery.charge + "%" + (device.battery.charging ? " · " + I18n.tr("common.charging") : ""));
-    if (device.network && device.network.type && device.network.type !== "Unknown")
-      parts.push(device.network.type);
-    return parts.join(" · ") || I18n.tr("common.connected");
   }
 
   function pickFiles() {

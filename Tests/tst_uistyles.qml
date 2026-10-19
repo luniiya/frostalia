@@ -326,34 +326,166 @@ TestCase {
     compare(UiStyles.glass("caelestia", true), null);
   }
 
+  function test_glassCustom_data() {
+    return [
+          {
+            tag: "custom",
+            custom: {
+              panelOpacity: 0.6,
+              surfaceOpacity: 0.4
+            },
+            panel: 0.6,
+            surface: 0.4
+          },
+          {
+            tag: "fully clear",
+            custom: {
+              panelOpacity: 0,
+              surfaceOpacity: 0
+            },
+            panel: 0,
+            surface: 0
+          },
+          {
+            tag: "clamped",
+            custom: {
+              panelOpacity: 1.5,
+              surfaceOpacity: -1
+            },
+            panel: 1,
+            surface: 0
+          },
+          {
+            tag: "missing uses style",
+            custom: {
+              panelOpacity: undefined,
+              surfaceOpacity: null
+            },
+            panel: 0.85,
+            surface: 0.7
+          },
+          {
+            tag: "invalid uses style",
+            custom: {
+              panelOpacity: "abc",
+              surfaceOpacity: ""
+            },
+            panel: 0.85,
+            surface: 0.7
+          },
+          {
+            tag: "no custom",
+            custom: undefined,
+            panel: 0.85,
+            surface: 0.7
+          }
+        ];
+  }
+
+  function test_glassCustom(data) {
+    const frosted = UiStyles.glass("material", true, data.custom);
+    compare(frosted.panelOpacity, data.panel);
+    compare(frosted.surfaceOpacity, data.surface);
+    compare(UiStyles.glass("material", false, data.custom), null);
+    compare(UiStyles.glass("caelestia", true, data.custom), null);
+  }
+
   function test_panelOpacity_data() {
     return [
-          { tag: "material glass", style: "material", glass: true, expected: 0.85 },
-          { tag: "material opaque", style: "material", glass: false, expected: 0.9 },
-          { tag: "caelestia ignores glass", style: "caelestia", glass: true, expected: 0.9 }
+          {
+            tag: "material glass",
+            style: "material",
+            glass: true,
+            expected: 0.85
+          },
+          {
+            tag: "material opaque",
+            style: "material",
+            glass: false,
+            expected: 0.9
+          },
+          {
+            tag: "caelestia ignores glass",
+            style: "caelestia",
+            glass: true,
+            expected: 0.9
+          },
+          {
+            tag: "material custom glass",
+            style: "material",
+            glass: true,
+            custom: {
+              panelOpacity: 0.5
+            },
+            expected: 0.5
+          },
+          {
+            tag: "custom ignored when off",
+            style: "material",
+            glass: false,
+            custom: {
+              panelOpacity: 0.5
+            },
+            expected: 0.9
+          }
         ];
   }
 
   function test_panelOpacity(data) {
-    compare(UiStyles.panelOpacity(data.style, 0.9, data.glass), data.expected);
+    compare(UiStyles.panelOpacity(data.style, 0.9, data.glass, data.custom), data.expected);
   }
 
   function test_fieldShape_data() {
     return [
-          { tag: "idle", focused: false, indicator: 1 },
-          { tag: "focused", focused: true, indicator: 2 }
+          {
+            tag: "idle",
+            focused: false,
+            radius: 12,
+            borderWidth: 0
+          },
+          {
+            tag: "focused",
+            focused: true,
+            radius: 12,
+            borderWidth: 1
+          },
+          {
+            tag: "search idle",
+            focused: false,
+            cornerRadius: 20,
+            radius: 20,
+            borderWidth: 0
+          },
+          {
+            tag: "search focused",
+            focused: true,
+            cornerRadius: 20,
+            radius: 20,
+            borderWidth: 1
+          },
+          {
+            tag: "square override",
+            focused: true,
+            cornerRadius: 0,
+            radius: 0,
+            borderWidth: 1
+          }
         ];
   }
 
   function test_fieldShape(data) {
-    const shape = UiStyles.fieldShape("material", data.focused);
-    compare(shape.topRadius, 12);
-    compare(shape.bottomRadius, 0);
-    compare(shape.indicator, data.indicator);
+    const shape = UiStyles.fieldShape("material", data.focused, data.cornerRadius);
+    compare(shape.radius, data.radius);
+    compare(shape.borderWidth, data.borderWidth);
   }
 
   function test_fieldShapeOnlyForMaterial() {
     compare(UiStyles.fieldShape("caelestia", true), null);
+  }
+
+  function test_weatherTokens() {
+    compare(UiStyles.tokens("material").weather.cookieLobes, 9);
+    compare(UiStyles.tokens("caelestia").weather, undefined);
   }
 
   function test_menuTokens() {
@@ -363,8 +495,16 @@ TestCase {
 
   function test_expandableShape_data() {
     return [
-          { tag: "collapsed", expanded: false, headerBottom: 24 },
-          { tag: "expanded", expanded: true, headerBottom: 4 }
+          {
+            tag: "collapsed",
+            expanded: false,
+            headerBottom: 24
+          },
+          {
+            tag: "expanded",
+            expanded: true,
+            headerBottom: 4
+          }
         ];
   }
 
@@ -383,11 +523,46 @@ TestCase {
 
   function test_buttonGroupRadii_data() {
     return [
-          { tag: "first unselected", checked: false, isFirst: true, isLast: false, left: 16, right: 8 },
-          { tag: "middle unselected", checked: false, isFirst: false, isLast: false, left: 8, right: 8 },
-          { tag: "last unselected", checked: false, isFirst: false, isLast: true, left: 8, right: 16 },
-          { tag: "middle selected", checked: true, isFirst: false, isLast: false, left: 16, right: 16 },
-          { tag: "single", checked: false, isFirst: true, isLast: true, left: 16, right: 16 }
+          {
+            tag: "first unselected",
+            checked: false,
+            isFirst: true,
+            isLast: false,
+            left: 16,
+            right: 8
+          },
+          {
+            tag: "middle unselected",
+            checked: false,
+            isFirst: false,
+            isLast: false,
+            left: 8,
+            right: 8
+          },
+          {
+            tag: "last unselected",
+            checked: false,
+            isFirst: false,
+            isLast: true,
+            left: 8,
+            right: 16
+          },
+          {
+            tag: "middle selected",
+            checked: true,
+            isFirst: false,
+            isLast: false,
+            left: 16,
+            right: 16
+          },
+          {
+            tag: "single",
+            checked: false,
+            isFirst: true,
+            isLast: true,
+            left: 16,
+            right: 16
+          }
         ];
   }
 

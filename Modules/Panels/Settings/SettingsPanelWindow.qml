@@ -19,6 +19,15 @@ FloatingWindow {
   // Paint the window surface itself, so the compositor's corner rounding is the only one
   color: Qt.alpha(Color.mSurface, Style.panelOpacity)
 
+  // Ask the compositor to blur behind the whole window; without a region it
+  // shows the translucent background unblurred.
+  BackgroundEffect.blurRegion: Settings.data.general.enableBlurBehind ? windowBlurRegion : null
+  Region {
+    id: windowBlurRegion
+    width: root.width
+    height: root.height
+  }
+
   visible: false
 
   // Register with SettingsPanelService

@@ -230,6 +230,41 @@ TestCase {
                                              ], false, false).length, 1);
   }
 
+  function test_insertMissingCardsUsesDefaultPosition() {
+    const ids = list => list.map(card => card.id);
+    const defaults = ["profile-card", "brightness-card", "kdeconnect-card", "weather-card", "calendar-month-card"].map(id => ({
+      id: id,
+      enabled: false
+    }));
+    const saved = ["weather-card", "brightness-card", "profile-card"].map(id => ({
+      id: id,
+      enabled: true
+    }));
+    compare(ids(ControlCenterLayout.insertMissingCards(saved, defaults)), ["weather-card", "calendar-month-card", "brightness-card", "kdeconnect-card", "profile-card"], "saved order kept, new cards after their default predecessor");
+    compare(ids(saved), ["weather-card", "brightness-card", "profile-card"], "input not mutated");
+    compare(ids(ControlCenterLayout.insertMissingCards([], defaults)), ids(defaults));
+    compare(ids(ControlCenterLayout.insertMissingCards(null, defaults.slice(2))), ["kdeconnect-card", "weather-card", "calendar-month-card"]);
+    compare(ids(ControlCenterLayout.insertMissingCards(defaults, defaults)), ids(defaults));
+  }
+
+  function test_kdeConnectCardNeedsIntegration() {
+    const cards = [
+            {
+              id: "kdeconnect-card",
+              enabled: true
+            }
+          ];
+    compare(ControlCenterLayout.visibleCards(cards, true, true, false), [], "hidden while KDE Connect is disabled");
+    compare(ControlCenterLayout.visibleCards(cards, true, true).length, 0);
+    compare(ControlCenterLayout.visibleCards(cards, true, true, true).map(card => card.id), ["kdeconnect-card"]);
+    compare(ControlCenterLayout.visibleCards([
+                                               {
+                                                 id: "kdeconnect-card",
+                                                 enabled: false
+                                               }
+                                             ], true, true, true), []);
+  }
+
   function test_additionalCardsPreserveSavedOrderAndDisabledState() {
     const saved = [
             {

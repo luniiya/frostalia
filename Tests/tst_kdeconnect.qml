@@ -535,6 +535,37 @@ TestCase {
     verify(!KdeConnect.widgetVisible(false, online, false), "disabled integration hides the widget");
   }
 
+  function test_statusLine() {
+    const labels = {
+      offline: "Offline",
+      charging: "Charging",
+      connected: "Connected"
+    };
+    compare(KdeConnect.statusLine(null, labels), "");
+    compare(KdeConnect.statusLine(device("p", false, true), labels), "Offline");
+    compare(KdeConnect.statusLine(device("p", true, true), labels), "Connected", "no battery or network data");
+    compare(KdeConnect.statusLine(device("p", true, true, {
+                                           battery: {
+                                             charge: 75,
+                                             charging: false
+                                           },
+                                           network: {
+                                             type: "LTE",
+                                             strength: 2
+                                           }
+                                         }), labels), "75% · LTE");
+    compare(KdeConnect.statusLine(device("p", true, true, {
+                                           battery: {
+                                             charge: 40,
+                                             charging: true
+                                           },
+                                           network: {
+                                             type: "Unknown",
+                                             strength: -1
+                                           }
+                                         }), labels), "40% · Charging");
+  }
+
   function test_unreadSuffix() {
     compare(KdeConnect.unreadSuffix(34, false), "", "hidden by default");
     compare(KdeConnect.unreadSuffix(34, true), " · 34");

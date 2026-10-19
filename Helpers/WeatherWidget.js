@@ -26,3 +26,28 @@ function summary(weather, enabled, fahrenheit, locationConfigured) {
     fallbackIcon: locationConfigured ? "weather-cloud-off" : "map-pin-off"
   };
 }
+
+// Base size of the weather desktop widgets before widgetScale, on the same
+// scale as the other desktop widgets (system monitor 240x120, media player 400).
+// A height of 0 means the widget follows its content.
+function desktopSize(kind, compact) {
+  switch (kind) {
+  case "WeatherHourly":
+    return { width: 400, height: 0 };
+  case "WeatherDaily":
+    return { width: compact ? 320 : 300, height: 0 };
+  case "WeatherDetail":
+    return { width: 240, height: 120 };
+  default:
+    return { width: 240, height: 0 };
+  }
+}
+
+// Rain chance label: always shown so the forecast has no holes; a low chance
+// is dimmed instead of hidden.
+function precipitationLabel(probability) {
+  if (probability === null || probability === undefined || !isFinite(probability))
+    return { text: "--", dim: true };
+  var value = Math.round(probability);
+  return { text: value + "%", dim: value < 10 };
+}

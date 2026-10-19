@@ -661,6 +661,14 @@
     "subTab": null
   },
   {
+    "labelKey": "panels.bubbles.reserve-space-label",
+    "descriptionKey": "panels.bubbles.reserve-space-description",
+    "widget": "NToggle",
+    "tab": 4,
+    "tabLabel": "panels.bubbles.title",
+    "subTab": null
+  },
+  {
     "labelKey": "panels.bubbles.auto-cycle-label",
     "descriptionKey": "panels.bubbles.auto-cycle-description",
     "widget": "NToggle",
@@ -2313,6 +2321,75 @@
     "subTabLabel": "common.location"
   },
   {
+    "labelKey": "panels.location.weather-wind-unit-label",
+    "descriptionKey": "panels.location.weather-wind-unit-description",
+    "widget": "NComboBox",
+    "tab": 16,
+    "tabLabel": "panels.region.title",
+    "subTab": 0,
+    "subTabLabel": "common.location"
+  },
+  {
+    "labelKey": "panels.location.weather-panel-title",
+    "descriptionKey": "panels.location.weather-panel-desc",
+    "widget": "NLabel",
+    "tab": 16,
+    "tabLabel": "panels.region.title",
+    "subTab": 0,
+    "subTabLabel": "common.location"
+  },
+  {
+    "labelKey": "panels.location.weather-show-hourly-label",
+    "descriptionKey": "panels.location.weather-show-hourly-description",
+    "widget": "NToggle",
+    "tab": 16,
+    "tabLabel": "panels.region.title",
+    "subTab": 0,
+    "subTabLabel": "common.location"
+  },
+  {
+    "labelKey": "panels.location.weather-hourly-count-label",
+    "descriptionKey": "panels.location.weather-hourly-count-description",
+    "widget": "NSpinBox",
+    "tab": 16,
+    "tabLabel": "panels.region.title",
+    "subTab": 0,
+    "subTabLabel": "common.location",
+    "visibleWhen": [
+      "Settings.data.location.weatherShowHourly"
+    ]
+  },
+  {
+    "labelKey": "panels.location.weather-show-daily-label",
+    "descriptionKey": "panels.location.weather-show-daily-description",
+    "widget": "NToggle",
+    "tab": 16,
+    "tabLabel": "panels.region.title",
+    "subTab": 0,
+    "subTabLabel": "common.location"
+  },
+  {
+    "labelKey": "panels.location.weather-daily-count-label",
+    "descriptionKey": "panels.location.weather-daily-count-description",
+    "widget": "NSpinBox",
+    "tab": 16,
+    "tabLabel": "panels.region.title",
+    "subTab": 0,
+    "subTabLabel": "common.location",
+    "visibleWhen": [
+      "Settings.data.location.weatherShowDaily"
+    ]
+  },
+  {
+    "labelKey": "panels.location.weather-show-details-label",
+    "descriptionKey": "panels.location.weather-show-details-description",
+    "widget": "NToggle",
+    "tab": 16,
+    "tabLabel": "panels.region.title",
+    "subTab": 0,
+    "subTabLabel": "common.location"
+  },
+  {
     "labelKey": "panels.session-menu.large-buttons-style-label",
     "descriptionKey": "panels.session-menu.large-buttons-style-description",
     "widget": "NToggle",
@@ -2568,6 +2645,24 @@
     "labelKey": "panels.user-interface.frosted-glass-label",
     "descriptionKey": "panels.user-interface.frosted-glass-description",
     "widget": "NToggle",
+    "tab": 1,
+    "tabLabel": "panels.user-interface.title",
+    "subTab": 0,
+    "subTabLabel": "common.appearance"
+  },
+  {
+    "labelKey": "panels.user-interface.glass-panel-opacity-label",
+    "descriptionKey": "panels.user-interface.glass-panel-opacity-description",
+    "widget": "NValueSlider",
+    "tab": 1,
+    "tabLabel": "panels.user-interface.title",
+    "subTab": 0,
+    "subTabLabel": "common.appearance"
+  },
+  {
+    "labelKey": "panels.user-interface.glass-surface-opacity-label",
+    "descriptionKey": "panels.user-interface.glass-surface-opacity-description",
+    "widget": "NValueSlider",
     "tab": 1,
     "tabLabel": "panels.user-interface.title",
     "subTab": 0,

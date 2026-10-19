@@ -336,6 +336,15 @@ NBox {
 
       NToggle {
         Layout.fillWidth: true
+        label: I18n.tr("panels.bubbles.reserve-space-label")
+        description: I18n.tr("panels.bubbles.reserve-space-description")
+        checked: root.bubble.reserveSpace
+        defaultValue: Settings.getDefaultValue("bubbles.defaults.reserveSpace")
+        onToggled: checked => root.change("reserveSpace", checked)
+      }
+
+      NToggle {
+        Layout.fillWidth: true
         label: I18n.tr("panels.bubbles.auto-cycle-label")
         description: I18n.tr("panels.bubbles.auto-cycle-description")
         checked: root.bubble.autoCycle

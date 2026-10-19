@@ -101,8 +101,12 @@ Rectangle {
         color: Qt.tint(Color.mSurfaceVariant, Qt.alpha(Color.mPrimary, 0.16))
         RowLayout {
           id: outputLabel
-          anchors.fill: parent
-          anchors.margins: Style.marginS
+          // Horizontal padding only: vertical margins squeeze the row below the text height and push it off-center.
+          anchors.left: parent.left
+          anchors.right: parent.right
+          anchors.verticalCenter: parent.verticalCenter
+          anchors.leftMargin: Style.marginS
+          anchors.rightMargin: Style.marginS
           spacing: Style.marginXS
           NIcon {
             icon: "headphones"

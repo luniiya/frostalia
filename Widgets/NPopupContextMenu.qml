@@ -229,13 +229,11 @@ PopupWindow {
     Keys.onEscapePressed: root.close()
   }
 
-  Rectangle {
+  NMenuSurface {
     id: menuBackground
     anchors.fill: parent
-    color: Color.mSurface
-    border.color: Color.mOutline
-    border.width: Style.borderS
-    radius: Style.radiusM
+    fallbackColor: Color.mSurface
+    fallbackRadius: Style.radiusM
     opacity: root.visible ? 1.0 : 0.0
 
     Behavior on opacity {
@@ -279,18 +277,12 @@ PopupWindow {
           visible: modelData.visible !== false
           color: "transparent"
 
-          Rectangle {
+          NMenuItemBackground {
             id: innerRect
             anchors.fill: parent
-            color: mouseArea.containsMouse ? Color.mHover : "transparent"
-            radius: Style.radiusS
+            highlighted: mouseArea.containsMouse
+            fallbackRadius: Style.radiusS
             opacity: modelData.enabled !== false ? 1.0 : 0.5
-
-            Behavior on color {
-              ColorAnimation {
-                duration: Style.animationFast
-              }
-            }
 
             RowLayout {
               anchors.fill: parent
@@ -303,7 +295,7 @@ PopupWindow {
                 icon: modelData.icon || ""
                 pointSize: Style.fontSizeS
                 applyUiScale: false
-                color: mouseArea.containsMouse ? Color.mOnHover : Color.mOnSurface
+                color: innerRect.contentColor
                 verticalAlignment: Text.AlignVCenter
 
                 Behavior on color {
@@ -316,7 +308,7 @@ PopupWindow {
               NText {
                 text: modelData.label || modelData.text || ""
                 pointSize: Style.fontSizeS
-                color: mouseArea.containsMouse ? Color.mOnHover : Color.mOnSurface
+                color: innerRect.contentColor
                 verticalAlignment: Text.AlignVCenter
                 Layout.fillWidth: true
 

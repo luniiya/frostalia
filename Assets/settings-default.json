@@ -145,6 +145,8 @@
     "panelBackgroundOpacity": 0.93,
     "translucentWidgets": false,
     "frostedGlass": false,
+    "glassPanelOpacity": 0.85,
+    "glassSurfaceOpacity": 0.7,
     "panelsAttachedToBar": true,
     "settingsPanelSideBarCardStyle": false
   },
@@ -152,6 +154,13 @@
     "name": "",
     "weatherEnabled": true,
     "weatherShowEffects": true,
+    "weatherShowHourly": true,
+    "weatherShowDaily": true,
+    "weatherShowDetails": true,
+    "weatherHourlyCount": 24,
+    "weatherDailyCount": 7,
+    "weatherDetails": [],
+    "windSpeedUnit": "kmh",
     "useFahrenheit": false,
     "use12hourFormat": false,
     "showWeekNumberInCalendar": false,
@@ -260,6 +269,10 @@
       {
         "enabled": false,
         "id": "brightness-card"
+      },
+      {
+        "enabled": false,
+        "id": "kdeconnect-card"
       },
       {
         "enabled": false,
@@ -553,6 +566,7 @@
       "transition": "up",
       "transitionDuration": 220,
       "hideOnFullscreen": true,
+      "reserveSpace": true,
       "backgroundColorKey": "none"
     }
   }

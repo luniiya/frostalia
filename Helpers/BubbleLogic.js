@@ -65,6 +65,7 @@ function bounded(value, fallback, minimum, maximum) {
 function effective(bubble, defaults) {
   var result = Object.assign({}, defaults, bubble || {});
   result.oledMode = result.oledMode === true;
+  result.reserveSpace = result.reserveSpace !== false;
   if (["top", "bottom", "left", "right"].indexOf(result.position) < 0)
     result.position = "top";
   if (["start", "center", "end"].indexOf(result.alignment) < 0)
@@ -327,6 +328,28 @@ function layout(configurations, defaults, sizes, monitor, id, screenWidth, scree
   var x = vertical ? (bubble.position === "left" ? gap : screenWidth - gap - width) : along;
   var y = vertical ? along : (bubble.position === "top" ? gap : screenHeight - gap - height);
   return { x: bounded(x, 0, 0, Math.max(0, screenWidth - width)), y: bounded(y, 0, 0, Math.max(0, screenHeight - height)), width: width, height: height };
+}
+
+// Space each screen edge must keep free so windows don't go under the bubbles:
+// the furthest any shown, space-reserving bubble reaches in from that edge.
+function reservedEdges(enabled, configurations, defaults, sizes, monitor, screenWidth, screenHeight) {
+  var edges = { top: 0, bottom: 0, left: 0, right: 0 };
+  if (!enabled)
+    return edges;
+  forMonitor(configurations, monitor).forEach(function (entry) {
+    var bubble = effective(entry, defaults);
+    if (!bubble.reserveSpace || bubble.widgets.length === 0)
+      return;
+    var placement = layout(configurations, defaults, sizes, monitor, bubble.id, screenWidth, screenHeight);
+    var reach = {
+      top: placement.y + placement.height,
+      bottom: screenHeight - placement.y,
+      left: placement.x + placement.width,
+      right: screenWidth - placement.x
+    }[bubble.position];
+    edges[bubble.position] = Math.max(edges[bubble.position], Math.ceil(reach));
+  });
+  return edges;
 }
 
 // The same path is rotated/reflected for all four edges. Notches flare into the

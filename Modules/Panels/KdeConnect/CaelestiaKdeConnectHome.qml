@@ -60,7 +60,7 @@ ColumnLayout {
             color: Color.mOnSurfaceVariant
           }
           NText {
-            text: root.nav.statusText
+            text: KdeConnectService.statusText
             pointSize: Style.fontSizeS
             color: Color.mOnSurfaceVariant
           }
@@ -194,7 +194,6 @@ ColumnLayout {
         Rectangle {
           id: feature
           required property var modelData
-          readonly property int badge: root.nav.featureBadge(modelData.id)
           Layout.fillWidth: true
           implicitHeight: Math.round(50 * Style.uiScaleRatio)
           radius: Style.radiusS
@@ -228,21 +227,6 @@ ColumnLayout {
                 pointSize: Style.fontSizeXS
                 color: featurePointer.containsMouse ? feature.fg : Color.mOnSurfaceVariant
                 elide: Text.ElideRight
-              }
-            }
-            Rectangle {
-              visible: feature.badge > 0
-              implicitHeight: Math.round(20 * Style.uiScaleRatio)
-              implicitWidth: Math.max(implicitHeight, badgeLabel.implicitWidth + Style.marginM)
-              radius: height / 2
-              color: Color.mPrimary
-              NText {
-                id: badgeLabel
-                anchors.centerIn: parent
-                text: feature.badge > 99 ? "99+" : String(feature.badge)
-                pointSize: Style.fontSizeXXS
-                font.weight: Style.fontWeightBold
-                color: Color.mOnPrimary
               }
             }
             NIcon {

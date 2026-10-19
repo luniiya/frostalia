@@ -50,8 +50,12 @@ class StyleViewTests(unittest.TestCase):
 
     def test_material_header_buttons_are_spaced(self):
         # Material icon buttons have a filled background, so they need a gap.
+        # The header buttons sit in NPill, whose row has a non-zero gap by default.
+        pill = (ROOT / "Widgets/NPill.qml").read_text()
+        row = re.search(r"id: row\n\s+anchors.centerIn: parent\n\s+spacing: (.+)", pill)
+        self.assertIsNotNone(row)
+        self.assertNotEqual(row.group(1).strip(), "0")
         for path in ("Modules/Panels/ControlCenter/MaterialControlHeader.qml", "Modules/Panels/KdeConnect/MaterialKdeConnectHome.qml"):
             source = (ROOT / path).read_text()
-            row = re.search(r"id: actions\n(?:\s+.*\n)*?\s+spacing: (.+)", source)
-            self.assertIsNotNone(row, path)
-            self.assertNotEqual(row.group(1).strip(), "0", path)
+            self.assertIn("NPill {", source, path)
+            self.assertNotRegex(source, r"spacing: 0\b", path)
