@@ -6,7 +6,6 @@
 // Layout:
 //   <configDir>/settings/<hostname>.toml   per-host settings (default)
 //   <configDir>/defaults.toml              shared seed for new hosts
-//   <configDir>/settings.json              legacy JSON seed
 
 var fallbackHostName = "default";
 
@@ -27,10 +26,6 @@ function settingsDir(configDir) {
   return ensureTrailingSlash(configDir) + "settings/";
 }
 
-function legacySettingsFile(configDir) {
-  return ensureTrailingSlash(configDir) + "settings.json";
-}
-
 function hostSettingsFile(configDir, hostName) {
   return settingsDir(configDir) + sanitizeHostName(hostName) + ".toml";
 }
@@ -42,11 +37,7 @@ function resolveSettingsFile(envOverride, configDir, hostName) {
   return hostSettingsFile(configDir, hostName);
 }
 
-// Prefer the host's previous JSON over shared seeds. Sources are never removed.
-function seedFiles(configDir, hostName) {
-  return [
-    settingsDir(configDir) + sanitizeHostName(hostName) + ".json",
-    ensureTrailingSlash(configDir) + "defaults.toml",
-    legacySettingsFile(configDir)
-  ];
+// A shared TOML configuration can seed a new host once.
+function seedFiles(configDir) {
+  return [ensureTrailingSlash(configDir) + "defaults.toml"];
 }

@@ -25,15 +25,6 @@ Singleton {
   property Component weatherComponent: Component {
     DesktopWeather {}
   }
-  property Component weatherHourlyComponent: Component {
-    DesktopWeatherHourly {}
-  }
-  property Component weatherDailyComponent: Component {
-    DesktopWeatherDaily {}
-  }
-  property Component weatherDetailComponent: Component {
-    DesktopWeatherDetail {}
-  }
   property Component systemStatComponent: Component {
     DesktopSystemStat {}
   }
@@ -57,9 +48,6 @@ Singleton {
     widgetsObj["Clock"] = clockComponent;
     widgetsObj["MediaPlayer"] = mediaPlayerComponent;
     widgetsObj["Weather"] = weatherComponent;
-    widgetsObj["WeatherHourly"] = weatherHourlyComponent;
-    widgetsObj["WeatherDaily"] = weatherDailyComponent;
-    widgetsObj["WeatherDetail"] = weatherDetailComponent;
     widgetsObj["SystemStat"] = systemStatComponent;
     widgetsObj["AudioVisualizer"] = audioVisualizerComponent;
     widgets = widgetsObj;
@@ -68,9 +56,6 @@ Singleton {
     urlsObj["Clock"] = _widgetsDir + "DesktopClock.qml";
     urlsObj["MediaPlayer"] = _widgetsDir + "DesktopMediaPlayer.qml";
     urlsObj["Weather"] = _widgetsDir + "DesktopWeather.qml";
-    urlsObj["WeatherHourly"] = _widgetsDir + "DesktopWeatherHourly.qml";
-    urlsObj["WeatherDaily"] = _widgetsDir + "DesktopWeatherDaily.qml";
-    urlsObj["WeatherDetail"] = _widgetsDir + "DesktopWeatherDetail.qml";
     urlsObj["SystemStat"] = _widgetsDir + "DesktopSystemStat.qml";
     urlsObj["AudioVisualizer"] = _widgetsDir + "DesktopAudioVisualizer.qml";
     widgetUrls = urlsObj;
@@ -82,9 +67,6 @@ Singleton {
                                      "Clock": "WidgetSettings/ClockSettings.qml",
                                      "MediaPlayer": "WidgetSettings/MediaPlayerSettings.qml",
                                      "Weather": "WidgetSettings/WeatherSettings.qml",
-                                     "WeatherHourly": "WidgetSettings/WeatherHourlySettings.qml",
-                                     "WeatherDaily": "WidgetSettings/WeatherDailySettings.qml",
-                                     "WeatherDetail": "WidgetSettings/WeatherDetailSettings.qml",
                                      "SystemStat": "WidgetSettings/SystemStatSettings.qml",
                                      "AudioVisualizer": "WidgetSettings/AudioVisualizerSettings.qml"
                                    })
@@ -109,30 +91,18 @@ Singleton {
                                     "showVisualizer": true
                                   },
                                   "Weather": {
+                                    "view": "current",
                                     "showBackground": true,
                                     "roundedCorners": true,
                                     "animatedSky": false,
                                     "showCondition": true,
                                     "showHighLow": true,
                                     "showFeelsLike": true,
-                                    "forecastDays": 0
-                                  },
-                                  "WeatherHourly": {
-                                    "showBackground": true,
-                                    "roundedCorners": true,
+                                    "forecastDays": 0,
                                     "hours": 12,
-                                    "showPrecipitation": true
-                                  },
-                                  "WeatherDaily": {
-                                    "showBackground": true,
-                                    "roundedCorners": true,
                                     "days": 7,
                                     "compact": false,
-                                    "showPrecipitation": true
-                                  },
-                                  "WeatherDetail": {
-                                    "showBackground": true,
-                                    "roundedCorners": true,
+                                    "showPrecipitation": true,
                                     "detail": "wind"
                                   },
                                   "SystemStat": {

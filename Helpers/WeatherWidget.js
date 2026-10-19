@@ -27,20 +27,54 @@ function summary(weather, enabled, fahrenheit, locationConfigured) {
   };
 }
 
-// Base size of the weather desktop widgets before widgetScale, on the same
-// scale as the other desktop widgets (system monitor 240x120, media player 400).
-// A height of 0 means the widget follows its content.
+var views = ["current", "hourly", "daily", "detail"];
+var viewLabels = {
+  current: "panels.desktop-widgets.weather-view-current",
+  hourly: "panels.desktop-widgets.weather-view-hourly",
+  daily: "panels.desktop-widgets.weather-view-daily",
+  detail: "panels.desktop-widgets.weather-view-detail"
+};
+
+function view(value) {
+  return views.indexOf(value) >= 0 ? value : "current";
+}
+
+// Base size before widgetScale. A zero height follows the selected view's content.
 function desktopSize(kind, compact) {
-  switch (kind) {
-  case "WeatherHourly":
+  switch (view(kind)) {
+  case "hourly":
     return { width: 400, height: 0 };
-  case "WeatherDaily":
+  case "daily":
     return { width: compact ? 320 : 300, height: 0 };
-  case "WeatherDetail":
+  case "detail":
     return { width: 240, height: 120 };
   default:
     return { width: 240, height: 0 };
   }
+}
+
+// Consolidate saved weather widgets without changing their instance data or order.
+function migrateDesktopWidgets(monitors) {
+  if (!Array.isArray(monitors))
+    return monitors;
+  const legacyViews = { WeatherHourly: "hourly", WeatherDaily: "daily", WeatherDetail: "detail" };
+  let changed = false;
+  const result = monitors.map(monitor => {
+    if (!monitor || !Array.isArray(monitor.widgets))
+      return monitor;
+    let monitorChanged = false;
+    const widgets = monitor.widgets.map(widget => {
+      if (!widget || !Object.prototype.hasOwnProperty.call(legacyViews, widget.id))
+        return widget;
+      monitorChanged = true;
+      return Object.assign({}, widget, { id: "Weather", view: legacyViews[widget.id] });
+    });
+    if (!monitorChanged)
+      return monitor;
+    changed = true;
+    return Object.assign({}, monitor, { widgets: widgets });
+  });
+  return changed ? result : monitors;
 }
 
 // Rain chance label: always shown so the forecast has no holes; a low chance

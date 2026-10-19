@@ -630,7 +630,7 @@ PopupWindow {
       boundsBehavior: Flickable.StopAtBounds
       interactive: contentHeight > height
 
-      ScrollBar.vertical: ScrollBar {
+      ScrollBar.vertical: NScrollBar {
         id: menuScrollBar
         policy: ScrollBar.AsNeeded
         visible: root.listOverflowing

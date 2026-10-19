@@ -23,7 +23,7 @@ Rectangle {
       clip: true
       spacing: Style.marginXS
       model: NotificationService.historyModel
-      ScrollBar.vertical: ScrollBar {
+      ScrollBar.vertical: NScrollBar {
         policy: ScrollBar.AsNeeded
       }
       // Each UI style supplies its own notification content, as in the popup.

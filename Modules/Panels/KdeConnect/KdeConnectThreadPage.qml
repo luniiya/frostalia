@@ -51,7 +51,7 @@ ColumnLayout {
       spacing: Style.marginXXS
       boundsBehavior: Flickable.StopAtBounds
       verticalLayoutDirection: ListView.BottomToTop
-      ScrollBar.vertical: ScrollBar {
+      ScrollBar.vertical: NScrollBar {
         policy: ScrollBar.AsNeeded
       }
       onAtYBeginningChanged: {

@@ -196,35 +196,35 @@ TestCase {
     return [
           {
             tag: "current",
-            kind: "Weather",
+            kind: "current",
             compact: false,
             width: 240,
             height: 0
           },
           {
             tag: "hourly",
-            kind: "WeatherHourly",
+            kind: "hourly",
             compact: false,
             width: 400,
             height: 0
           },
           {
             tag: "daily rows",
-            kind: "WeatherDaily",
+            kind: "daily",
             compact: false,
             width: 300,
             height: 0
           },
           {
             tag: "daily strip",
-            kind: "WeatherDaily",
+            kind: "daily",
             compact: true,
             width: 320,
             height: 0
           },
           {
             tag: "detail",
-            kind: "WeatherDetail",
+            kind: "detail",
             compact: false,
             width: 240,
             height: 120
@@ -236,6 +236,122 @@ TestCase {
     const size = WeatherWidget.desktopSize(data.kind, data.compact);
     compare(size.width, data.width);
     compare(size.height, data.height);
+  }
+
+  function test_views() {
+    compare(WeatherWidget.views, ["current", "hourly", "daily", "detail"]);
+    for (const selected of WeatherWidget.views)
+      compare(WeatherWidget.view(selected), selected);
+    for (const invalid of [undefined, null, "", "unknown", "toString"])
+      compare(WeatherWidget.view(invalid), "current");
+    compare(WeatherWidget.desktopSize("unknown", true), {
+              width: 240,
+              height: 0
+            });
+  }
+
+  function test_migratesAllLegacyWeatherViews_data() {
+    return [
+          {
+            tag: "hourly",
+            id: "WeatherHourly",
+            view: "hourly",
+            settings: {
+              hours: 24,
+              showPrecipitation: false
+            }
+          },
+          {
+            tag: "daily",
+            id: "WeatherDaily",
+            view: "daily",
+            settings: {
+              days: 5,
+              compact: true
+            }
+          },
+          {
+            tag: "detail",
+            id: "WeatherDetail",
+            view: "detail",
+            settings: {
+              detail: "moon"
+            }
+          }
+        ];
+  }
+
+  function test_migratesAllLegacyWeatherViews(data) {
+    const widget = Object.assign({
+                                   id: data.id,
+                                   x: 31,
+                                   y: 92,
+                                   scale: 1.4,
+                                   showBackground: false,
+                                   roundedCorners: false
+                                 }, data.settings);
+    const untouched = {
+      id: "Clock",
+      x: 1
+    };
+    const current = {
+      id: "Weather",
+      forecastDays: 3
+    };
+    const monitors = [
+            {
+              name: "DP-1",
+              extra: "preserved",
+              widgets: [untouched, widget, current]
+            },
+            {
+              name: "DP-2",
+              widgets: [
+                {
+                  id: "plugin:weather"
+                }
+              ]
+            }
+          ];
+    const snapshot = JSON.stringify(monitors);
+    const result = WeatherWidget.migrateDesktopWidgets(monitors);
+    compare(result[0].widgets[1], Object.assign({}, widget, {
+                                                  id: "Weather",
+                                                  view: data.view
+                                                }));
+    compare(result[0].name, "DP-1");
+    compare(result[0].extra, "preserved");
+    verify(result[0].widgets[0] === untouched);
+    verify(result[0].widgets[2] === current);
+    verify(result[1] === monitors[1]);
+    compare(JSON.stringify(monitors), snapshot);
+    verify(WeatherWidget.migrateDesktopWidgets(result) === result);
+  }
+
+  function test_migrationPreservesEmptyAndUnrelatedLayouts() {
+    for (const input of [undefined, null, [], [
+                           {
+                             name: "empty"
+                           }
+                         ], [
+                           {
+                             widgets: []
+                           }
+                         ], [
+                           {
+                             widgets: [null,
+                               {
+                                 id: "Weather",
+                                 view: "detail",
+                                 detail: "wind"
+                               },
+                               {
+                                 id: "toString"
+                               }
+                             ]
+                           }
+                         ]])
+      verify(WeatherWidget.migrateDesktopWidgets(input) === input);
   }
 
   function test_precipitationLabel_data() {

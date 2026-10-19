@@ -192,7 +192,7 @@ ScrollView {
     configureFlickable();
   }
 
-  ScrollBar.vertical: ScrollBar {
+  ScrollBar.vertical: NScrollBar {
     parent: root
     x: root.mirrored ? 0 : root.width - width
     y: root.topPadding
@@ -235,7 +235,7 @@ ScrollView {
     }
   }
 
-  ScrollBar.horizontal: ScrollBar {
+  ScrollBar.horizontal: NScrollBar {
     parent: root
     x: root.leftPadding
     y: root.height - height

@@ -294,7 +294,7 @@ Item {
       }
     }
 
-    ScrollBar.vertical: ScrollBar {
+    ScrollBar.vertical: NScrollBar {
       parent: root
       x: root.mirrored ? 0 : root.width - width
       y: 0

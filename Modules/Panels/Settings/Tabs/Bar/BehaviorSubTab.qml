@@ -12,7 +12,7 @@ ColumnLayout {
 
   readonly property string effectiveWheelAction: Settings.data.bar.mouseWheelAction || "none"
   readonly property string effectiveMiddleClickAction: Settings.data.bar.middleClickAction || "none"
-  readonly property string effectiveRightClickAction: Settings.data.bar.rightClickAction || "none"
+  readonly property string effectiveRightClickAction: Settings.data.bar.rightClickAction || "contextMenu"
 
   NComboBox {
     Layout.fillWidth: true
@@ -124,6 +124,10 @@ ColumnLayout {
     description: I18n.tr("panels.bar.behavior-right-click-description")
     model: [
       {
+        "key": "contextMenu",
+        "name": I18n.tr("panels.bar.behavior-right-click-menu")
+      },
+      {
         "key": "none",
         "name": I18n.tr("common.none")
       },
@@ -167,6 +171,6 @@ ColumnLayout {
     checked: Settings.data.bar.rightClickFollowMouse
     defaultValue: Settings.getDefaultValue("bar.rightClickFollowMouse")
     onToggled: checked => Settings.data.bar.rightClickFollowMouse = checked
-    visible: Settings.data.bar.rightClickAction !== "none" && Settings.data.bar.rightClickAction !== "command" && Settings.data.bar.rightClickAction !== "settings"
+    visible: Settings.data.bar.rightClickAction !== "contextMenu" && Settings.data.bar.rightClickAction !== "none" && Settings.data.bar.rightClickAction !== "command" && Settings.data.bar.rightClickAction !== "settings"
   }
 }

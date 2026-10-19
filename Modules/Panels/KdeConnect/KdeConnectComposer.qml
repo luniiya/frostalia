@@ -39,6 +39,9 @@ RowLayout {
       anchors.leftMargin: Style.marginM
       anchors.rightMargin: Style.marginM
       ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+      ScrollBar.vertical: NScrollBar {
+        policy: ScrollBar.AsNeeded
+      }
       TextArea {
         id: field
         placeholderText: root.placeholder

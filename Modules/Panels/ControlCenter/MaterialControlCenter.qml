@@ -23,7 +23,9 @@ Item {
     clip: true
     contentWidth: availableWidth
     ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
-    ScrollBar.vertical.policy: ScrollBar.AsNeeded
+    ScrollBar.vertical: NScrollBar {
+      policy: ScrollBar.AsNeeded
+    }
     ColumnLayout {
       id: content
       width: parent.width

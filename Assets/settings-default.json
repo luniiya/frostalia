@@ -76,7 +76,7 @@
     "middleClickAction": "none",
     "middleClickFollowMouse": false,
     "middleClickCommand": "",
-    "rightClickAction": "none",
+    "rightClickAction": "contextMenu",
     "rightClickFollowMouse": true,
     "rightClickCommand": "",
     "screenOverrides": []

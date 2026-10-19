@@ -853,11 +853,11 @@ Item {
           }
         }
 
-        // Sidebar content
-        ColumnLayout {
-          anchors.fill: parent
+        // Keep the list viewport stable while the outer sidebar reveals it.
+        SettingsSidebarLayout {
+          viewportWidth: sidebar.expandedWidth
+          inset: root.sidebarCardStyle ? Style.marginM : 0
           spacing: root.material ? Style.marginL : Style.marginS
-          anchors.margins: root.sidebarCardStyle ? Style.marginM : 0
 
           NButton {
             id: homeButton

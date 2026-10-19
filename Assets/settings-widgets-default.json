@@ -274,8 +274,19 @@
       "showVisualizer": true
     },
     "Weather": {
+      "view": "current",
       "showBackground": true,
-      "roundedCorners": true
+      "roundedCorners": true,
+      "animatedSky": false,
+      "showCondition": true,
+      "showHighLow": true,
+      "showFeelsLike": true,
+      "forecastDays": 0,
+      "hours": 12,
+      "days": 7,
+      "compact": false,
+      "showPrecipitation": true,
+      "detail": "wind"
     },
     "SystemStat": {
       "showBackground": true,

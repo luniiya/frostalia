@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Services.UPower
 import Quickshell.Wayland
+import "../../Helpers/BarContextMenu.js" as BarContextMenu
 import "../../Helpers/NotchGeometry.js" as NotchGeometry
 import qs.Commons
 import qs.Modules.Bar.Extras
@@ -212,7 +213,7 @@ Item {
         readonly property string barWheelAction: {
           return Settings.data.bar.mouseWheelAction || "none";
         }
-        readonly property string barRightClickAction: Settings.data.bar.rightClickAction || "none"
+        readonly property string barRightClickAction: Settings.data.bar.rightClickAction || "contextMenu"
 
         // Position and size the bar content based on orientation
         x: (root.barPosition === "right") ? (parent.width - root.barHeight) : 0
@@ -372,10 +373,40 @@ Item {
           CompositorService.switchToWorkspace(candidates[next]);
         }
 
+        Item {
+          id: emptyBarMenuAnchor
+          width: 1
+          height: 1
+        }
+
+        NPopupContextMenu {
+          id: emptyBarMenu
+          model: BarContextMenu.entries(DesktopWidgetRegistry.editMode).map(entry => Object.assign({}, entry, {
+                                                                                                     label: I18n.tr(entry.labelKey)
+                                                                                                   }))
+
+          onTriggered: action => {
+            emptyBarMenu.close();
+            PanelService.closeContextMenu(root.screen);
+            if (action === "settings") {
+              SettingsPanelService.openHome();
+            } else if (action === "desktopWidgets") {
+              const next = BarContextMenu.toggleDesktopEditing(Settings.data.desktopWidgets.enabled, DesktopWidgetRegistry.editMode);
+              Settings.data.desktopWidgets.enabled = next.enabled;
+              DesktopWidgetRegistry.editMode = next.editing;
+            }
+          }
+        }
+
         function handleEmptyBarClick(action, followMouse, command, mouse) {
           if (action === "none")
             return;
-          if (action === "controlCenter") {
+          if (action === "contextMenu") {
+            emptyBarMenuAnchor.x = mouse.x;
+            emptyBarMenuAnchor.y = mouse.y;
+            PanelService.showContextMenu(emptyBarMenu, emptyBarMenuAnchor, root.screen);
+            mouse.accepted = true;
+          } else if (action === "controlCenter") {
             var controlCenterPanel = PanelService.getPanel("controlCenterPanel", screen);
             controlCenterPanel?.toggle(null, followMouse ? mapToItem(null, mouse.x, mouse.y) : "ControlCenter");
             mouse.accepted = true;

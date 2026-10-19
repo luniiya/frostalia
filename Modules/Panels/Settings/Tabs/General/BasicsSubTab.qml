@@ -1,8 +1,9 @@
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Dialogs
 import QtQuick.Layouts
 import Quickshell
-import "../../../../../Helpers/QtObj2JS.js" as QtObj2JS
+import "../../../../../Helpers/SettingsExport.js" as SettingsExport
 import qs.Commons
 import qs.Services.System
 import qs.Services.UI
@@ -10,6 +11,26 @@ import qs.Widgets
 
 ColumnLayout {
   id: root
+
+  FileDialog {
+    id: exportDialog
+    title: I18n.tr("panels.general.export-settings")
+    fileMode: FileDialog.SaveFile
+    defaultSuffix: "toml"
+    nameFilters: [I18n.tr("panels.general.export-toml-filter")]
+    selectedFile: "file://" + Quickshell.env("HOME") + "/frostalia-settings.toml"
+    onAccepted: Settings.exportSettings(SettingsExport.localPath(selectedFile))
+  }
+
+  Connections {
+    target: Settings
+    function onSettingsExported(path) {
+      ToastService.showNotice(I18n.tr("panels.general.settings-exported"), path);
+    }
+    function onSettingsExportFailed(message) {
+      ToastService.showError(I18n.tr("panels.general.export-failed"), message);
+    }
+  }
 
   // Profile section
   RowLayout {
@@ -209,15 +230,13 @@ ColumnLayout {
     }
 
     NButton {
-      icon: "json"
-      text: I18n.tr("panels.general.copy-settings")
+      icon: "download"
+      text: I18n.tr("panels.general.export-settings")
+      enabled: !Settings.exportingSettings
       outlined: true
       Layout.fillWidth: true
       onClicked: {
-        var plainData = QtObj2JS.qtObjectToPlainObject(Settings.data);
-        var json = JSON.stringify(plainData, null, 2);
-        Quickshell.execDetached(["wl-copy", json]);
-        ToastService.showNotice(I18n.tr("panels.general.settings-copied"));
+        exportDialog.open();
       }
     }
   }

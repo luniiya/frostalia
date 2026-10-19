@@ -87,6 +87,14 @@ class StyleViewTests(unittest.TestCase):
         self.assertIn("showHome()", handler)
         self.assertIn("closeRequested()", handler)
 
+    def test_sidebar_viewport_does_not_collapse_during_page_reveal(self):
+        source = (ROOT / "Modules/Panels/Settings/SettingsContent.qml").read_text()
+        self.assertIn("SettingsSidebarLayout {", source)
+        self.assertIn("viewportWidth: sidebar.expandedWidth", source)
+        self.assertIn("Layout.preferredWidth: pageTransition.progress * expandedWidth", source)
+        self.assertIn("model: root.tabsModel", source)
+        self.assertNotIn("SettingsSidebarDebug", source)
+
     def test_registered_views_exist(self):
         source = (ROOT / "Helpers/UiStyles.js").read_text()
         paths = re.findall(r'"(?:controlCenter|mediaCard|mediaPlayer|osd|notificationContent|kdeConnectHome)": "([^"]+\.qml)"', source)

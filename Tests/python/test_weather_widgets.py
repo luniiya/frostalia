@@ -7,7 +7,7 @@ import unittest
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 REGISTRY = (ROOT / "Services/UI/DesktopWidgetRegistry.qml").read_text()
 EN = json.loads((ROOT / "Assets/Translations/en.json").read_text())
-WEATHER_WIDGETS = ("Weather", "WeatherHourly", "WeatherDaily", "WeatherDetail")
+WEATHER_WIDGETS = ("Weather",)
 
 
 def metadata(widget_id):
@@ -34,11 +34,55 @@ class WeatherWidgetTests(unittest.TestCase):
             settings = (ROOT / ("Modules/Panels/Settings/DesktopWidgets/WidgetSettings/%sSettings.qml" % widget_id)).read_text()
             for key in re.findall(r'widgetSetting\("(\w+)"\)', widget) + re.findall(r'\.set\("(\w+)"', settings):
                 self.assertIn(key, defaults, "%s.%s" % (widget_id, key))
-            self.assertIn("WeatherBackgroundToggles", settings)
+            self.assertIn('root.set("showBackground", checked)', settings)
+            self.assertIn('root.set("roundedCorners", checked)', settings)
 
     def test_detail_default_is_a_known_kind(self):
         kinds = re.search(r"var detailKinds = \[(.*?)\];", (ROOT / "Helpers/WeatherData.js").read_text()).group(1)
-        self.assertIn(metadata("WeatherDetail")["detail"], kinds)
+        self.assertIn(metadata("Weather")["detail"], kinds)
+
+    def test_only_one_weather_widget_is_registered(self):
+        self.assertEqual(["Weather"], re.findall(r'widgetsObj\["(Weather\w*)"\]', REGISTRY))
+        for suffix in ("Hourly", "Daily", "Detail"):
+            self.assertNotIn('"Weather%s"' % suffix, REGISTRY)
+            self.assertFalse((ROOT / ("Modules/DesktopWidgets/Widgets/DesktopWeather%s.qml" % suffix)).exists())
+            self.assertFalse((ROOT / ("Modules/Panels/Settings/DesktopWidgets/WidgetSettings/Weather%sSettings.qml" % suffix)).exists())
+
+    def test_weather_settings_have_no_dynamic_local_type_dependencies(self):
+        source = (ROOT / "Modules/Panels/Settings/DesktopWidgets/WidgetSettings/WeatherSettings.qml").read_text()
+        self.assertIn("ColumnLayout {", source)
+        self.assertIn("property var widgetData:", source)
+        self.assertIn("property var widgetMetadata:", source)
+        self.assertIn("signal settingsChanged(var settings)", source)
+        self.assertNotIn("WeatherSettingsForm", source)
+        self.assertNotIn("WeatherBackgroundToggles", source)
+        self.assertIn('defaultValue: root.widgetMetadata.showBackground', source)
+        self.assertIn('defaultValue: root.widgetMetadata.roundedCorners', source)
+
+    def test_view_selector_and_details_are_complete(self):
+        settings = (ROOT / "Modules/Panels/Settings/DesktopWidgets/WidgetSettings/WeatherSettings.qml").read_text()
+        source = (ROOT / "Modules/DesktopWidgets/Widgets/DesktopWeather.qml").read_text()
+        self.assertIn("model: WeatherWidget.views.map", settings)
+        self.assertIn("model: WeatherData.detailKinds.map", settings)
+        for view in ("current", "hourly", "daily", "detail"):
+            self.assertIn("weather-view-" + view, EN["panels"]["desktop-widgets"])
+            self.assertIn('root.selectedView === "%s"' % view, settings)
+        for component in ("WeatherCurrent", "WeatherHourly", "WeatherDaily", "WeatherDetailTile"):
+            self.assertIn(component + " {", source)
+        self.assertIn("Loader {", source)
+
+    def test_widget_reset_defaults_match_registry(self):
+        defaults = json.loads((ROOT / "Assets/settings-widgets-default.json").read_text())["desktop"]["Weather"]
+        expected = {key: json.loads(value) for key, value in metadata("Weather").items()}
+        self.assertEqual(defaults, expected)
+
+    def test_migration_is_registered(self):
+        registry = (ROOT / "Commons/Migrations/MigrationRegistry.qml").read_text()
+        self.assertIn("71: migration71Component", registry)
+        self.assertIn("migration71Component: Migration71", registry)
+        migration = (ROOT / "Commons/Migrations/Migration71.qml").read_text()
+        self.assertIn("WeatherWidget.migrateDesktopWidgets(monitors)", migration)
+        self.assertIn("adapter.desktopWidgets.monitorWidgets = migrated", migration)
 
     def test_core_widgets_have_display_names(self):
         names = EN["panels"]["desktop-widgets"]["names"]
@@ -71,7 +115,7 @@ class WeatherWidgetTests(unittest.TestCase):
 
 
 class DesktopWeatherConventionTests(unittest.TestCase):
-    WIDGETS = ("DesktopWeather", "DesktopWeatherHourly", "DesktopWeatherDaily", "DesktopWeatherDetail")
+    WIDGETS = ("DesktopWeather",)
 
     def test_sized_like_other_desktop_widgets(self):
         # Other desktop widgets size in widgetScale units with Style.marginM

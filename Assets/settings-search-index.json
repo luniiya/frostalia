@@ -527,7 +527,7 @@
     "subTab": 2,
     "subTabLabel": "common.behavior",
     "visibleWhen": [
-      "Settings.data.bar.rightClickAction !== \"none\" && Settings.data.bar.rightClickAction !== \"command\" && Settings.data.bar.rightClickAction !== \"settings\""
+      "Settings.data.bar.rightClickAction !== \"contextMenu\" && Settings.data.bar.rightClickAction !== \"none\" && Settings.data.bar.rightClickAction !== \"command\" && Settings.data.bar.rightClickAction !== \"settings\""
     ]
   },
   {

@@ -31,7 +31,7 @@ Singleton {
   - Appearance: ~/.config/frostalia/settings/UI/<style>.toml
   */
   readonly property alias data: adapter  // Used to access via Settings.data.xxx.yyy
-  readonly property int settingsVersion: 70
+  readonly property int settingsVersion: 72
   property bool isDebug: Quickshell.env("FROSTALIA_DEBUG") === "1"
   readonly property string shellName: "frostalia"
   readonly property string configDir: ensureTrailingSlash(Quickshell.env("FROSTALIA_CONFIG_DIR") || (Quickshell.env("XDG_CONFIG_HOME") || Quickshell.env("HOME") + "/.config") + "/" + shellName + "/")
@@ -49,6 +49,44 @@ Singleton {
   signal settingsLoaded
   signal settingsSaved
   signal settingsReloaded
+  signal settingsExported(string path)
+  signal settingsExportFailed(string message)
+
+  readonly property bool exportingSettings: settingsExportProcess.running
+
+  function exportSettings(path) {
+    if (exportingSettings)
+      return;
+    if (!path) {
+      settingsExportFailed(I18n.tr("panels.general.export-invalid-path"));
+      return;
+    }
+    settingsExportProcess.destination = path;
+    settingsExportProcess.snapshot = QtObj2JS.qtObjectToPlainObject(root.data);
+    settingsExportProcess.command = [settingsStore.helper, "export", path];
+    settingsExportProcess.running = true;
+  }
+
+  Process {
+    id: settingsExportProcess
+    property string destination: ""
+    property var snapshot: null
+    stdinEnabled: true
+    onStarted: write(JSON.stringify({
+                                      settings: snapshot
+                                    }) + "\n")
+    stdout: StdioCollector {}
+    stderr: StdioCollector {
+      id: settingsExportErrors
+    }
+    onExited: function (exitCode) {
+      if (exitCode === 0)
+        root.settingsExported(destination);
+      else
+        root.settingsExportFailed(settingsExportErrors.text.trim());
+      snapshot = null;
+    }
+  }
 
   // -----------------------------------------------------
   // -----------------------------------------------------
@@ -106,7 +144,7 @@ Singleton {
     uiProfiles: UiStyleSettings.configuration(root.settingsDir + "UI")
     configFile: root.settingsFile
     active: root.settingsPathReady
-    seedFiles: root.settingsEnvOverride ? [] : SettingsPaths.seedFiles(root.configDir, root.hostName)
+    seedFiles: root.settingsEnvOverride ? [] : SettingsPaths.seedFiles(root.configDir)
     onChanged: saveTimer.start()
     onSaved: root.settingsSaved()
     onFailed: message => Logger.e("Settings", message)
@@ -276,7 +314,7 @@ Singleton {
       property string middleClickAction: "none"
       property bool middleClickFollowMouse: false
       property string middleClickCommand: ""
-      property string rightClickAction: "none"
+      property string rightClickAction: "contextMenu"
       property bool rightClickFollowMouse: true
       property string rightClickCommand: ""
       // Per-screen overrides for position and widgets
