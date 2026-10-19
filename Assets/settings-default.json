@@ -218,9 +218,6 @@
           "id": "Bluetooth"
         },
         {
-          "id": "FrostaliaPerformance"
-        },
-        {
           "id": "CustomButton",
           "icon": "wall",
           "generalTooltipText": "random wallpaper",

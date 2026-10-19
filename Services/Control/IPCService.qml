@@ -696,18 +696,6 @@ Singleton {
         break;
       }
     }
-
-    function toggleFrostaliaPerformance() {
-      PowerProfileService.toggleFrostaliaPerformance();
-    }
-
-    function enableFrostaliaPerformance() {
-      PowerProfileService.setFrostaliaPerformance(true);
-    }
-
-    function disableFrostaliaPerformance() {
-      PowerProfileService.setFrostaliaPerformance(false);
-    }
   }
 
   IpcHandler {

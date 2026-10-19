@@ -251,8 +251,7 @@ Item {
     var panel = PanelService.getPanel("batteryPanel", screen);
     if (panel) {
       panel.panelID = {
-        showPowerProfiles: widgetSettings.showPowerProfiles !== undefined ? widgetSettings.showPowerProfiles : widgetMetadata.showPowerProfiles,
-        showFrostaliaPerformance: widgetSettings.showFrostaliaPerformance !== undefined ? widgetSettings.showFrostaliaPerformance : widgetMetadata.showFrostaliaPerformance
+        showPowerProfiles: widgetSettings.showPowerProfiles !== undefined ? widgetSettings.showPowerProfiles : widgetMetadata.showPowerProfiles
       };
     }
     return panel;

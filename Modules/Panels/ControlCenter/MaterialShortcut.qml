@@ -120,7 +120,4 @@ Rectangle {
     cursorShape: Qt.PointingHandCursor
     onClicked: mouse => ControlCenterLayout.invoke(root.action, mouse.button === Qt.RightButton ? "right" : mouse.button === Qt.MiddleButton ? "middle" : "left")
   }
-  ToolTip.visible: pointer.containsMouse && !root.wide
-  ToolTip.text: root.title + " · " + root.subtitle
-  ToolTip.delay: 500
 }

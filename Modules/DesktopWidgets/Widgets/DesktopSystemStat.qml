@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
+import "../../../Helpers/MemoryUsage.js" as MemoryUsage
 import qs.Commons
 import qs.Modules.DesktopWidgets
 import qs.Services.System
@@ -56,6 +57,11 @@ DraggableDesktopWidget {
               icon: "memory",
               text: Math.round(SystemStatService.memPercent) + "%",
               color: root.color
+            },
+            {
+              text: MemoryUsage.label(SystemStatService.memGb, SystemStatService.memTotalGb),
+              color: root.color,
+              opacity: 0.8
             }
           ];
     case "Disk":

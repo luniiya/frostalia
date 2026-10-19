@@ -19,8 +19,7 @@ Singleton {
                            "Notifications": notificationsComponent,
                            "PowerProfile": powerProfileComponent,
                            "WiFi": networkComponent,
-                           "Network": networkComponent,
-                           "FrostaliaPerformance": frostaliaPerformanceComponent
+                           "Network": networkComponent
                          })
 
   property var widgetMetadata: ({
@@ -65,9 +64,6 @@ Singleton {
   }
   property Component networkComponent: Component {
     Network {}
-  }
-  property Component frostaliaPerformanceComponent: Component {
-    FrostaliaPerformance {}
   }
 
   function init() {

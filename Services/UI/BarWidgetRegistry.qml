@@ -30,7 +30,6 @@ Singleton {
                            "ModelUsage": modelUsageComponent,
                            "Network": networkComponent,
                            "NightLight": nightLightComponent,
-                           "FrostaliaPerformance": frostaliaPerformanceComponent,
                            "NotificationHistory": notificationHistoryComponent,
                            "PowerProfile": powerProfileComponent,
                            "SessionMenu": sessionMenuComponent,
@@ -64,7 +63,6 @@ Singleton {
                                      "ModelUsage": "WidgetSettings/ModelUsageSettings.qml",
                                      "Network": "WidgetSettings/NetworkSettings.qml",
                                      "NightLight": "WidgetSettings/NightLightSettings.qml",
-                                     "FrostaliaPerformance": "WidgetSettings/FrostaliaPerformanceSettings.qml",
                                      "NotificationHistory": "WidgetSettings/NotificationHistorySettings.qml",
                                      "PowerProfile": "WidgetSettings/PowerProfileSettings.qml",
                                      "SessionMenu": "WidgetSettings/SessionMenuSettings.qml",
@@ -99,7 +97,6 @@ Singleton {
                                     "displayMode": "graphic-clean",
                                     "deviceNativePath": "__default__",
                                     "showPowerProfiles": false,
-                                    "showFrostaliaPerformance": false,
                                     "hideIfNotDetected": true,
                                     "hideIfIdle": false
                                   },
@@ -293,9 +290,6 @@ Singleton {
                                   "NightLight": {
                                     "iconColor": "none"
                                   },
-                                  "FrostaliaPerformance": {
-                                    "iconColor": "none"
-                                  },
                                   "PowerProfile": {
                                     "iconColor": "none"
                                   },
@@ -377,9 +371,6 @@ Singleton {
   }
   property Component nightLightComponent: Component {
     NightLight {}
-  }
-  property Component frostaliaPerformanceComponent: Component {
-    FrostaliaPerformance {}
   }
   property Component notificationHistoryComponent: Component {
     NotificationHistory {}

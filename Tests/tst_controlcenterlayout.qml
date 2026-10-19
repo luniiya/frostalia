@@ -287,4 +287,12 @@ TestCase {
   function test_equalWidth(data) {
     compare(ControlCenterLayout.equalWidth(data.width, data.gap, data.count), data.expected);
   }
+
+  // Regression: the sliders card added one padding but anchored with two,
+  // leaving no space below the microphone slider.
+  function test_paddedHeight() {
+    compare(ControlCenterLayout.paddedHeight(90, 8), 106);
+    compare(ControlCenterLayout.paddedHeight(0, 8), 16);
+    compare(ControlCenterLayout.paddedHeight(-5, -2), 0);
+  }
 }

@@ -78,8 +78,4 @@ Slider {
     acceptedButtons: Qt.RightButton
     onTapped: root.iconClicked()
   }
-
-  ToolTip.visible: root.hovered || root.pressed
-  ToolTip.text: root.label + " · " + Math.round(root.value * 100) + "%"
-  ToolTip.delay: 400
 }

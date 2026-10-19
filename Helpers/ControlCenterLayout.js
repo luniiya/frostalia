@@ -36,6 +36,11 @@ function equalWidth(width, gap, count) {
   return Math.max(0, (width - (count - 1) * gap) / count);
 }
 
+// Card height with the same padding above and below its content.
+function paddedHeight(contentHeight, padding) {
+  return Math.max(0, contentHeight) + 2 * Math.max(0, padding);
+}
+
 function cardEnabled(cards, id) {
   return (cards || []).some(card => card.id === id && card.enabled);
 }

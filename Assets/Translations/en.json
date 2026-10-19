@@ -63,8 +63,6 @@
       "hide-if-not-detected-description": "Hide the widget when no battery is detected on the system.",
       "hide-if-not-detected-label": "Hide when not detected",
       "low-battery-threshold-label": "Low battery warning threshold",
-      "show-frostalia-performance-description": "Display the Frostalia performance mode toggle inside the battery panel.<br>Disables shadows and animations in Frostalia to reduce resource usage.",
-      "show-frostalia-performance-label": "Show Frostalia Performance toggle",
       "show-power-profile-description": "Display the power profile selection inside the battery panel.",
       "show-power-profile-label": "Show power profile controls"
     },
@@ -1356,10 +1354,10 @@
       "frostalia-started-description": "Command to execute when Frostalia has finished loading.",
       "frostalia-started-label": "Frostalia started",
       "frostalia-started-placeholder": "e.g. notify-send 'Frostalia Loaded'",
-      "performance-mode-disabled-description": "Command to be executed when Frostalia performance mode is disabled.",
+      "performance-mode-disabled-description": "Command to be executed when leaving the Performance power profile turns off Frostalia performance mode.",
       "performance-mode-disabled-label": "Performance mode disabled",
       "performance-mode-disabled-placeholder": "e.g. notify-send \"Performance\" \"Mode disabled\"",
-      "performance-mode-enabled-description": "Command to be executed when Frostalia performance mode is enabled.",
+      "performance-mode-enabled-description": "Command to be executed when the Performance power profile turns on Frostalia performance mode.",
       "performance-mode-enabled-label": "Performance mode enabled",
       "performance-mode-enabled-placeholder": "e.g., notify-send \"Performance\" \"Mode enabled\"",
       "session-description": "Command to be executed before shutdown or reboot. Receives action type as $1 (shutdown/reboot).",
@@ -1756,7 +1754,7 @@
       "ai-usage-zen-key-description": "OPENCODE_ZEN_API_KEY, OPENCODE_API_KEY or ZEN_API_KEY take precedence. Keys are stored in plain text in your settings file.",
       "ai-usage-zen-key-label": "Zen API key",
       "ai-usage-zen-label": "Zen (opencode.ai)",
-      "frostalia-performance-disable-desktop-widgets-description": "Keep desktop widgets visible while Frostalia performance mode is enabled.",
+      "frostalia-performance-disable-desktop-widgets-description": "Keep desktop widgets visible while the Performance power profile is active.",
       "frostalia-performance-disable-desktop-widgets-label": "Enable desktop widgets in performance mode",
       "frostalia-performance-disable-wallpaper-description": "Keep desktop, overview, and lock screen wallpapers visible while Frostalia performance mode is enabled.",
       "frostalia-performance-disable-wallpaper-label": "Enable wallpaper rendering in performance mode",
@@ -2124,11 +2122,6 @@
       "normal": "Normal mode",
       "not-installed": "wlsunset not installed"
     },
-    "frostalia-performance": {
-      "disabled": "Performance mode disabled",
-      "enabled": "Performance mode enabled",
-      "label": "Frostalia Performance"
-    },
     "power-profile": {
       "changed": "Power profile changed",
       "profile-name": "{profile}"
@@ -2188,7 +2181,6 @@
     "next-media": "Next track",
     "next-month": "Next month",
     "night-light-not-installed": "Night Light (not available)",
-    "frostalia-performance-enabled": "Frostalia performance mode",
     "open-annotation-tool": "Open with annotation tool",
     "open-control-center": "Control center",
     "open-notification-history-enable-dnd": "Notification history",

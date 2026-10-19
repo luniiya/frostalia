@@ -31,7 +31,7 @@ Singleton {
   - Appearance: ~/.config/frostalia/settings/UI/<style>.toml
   */
   readonly property alias data: adapter  // Used to access via Settings.data.xxx.yyy
-  readonly property int settingsVersion: 67
+  readonly property int settingsVersion: 68
   property bool isDebug: Quickshell.env("FROSTALIA_DEBUG") === "1"
   readonly property string shellName: "frostalia"
   readonly property string configDir: ensureTrailingSlash(Quickshell.env("FROSTALIA_CONFIG_DIR") || (Quickshell.env("XDG_CONFIG_HOME") || Quickshell.env("HOME") + "/.config") + "/" + shellName + "/")
@@ -418,9 +418,6 @@ Singleton {
           },
           {
             "id": "Bluetooth"
-          },
-          {
-            "id": "FrostaliaPerformance"
           },
           {
             "id": "CustomButton",

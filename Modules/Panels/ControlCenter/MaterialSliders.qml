@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import "../../../Helpers/ControlCenterLayout.js" as ControlCenterLayout
 import qs.Commons
 import qs.Services.Hardware
 import qs.Services.Media
@@ -11,7 +12,8 @@ Rectangle {
   property bool showAudio: true
   property bool showBrightness: true
   readonly property var monitor: screen ? BrightnessService.getMonitorForScreen(screen) : null
-  implicitHeight: sliders.implicitHeight + Math.round(8 * Style.uiScaleRatio)
+  readonly property int padding: Math.round(8 * Style.uiScaleRatio)
+  implicitHeight: ControlCenterLayout.paddedHeight(sliders.implicitHeight, padding)
   radius: Style.radiusM
   color: Color.mSurfaceVariant
 
@@ -20,7 +22,7 @@ Rectangle {
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: parent.top
-    anchors.margins: Math.round(8 * Style.uiScaleRatio)
+    anchors.margins: root.padding
     spacing: Math.round(2 * Style.uiScaleRatio)
     NMaterialQuickSlider {
       id: brightness
