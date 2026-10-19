@@ -3,7 +3,6 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import "../../../Helpers/ControlCenterLayout.js" as ControlCenterLayout
 import qs.Commons
-import qs.Modules.Notification
 import qs.Services.System
 import qs.Widgets
 
@@ -27,22 +26,31 @@ Rectangle {
       ScrollBar.vertical: ScrollBar {
         policy: ScrollBar.AsNeeded
       }
+      // Each UI style supplies its own notification content, as in the popup.
       delegate: Rectangle {
         required property var model
         width: list.width
-        height: content.implicitHeight + Style.margin2M
+        height: content.implicitHeight + (Style.materialControls ? Style.margin2M : 0)
         radius: Style.radiusS
         color: Qt.tint(Color.mSurfaceVariant, Qt.alpha(Color.mOnSurface, 0.035))
-        MaterialNotificationContent {
+        Loader {
           id: content
+          source: Style.surfaceUrl("notificationContent")
           anchors.left: parent.left
           anchors.right: parent.right
           anchors.top: parent.top
-          anchors.margins: Style.marginM
-          notificationData: model
-          compact: true
-          onDismissRequested: NotificationService.removeFromHistory(model.id)
-          onActionRequested: identifier => {
+          anchors.margins: Style.materialControls ? Style.marginM : 0
+          onLoaded: {
+            item.notificationData = Qt.binding(() => model);
+            item.compact = true;
+          }
+        }
+        Connections {
+          target: content.item
+          function onDismissRequested() {
+            NotificationService.removeFromHistory(model.id);
+          }
+          function onActionRequested(identifier) {
             if (NotificationService.invokeAction(model.id, identifier))
               NotificationService.removeFromHistory(model.id);
           }

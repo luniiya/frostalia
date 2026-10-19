@@ -29,6 +29,13 @@ function cellWidth(width, gap, span) {
   return Math.max(0, (width - (columns - 1) * gap) / columns * span + (span - 1) * gap);
 }
 
+// Equal share of a row for count items separated by gap.
+function equalWidth(width, gap, count) {
+  if (!(count > 0))
+    return 0;
+  return Math.max(0, (width - (count - 1) * gap) / count);
+}
+
 function cardEnabled(cards, id) {
   return (cards || []).some(card => card.id === id && card.enabled);
 }

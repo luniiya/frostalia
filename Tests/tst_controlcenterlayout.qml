@@ -249,4 +249,42 @@ TestCase {
               }
             ]);
   }
+
+  function test_equalWidth_data() {
+    return [
+          {
+            tag: "four stats",
+            width: 400,
+            gap: 8,
+            count: 4,
+            expected: 94
+          },
+          {
+            tag: "no gap",
+            width: 100,
+            gap: 0,
+            count: 4,
+            expected: 25
+          },
+          {
+            tag: "too narrow",
+            width: 10,
+            gap: 8,
+            count: 4,
+            expected: 0
+          },
+          {
+            tag: "empty",
+            width: 400,
+            gap: 8,
+            count: 0,
+            expected: 0
+          }
+        ];
+  }
+
+  // Regression: system monitor stats were sized by label width.
+  function test_equalWidth(data) {
+    compare(ControlCenterLayout.equalWidth(data.width, data.gap, data.count), data.expected);
+  }
 }

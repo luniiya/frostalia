@@ -36,34 +36,41 @@ SmartPanel {
     Bubbles
   }
 
-  property int requestedTab: SettingsPanel.Tab.General
+  // -1 opens the settings home; callers set a tab before open() or toggle().
+  property int requestedTab: -1
   property int requestedSubTab: -1
   property var requestedEntry: null
 
-  // Forward the requested tab, subtab or search entry to the settings window
-  function openInWindow(home) {
-    if (home) {
-      SettingsPanelService.openHome();
-      return;
-    }
+  // Forward the requested tab, subtab or search entry to the settings window,
+  // then clear it so the next plain open goes home again.
+  function openInWindow() {
     const request = SettingsWindowRequest.resolve(requestedTab, requestedSubTab, requestedEntry);
-    requestedSubTab = -1;
-    requestedEntry = null;
+    clearRequest();
     if (request.kind === "entry")
       SettingsPanelService.openToEntry(request.entry);
-    else
+    else if (request.kind === "tab")
       SettingsPanelService.openToTab(request.tab, request.subTab);
+    else
+      SettingsPanelService.openHome();
+  }
+
+  function clearRequest() {
+    requestedTab = -1;
+    requestedSubTab = -1;
+    requestedEntry = null;
   }
 
   function toggle(buttonItem, buttonName) {
-    if (SettingsPanelService.isWindowOpen)
+    if (SettingsPanelService.isWindowOpen) {
+      clearRequest();
       SettingsPanelService.closeWindow();
-    else
-      openInWindow(true);
+    } else {
+      openInWindow();
+    }
   }
 
   function open(buttonItem, buttonName) {
-    openInWindow(true);
+    openInWindow();
   }
 
   // Open to a specific tab and optionally a subtab

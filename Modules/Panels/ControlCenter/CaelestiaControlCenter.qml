@@ -131,7 +131,7 @@ Item {
 
   Component {
     id: notificationCard
-    MaterialNotificationFeed {}
+    NotificationFeed {}
   }
 
   Component {

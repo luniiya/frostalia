@@ -421,6 +421,17 @@ Singleton {
           },
           {
             "id": "FrostaliaPerformance"
+          },
+          {
+            "id": "CustomButton",
+            "icon": "wall",
+            "generalTooltipText": "random wallpaper",
+            "onClicked": "",
+            "onRightClicked": "",
+            "onMiddleClicked": "",
+            "stateChecksJson": "[]",
+            "enableOnStateLogic": false,
+            "showExecTooltip": true
           }
         ]
         property list<var> right: [
@@ -457,7 +468,7 @@ Singleton {
         },
         {
           "id": "weather-card",
-          "enabled": true
+          "enabled": false
         },
         {
           "id": "media-sysmon-card",
@@ -465,11 +476,11 @@ Singleton {
         },
         {
           "id": "notification-card",
-          "enabled": true
+          "enabled": false
         },
         {
           "id": "calendar-month-card",
-          "enabled": true
+          "enabled": false
         }
       ]
     }

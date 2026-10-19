@@ -219,6 +219,17 @@
         },
         {
           "id": "FrostaliaPerformance"
+        },
+        {
+          "id": "CustomButton",
+          "icon": "wall",
+          "generalTooltipText": "random wallpaper",
+          "onClicked": "",
+          "onRightClicked": "",
+          "onMiddleClicked": "",
+          "stateChecksJson": "[]",
+          "enableOnStateLogic": false,
+          "showExecTooltip": true
         }
       ],
       "right": [
@@ -254,7 +265,7 @@
         "id": "brightness-card"
       },
       {
-        "enabled": true,
+        "enabled": false,
         "id": "weather-card"
       },
       {
@@ -263,11 +274,11 @@
       },
       {
         "id": "notification-card",
-        "enabled": true
+        "enabled": false
       },
       {
         "id": "calendar-month-card",
-        "enabled": true
+        "enabled": false
       }
     ]
   },

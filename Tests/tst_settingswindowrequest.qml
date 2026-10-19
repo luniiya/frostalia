@@ -43,18 +43,11 @@ TestCase {
             expectedSubTab: -1
           },
           {
-            tag: "undefined tab",
-            tab: undefined,
+            tag: "first tab",
+            tab: 0,
             subTab: -1,
             expectedTab: 0,
             expectedSubTab: -1
-          },
-          {
-            tag: "negative tab",
-            tab: -3,
-            subTab: 2,
-            expectedTab: 0,
-            expectedSubTab: 2
           }
         ];
   }
@@ -64,6 +57,36 @@ TestCase {
     compare(r.kind, "tab");
     compare(r.tab, data.expectedTab);
     compare(r.subTab, data.expectedSubTab);
+  }
+
+  function test_home_data() {
+    return [
+          {
+            tag: "no tab",
+            tab: -1
+          },
+          {
+            tag: "undefined tab",
+            tab: undefined
+          },
+          {
+            tag: "negative tab with subtab",
+            tab: -3,
+            subTab: 2
+          }
+        ];
+  }
+
+  function test_home(data) {
+    compare(SettingsWindowRequest.resolve(data.tab, data.subTab, null).kind, "home");
+  }
+
+  // Regression: open() and toggle() always went home, so buttons that set
+  // requestedTab first (control center edit, dock, launcher) ignored it.
+  function test_requestedTabIsNotHome() {
+    var r = SettingsWindowRequest.resolve(4, -1, null);
+    compare(r.kind, "tab");
+    compare(r.tab, 4);
   }
 
   // Regression: window mode used to open only requestedTab, dropping the

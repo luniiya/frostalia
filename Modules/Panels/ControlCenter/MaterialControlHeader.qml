@@ -13,13 +13,12 @@ Item {
   property string uptime: "--"
   implicitHeight: Math.round(48 * Style.uiScaleRatio)
 
-  function openSettings(tab) {
+  // Control Center sub-tabs: Appearance, Cards, Shortcuts.
+  readonly property int shortcutsSubTab: 2
+
+  function openSettings(tab, subTab) {
     PanelService.getPanel("controlCenterPanel", screen)?.close();
-    const settings = PanelService.getPanel("settingsPanel", screen);
-    if (settings) {
-      settings.requestedTab = tab;
-      settings.open();
-    }
+    SettingsPanelService.openToTab(tab, subTab);
   }
 
   RowLayout {
@@ -63,7 +62,7 @@ Item {
           icon: "pencil"
           baseSize: Style.baseWidgetSize
           tooltipText: I18n.tr("control-center.edit-shortcuts")
-          onClicked: root.openSettings(SettingsPanel.Tab.ControlCenter)
+          onClicked: root.openSettings(SettingsPanel.Tab.ControlCenter, root.shortcutsSubTab)
         }
         NIconButton {
           icon: "settings"

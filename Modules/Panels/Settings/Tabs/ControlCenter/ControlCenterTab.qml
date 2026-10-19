@@ -41,7 +41,7 @@ ColumnLayout {
     {
       "id": "weather-card",
       "text": "Weather",
-      "enabled": true,
+      "enabled": false,
       "required": false
     },
     {
@@ -53,13 +53,13 @@ ColumnLayout {
     {
       "id": "notification-card",
       "text": I18n.tr("common.notifications"),
-      "enabled": true,
+      "enabled": false,
       "required": false
     },
     {
       "id": "calendar-month-card",
       "text": I18n.tr("common.calendar"),
-      "enabled": true,
+      "enabled": false,
       "required": false
     }
   ]
