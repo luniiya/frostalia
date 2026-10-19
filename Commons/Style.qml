@@ -5,6 +5,7 @@ import Quickshell
 import "../Helpers/BubbleLogic.js" as BubbleLogic
 import "../Helpers/NotchGeometry.js" as NotchGeometry
 import "../Helpers/OutlineStyle.js" as OutlineStyle
+import "../Helpers/ScreenCorners.js" as ScreenCorners
 import "../Helpers/UiStyles.js" as UiStyles
 import qs.Services.Power
 
@@ -77,7 +78,7 @@ Singleton {
   readonly property int iRadiusM: Math.round(uiStyleTokens.inputRadii.M * Settings.data.general.iRadiusRatio)
   readonly property int iRadiusL: Math.round(uiStyleTokens.inputRadii.L * Settings.data.general.iRadiusRatio)
 
-  readonly property int screenRadius: Math.round(uiStyleTokens.screenRadius * Settings.data.general.screenRadiusRatio)
+  readonly property int screenRadius: ScreenCorners.radius(Settings.data.general.screenRadiusRatio)
 
   // Border
   readonly property int borderS: Math.max(1, Math.round(uiStyleTokens.borders.S * uiScaleRatio))

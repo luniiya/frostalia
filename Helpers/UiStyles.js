@@ -21,7 +21,6 @@ var definitions = {
       "fixedFontFamily": "monospace",
       "radii": { "XXXS": 3, "XXS": 4, "XS": 8, "S": 12, "M": 16, "L": 20 },
       "inputRadii": { "XXXS": 3, "XXS": 4, "XS": 8, "S": 12, "M": 16, "L": 20 },
-      "screenRadius": 20,
       "borders": { "S": 1, "M": 2, "L": 3 },
       "margins": { "XXXS": 1, "XXS": 2, "XS": 4, "S": 6, "M": 9, "L": 13, "XL": 18 },
       "animations": { "Faster": 75, "Fast": 150, "Normal": 300, "Slow": 450, "Slowest": 750 },
@@ -91,7 +90,6 @@ var definitions = {
         "M": 12,
         "L": 28
       },
-      "screenRadius": 28,
       "borders": {
         "S": 1,
         "M": 2,

@@ -94,7 +94,6 @@ TestCase {
               L: 20
             });
     compare(tokens.inputRadii, tokens.radii);
-    compare(tokens.screenRadius, 20);
     compare(tokens.margins, {
               XXXS: 1,
               XXS: 2,
