@@ -1,5 +1,8 @@
 import QtQuick
 import QtTest
+import "../Commons/Migrations" as Migrations
+import "../Helpers/QtObj2JS.js" as QtObj2JS
+import "../Helpers/WeatherData.js" as WeatherData
 import "../Helpers/WeatherWidget.js" as WeatherWidget
 
 TestCase {
@@ -239,10 +242,10 @@ TestCase {
   }
 
   function test_views() {
-    compare(WeatherWidget.views, ["current", "hourly", "daily", "detail"]);
+    compare(WeatherWidget.views, ["current", "hourly", "daily"]);
     for (const selected of WeatherWidget.views)
       compare(WeatherWidget.view(selected), selected);
-    for (const invalid of [undefined, null, "", "unknown", "toString"])
+    for (const invalid of [undefined, null, "", "unknown", "detail", "toString"])
       compare(WeatherWidget.view(invalid), "current");
     compare(WeatherWidget.desktopSize("unknown", true), {
               width: 240,
@@ -352,6 +355,116 @@ TestCase {
                            }
                          ]])
       verify(WeatherWidget.migrateDesktopWidgets(input) === input);
+  }
+
+  Migrations.Migration71 {
+    id: consolidateMigration
+  }
+  Migrations.Migration73 {
+    id: detailMigration
+  }
+  QtObject {
+    id: migrationAdapter
+    property QtObject desktopWidgets: QtObject {
+      property list<var> monitorWidgets: []
+    }
+  }
+
+  function test_separatesDetailWidgetWithoutChangingOtherViews() {
+    const detail = {
+      id: "Weather",
+      view: "detail",
+      detail: "moon",
+      x: 10,
+      y: 20,
+      scale: 1.5,
+      showBackground: false
+    };
+    const daily = {
+      id: "Weather",
+      view: "daily",
+      days: 5
+    };
+    const separate = {
+      id: "WeatherDetails",
+      detail: "humidity"
+    };
+    const original = [
+            {
+              name: "DP-1",
+              widgets: [daily, detail, separate]
+            }
+          ];
+    const snapshot = JSON.stringify(original);
+    const result = WeatherWidget.splitDetailWidgets(original);
+    compare(result[0].widgets[1], {
+              id: "WeatherDetails",
+              detail: "moon",
+              x: 10,
+              y: 20,
+              scale: 1.5,
+              showBackground: false
+            });
+    verify(result[0].widgets[0] === daily);
+    verify(result[0].widgets[2] === separate);
+    compare(JSON.stringify(original), snapshot);
+    verify(WeatherWidget.splitDetailWidgets(result) === result);
+  }
+
+  function test_detailMigrationFollowsConsolidationOnQmlAdapter() {
+    const raw = {
+      desktopWidgets: {
+        monitorWidgets: [
+          {
+            name: "DP-1",
+            widgets: [
+              {
+                id: "WeatherHourly",
+                hours: 24
+              },
+              {
+                id: "WeatherDetail",
+                detail: "uv"
+              }
+            ]
+          }
+        ]
+      }
+    };
+    const logger = {
+      i: function () {}
+    };
+    migrationAdapter.desktopWidgets.monitorWidgets = raw.desktopWidgets.monitorWidgets;
+    verify(consolidateMigration.migrate(migrationAdapter, logger, raw));
+    verify(detailMigration.migrate(migrationAdapter, logger, raw));
+    const widgets = QtObj2JS.qtObjectToPlainObject(migrationAdapter.desktopWidgets.monitorWidgets)[0].widgets;
+    compare(widgets[0], {
+              id: "Weather",
+              view: "hourly",
+              hours: 24
+            });
+    compare(widgets[1], {
+              id: "WeatherDetails",
+              detail: "uv"
+            });
+  }
+
+  function test_hourlyWidthFitsEverySelectedHour() {
+    for (const scale of [0.5, 1, 1.5, 2]) {
+      const columnWidth = Math.round(52 * scale);
+      const padding = Math.round(16 * scale);
+      for (const count of [0, 4, 12, 24, 48]) {
+        const width = WeatherWidget.hourlyWidgetWidth(count, columnWidth, padding, 400 * scale);
+        verify(width >= 400 * scale);
+        verify(width - padding * 2 >= count * columnWidth);
+        const cell = WeatherWidget.hourlyColumnWidth(width - padding * 2, count);
+        const points = WeatherData.chartPoints(Array(count).fill(12), width - padding * 2, 0, 50);
+        for (let i = 0; i < count; i++)
+          fuzzyCompare(cell * (i + 0.5), points[i].x, 0.001);
+        verify(isFinite(cell));
+      }
+    }
+    verify(WeatherWidget.hourlyWidgetWidth(24, 52, 16, 400) > WeatherWidget.hourlyWidgetWidth(12, 52, 16, 400));
   }
 
   function test_precipitationLabel_data() {

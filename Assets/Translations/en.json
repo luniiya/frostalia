@@ -1,5 +1,7 @@
 {
   "actions": {
+    "undo-desktop-widget-change": "Undo widget change (Ctrl+Z)",
+    "redo-desktop-widget-change": "Redo widget change (Ctrl+Shift+Z)",
     "edit-desktop-widgets": "Edit desktop widgets",
     "finish-editing-desktop-widgets": "Finish editing desktop widgets",
     "clear-history": "Clear history",
@@ -1237,7 +1239,8 @@
       "clock-width-description": "Width of the clock widget in pixels.",
       "cpu-intensive-note": "Widgets marked with ! use more CPU and should be enabled mindfully.",
       "edit-mode-button-label": "Enter edit mode",
-      "edit-mode-controls-explanation": "Left-click & drag: Move or resize the widget.\nRight-click: Open the context menu options.",
+      "edit-mode-controls-explanation": "Drag a widget to move it. Drag edges to resize supported axes, or corners to scale.\nScaling snaps to 10% steps; edges snap to size steps or the grid. Hold Shift for precise sizing.\nRight-click for widget options.\nUndo: Ctrl+Z · Redo: Ctrl+Shift+Z",
+      "size-feedback": "{widthScale}× wide · {heightScale}× tall · {width} × {height} px",
       "edit-mode-description": "Enable edit mode to move and reposition desktop widgets. When enabled, widgets show a drag outline and can be repositioned.",
       "edit-mode-exit-button": "Exit edit mode",
       "edit-mode-grid-snap-label": "Grid snap",
@@ -1262,7 +1265,8 @@
         "Clock": "Clock",
         "MediaPlayer": "Media player",
         "SystemStat": "System stat",
-        "Weather": "Weather"
+        "Weather": "Weather",
+        "WeatherDetails": "Weather details"
       },
       "overview-enabled-description": "Show desktop widgets while the compositor overview is open.",
       "overview-enabled-label": "Show in overview",
@@ -1279,11 +1283,10 @@
       "title": "Desktop Widgets",
       "weather-animated-sky-description": "Animate the sky behind the current conditions.",
       "weather-view-label": "View",
-      "weather-view-description": "Choose current conditions, a forecast, or an individual weather detail.",
+      "weather-view-description": "Choose current conditions, an hourly forecast, or a daily forecast.",
       "weather-view-current": "Current conditions",
       "weather-view-hourly": "Hourly forecast",
       "weather-view-daily": "Daily forecast",
-      "weather-view-detail": "Weather details",
       "weather-animated-sky-label": "Animated sky",
       "weather-compact-description": "Lay the days out side by side instead of in rows.",
       "weather-compact-label": "Compact",

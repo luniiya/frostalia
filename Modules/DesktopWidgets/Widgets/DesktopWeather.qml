@@ -6,19 +6,19 @@ import qs.Modules.DesktopWidgets
 import qs.Modules.Weather
 import qs.Services.Location
 
-// One desktop widget with current, forecast and detail views.
+// Current conditions and forecasts in one desktop widget.
 DraggableDesktopWidget {
   id: root
+  horizontalResizable: true
+  verticalResizable: false
 
   readonly property string view: WeatherWidget.view(widgetSetting("view"))
   readonly property int forecastDays: widgetSetting("forecastDays") ?? 0
   readonly property real padding: Math.round(Style.marginM * widgetScale)
   readonly property var baseSize: WeatherWidget.desktopSize(view, widgetSetting("compact") ?? false)
 
-  implicitWidth: Math.round(baseSize.width * widgetScale)
+  implicitWidth: view === "hourly" && viewLoader.item ? viewLoader.item.implicitWidth : Math.round(baseSize.width * widgetScale)
   implicitHeight: baseSize.height > 0 ? Math.round(baseSize.height * widgetScale) : (viewLoader.item ? viewLoader.item.implicitHeight : 0)
-  width: implicitWidth
-  height: implicitHeight
 
   Loader {
     id: viewLoader
@@ -29,8 +29,6 @@ DraggableDesktopWidget {
         return hourlyView;
       case "daily":
         return dailyView;
-      case "detail":
-        return detailView;
       default:
         return currentView;
       }
@@ -75,6 +73,7 @@ DraggableDesktopWidget {
     id: hourlyView
 
     Item {
+      implicitWidth: WeatherWidget.hourlyWidgetWidth(hourly.hours.length, hourly.columnWidth, root.padding, root.baseSize.width * root.widgetScale)
       implicitHeight: hourly.implicitHeight + root.padding * 2
 
       WeatherHourly {
@@ -102,19 +101,6 @@ DraggableDesktopWidget {
         count: root.widgetSetting("days") ?? 7
         compact: root.widgetSetting("compact") ?? false
         showPrecipitation: root.widgetSetting("showPrecipitation") ?? true
-      }
-    }
-  }
-
-  Component {
-    id: detailView
-
-    Item {
-      WeatherDetailTile {
-        anchors.fill: parent
-        anchors.margins: root.padding
-        scaleFactor: root.widgetScale
-        kind: root.widgetSetting("detail") ?? "wind"
       }
     }
   }

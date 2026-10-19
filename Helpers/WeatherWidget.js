@@ -27,12 +27,11 @@ function summary(weather, enabled, fahrenheit, locationConfigured) {
   };
 }
 
-var views = ["current", "hourly", "daily", "detail"];
+var views = ["current", "hourly", "daily"];
 var viewLabels = {
   current: "panels.desktop-widgets.weather-view-current",
   hourly: "panels.desktop-widgets.weather-view-hourly",
-  daily: "panels.desktop-widgets.weather-view-daily",
-  detail: "panels.desktop-widgets.weather-view-detail"
+  daily: "panels.desktop-widgets.weather-view-daily"
 };
 
 function view(value) {
@@ -41,7 +40,7 @@ function view(value) {
 
 // Base size before widgetScale. A zero height follows the selected view's content.
 function desktopSize(kind, compact) {
-  switch (view(kind)) {
+  switch (kind) {
   case "hourly":
     return { width: 400, height: 0 };
   case "daily":
@@ -51,6 +50,14 @@ function desktopSize(kind, compact) {
   default:
     return { width: 240, height: 0 };
   }
+}
+
+function hourlyWidgetWidth(count, columnWidth, padding, minimumWidth) {
+  return Math.ceil(Math.max(minimumWidth, Math.max(0, count) * columnWidth + padding * 2));
+}
+
+function hourlyColumnWidth(width, count) {
+  return Math.max(0, width) / Math.max(1, count);
 }
 
 // Consolidate saved weather widgets without changing their instance data or order.
@@ -68,6 +75,31 @@ function migrateDesktopWidgets(monitors) {
         return widget;
       monitorChanged = true;
       return Object.assign({}, widget, { id: "Weather", view: legacyViews[widget.id] });
+    });
+    if (!monitorChanged)
+      return monitor;
+    changed = true;
+    return Object.assign({}, monitor, { widgets: widgets });
+  });
+  return changed ? result : monitors;
+}
+
+// Detail tiles have their own widget and selector, separate from forecasts.
+function splitDetailWidgets(monitors) {
+  if (!Array.isArray(monitors))
+    return monitors;
+  let changed = false;
+  const result = monitors.map(monitor => {
+    if (!monitor || !Array.isArray(monitor.widgets))
+      return monitor;
+    let monitorChanged = false;
+    const widgets = monitor.widgets.map(widget => {
+      if (!widget || widget.id !== "Weather" || widget.view !== "detail")
+        return widget;
+      monitorChanged = true;
+      const detail = Object.assign({}, widget, { id: "WeatherDetails" });
+      delete detail.view;
+      return detail;
     });
     if (!monitorChanged)
       return monitor;

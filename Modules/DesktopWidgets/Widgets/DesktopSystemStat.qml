@@ -10,6 +10,10 @@ import qs.Widgets
 
 DraggableDesktopWidget {
   id: root
+  horizontalResizable: true
+  verticalResizable: true
+  minimumWidgetWidth: Math.round(180 * widgetScale)
+  minimumWidgetHeight: Math.round(96 * widgetScale)
 
   // Widget settings
   readonly property var widgetMetadata: DesktopWidgetRegistry.widgetMetadata["SystemStat"]
@@ -169,8 +173,6 @@ DraggableDesktopWidget {
 
   implicitWidth: Math.round(240 * widgetScale)
   implicitHeight: Math.round(120 * widgetScale)
-  width: implicitWidth
-  height: implicitHeight
 
   // Update interval per stat type
   readonly property int graphUpdateInterval: {

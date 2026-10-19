@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Layouts
-import "../../../../../Helpers/WeatherData.js" as WeatherData
 import "../../../../../Helpers/WeatherWidget.js" as WeatherWidget
 import qs.Commons
 import qs.Widgets
@@ -128,21 +127,6 @@ ColumnLayout {
     checked: root.value("compact")
     onToggled: checked => root.set("compact", checked)
     defaultValue: root.widgetMetadata.compact
-  }
-
-  NComboBox {
-    visible: root.selectedView === "detail"
-    Layout.fillWidth: true
-    label: I18n.tr("panels.desktop-widgets.weather-detail-label")
-    description: I18n.tr("panels.desktop-widgets.weather-detail-description")
-    minimumWidth: 200 * Style.uiScaleRatio
-    model: WeatherData.detailKinds.map(kind => ({
-      "key": kind,
-      "name": I18n.tr("weather.details." + kind)
-    }))
-    currentKey: root.value("detail")
-    onSelected: key => root.set("detail", key)
-    defaultValue: root.widgetMetadata.detail
   }
 
   NToggle {

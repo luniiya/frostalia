@@ -155,7 +155,7 @@ Item {
             ColumnLayout {
               required property var modelData
               required property int index
-              width: root.columnWidth
+              width: WeatherWidget.hourlyColumnWidth(flick.contentWidth, root.hours.length)
               spacing: Style.marginXXS
 
               WeatherIcon {

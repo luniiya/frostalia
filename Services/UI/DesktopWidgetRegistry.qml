@@ -2,6 +2,8 @@ pragma Singleton
 
 import QtQuick
 import Quickshell
+import "../../Helpers/DesktopWidgetHistory.js" as WidgetHistory
+import "../../Helpers/QtObj2JS.js" as QtObj2JS
 import qs.Commons
 import qs.Modules.DesktopWidgets.Widgets
 import qs.Services.Frostalia
@@ -11,6 +13,72 @@ Singleton {
 
   // Transient state - not persisted, resets on shell restart
   property bool editMode: false
+
+  property var layoutHistory: WidgetHistory.create([])
+  property bool historyReady: false
+  property bool restoringLayout: false
+  property Item manipulatingWidget: null
+  readonly property bool canUndo: historyReady && !manipulatingWidget && layoutHistory.past.length > 0
+  readonly property bool canRedo: historyReady && !manipulatingWidget && layoutHistory.future.length > 0
+
+  function resetHistory() {
+    layoutHistory = WidgetHistory.create(QtObj2JS.qtObjectToPlainObject(Settings.data.desktopWidgets.monitorWidgets));
+    historyReady = true;
+  }
+
+  function recordLayout() {
+    if (!historyReady || restoringLayout || !Settings.isLoaded)
+      return;
+    layoutHistory = WidgetHistory.record(layoutHistory, QtObj2JS.qtObjectToPlainObject(Settings.data.desktopWidgets.monitorWidgets));
+  }
+
+  function prepareHistory() {
+    if (currentSettingsDialog) {
+      currentSettingsDialog.flushPendingChanges();
+      currentSettingsDialog.discardPendingChanges();
+      currentSettingsDialog.close();
+    }
+  }
+
+  function restoreHistory(next) {
+    restoringLayout = true;
+    try {
+      layoutHistory = next;
+      Settings.data.desktopWidgets.monitorWidgets = WidgetHistory.snapshot(next.current);
+    } finally {
+      restoringLayout = false;
+    }
+  }
+
+  function undo() {
+    if (manipulatingWidget)
+      return;
+    prepareHistory();
+    if (canUndo)
+      restoreHistory(WidgetHistory.undo(layoutHistory));
+  }
+
+  function redo() {
+    if (manipulatingWidget)
+      return;
+    prepareHistory();
+    if (canRedo)
+      restoreHistory(WidgetHistory.redo(layoutHistory));
+  }
+
+  Connections {
+    target: Settings
+    function onSettingsLoaded() {
+      root.resetHistory();
+    }
+  }
+
+  Connections {
+    target: Settings.data.desktopWidgets
+    function onMonitorWidgetsChanged() {
+      root.recordLayout();
+    }
+  }
 
   // Signal emitted when plugin widgets are registered/unregistered
   signal pluginWidgetRegistryUpdated
@@ -24,6 +92,9 @@ Singleton {
   }
   property Component weatherComponent: Component {
     DesktopWeather {}
+  }
+  property Component weatherDetailsComponent: Component {
+    DesktopWeatherDetails {}
   }
   property Component systemStatComponent: Component {
     DesktopSystemStat {}
@@ -43,11 +114,14 @@ Singleton {
   property var widgetUrls: ({})
 
   Component.onCompleted: {
+    if (Settings.isLoaded)
+      resetHistory();
     // Initialize widgets object after Components are ready
     var widgetsObj = {};
     widgetsObj["Clock"] = clockComponent;
     widgetsObj["MediaPlayer"] = mediaPlayerComponent;
     widgetsObj["Weather"] = weatherComponent;
+    widgetsObj["WeatherDetails"] = weatherDetailsComponent;
     widgetsObj["SystemStat"] = systemStatComponent;
     widgetsObj["AudioVisualizer"] = audioVisualizerComponent;
     widgets = widgetsObj;
@@ -56,6 +130,7 @@ Singleton {
     urlsObj["Clock"] = _widgetsDir + "DesktopClock.qml";
     urlsObj["MediaPlayer"] = _widgetsDir + "DesktopMediaPlayer.qml";
     urlsObj["Weather"] = _widgetsDir + "DesktopWeather.qml";
+    urlsObj["WeatherDetails"] = _widgetsDir + "DesktopWeatherDetails.qml";
     urlsObj["SystemStat"] = _widgetsDir + "DesktopSystemStat.qml";
     urlsObj["AudioVisualizer"] = _widgetsDir + "DesktopAudioVisualizer.qml";
     widgetUrls = urlsObj;
@@ -67,6 +142,7 @@ Singleton {
                                      "Clock": "WidgetSettings/ClockSettings.qml",
                                      "MediaPlayer": "WidgetSettings/MediaPlayerSettings.qml",
                                      "Weather": "WidgetSettings/WeatherSettings.qml",
+                                     "WeatherDetails": "WidgetSettings/WeatherDetailsSettings.qml",
                                      "SystemStat": "WidgetSettings/SystemStatSettings.qml",
                                      "AudioVisualizer": "WidgetSettings/AudioVisualizerSettings.qml"
                                    })
@@ -102,7 +178,11 @@ Singleton {
                                     "hours": 12,
                                     "days": 7,
                                     "compact": false,
-                                    "showPrecipitation": true,
+                                    "showPrecipitation": true
+                                  },
+                                  "WeatherDetails": {
+                                    "showBackground": true,
+                                    "roundedCorners": true,
                                     "detail": "wind"
                                   },
                                   "SystemStat": {

@@ -197,6 +197,18 @@ Popup {
     }
   }
 
+  function flushPendingChanges() {
+    if (!saveTimer.running)
+      return;
+    saveTimer.stop();
+    root.updateWidgetSettings(root.sectionId, root.widgetIndex, root.settingsCache);
+  }
+
+  function discardPendingChanges() {
+    saveTimer.stop();
+    settingsCache = ({});
+  }
+
   function saveAndClose() {
     if (settingsLoader.item && typeof settingsLoader.item.saveSettings === 'function') {
       var newSettings = settingsLoader.item.saveSettings();

@@ -72,6 +72,7 @@ Variants {
         regions: window._maskRegions
       }
 
+      WlrLayershell.keyboardFocus: DesktopWidgetRegistry.editMode ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
       WlrLayershell.layer: WlrLayer.Bottom
       WlrLayershell.exclusionMode: ExclusionMode.Ignore
       WlrLayershell.namespace: "frostalia-desktop-widgets-" + (screen?.name || "unknown")
@@ -85,6 +86,17 @@ Variants {
 
       Component.onCompleted: {
         Logger.d("DesktopWidgets", "Created panel window for", screen?.name);
+      }
+
+      Shortcut {
+        sequence: "Ctrl+Z"
+        enabled: DesktopWidgetRegistry.editMode && DesktopWidgetRegistry.canUndo
+        onActivated: DesktopWidgetRegistry.undo()
+      }
+      Shortcut {
+        sequences: ["Ctrl+Shift+Z", "Ctrl+Y"]
+        enabled: DesktopWidgetRegistry.editMode && DesktopWidgetRegistry.canRedo
+        onActivated: DesktopWidgetRegistry.redo()
       }
 
       // Add a new widget to the current screen
@@ -468,6 +480,20 @@ Variants {
             RowLayout {
               Layout.alignment: Qt.AlignRight
               spacing: Style.marginS
+
+              NIconButton {
+                icon: "arrow-back-up"
+                tooltipText: I18n.tr("actions.undo-desktop-widget-change")
+                enabled: DesktopWidgetRegistry.canUndo
+                onClicked: DesktopWidgetRegistry.undo()
+              }
+
+              NIconButton {
+                icon: "arrow-forward-up"
+                tooltipText: I18n.tr("actions.redo-desktop-widget-change")
+                enabled: DesktopWidgetRegistry.canRedo
+                onClicked: DesktopWidgetRegistry.redo()
+              }
 
               NIconButton {
                 id: addWidgetButton

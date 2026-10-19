@@ -285,7 +285,11 @@
       "hours": 12,
       "days": 7,
       "compact": false,
-      "showPrecipitation": true,
+      "showPrecipitation": true
+    },
+    "WeatherDetails": {
+      "showBackground": true,
+      "roundedCorners": true,
       "detail": "wind"
     },
     "SystemStat": {
