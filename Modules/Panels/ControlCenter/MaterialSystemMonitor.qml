@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import "../../../Helpers/ControlCenterLayout.js" as ControlCenterLayout
 import qs.Commons
 import qs.Services.System
 import qs.Widgets
@@ -14,10 +15,12 @@ Rectangle {
   Component.onDestruction: SystemStatService.unregisterComponent("material-control-center")
 
   RowLayout {
+    id: stats
     anchors.fill: parent
     anchors.margins: Style.marginM
     spacing: Style.marginS
     Repeater {
+      id: statsRepeater
       model: [
         {
           icon: "cpu-usage",
@@ -42,7 +45,11 @@ Rectangle {
       ]
       ColumnLayout {
         required property var modelData
-        Layout.fillWidth: true
+        // Equal columns, so long labels don't widen their stat.
+        readonly property real cellWidth: ControlCenterLayout.equalWidth(stats.width, stats.spacing, statsRepeater.count)
+        Layout.minimumWidth: cellWidth
+        Layout.preferredWidth: cellWidth
+        Layout.maximumWidth: cellWidth
         spacing: Style.marginXXS
         NIcon {
           Layout.alignment: Qt.AlignHCenter

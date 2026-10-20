@@ -7,6 +7,12 @@ Frostalia is an independent fork of [Noctalia Shell](https://github.com/noctalia
 - **MrDowntempo** - Creator of the Noctalia Owl and moon logo
 - **[SaberJ2X](https://www.reddit.com/user/SaberJ64/)** - Creator of Talia, the Noctalia mascot
 
+## Shells
+
+- **[Clavis Shell](https://github.com/StatIndet/quickshell)** by StatIndet - Weather views and animated weather backdrop (GPL-3.0), and the visual reference for the Material style
+- **[Animated Weather Cards](https://codepen.io/ste-vg/pen/GqaZbo)** by Steve Gardner - The original web animation behind the weather backdrop ([MIT](licenses/AnimatedWeatherCards-MIT.txt))
+- **[Open-Meteo](https://open-meteo.com/)** - Weather and air quality data
+
 ## Core Framework
 
 - **[Quickshell](https://github.com/outfoxxed/quickshell)** - The Qt/QML-based Wayland shell framework that powers Noctalia
@@ -43,6 +49,6 @@ Frostalia is an independent fork of [Noctalia Shell](https://github.com/noctalia
 - All the contributors and users who have helped make Noctalia better
 
 ## License
-Noctalia Shell is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+Frostalia is licensed under the GNU General Public License v3.0. See [LICENSE](LICENSE) for details. Code inherited from Noctalia Shell was released under the MIT License; its notice is kept in [licenses/Noctalia-MIT.txt](licenses/Noctalia-MIT.txt).
 
 Each dependency listed above is governed by its own respective license. Please refer to their individual projects for licensing information.

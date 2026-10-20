@@ -3,6 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
 import qs.Commons
+import qs.Services.Networking
 import qs.Services.System
 import qs.Services.UI
 import qs.Widgets
@@ -58,7 +59,7 @@ ColumnLayout {
     NReorderCheckboxes {
       Layout.fillWidth: true
       model: root.cardsModel
-      disabledIds: Settings.data.location.weatherEnabled ? [] : ["weather-card"]
+      disabledIds: (Settings.data.location.weatherEnabled ? [] : ["weather-card"]).concat(KdeConnectService.enabled ? [] : ["kdeconnect-card"])
       onItemToggled: function (index, enabled) {
         var newModel = root.cardsModel.slice();
         newModel[index] = Object.assign({}, newModel[index], {

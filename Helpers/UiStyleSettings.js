@@ -18,17 +18,20 @@ var defaults = {
     "allowPanelsOnScreenWithoutBar": true
   },
   "ui": {
-    "fontDefault": "Rubik",
+    "fontDefault": "Roboto",
     "fontFixed": "",
     "tooltipsEnabled": true,
     "scrollbarAlwaysVisible": true,
-    "boxBorderEnabled": true,
+    "boxBorderEnabled": false,
     "boxBorderWidth": 1,
     "boxBorderColor": "outline",
     "boxBorderBrightness": 0,
     "boxBorderOpacity": 100,
-    "panelBackgroundOpacity": 0.93,
+    "panelBackgroundOpacity": 1.0,
     "translucentWidgets": false,
+    "frostedGlass": true,
+    "glassPanelOpacity": 0.85,
+    "glassSurfaceOpacity": 0.7,
     "panelsAttachedToBar": true,
     "settingsPanelSideBarCardStyle": false
   }

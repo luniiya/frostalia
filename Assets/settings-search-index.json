@@ -1,14 +1,5 @@
 [
   {
-    "labelKey": "panels.about.telemetry-enabled",
-    "descriptionKey": "panels.about.telemetry-desc",
-    "widget": "NToggle",
-    "tab": 20,
-    "tabLabel": "panels.about.title",
-    "subTab": 0,
-    "subTabLabel": "common.info"
-  },
-  {
     "labelKey": "panels.audio.devices-output-device-label",
     "descriptionKey": "panels.audio.devices-output-device-description",
     "widget": "NLabel",
@@ -536,7 +527,7 @@
     "subTab": 2,
     "subTabLabel": "common.behavior",
     "visibleWhen": [
-      "Settings.data.bar.rightClickAction !== \"none\" && Settings.data.bar.rightClickAction !== \"command\" && Settings.data.bar.rightClickAction !== \"settings\""
+      "Settings.data.bar.rightClickAction !== \"contextMenu\" && Settings.data.bar.rightClickAction !== \"none\" && Settings.data.bar.rightClickAction !== \"command\" && Settings.data.bar.rightClickAction !== \"settings\""
     ]
   },
   {
@@ -655,6 +646,14 @@
   {
     "labelKey": "panels.bubbles.hide-fullscreen-label",
     "descriptionKey": "panels.bubbles.hide-fullscreen-description",
+    "widget": "NToggle",
+    "tab": 4,
+    "tabLabel": "panels.bubbles.title",
+    "subTab": null
+  },
+  {
+    "labelKey": "panels.bubbles.reserve-space-label",
+    "descriptionKey": "panels.bubbles.reserve-space-description",
     "widget": "NToggle",
     "tab": 4,
     "tabLabel": "panels.bubbles.title",
@@ -869,6 +868,27 @@
     "subTabLabel": "common.bluetooth",
     "visibleWhen": [
       "Settings.data.network.bluetoothAutoConnect"
+    ]
+  },
+  {
+    "labelKey": "panels.connections.kdeconnect-enabled-label",
+    "descriptionKey": "panels.connections.kdeconnect-enabled-description",
+    "widget": "NToggle",
+    "tab": 15,
+    "tabLabel": "panels.connections.title",
+    "subTab": 2,
+    "subTabLabel": "kdeconnect.title"
+  },
+  {
+    "labelKey": "panels.connections.kdeconnect-touchpad-sensitivity-label",
+    "descriptionKey": "panels.connections.kdeconnect-touchpad-sensitivity-description",
+    "widget": "NValueSlider",
+    "tab": 15,
+    "tabLabel": "panels.connections.title",
+    "subTab": 2,
+    "subTabLabel": "kdeconnect.title",
+    "visibleWhen": [
+      "Settings.data.kdeConnect.enabled"
     ]
   },
   {
@@ -1479,6 +1499,78 @@
     "subTabLabel": "panels.general.tab-basics"
   },
   {
+    "labelKey": "panels.hooks.system-hooks-enable-label",
+    "descriptionKey": "panels.hooks.system-hooks-enable-description",
+    "widget": "NToggle",
+    "tab": 0,
+    "tabLabel": "common.general",
+    "subTab": 3,
+    "subTabLabel": "panels.hooks.title"
+  },
+  {
+    "labelKey": "panels.hooks.info-parameters-label",
+    "descriptionKey": "panels.hooks.info-parameters-description",
+    "widget": "NLabel",
+    "tab": 0,
+    "tabLabel": "common.general",
+    "subTab": 3,
+    "subTabLabel": "panels.hooks.title"
+  },
+  {
+    "labelKey": "panels.hooks.frostalia-started-label",
+    "descriptionKey": "panels.hooks.frostalia-started-description",
+    "widget": "HookRow",
+    "tab": 0,
+    "tabLabel": "common.general",
+    "subTab": 3,
+    "subTabLabel": "panels.hooks.title"
+  },
+  {
+    "labelKey": "panels.hooks.color-generation-label",
+    "descriptionKey": "panels.hooks.color-generation-description",
+    "widget": "HookRow",
+    "tab": 0,
+    "tabLabel": "common.general",
+    "subTab": 3,
+    "subTabLabel": "panels.hooks.title"
+  },
+  {
+    "labelKey": "panels.hooks.theme-changed-label",
+    "descriptionKey": "panels.hooks.theme-changed-description",
+    "widget": "HookRow",
+    "tab": 0,
+    "tabLabel": "common.general",
+    "subTab": 3,
+    "subTabLabel": "panels.hooks.title"
+  },
+  {
+    "labelKey": "panels.hooks.performance-mode-enabled-label",
+    "descriptionKey": "panels.hooks.performance-mode-enabled-description",
+    "widget": "HookRow",
+    "tab": 0,
+    "tabLabel": "common.general",
+    "subTab": 3,
+    "subTabLabel": "panels.hooks.title"
+  },
+  {
+    "labelKey": "panels.hooks.performance-mode-disabled-label",
+    "descriptionKey": "panels.hooks.performance-mode-disabled-description",
+    "widget": "HookRow",
+    "tab": 0,
+    "tabLabel": "common.general",
+    "subTab": 3,
+    "subTabLabel": "panels.hooks.title"
+  },
+  {
+    "labelKey": "panels.hooks.session-label",
+    "descriptionKey": "panels.hooks.session-description",
+    "widget": "HookRow",
+    "tab": 0,
+    "tabLabel": "common.general",
+    "subTab": 3,
+    "subTabLabel": "panels.hooks.title"
+  },
+  {
     "labelKey": "panels.general.keybinds-title",
     "descriptionKey": "panels.general.keybinds-description",
     "widget": "NLabel",
@@ -1513,78 +1605,6 @@
     "tabLabel": "common.general",
     "subTab": 2,
     "subTabLabel": "common.screen-corners"
-  },
-  {
-    "labelKey": "panels.hooks.system-hooks-enable-label",
-    "descriptionKey": "panels.hooks.system-hooks-enable-description",
-    "widget": "NToggle",
-    "tab": 19,
-    "tabLabel": "panels.hooks.title",
-    "subTab": 0,
-    "subTabLabel": "common.general"
-  },
-  {
-    "labelKey": "panels.hooks.info-parameters-label",
-    "descriptionKey": "panels.hooks.info-parameters-description",
-    "widget": "NLabel",
-    "tab": 19,
-    "tabLabel": "panels.hooks.title",
-    "subTab": 0,
-    "subTabLabel": "common.general"
-  },
-  {
-    "labelKey": "panels.hooks.frostalia-started-label",
-    "descriptionKey": "panels.hooks.frostalia-started-description",
-    "widget": "HookRow",
-    "tab": 19,
-    "tabLabel": "panels.hooks.title",
-    "subTab": 1,
-    "subTabLabel": "panels.hooks.title"
-  },
-  {
-    "labelKey": "panels.hooks.color-generation-label",
-    "descriptionKey": "panels.hooks.color-generation-description",
-    "widget": "HookRow",
-    "tab": 19,
-    "tabLabel": "panels.hooks.title",
-    "subTab": 1,
-    "subTabLabel": "panels.hooks.title"
-  },
-  {
-    "labelKey": "panels.hooks.theme-changed-label",
-    "descriptionKey": "panels.hooks.theme-changed-description",
-    "widget": "HookRow",
-    "tab": 19,
-    "tabLabel": "panels.hooks.title",
-    "subTab": 1,
-    "subTabLabel": "panels.hooks.title"
-  },
-  {
-    "labelKey": "panels.hooks.performance-mode-enabled-label",
-    "descriptionKey": "panels.hooks.performance-mode-enabled-description",
-    "widget": "HookRow",
-    "tab": 19,
-    "tabLabel": "panels.hooks.title",
-    "subTab": 1,
-    "subTabLabel": "panels.hooks.title"
-  },
-  {
-    "labelKey": "panels.hooks.performance-mode-disabled-label",
-    "descriptionKey": "panels.hooks.performance-mode-disabled-description",
-    "widget": "HookRow",
-    "tab": 19,
-    "tabLabel": "panels.hooks.title",
-    "subTab": 1,
-    "subTabLabel": "panels.hooks.title"
-  },
-  {
-    "labelKey": "panels.hooks.session-label",
-    "descriptionKey": "panels.hooks.session-description",
-    "widget": "HookRow",
-    "tab": 19,
-    "tabLabel": "panels.hooks.title",
-    "subTab": 1,
-    "subTabLabel": "panels.hooks.title"
   },
   {
     "labelKey": "panels.idle.enable-label",
@@ -2274,15 +2294,6 @@
     "subTabLabel": "common.location"
   },
   {
-    "labelKey": "panels.location.weather-talia-mascot-always-label",
-    "descriptionKey": "panels.location.weather-talia-mascot-always-description",
-    "widget": "NToggle",
-    "tab": 16,
-    "tabLabel": "panels.region.title",
-    "subTab": 0,
-    "subTabLabel": "common.location"
-  },
-  {
     "labelKey": "panels.location.weather-hide-city-label",
     "descriptionKey": "panels.location.weather-hide-city-description",
     "widget": "NToggle",
@@ -2294,6 +2305,75 @@
   {
     "labelKey": "panels.location.weather-hide-timezone-label",
     "descriptionKey": "panels.location.weather-hide-timezone-description",
+    "widget": "NToggle",
+    "tab": 16,
+    "tabLabel": "panels.region.title",
+    "subTab": 0,
+    "subTabLabel": "common.location"
+  },
+  {
+    "labelKey": "panels.location.weather-wind-unit-label",
+    "descriptionKey": "panels.location.weather-wind-unit-description",
+    "widget": "NComboBox",
+    "tab": 16,
+    "tabLabel": "panels.region.title",
+    "subTab": 0,
+    "subTabLabel": "common.location"
+  },
+  {
+    "labelKey": "panels.location.weather-panel-title",
+    "descriptionKey": "panels.location.weather-panel-desc",
+    "widget": "NLabel",
+    "tab": 16,
+    "tabLabel": "panels.region.title",
+    "subTab": 0,
+    "subTabLabel": "common.location"
+  },
+  {
+    "labelKey": "panels.location.weather-show-hourly-label",
+    "descriptionKey": "panels.location.weather-show-hourly-description",
+    "widget": "NToggle",
+    "tab": 16,
+    "tabLabel": "panels.region.title",
+    "subTab": 0,
+    "subTabLabel": "common.location"
+  },
+  {
+    "labelKey": "panels.location.weather-hourly-count-label",
+    "descriptionKey": "panels.location.weather-hourly-count-description",
+    "widget": "NSpinBox",
+    "tab": 16,
+    "tabLabel": "panels.region.title",
+    "subTab": 0,
+    "subTabLabel": "common.location",
+    "visibleWhen": [
+      "Settings.data.location.weatherShowHourly"
+    ]
+  },
+  {
+    "labelKey": "panels.location.weather-show-daily-label",
+    "descriptionKey": "panels.location.weather-show-daily-description",
+    "widget": "NToggle",
+    "tab": 16,
+    "tabLabel": "panels.region.title",
+    "subTab": 0,
+    "subTabLabel": "common.location"
+  },
+  {
+    "labelKey": "panels.location.weather-daily-count-label",
+    "descriptionKey": "panels.location.weather-daily-count-description",
+    "widget": "NSpinBox",
+    "tab": 16,
+    "tabLabel": "panels.region.title",
+    "subTab": 0,
+    "subTabLabel": "common.location",
+    "visibleWhen": [
+      "Settings.data.location.weatherShowDaily"
+    ]
+  },
+  {
+    "labelKey": "panels.location.weather-show-details-label",
+    "descriptionKey": "panels.location.weather-show-details-description",
     "widget": "NToggle",
     "tab": 16,
     "tabLabel": "panels.region.title",
@@ -2364,45 +2444,9 @@
     ]
   },
   {
-    "labelKey": "panels.system.ai-usage-claude-label",
-    "descriptionKey": "panels.system.ai-usage-claude-description",
-    "widget": "NToggle",
-    "tab": 17,
-    "tabLabel": "panels.system.title",
-    "subTab": 3,
-    "subTabLabel": "panels.system.ai-usage-title"
-  },
-  {
-    "labelKey": "panels.system.ai-usage-codex-label",
-    "descriptionKey": "panels.system.ai-usage-codex-description",
-    "widget": "NToggle",
-    "tab": 17,
-    "tabLabel": "panels.system.title",
-    "subTab": 3,
-    "subTabLabel": "panels.system.ai-usage-title"
-  },
-  {
-    "labelKey": "panels.system.ai-usage-copilot-label",
-    "descriptionKey": "panels.system.ai-usage-copilot-description",
-    "widget": "NToggle",
-    "tab": 17,
-    "tabLabel": "panels.system.title",
-    "subTab": 3,
-    "subTabLabel": "panels.system.ai-usage-title"
-  },
-  {
-    "labelKey": "panels.system.ai-usage-gemini-label",
-    "descriptionKey": "panels.system.ai-usage-gemini-description",
-    "widget": "NToggle",
-    "tab": 17,
-    "tabLabel": "panels.system.title",
-    "subTab": 3,
-    "subTabLabel": "panels.system.ai-usage-title"
-  },
-  {
-    "labelKey": "panels.system.ai-usage-openrouter-label",
-    "descriptionKey": "panels.system.ai-usage-openrouter-description",
-    "widget": "NToggle",
+    "labelKey": "panels.system.ai-usage-providers-label",
+    "descriptionKey": "panels.system.ai-usage-providers-description",
+    "widget": "NLabel",
     "tab": 17,
     "tabLabel": "panels.system.title",
     "subTab": 3,
@@ -2419,15 +2463,6 @@
     "visibleWhen": [
       "Settings.data.modelUsage.openrouterEnabled"
     ]
-  },
-  {
-    "labelKey": "panels.system.ai-usage-zen-label",
-    "descriptionKey": "panels.system.ai-usage-zen-description",
-    "widget": "NToggle",
-    "tab": 17,
-    "tabLabel": "panels.system.title",
-    "subTab": 3,
-    "subTabLabel": "panels.system.ai-usage-title"
   },
   {
     "labelKey": "panels.system.ai-usage-zen-key-label",
@@ -2592,6 +2627,33 @@
     "labelKey": "panels.user-interface.blur-behind-label",
     "descriptionKey": "panels.user-interface.blur-behind-description",
     "widget": "NToggle",
+    "tab": 1,
+    "tabLabel": "panels.user-interface.title",
+    "subTab": 0,
+    "subTabLabel": "common.appearance"
+  },
+  {
+    "labelKey": "panels.user-interface.frosted-glass-label",
+    "descriptionKey": "panels.user-interface.frosted-glass-description",
+    "widget": "NToggle",
+    "tab": 1,
+    "tabLabel": "panels.user-interface.title",
+    "subTab": 0,
+    "subTabLabel": "common.appearance"
+  },
+  {
+    "labelKey": "panels.user-interface.glass-panel-opacity-label",
+    "descriptionKey": "panels.user-interface.glass-panel-opacity-description",
+    "widget": "NValueSlider",
+    "tab": 1,
+    "tabLabel": "panels.user-interface.title",
+    "subTab": 0,
+    "subTabLabel": "common.appearance"
+  },
+  {
+    "labelKey": "panels.user-interface.glass-surface-opacity-label",
+    "descriptionKey": "panels.user-interface.glass-surface-opacity-description",
+    "widget": "NValueSlider",
     "tab": 1,
     "tabLabel": "panels.user-interface.title",
     "subTab": 0,

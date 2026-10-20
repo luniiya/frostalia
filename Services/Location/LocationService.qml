@@ -4,6 +4,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import qs.Commons
+import "../../Helpers/WeatherData.js" as WeatherData
 
 // Location and weather service with decoupled geocoding and weather fetching.
 Singleton {
@@ -22,9 +23,15 @@ Singleton {
     return d.getMonth() === root.taliaMascotWeatherMonth && d.getDate() === root.taliaMascotWeatherDay;
   }
 
-  readonly property bool taliaWeatherMascotActive: taliaWeatherMascotDayActive || Settings.data.location.weatherTaliaMascotAlways
+  readonly property bool taliaWeatherMascotActive: taliaWeatherMascotDayActive
 
   readonly property alias data: adapter
+
+  // Normalised forecast for the weather views (see Helpers/WeatherData.js)
+  readonly property bool weatherReady: Settings.data.location.weatherEnabled && adapter.weather !== null
+  readonly property var currentWeather: WeatherData.current(adapter.weather)
+  readonly property var hourlyForecast: WeatherData.hourly(adapter.weather, 48)
+  readonly property var dailyForecast: WeatherData.daily(adapter.weather, 7)
 
   // True when the user has set a location name or enabled auto-locate
   readonly property bool locationConfigured: Settings.data.location.name !== "" || Settings.data.location.autoLocate
@@ -62,6 +69,7 @@ Singleton {
       property string name: ""
       property int weatherLastFetch: 0
       property var weather: null
+      property var airQuality: null
     }
   }
 
@@ -120,6 +128,7 @@ Singleton {
     adapter.name = "";
     adapter.weatherLastFetch = 0;
     adapter.weather = null;
+    adapter.airQuality = null;
     isFetchingWeather = false;
     update();
   }
@@ -186,7 +195,8 @@ Singleton {
       Logger.w("Location", "Cannot fetch weather without coordinates");
       return;
     }
-    const needsWeatherUpdate = (adapter.weatherLastFetch === "") || (adapter.weather === null) || (Time.timestamp >= adapter.weatherLastFetch + weatherUpdateFrequency);
+    // Caches from before the hourly forecast are refreshed right away
+    const needsWeatherUpdate = (adapter.weatherLastFetch === "") || (adapter.weather === null) || !adapter.weather.hourly || (Time.timestamp >= adapter.weatherLastFetch + weatherUpdateFrequency);
 
     if (needsWeatherUpdate) {
       isFetchingWeather = true;
@@ -229,7 +239,7 @@ Singleton {
   // Fetch weather data from Open-Meteo API
   function fetchWeatherData(latitude, longitude, errorCallback) {
     Logger.d("Location", "Fetching weather from api.open-meteo.com");
-    var url = "https://api.open-meteo.com/v1/forecast?latitude=" + latitude + "&longitude=" + longitude + "&current_weather=true&current=relativehumidity_2m,surface_pressure,is_day&daily=temperature_2m_max,temperature_2m_min,weathercode,sunset,sunrise&timezone=auto";
+    var url = WeatherData.forecastUrl(latitude, longitude);
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function () {
       if (xhr.readyState === XMLHttpRequest.DONE) {
@@ -249,6 +259,7 @@ Singleton {
 
             isFetchingWeather = false;
             Logger.d("Location", "Cached weather to disk - stable coordinates updated");
+            fetchAirQuality(latitude, longitude);
           } catch (e) {
             errorCallback("Location", "Failed to parse weather data");
           }
@@ -258,6 +269,26 @@ Singleton {
       }
     };
     xhr.open("GET", url);
+    xhr.send();
+  }
+
+  // Air quality is optional: a failure keeps the last value
+  function fetchAirQuality(latitude, longitude) {
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState !== XMLHttpRequest.DONE)
+        return;
+      if (xhr.status !== 200) {
+        Logger.w("Location", `Air quality error: ${xhr.status}`);
+        return;
+      }
+      try {
+        data.airQuality = WeatherData.airQuality(JSON.parse(xhr.responseText));
+      } catch (e) {
+        Logger.w("Location", "Failed to parse air quality data");
+      }
+    };
+    xhr.open("GET", WeatherData.airQualityUrl(latitude, longitude));
     xhr.send();
   }
 
@@ -325,29 +356,10 @@ Singleton {
   }
 
   // --------------------------------
-  function weatherSymbolFromCode(code) {
-    var isDay = data.weather ? data.weather.current_weather.is_day : true;
-    if (code === 0)
-      return isDay ? "weather-sun" : "weather-moon";
-    if (code === 1 || code === 2)
-      return isDay ? "weather-cloud-sun" : "weather-moon-stars";
-    if (code === 3)
-      return "weather-cloud";
-    if (code >= 45 && code <= 48)
-      return "weather-cloud-haze";
-    if (code >= 51 && code <= 67)
-      return "weather-cloud-rain";
-    if (code >= 80 && code <= 82)
-      return "weather-cloud-rain";
-    if (code >= 71 && code <= 77)
-      return "weather-cloud-snow";
-    if (code >= 71 && code <= 77)
-      return "weather-cloud-snow";
-    if (code >= 85 && code <= 86)
-      return "weather-cloud-snow";
-    if (code >= 95 && code <= 99)
-      return "weather-cloud-lightning";
-    return "weather-cloud";
+  function weatherSymbolFromCode(code, isDay) {
+    if (isDay === undefined)
+      isDay = data.weather ? !!data.weather.current_weather.is_day : true;
+    return WeatherData.symbol(code, isDay);
   }
 
   // --------------------------------

@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import qs.Commons
 import qs.Services.Location
 import qs.Widgets
+import "../../../../../Helpers/WeatherData.js" as WeatherData
 
 ColumnLayout {
   id: root
@@ -130,15 +131,6 @@ ColumnLayout {
     }
 
     NToggle {
-      label: I18n.tr("panels.location.weather-talia-mascot-always-label")
-      description: I18n.tr("panels.location.weather-talia-mascot-always-description")
-      checked: Settings.data.location.weatherTaliaMascotAlways
-      onToggled: checked => Settings.data.location.weatherTaliaMascotAlways = checked
-      enabled: Settings.data.location.weatherEnabled
-      defaultValue: Settings.getDefaultValue("location.weatherTaliaMascotAlways")
-    }
-
-    NToggle {
       label: I18n.tr("panels.location.weather-hide-city-label")
       description: I18n.tr("panels.location.weather-hide-city-description")
       checked: Settings.data.location.hideWeatherCityName
@@ -152,6 +144,98 @@ ColumnLayout {
       checked: Settings.data.location.hideWeatherTimezone
       onToggled: checked => Settings.data.location.hideWeatherTimezone = checked
       enabled: Settings.data.location.weatherEnabled
+    }
+
+    NComboBox {
+      Layout.fillWidth: true
+      label: I18n.tr("panels.location.weather-wind-unit-label")
+      description: I18n.tr("panels.location.weather-wind-unit-description")
+      enabled: Settings.data.location.weatherEnabled
+      minimumWidth: 160 * Style.uiScaleRatio
+      model: WeatherData.windUnits.map(unit => ({
+                                                  "key": unit,
+                                                  "name": WeatherData.windUnitLabel(unit)
+                                                }))
+      currentKey: Settings.data.location.windSpeedUnit
+      onSelected: key => Settings.data.location.windSpeedUnit = key
+      defaultValue: Settings.getDefaultValue("location.windSpeedUnit")
+    }
+  }
+
+  NDivider {
+    Layout.fillWidth: true
+  }
+
+  // What the weather panel shows
+  ColumnLayout {
+    spacing: Style.marginL
+    Layout.fillWidth: true
+    enabled: Settings.data.location.weatherEnabled
+
+    NLabel {
+      label: I18n.tr("panels.location.weather-panel-title")
+      description: I18n.tr("panels.location.weather-panel-desc")
+    }
+
+    NToggle {
+      label: I18n.tr("panels.location.weather-show-hourly-label")
+      description: I18n.tr("panels.location.weather-show-hourly-description")
+      checked: Settings.data.location.weatherShowHourly
+      onToggled: checked => Settings.data.location.weatherShowHourly = checked
+      defaultValue: Settings.getDefaultValue("location.weatherShowHourly")
+    }
+
+    NSpinBox {
+      Layout.fillWidth: true
+      visible: Settings.data.location.weatherShowHourly
+      label: I18n.tr("panels.location.weather-hourly-count-label")
+      description: I18n.tr("panels.location.weather-hourly-count-description")
+      from: 6
+      to: 48
+      stepSize: 6
+      value: Settings.data.location.weatherHourlyCount
+      onValueChanged: Settings.data.location.weatherHourlyCount = value
+      defaultValue: Settings.getDefaultValue("location.weatherHourlyCount")
+    }
+
+    NToggle {
+      label: I18n.tr("panels.location.weather-show-daily-label")
+      description: I18n.tr("panels.location.weather-show-daily-description")
+      checked: Settings.data.location.weatherShowDaily
+      onToggled: checked => Settings.data.location.weatherShowDaily = checked
+      defaultValue: Settings.getDefaultValue("location.weatherShowDaily")
+    }
+
+    NSpinBox {
+      Layout.fillWidth: true
+      visible: Settings.data.location.weatherShowDaily
+      label: I18n.tr("panels.location.weather-daily-count-label")
+      description: I18n.tr("panels.location.weather-daily-count-description")
+      from: 3
+      to: 7
+      value: Settings.data.location.weatherDailyCount
+      onValueChanged: Settings.data.location.weatherDailyCount = value
+      defaultValue: Settings.getDefaultValue("location.weatherDailyCount")
+    }
+
+    NToggle {
+      label: I18n.tr("panels.location.weather-show-details-label")
+      description: I18n.tr("panels.location.weather-show-details-description")
+      checked: Settings.data.location.weatherShowDetails
+      onToggled: checked => Settings.data.location.weatherShowDetails = checked
+      defaultValue: Settings.getDefaultValue("location.weatherShowDetails")
+    }
+
+    NReorderCheckboxes {
+      Layout.fillWidth: true
+      visible: Settings.data.location.weatherShowDetails
+      model: WeatherData.detailEntries(Settings.data.location.weatherDetails).map(entry => ({
+                                                                                            "id": entry.id,
+                                                                                            "text": I18n.tr("weather.details." + entry.id),
+                                                                                            "enabled": entry.enabled
+                                                                                          }))
+      onItemToggled: (index, enabled) => Settings.data.location.weatherDetails = WeatherData.toggledDetail(Settings.data.location.weatherDetails, index, enabled)
+      onItemsReordered: (fromIndex, toIndex) => Settings.data.location.weatherDetails = WeatherData.movedDetail(Settings.data.location.weatherDetails, fromIndex, toIndex)
     }
   }
 }

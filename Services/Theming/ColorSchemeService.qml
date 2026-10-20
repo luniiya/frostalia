@@ -4,6 +4,7 @@ import Qt.labs.folderlistmodel
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "../../Helpers/ColorSchemeNames.js" as ColorSchemeNames
 import qs.Commons
 import qs.Services.Theming
 import qs.Services.UI
@@ -75,17 +76,7 @@ Singleton {
     // Get the filename without extension
     var filename = chunks[chunks.length - 1];
     var schemeName = filename.replace(".json", "");
-    // Convert back to display names for special cases
-    if (schemeName === "Frostalia-default") {
-      return "Frostalia (default)";
-    } else if (schemeName === "Frostalia-legacy") {
-      return "Frostalia (legacy)";
-    } else if (schemeName === "Tokyo-Night") {
-      return "Tokyo Night";
-    } else if (schemeName === "Rosepine") {
-      return "Rose Pine";
-    }
-    return schemeName;
+    return ColorSchemeNames.displayName(schemeName);
   }
 
   function resolveSchemePath(nameOrPath) {
@@ -94,17 +85,7 @@ Singleton {
     if (nameOrPath.indexOf("/") !== -1) {
       return nameOrPath;
     }
-    // Handle special cases for Frostalia schemes
-    var schemeName = nameOrPath.replace(".json", "");
-    if (schemeName === "Frostalia (default)") {
-      schemeName = "Frostalia-default";
-    } else if (schemeName === "Frostalia (legacy)") {
-      schemeName = "Frostalia-legacy";
-    } else if (schemeName === "Tokyo Night") {
-      schemeName = "Tokyo-Night";
-    } else if (schemeName === "Rose Pine") {
-      schemeName = "Rosepine";
-    }
+    var schemeName = ColorSchemeNames.folderName(nameOrPath.replace(".json", ""));
     // Check preinstalled directory first, then downloaded directory
     var preinstalledPath = schemesDirectory + "/" + schemeName + "/" + schemeName + ".json";
     var downloadedPath = downloadedSchemesDirectory + "/" + schemeName + "/" + schemeName + ".json";

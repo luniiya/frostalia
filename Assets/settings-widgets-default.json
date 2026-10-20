@@ -19,7 +19,6 @@
       "displayMode": "graphic-clean",
       "deviceNativePath": "__default__",
       "showPowerProfiles": false,
-      "showFrostaliaPerformance": false,
       "hideIfNotDetected": true,
       "hideIfIdle": false
     },
@@ -86,6 +85,13 @@
     },
     "DarkMode": {
       "iconColor": "none"
+    },
+    "KdeConnect": {
+      "displayMode": "alwaysShow",
+      "hideWhenOffline": true,
+      "showUnread": false,
+      "iconColor": "none",
+      "textColor": "none"
     },
     "KeepAwake": {
       "iconColor": "none",
@@ -206,9 +212,6 @@
     "NightLight": {
       "iconColor": "none"
     },
-    "FrostaliaPerformance": {
-      "iconColor": "none"
-    },
     "PowerProfile": {
       "iconColor": "none"
     },
@@ -271,8 +274,23 @@
       "showVisualizer": true
     },
     "Weather": {
+      "view": "current",
       "showBackground": true,
-      "roundedCorners": true
+      "roundedCorners": true,
+      "animatedSky": false,
+      "showCondition": true,
+      "showHighLow": true,
+      "showFeelsLike": true,
+      "forecastDays": 0,
+      "hours": 12,
+      "days": 7,
+      "compact": false,
+      "showPrecipitation": true
+    },
+    "WeatherDetails": {
+      "showBackground": true,
+      "roundedCorners": true,
+      "detail": "wind"
     },
     "SystemStat": {
       "showBackground": true,

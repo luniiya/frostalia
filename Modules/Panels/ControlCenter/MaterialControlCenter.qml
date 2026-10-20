@@ -5,6 +5,8 @@ import "../../../Helpers/ControlCenterLayout.js" as ControlCenterLayout
 import qs.Commons
 import qs.Modules.Cards
 import qs.Services.Media
+import qs.Services.Networking
+import qs.Services.UI
 import qs.Widgets
 
 Item {
@@ -13,7 +15,7 @@ Item {
   implicitWidth: Math.round(440 * Style.uiScaleRatio)
   implicitHeight: Math.min(content.implicitHeight + Style.margin2S, Math.round(980 * Style.uiScaleRatio))
   readonly property var shortcutRows: ControlCenterLayout.shortcutRows(Settings.data.controlCenter.shortcuts.left, Settings.data.controlCenter.shortcuts.right)
-  readonly property var cards: ControlCenterLayout.visibleCards(Settings.data.controlCenter.cards, Settings.data.location.weatherEnabled, shortcutRows.length > 0)
+  readonly property var cards: ControlCenterLayout.visibleCards(Settings.data.controlCenter.cards, Settings.data.location.weatherEnabled, shortcutRows.length > 0, KdeConnectService.enabled)
 
   ScrollView {
     anchors.fill: parent
@@ -21,7 +23,9 @@ Item {
     clip: true
     contentWidth: availableWidth
     ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
-    ScrollBar.vertical.policy: ScrollBar.AsNeeded
+    ScrollBar.vertical: NScrollBar {
+      policy: ScrollBar.AsNeeded
+    }
     ColumnLayout {
       id: content
       width: parent.width
@@ -50,6 +54,8 @@ Item {
               return calendarCard;
             case "weather-card":
               return weatherCard;
+            case "kdeconnect-card":
+              return kdeConnectCard;
             default:
               return null;
             }
@@ -139,7 +145,7 @@ Item {
   }
   Component {
     id: notificationCard
-    MaterialNotificationFeed {}
+    NotificationFeed {}
   }
   Component {
     id: calendarCard
@@ -148,5 +154,13 @@ Item {
   Component {
     id: weatherCard
     WeatherCard {}
+  }
+  Component {
+    id: kdeConnectCard
+    KdeConnectPill {
+      id: pill
+      showChevron: false
+      onClicked: PanelService.getPanel("kdeConnectPanel", root.screen)?.toggle(pill)
+    }
   }
 }

@@ -17,7 +17,16 @@ FloatingWindow {
   implicitWidth: windowMetrics.width
   implicitHeight: windowMetrics.height
   // Paint the window surface itself, so the compositor's corner rounding is the only one
-  color: Qt.alpha(ShellColors.mSurface, Settings.data.ui.panelBackgroundOpacity)
+  color: Qt.alpha(ShellColors.mSurface, Style.panelOpacity)
+
+  // Ask the compositor to blur behind the whole window; without a region it
+  // shows the translucent background unblurred.
+  BackgroundEffect.blurRegion: Settings.data.general.enableBlurBehind ? windowBlurRegion : null
+  Region {
+    id: windowBlurRegion
+    width: root.width
+    height: root.height
+  }
 
   visible: false
 
@@ -85,7 +94,7 @@ FloatingWindow {
   Shortcut {
     sequence: "Escape"
     enabled: !PanelService.isKeybindRecording
-    onActivated: SettingsPanelService.closeWindow()
+    onActivated: settingsContent.handleEscape()
   }
 
   Shortcut {

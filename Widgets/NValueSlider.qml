@@ -90,7 +90,7 @@ RowLayout {
         visible: root.text !== ""
         text: root.text
         pointSize: root.textSize
-        family: Settings.data.ui.fontFixed
+        family: Style.fontFixed
         opacity: root.enabled ? 1.0 : 0.6
         Layout.alignment: Qt.AlignVCenter
         Layout.preferredWidth: 45 * Style.uiScaleRatio

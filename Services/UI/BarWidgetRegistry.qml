@@ -21,6 +21,7 @@ Singleton {
                            "ControlCenter": controlCenterComponent,
                            "CustomButton": customButtonComponent,
                            "DarkMode": darkModeComponent,
+                           "KdeConnect": kdeConnectComponent,
                            "KeepAwake": keepAwakeComponent,
                            "KeyboardLayout": keyboardLayoutComponent,
                            "LockKeys": lockKeysComponent,
@@ -30,7 +31,6 @@ Singleton {
                            "ModelUsage": modelUsageComponent,
                            "Network": networkComponent,
                            "NightLight": nightLightComponent,
-                           "FrostaliaPerformance": frostaliaPerformanceComponent,
                            "NotificationHistory": notificationHistoryComponent,
                            "PowerProfile": powerProfileComponent,
                            "SessionMenu": sessionMenuComponent,
@@ -55,6 +55,7 @@ Singleton {
                                      "ControlCenter": "WidgetSettings/ControlCenterSettings.qml",
                                      "CustomButton": "WidgetSettings/CustomButtonSettings.qml",
                                      "DarkMode": "WidgetSettings/DarkModeSettings.qml",
+                                     "KdeConnect": "WidgetSettings/KdeConnectSettings.qml",
                                      "KeepAwake": "WidgetSettings/KeepAwakeSettings.qml",
                                      "KeyboardLayout": "WidgetSettings/KeyboardLayoutSettings.qml",
                                      "Launcher": "WidgetSettings/LauncherSettings.qml",
@@ -64,7 +65,6 @@ Singleton {
                                      "ModelUsage": "WidgetSettings/ModelUsageSettings.qml",
                                      "Network": "WidgetSettings/NetworkSettings.qml",
                                      "NightLight": "WidgetSettings/NightLightSettings.qml",
-                                     "FrostaliaPerformance": "WidgetSettings/FrostaliaPerformanceSettings.qml",
                                      "NotificationHistory": "WidgetSettings/NotificationHistorySettings.qml",
                                      "PowerProfile": "WidgetSettings/PowerProfileSettings.qml",
                                      "SessionMenu": "WidgetSettings/SessionMenuSettings.qml",
@@ -99,7 +99,6 @@ Singleton {
                                     "displayMode": "graphic-clean",
                                     "deviceNativePath": "__default__",
                                     "showPowerProfiles": false,
-                                    "showFrostaliaPerformance": false,
                                     "hideIfNotDetected": true,
                                     "hideIfIdle": false
                                   },
@@ -290,10 +289,14 @@ Singleton {
                                     "iconColor": "none",
                                     "textColor": "none"
                                   },
-                                  "NightLight": {
-                                    "iconColor": "none"
+                                  "KdeConnect": {
+                                    "displayMode": "alwaysShow",
+                                    "hideWhenOffline": true,
+                                    "showUnread": false,
+                                    "iconColor": "none",
+                                    "textColor": "none"
                                   },
-                                  "FrostaliaPerformance": {
+                                  "NightLight": {
                                     "iconColor": "none"
                                   },
                                   "PowerProfile": {
@@ -357,6 +360,9 @@ Singleton {
   property Component darkModeComponent: Component {
     DarkMode {}
   }
+  property Component kdeConnectComponent: Component {
+    KdeConnect {}
+  }
   property Component keyboardLayoutComponent: Component {
     KeyboardLayout {}
   }
@@ -377,9 +383,6 @@ Singleton {
   }
   property Component nightLightComponent: Component {
     NightLight {}
-  }
-  property Component frostaliaPerformanceComponent: Component {
-    FrostaliaPerformance {}
   }
   property Component notificationHistoryComponent: Component {
     NotificationHistory {}

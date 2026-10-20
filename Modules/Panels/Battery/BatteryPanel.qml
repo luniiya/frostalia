@@ -30,7 +30,6 @@ SmartPanel {
     readonly property bool profilesAvailable: PowerProfileService.available
     property int profileIndex: profileToIndex(PowerProfileService.profile)
     readonly property bool showPowerProfiles: panelID ? panelID.showPowerProfiles : resolveWidgetSetting("showPowerProfiles", false)
-    readonly property bool showFrostaliaPerformance: panelID ? panelID.showFrostaliaPerformance : resolveWidgetSetting("showFrostaliaPerformance", false)
     readonly property bool isLowBattery: BatteryService.isLowBattery
     readonly property bool isCriticalBattery: BatteryService.isCriticalBattery
     readonly property var primaryDevice: BatteryService.primaryDevice
@@ -293,7 +292,7 @@ SmartPanel {
       NBox {
         Layout.fillWidth: true
         height: controlsLayout.implicitHeight + Style.margin2L
-        visible: showPowerProfiles || showFrostaliaPerformance
+        visible: showPowerProfiles
 
         ColumnLayout {
           id: controlsLayout
@@ -362,36 +361,6 @@ SmartPanel {
                 pointSize: Style.fontSizeS
                 color: PowerProfileService.getIcon() === "performance" ? ShellColors.mPrimary : ShellColors.mOnSurfaceVariant
               }
-            }
-          }
-
-          NDivider {
-            Layout.fillWidth: true
-            visible: showPowerProfiles && PowerProfileService.available && showFrostaliaPerformance
-          }
-
-          RowLayout {
-            Layout.fillWidth: true
-            spacing: Style.marginS
-            visible: showFrostaliaPerformance
-
-            NText {
-              text: I18n.tr("toast.frostalia-performance.label")
-              pointSize: Style.fontSizeM
-              font.weight: Style.fontWeightBold
-              color: ShellColors.mOnSurface
-              Layout.fillWidth: true
-            }
-
-            NIcon {
-              icon: PowerProfileService.frostaliaPerformanceMode ? "rocket" : "rocket-off"
-              pointSize: Style.fontSizeL
-              color: PowerProfileService.frostaliaPerformanceMode ? ShellColors.mPrimary : ShellColors.mOnSurfaceVariant
-            }
-
-            NToggle {
-              checked: PowerProfileService.frostaliaPerformanceMode
-              onToggled: checked => PowerProfileService.frostaliaPerformanceMode = checked
             }
           }
         }

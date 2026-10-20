@@ -283,6 +283,28 @@ class WallpaperTests(unittest.TestCase):
         self.assertEqual(users, {"shell.qml", "Services/Theming/AppThemeService.qml"})
 
 
+class PerformanceModeTests(unittest.TestCase):
+    """Performance mode follows the Performance power profile and has no toggle of its own."""
+
+    def test_no_performance_toggle_left(self):
+        pattern = re.compile(r"FrostaliaPerformance\b|toggleFrostaliaPerformance|setFrostaliaPerformance|frostaliaPerformanceMode\s*=")
+        for path in qml_files():
+            if path.parent.name == "Migrations":
+                continue
+            with self.subTest(path=str(path.relative_to(ROOT))):
+                self.assertIsNone(pattern.search(path.read_text(encoding="utf-8")))
+        for name in ("settings-default.json", "settings-widgets-default.json"):
+            self.assertNotIn("FrostaliaPerformance", (ROOT / "Assets" / name).read_text(encoding="utf-8"))
+
+
+class TooltipTests(unittest.TestCase):
+    def test_no_unstyled_qt_tooltips(self):
+        # Qt's attached ToolTip ignores the theme; it showed as a white box on control center tiles.
+        for path in qml_files():
+            with self.subTest(path=str(path.relative_to(ROOT))):
+                self.assertNotRegex(path.read_text(encoding="utf-8"), r"\bToolTip\.(visible|text)\s*:")
+
+
 class ShellNameTests(unittest.TestCase):
     def test_shell_name(self):
         settings = (ROOT / "Commons" / "Settings.qml").read_text(encoding="utf-8")

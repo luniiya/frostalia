@@ -19,6 +19,7 @@ import qs.Modules.Panels.Brightness
 import qs.Modules.Panels.Clock
 import qs.Modules.Panels.ControlCenter
 import qs.Modules.Panels.Dock
+import qs.Modules.Panels.KdeConnect
 import qs.Modules.Panels.Launcher
 import qs.Modules.Panels.Media
 import qs.Modules.Panels.ModelUsage
@@ -324,6 +325,12 @@ PanelWindow {
     BrightnessPanel {
       id: brightnessPanel
       objectName: "brightnessPanel-" + (root.screen?.name || "unknown")
+      screen: root.screen
+    }
+
+    KdeConnectPanel {
+      id: kdeConnectPanel
+      objectName: "kdeConnectPanel-" + (root.screen?.name || "unknown")
       screen: root.screen
     }
 

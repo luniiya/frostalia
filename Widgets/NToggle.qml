@@ -77,14 +77,6 @@ RowLayout {
       anchors.verticalCenterOffset: 0
       x: root.geometry.x
 
-      NIcon {
-        anchors.centerIn: parent
-        visible: Style.materialControls && root.checked
-        icon: "check"
-        pointSize: parent.width * 0.55 / Style.uiScaleRatio
-        color: ShellColors.mPrimary
-      }
-
       Behavior on implicitWidth {
         enabled: Style.materialControls
         NumberAnimation {

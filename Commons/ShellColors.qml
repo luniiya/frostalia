@@ -81,6 +81,10 @@ Singleton {
   property color mHover: defaultColors.mHover
   property color mOnHover: defaultColors.mOnHover
 
+  // Material filled containers: a tint over whatever is behind them, so they
+  // stay visible on surface and surface-variant backgrounds alike.
+  readonly property color mTonalContainer: Qt.alpha(mOnSurface, 0.08)
+
   // --- Color transition animations ---
   Behavior on mPrimary {
     enabled: !root.skipTransition
@@ -360,10 +364,11 @@ Singleton {
     if (PowerProfileService.frostaliaPerformanceMode)
       return baseColor;
 
-    if (!Settings.data.ui.translucentWidgets)
+    const glass = Style.glass;
+    if (!Settings.data.ui.translucentWidgets && !glass)
       return baseColor;
 
-    let alpha = Math.max(adaptiveOpacity(Settings.data.ui.panelBackgroundOpacity), minAlpha);
+    let alpha = glass ? adaptiveOpacity(glass.surfaceOpacity) : Math.max(adaptiveOpacity(Settings.data.ui.panelBackgroundOpacity), minAlpha);
 
     // Combine with the base color's existing alpha
     let resultAlpha = Math.max(0, baseColor.a - (1.0 - alpha));
@@ -394,33 +399,33 @@ Singleton {
   ]
 
   // --------------------------------
-  // Default colors: Frostalia (default) dark — must match Assets/ColorScheme/Frostalia-default
+  // Default colors: Eldritch dark — must match Assets/ColorScheme/Eldritch
   QtObject {
     id: defaultColors
 
-    readonly property color mPrimary: "#fff59b"
-    readonly property color mOnPrimary: "#0e0e43"
+    readonly property color mPrimary: "#37f499"
+    readonly property color mOnPrimary: "#171928"
 
-    readonly property color mSecondary: "#a9aefe"
-    readonly property color mOnSecondary: "#0e0e43"
+    readonly property color mSecondary: "#04d1f9"
+    readonly property color mOnSecondary: "#171928"
 
-    readonly property color mTertiary: "#9BFECE"
-    readonly property color mOnTertiary: "#0e0e43"
+    readonly property color mTertiary: "#a48cf2"
+    readonly property color mOnTertiary: "#171928"
 
-    readonly property color mError: "#FD4663"
-    readonly property color mOnError: "#0e0e43"
+    readonly property color mError: "#f16c75"
+    readonly property color mOnError: "#171928"
 
-    readonly property color mSurface: "#070722"
-    readonly property color mOnSurface: "#f3edf7"
+    readonly property color mSurface: "#212337"
+    readonly property color mOnSurface: "#ebfafa"
 
-    readonly property color mSurfaceVariant: "#11112d"
-    readonly property color mOnSurfaceVariant: "#7c80b4"
+    readonly property color mSurfaceVariant: "#292e42"
+    readonly property color mOnSurfaceVariant: "#ABB4DA"
 
-    readonly property color mOutline: "#21215F"
-    readonly property color mShadow: "#070722"
+    readonly property color mOutline: "#3b4261"
+    readonly property color mShadow: "#414868"
 
-    readonly property color mHover: "#9BFECE"
-    readonly property color mOnHover: "#0e0e43"
+    readonly property color mHover: "#a48cf2"
+    readonly property color mOnHover: "#171928"
   }
 
   // ----------------------------------------------------------------

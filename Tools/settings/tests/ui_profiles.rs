@@ -173,12 +173,13 @@ fn manual_profile_edits_and_removed_keys_resolve_against_style_defaults() {
 }
 
 #[test]
-fn legacy_json_seed_is_preserved_and_unknown_style_uses_safe_fallback() {
+fn toml_seed_is_preserved_and_unknown_style_uses_safe_fallback() {
     let dir = tempdir().unwrap();
     let host = dir.path().join("moon.toml");
-    let seed = dir.path().join("moon.json");
-    let data = json!({"ui":{"style":"../../escape","fontDefault":"Seed Font"},"general":{"radiusRatio":0.2}});
-    fs::write(&seed, data.to_string()).unwrap();
+    let seed = dir.path().join("seed.toml");
+    let data =
+        "[ui]\nstyle = '../../escape'\nfontDefault = 'Seed Font'\n[general]\nradiusRatio = 0.2\n";
+    fs::write(&seed, data).unwrap();
     let response = load(
         &host,
         &[seed.clone()],
@@ -236,4 +237,19 @@ fn malformed_profile_schema_is_rejected_without_panicking_or_creating_files() {
         .insert("material".into(), json!({"ui": 123}));
     assert!(load(&host, &[], input).is_err());
     assert!(!host.exists());
+}
+
+#[test]
+fn export_includes_active_style_values_without_creating_profile_files() {
+    let dir = tempdir().unwrap();
+    let path = dir.path().join("export.toml");
+    let mut active = defaults();
+    active["ui"]["style"] = json!("material");
+    active["ui"]["fontDefault"] = json!("My Font");
+    active["general"]["radiusRatio"] = json!(0.4);
+    let result =
+        frostalia_settings::export(&path, request(dir.path(), active.clone(), None)).unwrap();
+    assert_eq!(result.settings, active);
+    assert!(fs::read_to_string(&path).unwrap().contains("My Font"));
+    assert!(!dir.path().join("UI").exists());
 }

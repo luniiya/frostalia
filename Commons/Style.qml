@@ -5,6 +5,7 @@ import Quickshell
 import "../Helpers/BubbleLogic.js" as BubbleLogic
 import "../Helpers/NotchGeometry.js" as NotchGeometry
 import "../Helpers/OutlineStyle.js" as OutlineStyle
+import "../Helpers/ScreenCorners.js" as ScreenCorners
 import "../Helpers/UiStyles.js" as UiStyles
 import qs.Services.Power
 
@@ -35,6 +36,18 @@ Singleton {
 
   function getSliderGeometry(heightRatio) {
     return UiStyles.sliderGeometry(uiStyleId, baseWidgetSize, heightRatio, uiScaleRatio);
+  }
+
+  function getFieldShape(focused, cornerRadius) {
+    return UiStyles.fieldShape(uiStyleId, focused, cornerRadius);
+  }
+
+  function getExpandableShape(expanded) {
+    return UiStyles.expandableShape(uiStyleId, expanded);
+  }
+
+  function getButtonGroupRadii(height, checked, isFirst, isLast) {
+    return UiStyles.buttonGroupRadii(uiStyleId, height, checked, isFirst, isLast);
   }
 
   function getToggleGeometry(baseSize, checked, pressed) {
@@ -77,7 +90,7 @@ Singleton {
   readonly property int iRadiusM: Math.round(uiStyleTokens.inputRadii.M * Settings.data.general.iRadiusRatio)
   readonly property int iRadiusL: Math.round(uiStyleTokens.inputRadii.L * Settings.data.general.iRadiusRatio)
 
-  readonly property int screenRadius: Math.round(uiStyleTokens.screenRadius * Settings.data.general.screenRadiusRatio)
+  readonly property int screenRadius: ScreenCorners.radius(Settings.data.general.screenRadiusRatio)
 
   // Border
   readonly property int borderS: Math.max(1, Math.round(uiStyleTokens.borders.S * uiScaleRatio))
@@ -110,7 +123,13 @@ Singleton {
   readonly property real opacityAlmost: 0.95
   readonly property real opacityFull: 1.0
 
-  readonly property real effectivePanelOpacity: PowerProfileService.frostaliaPerformanceMode ? 1.0 : ShellColors.adaptiveOpacity(Settings.data.ui.panelBackgroundOpacity)
+  // Material frosted glass replaces the configured panel opacity with its own
+  readonly property var glass: UiStyles.glass(uiStyleId, Settings.data.ui.frostedGlass && !PowerProfileService.frostaliaPerformanceMode, {
+                                                "panelOpacity": Settings.data.ui.glassPanelOpacity,
+                                                "surfaceOpacity": Settings.data.ui.glassSurfaceOpacity
+                                              })
+  readonly property real panelOpacity: UiStyles.panelOpacity(uiStyleId, Settings.data.ui.panelBackgroundOpacity, glass !== null, glass)
+  readonly property real effectivePanelOpacity: PowerProfileService.frostaliaPerformanceMode ? 1.0 : ShellColors.adaptiveOpacity(panelOpacity)
   readonly property real effectiveBarOpacity: PowerProfileService.frostaliaPerformanceMode ? 1.0 : Settings.data.bar.backgroundOpacity
 
   // Shadows

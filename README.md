@@ -29,7 +29,7 @@ The shell config is `frostalia`, user data lives in `~/.config/frostalia`, cache
 
 - A Wayland compositor. Hyprland is my daily setup. Niri, Sway, Scroll, Labwc and MangoWC integrations are inherited and may need work.
 - [noctalia-qs](https://github.com/noctalia-dev/noctalia-qs), the Quickshell build used by this shell. Its dependency name stays unchanged.
-- Rust and Cargo to build the settings and theming helpers during installation. Nix builds and supplies them automatically. The shell itself remains QML and JavaScript.
+- Rust and Cargo to build the settings, theming and KDE Connect helpers during installation. Nix builds and supplies them automatically. The shell itself remains QML and JavaScript.
 - Python 3 for theme generation and template rendering, plus optional calendar integration. Rust handles wallpaper pixel extraction, color quantization and palette generation.
 - Feature-specific tools such as `brightnessctl`, `ddcutil`, `wl-clipboard`, `cliphist`, `wlsunset` and ImageMagick. The Nix package supplies its runtime dependencies; see [nix/package.nix](nix/package.nix).
 
@@ -71,7 +71,7 @@ Frostalia migrates saved performance widget IDs, Battery widget toggles, the per
 
 ## Configuration
 
-Settings are stored in `~/.config/frostalia/settings/<hostname>.toml`. On first launch, Frostalia creates the host file automatically from `defaults.toml` when present, or from the defaults. Existing per-host JSON and legacy `settings.json` files migrate to TOML automatically; the original JSON files remain untouched. Each host keeps its own file for host settings, including interface and font scaling. Appearance preferences and font families are shared per UI style in `settings/UI/<style>.toml`; the selected style stays in the host file. On migration, existing appearance values move into the active style’s file, while other styles start from their own defaults. `defaults.toml` is only a starting configuration for new hosts; edit `settings/<hostname>.toml` to change an existing machine.
+Settings use TOML only. A new host is seeded once from `defaults.toml`, otherwise from built-in defaults. Each host keeps its own `settings/<hostname>.toml` for host settings and scaling. Appearance preferences are shared per style in `settings/UI/<style>.toml`. Use **Export settings** in General to save the complete active configuration, including the current style’s appearance, as a standalone TOML file. JSON settings files and seeds are not supported.
 
 ```toml
 [bar]
@@ -122,7 +122,7 @@ The inherited modules discourage running the shell as a systemd service; launchi
 
 ## Privacy
 
-Frostalia has no default telemetry endpoint and sends no telemetry unless you configure `FROSTALIA_TELEMETRY_ENDPOINT` and explicitly enable the setting. The inherited upstream changelog popup has been removed; Frostalia does not show Noctalia release notes. The supporter service is disabled by default. Release checks and contributor links point to this repository.
+Frostalia does not collect or send telemetry. The inherited changelog popup and upstream donation actions have been removed. Release checks and contributor links point to this repository.
 
 Some optional integrations still use upstream services: the Noctalia plugin and color scheme registries, location search/IP geolocation, and the Noctalia VS Code theme extension. Weather and other online features also contact their respective providers. These are external dependencies, not Frostalia-hosted services. The About page retains an explicitly labeled link to support upstream Noctalia.
 
@@ -133,7 +133,7 @@ Scripts/dev/run-tests.sh             # Rust helper tests, headless QML tests and
 python3 Scripts/dev/build-settings-search-index.py
 ```
 
-Tests require Rust/Cargo, Qt 6's `qmltestrunner` (on Arch, `qt6-declarative`) and Python 3. Pure JS helpers live in `Helpers/`; QML tests live in `Tests/`, and repository checks in `Tests/python/`. Rust helpers and their unit tests live in `Tools/settings/` and `Tools/theming/`. See [CLAUDE.md](CLAUDE.md) for conventions and the settings checklist.
+Tests require Rust/Cargo, Qt 6's `qmltestrunner` (on Arch, `qt6-declarative`) and Python 3. Pure JS helpers live in `Helpers/`; QML tests live in `Tests/`, and repository checks in `Tests/python/`. Rust helpers and their unit tests live in `Tools/settings/`, `Tools/theming/` and `Tools/kdeconnect/`. See [CLAUDE.md](CLAUDE.md) for conventions and the settings checklist.
 
 ### UI styles
 
@@ -141,10 +141,12 @@ Tests require Rust/Cargo, Qt 6's `qmltestrunner` (on Arch, `qt6-declarative`) an
 
 Shared panels load their style’s registered `views` through `NStyleView`: control center, media cards/player, OSD, and notification content each have separate renderers. Shared services retain playback, notification lifetime, settings, and panel behavior. Material uses Android-inspired quick tiles, an artwork-backed media card with a playback wave, and elastic notification dragging. Both styles have a settings home with category cards; the navigation sidebar appears inside categories.
 
-Styles are registered in `Helpers/UiStyles.js`. Each entry has a translated label key and tokens for typography, radii, spacing, borders, animations, sliders and toggles. `Commons/Style.qml` exposes the active tokens to shared widgets; use it when adding controls instead of hardcoding style values. An unknown saved style falls back to Caelestia for rendering without rewriting the saved choice. Add a complete registry entry, its English label in `Assets/Translations/en.json`, and tests in `Tests/tst_uistyles.qml` when implementing another style. The `controls.renderer` token selects the control rendering path; Material-specific rendering stays separate from Caelestia. Styles change live, saving pending appearance edits to the previous style and loading the selected style’s preferences. `Helpers/UiStyleSettings.js` defines the appearance fields and shared defaults; a registry entry can override them with `settingsDefaults` (for example, zero radius ratios for square corners). Reset buttons use the active style’s defaults. Material UI is an original implementation with Clavis Shell used as a visual reference; no Clavis source or assets are bundled.
+Styles are registered in `Helpers/UiStyles.js`. Each entry has a translated label key and tokens for typography, radii, spacing, borders, animations, sliders and toggles. `Commons/Style.qml` exposes the active tokens to shared widgets; use it when adding controls instead of hardcoding style values. An unknown saved style falls back to Material for rendering without rewriting the saved choice. Add a complete registry entry, its English label in `Assets/Translations/en.json`, and tests in `Tests/tst_uistyles.qml` when implementing another style. The `controls.renderer` token selects the control rendering path; Material-specific rendering stays separate from Caelestia. Styles change live, saving pending appearance edits to the previous style and loading the selected style’s preferences. `Helpers/UiStyleSettings.js` defines the appearance fields and shared defaults; a registry entry can override them with `settingsDefaults` (for example, zero radius ratios for square corners). Reset buttons use the active style’s defaults. Material UI is an original implementation with Clavis Shell used as a visual reference. The weather views are adapted from Clavis Shell.
 
 ## Credits and license
 
 Frostalia builds on Noctalia and its contributors' work. The inherited artwork remains credited to its original creators; see [CREDITS.md](CREDITS.md). A fresh Git history does not change that attribution.
 
-Licensed under the [MIT License](LICENSE), with the original copyright notice retained.
+Thanks to [Clavis Shell](https://github.com/StatIndet/quickshell) by StatIndet: Frostalia's weather views and animated weather backdrop are adapted from it, and its Material look inspired Frostalia's Material style.
+
+Licensed under the [GNU General Public License v3.0](LICENSE). Code inherited from Noctalia keeps its original MIT notice ([licenses/Noctalia-MIT.txt](licenses/Noctalia-MIT.txt)); third-party notices live in [licenses/](licenses/).

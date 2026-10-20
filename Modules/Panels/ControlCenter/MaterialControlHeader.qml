@@ -13,75 +13,59 @@ Item {
   property string uptime: "--"
   implicitHeight: Math.round(48 * Style.uiScaleRatio)
 
-  function openSettings(tab) {
+  // Control Center sub-tabs: Appearance, Cards, Shortcuts.
+  readonly property int shortcutsSubTab: 2
+
+  function openSettings(tab, subTab) {
     PanelService.getPanel("controlCenterPanel", screen)?.close();
-    const settings = PanelService.getPanel("settingsPanel", screen);
-    if (settings) {
-      settings.requestedTab = tab;
-      settings.open();
-    }
+    SettingsPanelService.openToTab(tab, subTab);
   }
 
   RowLayout {
     anchors.fill: parent
     spacing: Style.marginS
-    Rectangle {
-      Layout.preferredWidth: uptimeRow.implicitWidth + Style.margin2L
+    NPill {
       Layout.fillHeight: true
-      radius: height / 2
-      color: ShellColors.mSurfaceVariant
-      RowLayout {
-        id: uptimeRow
-        anchors.centerIn: parent
-        spacing: Style.marginS
-        NIcon {
-          icon: "clock"
-          pointSize: Style.fontSizeL
-          color: ShellColors.mOnSurfaceVariant
-        }
-        NText {
-          text: I18n.tr("system.uptime", {
-                          uptime: root.uptime
-                        })
-          pointSize: Style.fontSizeS
-        }
+      spacing: Style.marginS
+      NIcon {
+        icon: "clock"
+        pointSize: Style.fontSizeL
+        color: ShellColors.mOnSurfaceVariant
+      }
+      NText {
+        text: I18n.tr("system.uptime", {
+                        uptime: root.uptime
+                      })
+        pointSize: Style.fontSizeS
       }
     }
     Item {
       Layout.fillWidth: true
     }
-    Rectangle {
-      Layout.preferredWidth: actions.implicitWidth + Style.marginS
+    NPill {
       Layout.fillHeight: true
-      radius: height / 2
-      color: ShellColors.mSurfaceVariant
-      RowLayout {
-        id: actions
-        anchors.centerIn: parent
-        spacing: 0
-        NIconButton {
-          icon: "pencil"
-          baseSize: Style.baseWidgetSize
-          tooltipText: I18n.tr("control-center.edit-shortcuts")
-          onClicked: root.openSettings(SettingsPanel.Tab.ControlCenter)
+      NIconButton {
+        icon: "pencil"
+        baseSize: Style.baseWidgetSize
+        tooltipText: I18n.tr("control-center.edit-shortcuts")
+        onClicked: root.openSettings(SettingsPanel.Tab.ControlCenter, root.shortcutsSubTab)
+      }
+      NIconButton {
+        icon: "settings"
+        baseSize: Style.baseWidgetSize
+        tooltipText: I18n.tr("tooltips.open-settings")
+        onClicked: {
+          PanelService.getPanel("controlCenterPanel", root.screen)?.close();
+          SettingsPanelService.openHome();
         }
-        NIconButton {
-          icon: "settings"
-          baseSize: Style.baseWidgetSize
-          tooltipText: I18n.tr("tooltips.open-settings")
-          onClicked: {
-            PanelService.getPanel("controlCenterPanel", root.screen)?.close();
-            SettingsPanelService.openHome();
-          }
-        }
-        NIconButton {
-          icon: "power"
-          baseSize: Style.baseWidgetSize
-          tooltipText: I18n.tr("tooltips.session-menu")
-          onClicked: {
-            PanelService.getPanel("controlCenterPanel", root.screen)?.close();
-            PanelService.getPanel("sessionMenuPanel", root.screen)?.open();
-          }
+      }
+      NIconButton {
+        icon: "power"
+        baseSize: Style.baseWidgetSize
+        tooltipText: I18n.tr("tooltips.session-menu")
+        onClicked: {
+          PanelService.getPanel("controlCenterPanel", root.screen)?.close();
+          PanelService.getPanel("sessionMenuPanel", root.screen)?.open();
         }
       }
     }

@@ -7,6 +7,7 @@ import qs.Commons
 import qs.Modules.Cards
 import qs.Modules.MainScreen
 import qs.Services.Media
+import qs.Services.Networking
 import qs.Services.System
 import qs.Services.UI
 import qs.Widgets
@@ -22,7 +23,7 @@ Item {
       const card = Settings.data.controlCenter.cards[i];
       if (!card.enabled)
         continue;
-      const contributes = (card.id !== "weather-card" || Settings.data.location.weatherEnabled);
+      const contributes = ControlCenterLayout.visibleCards([card], Settings.data.location.weatherEnabled, true, KdeConnectService.enabled).length > 0;
       if (!contributes)
         continue;
       count++;
@@ -51,6 +52,9 @@ Item {
       case "media-sysmon-card":
         height += mediaSysMonHeight;
         break;
+      case "kdeconnect-card":
+        height += kdeConnectHeight;
+        break;
       default:
         break;
       }
@@ -63,6 +67,7 @@ Item {
   readonly property int audioHeight: Math.round(60 * Style.uiScaleRatio)
   readonly property int brightnessHeight: Math.round(60 * Style.uiScaleRatio)
   readonly property int mediaSysMonHeight: Math.round(260 * Style.uiScaleRatio)
+  readonly property int kdeConnectHeight: Math.round(64 * Style.uiScaleRatio)
 
   readonly property int notificationHeight: ControlCenterLayout.notificationHeight(NotificationService.historyModel.count, Style.uiScaleRatio)
   property real calendarHeight: Math.round(350 * Style.uiScaleRatio)
@@ -80,7 +85,7 @@ Item {
     Repeater {
       model: Settings.data.controlCenter.cards
       Loader {
-        active: modelData.enabled && (modelData.id !== "weather-card" || Settings.data.location.weatherEnabled)
+        active: ControlCenterLayout.visibleCards([modelData], Settings.data.location.weatherEnabled, true, KdeConnectService.enabled).length > 0
         visible: active
         Layout.fillWidth: true
         Layout.preferredHeight: {
@@ -101,6 +106,8 @@ Item {
             return calendarHeight;
           case "media-sysmon-card":
             return mediaSysMonHeight;
+          case "kdeconnect-card":
+            return kdeConnectHeight;
           default:
             return 0;
           }
@@ -123,6 +130,8 @@ Item {
             return calendarCard;
           case "media-sysmon-card":
             return mediaSysMonCard;
+          case "kdeconnect-card":
+            return kdeConnectCard;
           }
         }
       }
@@ -131,7 +140,7 @@ Item {
 
   Component {
     id: notificationCard
-    MaterialNotificationFeed {}
+    NotificationFeed {}
   }
 
   Component {
@@ -145,6 +154,14 @@ Item {
   Component {
     id: profileCard
     ProfileCard {}
+  }
+
+  Component {
+    id: kdeConnectCard
+    CaelestiaKdeConnectCard {
+      id: phoneCard
+      onClicked: PanelService.getPanel("kdeConnectPanel", root.screen)?.toggle(phoneCard)
+    }
   }
 
   Component {

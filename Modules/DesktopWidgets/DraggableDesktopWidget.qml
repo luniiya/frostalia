@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Effects
 import Quickshell
+import "../../Helpers/DesktopWidgetEdit.js" as WidgetEdit
 import qs.Commons
 import qs.Services.Frostalia
 import qs.Services.UI
@@ -19,7 +20,8 @@ Item {
   default property alias content: contentContainer.data
 
   readonly property bool isDragging: internal.isDragging
-  readonly property bool isScaling: internal.isScaling
+  readonly property bool isScaling: internal.isScaling || internal.isResizing
+  readonly property bool isResizing: internal.isResizing
 
   // All Desktop widgets have these settings, but fallback just in case
   readonly property var _metadata: widgetData?.id ? DesktopWidgetRegistry.widgetMetadata[widgetData.id] : null
@@ -27,6 +29,22 @@ Item {
   property bool roundedCorners: widgetData.roundedCorners !== undefined ? widgetData.roundedCorners : (_metadata?.roundedCorners ?? true)
 
   property real widgetScale: 1.0
+  property bool horizontalResizable: false
+  property bool verticalResizable: false
+  property real widgetWidthScale: 1.0
+  property real widgetHeightScale: 1.0
+  property real minimumWidgetWidth: Math.min(implicitWidth, 96 * widgetScale)
+  property real minimumWidgetHeight: Math.min(implicitHeight, 48 * widgetScale)
+  width: Math.round(implicitWidth * (horizontalResizable ? widgetWidthScale : 1))
+  height: Math.round(implicitHeight * (verticalResizable ? widgetHeightScale : 1))
+  readonly property real backgroundRadius: container.radius
+
+  // A per-widget setting, falling back to the registry default
+  function widgetSetting(key) {
+    if (widgetData && widgetData[key] !== undefined)
+      return widgetData[key];
+    return _metadata ? _metadata[key] : undefined;
+  }
   property real minScale: 0.5
   property real maxScale: 5.0
 
@@ -95,6 +113,11 @@ Item {
     id: internal
     property bool isDragging: false
     property bool isScaling: false
+    property bool isResizing: false
+    property real initialX: 0
+    property real initialY: 0
+    property real initialWidthScale: 1
+    property real initialHeightScale: 1
     property real dragOffsetX: 0
     property real dragOffsetY: 0
     property real baseX: (root.widgetData && root.widgetData.x !== undefined) ? root.widgetData.x : root.defaultX
@@ -115,33 +138,10 @@ Item {
     return Math.round(coord / root.gridSize) * root.gridSize;
   }
 
-  function snapScaleToGrid(scale) {
-    if (!Settings.data.desktopWidgets.gridSnap || !Settings.data.desktopWidgets.gridSnapScale) {
-      return scale;
-    }
-
-    // Get widget's base width
-    var initialWidth = internal.initialWidth;
-    var initialScale = internal.initialScale;
-    if (initialWidth <= 0 || initialScale <= 0) {
-      return scale;
-    }
-
-    // Since initialWidth = baseWidth * initialScale
-    var baseWidth = initialWidth / initialScale;
-
-    // Snap the resulting width with the scale
-    var resultingWidth = baseWidth * scale;
-    var snappedWidth = root.snapToGrid(resultingWidth);
-
-    // Check that the snappedWidth isn't smaller than one grid size
-    if (snappedWidth < root.gridSize) {
-      snappedWidth = root.gridSize;
-    }
-
-    // Return the ratio of the snappedWidth and the baseWidth, which is the new snapped scale
-    var snappedScale = snappedWidth / baseWidth;
-    return Math.max(minScale, Math.min(maxScale, snappedScale));
+  function snapScaleToGrid(scale, precise) {
+    const baseWidth = internal.initialWidth > 0 && internal.initialScale > 0 ? internal.initialWidth / internal.initialScale : 0;
+    const grid = Settings.data.desktopWidgets.gridSnap && Settings.data.desktopWidgets.gridSnapScale ? root.gridSize : 0;
+    return WidgetEdit.snappedScale(scale, minScale, maxScale, precise, baseWidth, grid);
   }
 
   function updateWidgetData(properties) {
@@ -234,10 +234,14 @@ Item {
     } else if (action === "reset") {
       // Reset scale and position to defaults
       root.widgetScale = 1.0;
+      root.widgetWidthScale = 1.0;
+      root.widgetHeightScale = 1.0;
       internal.baseX = root.defaultX;
       internal.baseY = root.defaultY;
       root.updateWidgetData({
                               "scale": 1.0,
+                              "widthScale": 1.0,
+                              "heightScale": 1.0,
                               "x": Math.round(root.defaultX),
                               "y": Math.round(root.defaultY)
                             });
@@ -263,6 +267,8 @@ Item {
   // This prevents blurry text at fractional scale values
 
   Component.onCompleted: {
+    root.widgetWidthScale = widgetData?.widthScale ?? 1;
+    root.widgetHeightScale = widgetData?.heightScale ?? 1;
     // Initialize scale from widgetData when component is first created
     if (widgetData && widgetData.scale !== undefined) {
       widgetScale = widgetData.scale;
@@ -270,7 +276,9 @@ Item {
   }
 
   onWidgetDataChanged: {
-    if (!internal.isDragging && !internal.isScaling) {
+    if (!internal.isDragging && !internal.isScaling && !internal.isResizing) {
+      root.widgetWidthScale = widgetData?.widthScale ?? 1;
+      root.widgetHeightScale = widgetData?.heightScale ?? 1;
       internal.baseX = (widgetData && widgetData.x !== undefined) ? widgetData.x : defaultX;
       internal.baseY = (widgetData && widgetData.y !== undefined) ? widgetData.y : defaultY;
       if (widgetData && widgetData.scale !== undefined) {
@@ -297,6 +305,8 @@ Item {
     id: container
     anchors.fill: parent
     radius: root.roundedCorners ? Math.min(Math.round(Style.radiusL * root.widgetScale), Style.radiusL, width / 2, height / 2) : 0
+    // Not frosted: desktop widgets get no compositor blur, and a translucent
+    // background would show its own drop shadow through.
     color: Qt.alpha(ShellColors.mSurface, Settings.data.ui.panelBackgroundOpacity)
     border {
       width: 1
@@ -322,6 +332,32 @@ Item {
     anchors.fill: parent
     z: 1
     clip: true
+  }
+
+  Rectangle {
+    id: sizeFeedback
+    visible: DesktopWidgetRegistry.editMode && (internal.isScaling || internal.isResizing || dragArea.containsMouse)
+    z: 3000
+    width: sizeLabel.implicitWidth + Style.margin2M
+    height: sizeLabel.implicitHeight + Style.margin2S
+    radius: Style.radiusS
+    color: ShellColors.mPrimary
+    readonly property var placement: WidgetEdit.feedbackPosition(root.x, root.y, root.width, root.height, width, height, root.screen ? root.screen.width : 1920, root.screen ? root.screen.height : 1080, Style.marginS)
+    x: placement.x
+    y: placement.y
+
+    NText {
+      id: sizeLabel
+      anchors.centerIn: parent
+      pointSize: Style.fontSizeS
+      color: ShellColors.mOnPrimary
+      text: I18n.tr("panels.desktop-widgets.size-feedback", {
+                      "widthScale": WidgetEdit.scaleText(root.widgetScale * (root.horizontalResizable ? root.widgetWidthScale : 1)),
+                      "heightScale": WidgetEdit.scaleText(root.widgetScale * (root.verticalResizable ? root.widgetHeightScale : 1)),
+                      "width": Math.round(root.width),
+                      "height": Math.round(root.height)
+                    })
+    }
   }
 
   // Context menu model and handler - menu is created dynamically in PopupMenuWindow
@@ -388,6 +424,7 @@ Item {
       }
 
       pressPos = Qt.point(mouse.x, mouse.y);
+      DesktopWidgetRegistry.manipulatingWidget = root;
       internal.operationType = "drag";
       internal.dragOffsetX = root.x;
       internal.dragOffsetY = root.y;
@@ -446,12 +483,16 @@ Item {
         internal.baseY = roundedY;
         internal.isDragging = false;
         internal.operationType = "";
+        if (DesktopWidgetRegistry.manipulatingWidget === root)
+          DesktopWidgetRegistry.manipulatingWidget = null;
       }
     }
 
     onCanceled: {
       internal.isDragging = false;
       internal.operationType = "";
+      if (DesktopWidgetRegistry.manipulatingWidget === root)
+        DesktopWidgetRegistry.manipulatingWidget = null;
     }
   }
 
@@ -531,7 +572,7 @@ Item {
       required property var modelData
       required property int index
 
-      visible: DesktopWidgetRegistry.editMode && !internal.isDragging
+      visible: DesktopWidgetRegistry.editMode && !internal.isDragging && !internal.isResizing
       // Position handles at corners of decoration rectangle (which extends by outlineMargin)
       x: modelData.xMult === 0 ? -outlineMargin : (root.width + outlineMargin - cornerHandleSize)
       y: modelData.yMult === 0 ? -outlineMargin : (root.height + outlineMargin - cornerHandleSize)
@@ -579,6 +620,7 @@ Item {
             return;
           }
           pressPos = mapToItem(root.parent, mouse.x, mouse.y);
+          DesktopWidgetRegistry.manipulatingWidget = root;
           internal.operationType = "scale";
           internal.isScaling = true;
           internal.initialScale = root.widgetScale;
@@ -602,7 +644,7 @@ Item {
             var scaleDelta = diagonalDelta / sensitivity;
             var newScale = Math.max(root.minScale, Math.min(root.maxScale, internal.initialScale + scaleDelta));
 
-            newScale = root.snapScaleToGrid(newScale);
+            newScale = root.snapScaleToGrid(newScale, (mouse.modifiers & Qt.ShiftModifier) !== 0);
 
             if (!isNaN(newScale) && newScale > 0) {
               root.widgetScale = newScale;
@@ -613,20 +655,128 @@ Item {
 
         onReleased: mouse => {
           if (internal.isScaling && internal.operationType === "scale") {
+            root.widgetScale = root.snapScaleToGrid(root.widgetScale, (mouse.modifiers & Qt.ShiftModifier) !== 0);
+            internal.lastScale = root.widgetScale;
+            internal.isScaling = false;
+            internal.operationType = "";
+            DesktopWidgetRegistry.manipulatingWidget = null;
             root.updateWidgetData({
                                     "scale": root.widgetScale
                                   });
-            internal.isScaling = false;
-            internal.operationType = "";
-            root.widgetScale = root.snapScaleToGrid(root.widgetScale);
-            internal.lastScale = root.widgetScale;
           }
         }
 
         onCanceled: {
+          root.widgetScale = internal.initialScale;
           internal.isScaling = false;
           internal.operationType = "";
+          if (DesktopWidgetRegistry.manipulatingWidget === root)
+            DesktopWidgetRegistry.manipulatingWidget = null;
           internal.lastScale = root.widgetScale;
+        }
+      }
+    }
+  }
+  Repeater {
+    model: [
+      {
+        horizontal: true,
+        leading: true
+      },
+      {
+        horizontal: true,
+        leading: false
+      },
+      {
+        horizontal: false,
+        leading: true
+      },
+      {
+        horizontal: false,
+        leading: false
+      }
+    ]
+
+    Rectangle {
+      id: edgeHandle
+      required property var modelData
+      visible: DesktopWidgetRegistry.editMode && !internal.isDragging && !internal.isScaling && (modelData.horizontal ? root.horizontalResizable : root.verticalResizable)
+      width: modelData.horizontal ? 6 : 28
+      height: modelData.horizontal ? 28 : 6
+      radius: 3
+      color: root.colorHandle
+      x: modelData.horizontal ? (modelData.leading ? -root.outlineMargin - width / 2 : root.width + root.outlineMargin - width / 2) : (root.width - width) / 2
+      y: modelData.horizontal ? (root.height - height) / 2 : (modelData.leading ? -root.outlineMargin - height / 2 : root.height + root.outlineMargin - height / 2)
+      z: 2500
+
+      MouseArea {
+        anchors.fill: parent
+        anchors.margins: -4
+        acceptedButtons: Qt.LeftButton
+        cursorShape: edgeHandle.modelData.horizontal ? Qt.SizeHorCursor : Qt.SizeVerCursor
+        property point pressPos: Qt.point(0, 0)
+
+        function resizeAt(mouse) {
+          const current = mapToItem(root.parent, mouse.x, mouse.y);
+          const horizontal = edgeHandle.modelData.horizontal;
+          const delta = horizontal ? current.x - pressPos.x : current.y - pressPos.y;
+          const length = horizontal ? internal.initialWidth : internal.initialHeight;
+          const natural = horizontal ? root.implicitWidth : root.implicitHeight;
+          if (natural <= 0)
+            return;
+          const minimum = horizontal ? root.minimumWidgetWidth : root.minimumWidgetHeight;
+          const step = Settings.data.desktopWidgets.gridSnap ? root.gridSize : 10 * root.widgetScale;
+          const next = WidgetEdit.resizedAxis(horizontal ? internal.initialX : internal.initialY, length, delta, edgeHandle.modelData.leading, minimum, Math.max(minimum, natural * 5), step, (mouse.modifiers & Qt.ShiftModifier) !== 0);
+          if (horizontal) {
+            root.widgetWidthScale = next.length / natural;
+            internal.baseX = next.start;
+          } else {
+            root.widgetHeightScale = next.length / natural;
+            internal.baseY = next.start;
+          }
+        }
+
+        onPressed: mouse => {
+          if (internal.operationType !== "")
+            return;
+          pressPos = mapToItem(root.parent, mouse.x, mouse.y);
+          internal.initialX = root.x;
+          internal.initialY = root.y;
+          internal.initialWidth = root.width;
+          internal.initialHeight = root.height;
+          internal.initialWidthScale = root.widgetWidthScale;
+          internal.initialHeightScale = root.widgetHeightScale;
+          internal.operationType = "resize";
+          internal.isResizing = true;
+          DesktopWidgetRegistry.manipulatingWidget = root;
+        }
+        onPositionChanged: mouse => {
+          if (pressed && internal.operationType === "resize")
+            resizeAt(mouse);
+        }
+        onReleased: mouse => {
+          if (internal.operationType !== "resize")
+            return;
+          resizeAt(mouse);
+          internal.isResizing = false;
+          internal.operationType = "";
+          DesktopWidgetRegistry.manipulatingWidget = null;
+          root.updateWidgetData({
+                                  widthScale: root.widgetWidthScale,
+                                  heightScale: root.widgetHeightScale,
+                                  x: Math.round(internal.baseX),
+                                  y: Math.round(internal.baseY)
+                                });
+        }
+        onCanceled: {
+          root.widgetWidthScale = internal.initialWidthScale;
+          root.widgetHeightScale = internal.initialHeightScale;
+          internal.baseX = internal.initialX;
+          internal.baseY = internal.initialY;
+          internal.isResizing = false;
+          internal.operationType = "";
+          if (DesktopWidgetRegistry.manipulatingWidget === root)
+            DesktopWidgetRegistry.manipulatingWidget = null;
         }
       }
     }

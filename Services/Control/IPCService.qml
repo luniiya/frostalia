@@ -93,7 +93,6 @@ Singleton {
                                             "display": SettingsPanel.Tab.Display,
                                             "dock": SettingsPanel.Tab.Dock,
                                             "general": SettingsPanel.Tab.General,
-                                            "hooks": SettingsPanel.Tab.Hooks,
                                             "launcher": SettingsPanel.Tab.Launcher,
                                             "location": SettingsPanel.Tab.Location,
                                             "connections": SettingsPanel.Tab.Connections,
@@ -651,6 +650,29 @@ Singleton {
   }
 
   IpcHandler {
+    target: "kdeConnect"
+    function togglePanel() {
+      root.screenDetector.withCurrentScreen(screen => {
+        PanelService.getPanel("kdeConnectPanel", screen)?.toggle(null, "KdeConnect");
+      });
+    }
+    function messages() {
+      root.screenDetector.withCurrentScreen(screen => {
+        PanelService.getPanel("kdeConnectPanel", screen)?.openPage("messages", null);
+      });
+    }
+    function ring() {
+      KdeConnectService.ring();
+    }
+    function sendClipboard() {
+      KdeConnectService.sendClipboard();
+    }
+    function share(path: string) {
+      KdeConnectService.shareFiles([path]);
+    }
+  }
+
+  IpcHandler {
     target: "airplaneMode"
     function toggle() {
       NetworkService.setAirplaneMode(!NetworkService.airplaneModeEnabled);
@@ -695,18 +717,6 @@ Singleton {
         PowerProfileService.setProfile(0);
         break;
       }
-    }
-
-    function toggleFrostaliaPerformance() {
-      PowerProfileService.toggleFrostaliaPerformance();
-    }
-
-    function enableFrostaliaPerformance() {
-      PowerProfileService.setFrostaliaPerformance(true);
-    }
-
-    function disableFrostaliaPerformance() {
-      PowerProfileService.setFrostaliaPerformance(false);
     }
   }
 

@@ -12,6 +12,7 @@ class UiStyleTests(unittest.TestCase):
         defaults = json.loads((ROOT / "Assets/settings-default.json").read_text())
         helper = (ROOT / "Helpers/UiStyles.js").read_text()
         default = re.search(r'var defaultStyle = "([^"]+)"', helper).group(1)
+        self.assertEqual(default, "material")
         self.assertEqual(defaults["ui"]["style"], default)
         self.assertRegex(helper, r'"' + default + r'":\s*\{')
 
@@ -50,6 +51,18 @@ class UiStyleTests(unittest.TestCase):
         for name in ("AppearanceSubTab.qml", "PanelsSubTab.qml"):
             for section, key in re.findall(r"Settings.data.(general|ui).(\w+)", (tabs / name).read_text()):
                 self.assertIn(key, appearance[section], f"{name}: {section}.{key}")
+
+    def test_control_centers_share_the_notification_feed(self):
+        # Regression: Caelestia's control center showed Material notifications.
+        folder = ROOT / "Modules/Panels/ControlCenter"
+        self.assertFalse((folder / "MaterialNotificationFeed.qml").exists())
+        for name in ("CaelestiaControlCenter.qml", "MaterialControlCenter.qml"):
+            self.assertIn("NotificationFeed {}", (folder / name).read_text())
+        caelestia = (folder / "CaelestiaControlCenter.qml").read_text()
+        self.assertNotIn("Material", caelestia)
+        feed = (folder / "NotificationFeed.qml").read_text()
+        self.assertIn('Style.surfaceUrl("notificationContent")', feed)
+        self.assertNotIn("MaterialNotificationContent", feed)
 
     def test_screen_corners_are_host_settings_in_general(self):
         source = (ROOT / "Helpers/UiStyleSettings.js").read_text()

@@ -1,5 +1,6 @@
 """Run the actual Quickshell/Rust storage bridge without touching user settings."""
 import os
+import re
 import pathlib
 import shutil
 import subprocess
@@ -104,6 +105,7 @@ class SettingsStoreTests(unittest.TestCase):
 
     def test_real_settings_singleton_generates_hostname_config_on_first_install(self):
         root = ROOT
+        version = int(re.search(r'readonly property int settingsVersion: (\d+)', (root/'Commons/Settings.qml').read_text()).group(1))
         with tempfile.TemporaryDirectory(prefix='frostalia-first-install-') as d:
          p=pathlib.Path(d)
          for folder in ['Commons','Helpers','Services/Frostalia','Services/UI','Modules/OSD','run']: (p/folder).mkdir(parents=True,exist_ok=True)
@@ -121,7 +123,7 @@ class SettingsStoreTests(unittest.TestCase):
         import qs.Commons
         ShellRoot {
          Connections { target: Settings; function onSettingsSaved() {
-          if (Settings.isLoaded && Settings.isFreshInstall && Settings.shouldOpenSetupWizard && Settings.data.settingsVersion === 67) console.log("FIRST_INSTALL_SUCCESS", Settings.settingsFile);
+          if (Settings.isLoaded && Settings.isFreshInstall && Settings.shouldOpenSetupWizard && Settings.data.settingsVersion === ''' + str(version) + ''') console.log("FIRST_INSTALL_SUCCESS", Settings.settingsFile);
           else console.error("FIRST_INSTALL_FAILURE");
           Qt.quit();
          } }
@@ -134,5 +136,5 @@ class SettingsStoreTests(unittest.TestCase):
          self.assertNotIn('FIRST_INSTALL_FAILURE', r.stdout+r.stderr)
          generated = list((p/'config/settings').glob('*.toml'))
          self.assertEqual(len(generated), 1)
-         self.assertEqual(tomllib.loads(generated[0].read_text())['settingsVersion'], 67)
+         self.assertEqual(tomllib.loads(generated[0].read_text())['settingsVersion'], version)
          self.assertGreater(len(tomllib.loads(generated[0].read_text())), 20)

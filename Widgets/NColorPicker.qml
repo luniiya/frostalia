@@ -60,7 +60,7 @@ Rectangle {
 
       NText {
         text: root.selectedColor.toString().toUpperCase()
-        family: Settings.data.ui.fontFixed
+        family: Style.fontFixed
         Layout.fillWidth: true
         Layout.alignment: Qt.AlignVCenter
       }

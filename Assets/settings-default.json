@@ -76,7 +76,7 @@
     "middleClickAction": "none",
     "middleClickFollowMouse": false,
     "middleClickCommand": "",
-    "rightClickAction": "none",
+    "rightClickAction": "contextMenu",
     "rightClickFollowMouse": true,
     "rightClickCommand": "",
     "screenOverrides": []
@@ -101,7 +101,6 @@
     "shadowOffsetY": 3,
     "language": "",
     "allowPanelsOnScreenWithoutBar": true,
-    "telemetryEnabled": false,
     "keybinds": {
       "keyUp": [
         "Up"
@@ -130,20 +129,23 @@
     "smoothScrollEnabled": true
   },
   "ui": {
-    "style": "caelestia",
-    "fontDefault": "Rubik",
+    "style": "material",
+    "fontDefault": "Roboto",
     "fontFixed": "",
     "fontDefaultScale": 1,
     "fontFixedScale": 1,
     "tooltipsEnabled": true,
     "scrollbarAlwaysVisible": true,
-    "boxBorderEnabled": true,
+    "boxBorderEnabled": false,
     "boxBorderWidth": 1,
     "boxBorderColor": "outline",
     "boxBorderBrightness": 0,
     "boxBorderOpacity": 100,
-    "panelBackgroundOpacity": 0.93,
+    "panelBackgroundOpacity": 1.0,
     "translucentWidgets": false,
+    "frostedGlass": true,
+    "glassPanelOpacity": 0.85,
+    "glassSurfaceOpacity": 0.7,
     "panelsAttachedToBar": true,
     "settingsPanelSideBarCardStyle": false
   },
@@ -151,7 +153,13 @@
     "name": "",
     "weatherEnabled": true,
     "weatherShowEffects": true,
-    "weatherTaliaMascotAlways": false,
+    "weatherShowHourly": true,
+    "weatherShowDaily": true,
+    "weatherShowDetails": true,
+    "weatherHourlyCount": 24,
+    "weatherDailyCount": 7,
+    "weatherDetails": [],
+    "windSpeedUnit": "kmh",
     "useFahrenheit": false,
     "use12hourFormat": false,
     "showWeekNumberInCalendar": false,
@@ -218,7 +226,15 @@
           "id": "Bluetooth"
         },
         {
-          "id": "FrostaliaPerformance"
+          "id": "CustomButton",
+          "icon": "wall",
+          "generalTooltipText": "random wallpaper",
+          "onClicked": "",
+          "onRightClicked": "",
+          "onMiddleClicked": "",
+          "stateChecksJson": "[]",
+          "enableOnStateLogic": false,
+          "showExecTooltip": true
         }
       ],
       "right": [
@@ -254,7 +270,11 @@
         "id": "brightness-card"
       },
       {
-        "enabled": true,
+        "enabled": false,
+        "id": "kdeconnect-card"
+      },
+      {
+        "enabled": false,
         "id": "weather-card"
       },
       {
@@ -263,11 +283,11 @@
       },
       {
         "id": "notification-card",
-        "enabled": true
+        "enabled": false
       },
       {
         "id": "calendar-month-card",
-        "enabled": true
+        "enabled": false
       }
     ]
   },
@@ -303,7 +323,8 @@
     "openrouterEnabled": false,
     "zenEnabled": false,
     "openrouterApiKey": "",
-    "zenApiKey": ""
+    "zenApiKey": "",
+    "providerOrder": ["claude", "codex", "copilot", "gemini", "openrouter", "zen"]
   },
   "frostaliaPerformance": {
     "disableDesktopWidgets": true
@@ -348,6 +369,11 @@
     "bluetoothHideUnnamedDevices": false,
     "disableDiscoverability": false,
     "bluetoothAutoConnect": true
+  },
+  "kdeConnect": {
+    "enabled": false,
+    "device": "",
+    "touchpadSensitivity": 1.5
   },
   "sessionMenu": {
     "enableCountdown": true,
@@ -466,7 +492,7 @@
   },
   "colorSchemes": {
     "useWallpaperColors": false,
-    "predefinedScheme": "Frostalia (default)",
+    "predefinedScheme": "Eldritch",
     "darkMode": true,
     "schedulingMode": "off",
     "manualSunrise": "06:30",
@@ -539,6 +565,7 @@
       "transition": "up",
       "transitionDuration": 220,
       "hideOnFullscreen": true,
+      "reserveSpace": true,
       "backgroundColorKey": "none"
     }
   }

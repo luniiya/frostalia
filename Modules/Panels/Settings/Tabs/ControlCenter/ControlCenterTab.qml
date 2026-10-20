@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
+import "../../../../../Helpers/ControlCenterLayout.js" as ControlCenterLayout
 import qs.Commons
 import qs.Services.Frostalia
 import qs.Services.System
@@ -39,9 +40,15 @@ ColumnLayout {
       "required": false
     },
     {
+      "id": "kdeconnect-card",
+      "text": I18n.tr("kdeconnect.title"),
+      "enabled": false,
+      "required": false
+    },
+    {
       "id": "weather-card",
       "text": "Weather",
-      "enabled": true,
+      "enabled": false,
       "required": false
     },
     {
@@ -53,13 +60,13 @@ ColumnLayout {
     {
       "id": "notification-card",
       "text": I18n.tr("common.notifications"),
-      "enabled": true,
+      "enabled": false,
       "required": false
     },
     {
       "id": "calendar-month-card",
       "text": I18n.tr("common.calendar"),
-      "enabled": true,
+      "enabled": false,
       "required": false
     }
   ]
@@ -111,25 +118,14 @@ ColumnLayout {
       }
     }
 
-    // Add any missing cards from default
+    // Add any missing cards from default, at their default position
     for (var i = 0; i < cardsDefault.length; i++) {
-      var found = false;
-      for (var j = 0; j < cardsModel.length; j++) {
-        if (cardsModel[j].id === cardsDefault[i].id) {
-          found = true;
-          break;
-        }
-      }
-
-      if (!found) {
-        var card = cardsDefault[i];
-        // Auto-disable weather card if weather is disabled
-        if (card.id === "weather-card" && !Settings.data.location.weatherEnabled) {
-          card.enabled = false;
-        }
-        cardsModel.push(card);
+      // Auto-disable weather card if weather is disabled
+      if (cardsDefault[i].id === "weather-card" && !Settings.data.location.weatherEnabled && !cardsModel.some(c => c.id === "weather-card")) {
+        cardsDefault[i].enabled = false;
       }
     }
+    cardsModel = ControlCenterLayout.insertMissingCards(cardsModel, cardsDefault);
   }
 
   NTabBar {

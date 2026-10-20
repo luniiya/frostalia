@@ -25,11 +25,12 @@ class ForkIdentityTests(unittest.TestCase):
             for asset in re.findall(r"(/Assets/[\w/.-]*[Ff]rostalia[\w/.-]*)", path.read_text()):
                 self.assertTrue((ROOT / asset.lstrip("/")).exists(), f"{path}: {asset}")
 
-    def test_no_default_upstream_telemetry_or_changelog(self):
-        for service, upstream in (("TelemetryService.qml", "api.noctalia.dev/ping"),
-                                  ("UpdateService.qml", "api.noctalia.dev/upgradelog"),
-                                  ("SupporterService.qml", "api.noctalia.dev/supporters")):
-            self.assertNotIn(upstream, (ROOT / "Services/Frostalia" / service).read_text())
+    def test_no_upstream_telemetry_or_donation_services(self):
+        for service in ("TelemetryService.qml", "SupporterService.qml"):
+            self.assertFalse((ROOT / "Services/Frostalia" / service).exists())
+        service = (ROOT / "Services/Frostalia/UpdateService.qml").read_text()
+        self.assertNotIn("api.noctalia.dev/upgradelog", service)
+        self.assertFalse((ROOT / "Modules/Panels/Settings/Tabs/About/SupportersSubTab.qml").exists())
 
 
 if __name__ == "__main__":

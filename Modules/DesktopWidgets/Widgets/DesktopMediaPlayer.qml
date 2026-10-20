@@ -11,6 +11,8 @@ import qs.Widgets.AudioSpectrum
 
 DraggableDesktopWidget {
   id: root
+  horizontalResizable: true
+  verticalResizable: false
 
   defaultY: 200
 
@@ -60,8 +62,6 @@ DraggableDesktopWidget {
 
   implicitWidth: Math.round(400 * widgetScale)
   implicitHeight: Math.round(64 * widgetScale + Style.margin2M * widgetScale)
-  width: implicitWidth
-  height: implicitHeight
 
   // Visualizer visibility mode
   readonly property bool shouldShowVisualizer: {

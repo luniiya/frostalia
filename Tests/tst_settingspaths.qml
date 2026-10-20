@@ -103,7 +103,6 @@ TestCase {
   function test_paths() {
     compare(SettingsPaths.settingsDir("/home/u/.config/frostalia/"), "/home/u/.config/frostalia/settings/");
     compare(SettingsPaths.settingsDir("/home/u/.config/frostalia"), "/home/u/.config/frostalia/settings/");
-    compare(SettingsPaths.legacySettingsFile("/cfg/"), "/cfg/settings.json");
     compare(SettingsPaths.hostSettingsFile("/cfg/", "cubeberry\n"), "/cfg/settings/cubeberry.toml");
     compare(SettingsPaths.hostSettingsFile("/cfg/", ""), "/cfg/settings/default.toml");
   }
@@ -118,7 +117,7 @@ TestCase {
     verify(SettingsPaths.resolveSettingsFile("", "/cfg/", "desk") !== SettingsPaths.resolveSettingsFile("", "/cfg/", "laptop"));
   }
 
-  function test_seedFilesPreferHostJson() {
-    compare(SettingsPaths.seedFiles("/cfg/", "laptop"), ["/cfg/settings/laptop.json", "/cfg/defaults.toml", "/cfg/settings.json"]);
+  function test_seedFilesOnlyUseToml() {
+    compare(SettingsPaths.seedFiles("/cfg/"), ["/cfg/defaults.toml"]);
   }
 }

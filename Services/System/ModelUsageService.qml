@@ -3,6 +3,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import "../../Helpers/ModelUsageLogic.js" as ModelUsageLogic
+import "../../Helpers/ModelUsageOrder.js" as ModelUsageOrder
 import qs.Commons
 import qs.Services.System.ModelUsage
 
@@ -40,7 +41,7 @@ Singleton {
     configuredKey: root.cfg.zenApiKey
   }
 
-  readonly property var providers: [claude, codex, copilot, gemini, openRouter, zen]
+  readonly property var providers: ModelUsageOrder.sortByOrder([claude, codex, copilot, gemini, openRouter, zen], root.cfg.providerOrder, p => p.providerId)
   readonly property var enabledProviders: providers.filter(p => p.enabled)
 
   // Fallback polling in case file watches miss a change

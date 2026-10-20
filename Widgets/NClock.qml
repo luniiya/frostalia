@@ -297,7 +297,7 @@ Item {
         pointSize: hoursFontSize
         font.weight: hoursFontWeight
         color: clockColor
-        family: Settings.data.ui.fontFixed
+        family: Style.fontFixed
         Layout.alignment: Qt.AlignHCenter
       }
 
@@ -306,7 +306,7 @@ Item {
         pointSize: minutesFontSize
         font.weight: minutesFontWeight
         color: clockColor
-        family: Settings.data.ui.fontFixed
+        family: Style.fontFixed
         Layout.alignment: Qt.AlignHCenter
       }
     }

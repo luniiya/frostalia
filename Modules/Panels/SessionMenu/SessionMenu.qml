@@ -593,7 +593,7 @@ SmartPanel {
           contentHeight: largeButtonsGrid.implicitHeight
           clip: true
           boundsBehavior: Flickable.StopAtBounds
-          ScrollBar.vertical: ScrollBar {}
+          ScrollBar.vertical: NScrollBar {}
 
           function revealSelection() {
             if (root.selectedIndex < 0)

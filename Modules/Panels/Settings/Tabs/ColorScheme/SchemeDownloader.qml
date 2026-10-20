@@ -3,6 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
+import "../../../../../Helpers/ColorSchemeNames.js" as ColorSchemeNames
 import qs.Commons
 import qs.Services.Theming
 import qs.Services.UI
@@ -661,11 +662,11 @@ Popup {
 
         // If the deleted scheme was the active one, reset to default BEFORE reloading
         if (needsReset) {
-          Logger.i("ColorSchemeDownload", "Deleted scheme was active, resetting to Frostalia (default)");
+          Logger.i("ColorSchemeDownload", "Deleted scheme was active, resetting to " + ColorSchemeNames.defaultScheme);
           // Clear the setting immediately so ColorSchemeService won't try to apply the deleted scheme
-          Settings.data.colorSchemes.predefinedScheme = "Frostalia (default)";
+          Settings.data.colorSchemes.predefinedScheme = ColorSchemeNames.defaultScheme;
           // Apply the default scheme immediately
-          ColorSchemeService.setPredefinedScheme("Frostalia (default)");
+          ColorSchemeService.setPredefinedScheme(ColorSchemeNames.defaultScheme);
         }
 
         // Reload color schemes

@@ -50,8 +50,8 @@ fn validate_request(request: &Request) -> Result<()> {
 }
 
 fn config_path(path: &Path) -> Result<PathBuf> {
-    if path.extension().is_some_and(|ext| ext == "json") {
-        return Err("CONFIG must be a .toml file; change FROSTALIA_SETTINGS_FILE to a .toml path and pass the old JSON file as a load seed".into());
+    if !path.extension().is_some_and(|ext| ext == "toml") {
+        return Err("Settings files must use .toml; FROSTALIA_SETTINGS_FILE and seed files must point to TOML files".into());
     }
     // Follow existing symlinks, including relative links, without replacing the link itself.
     if fs::symlink_metadata(path).is_ok() {
@@ -195,14 +195,11 @@ fn load_document(path: &Path, seeds: &[PathBuf], request: Request) -> Result<Res
     } else {
         let mut seeded = None;
         for seed in seeds {
+            let seed = config_path(seed)?;
             if !seed.exists() {
                 continue;
             }
-            let value = if seed.extension().is_some_and(|ext| ext == "json") {
-                serde_json::from_str::<Value>(&fs::read_to_string(seed)?)?
-            } else {
-                document_value(&read_document(seed)?)?
-            };
+            let value = document_value(&read_document(&seed)?)?;
             if !value.is_object() {
                 return Err("seed settings must be an object".into());
             }
@@ -247,3 +244,15 @@ fn save_document(path: &Path, request: Request) -> Result<Response> {
 
 mod ui_profiles;
 pub use ui_profiles::{UiProfiles, load, save};
+
+// Export the complete active configuration, including the selected style's
+// appearance values, without splitting profiles or merging an existing file.
+pub fn export(path: &Path, request: Request) -> Result<Response> {
+    validate_request(&request)?;
+    let path = config_path(path)?;
+    write_document(&path, &document(&request.settings)?)?;
+    Ok(Response {
+        settings: request.settings,
+        fresh: false,
+    })
+}

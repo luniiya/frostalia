@@ -106,7 +106,7 @@ DraggableDesktopWidget {
       NText {
         Layout.alignment: Qt.AlignHCenter
         text: root.timeText
-        family: Settings.data.ui.fontFixed
+        family: Style.fontFixed
         applyUiScale: false
         pointSize: Math.round(root.fontSize * (root.timeText.length > 5 ? 0.24 : 0.32))
         font.weight: Style.fontWeightBold

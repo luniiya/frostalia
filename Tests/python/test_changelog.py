@@ -1,4 +1,4 @@
-"""Release notes belong to Frostalia and are opened only on request."""
+"""Removed release UI and upstream donation actions must stay removed."""
 import pathlib
 import re
 import unittest
@@ -7,12 +7,13 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 
 
 class ChangelogTests(unittest.TestCase):
-    def test_manual_changelog_opens_project_releases(self):
-        service = (ROOT / "Services/Frostalia/UpdateService.qml").read_text()
-        self.assertIn('releasesUrl: "https://github.com/luniiya/frostalia/releases"', service)
-        self.assertRegex(service, r'function viewChangelog\(\)\s*\{\s*Quickshell.execDetached\(\["xdg-open", releasesUrl\]\);\s*\}')
+    def test_about_has_no_old_actions(self):
         about = (ROOT / "Modules/Panels/Settings/Tabs/About/VersionSubTab.qml").read_text()
-        self.assertIn("onClicked: UpdateService.viewChangelog()", about)
+        for removed in ("actionsGrid", "changelogBtn", "copyBtn", "supportBtn", "copyInfoToClipboard", "buymeacoffee"):
+            self.assertNotIn(removed, about)
+        service = (ROOT / "Services/Frostalia/UpdateService.qml").read_text()
+        self.assertNotIn("viewChangelog", service)
+        self.assertNotIn("releasesUrl", service)
 
     def test_startup_has_no_release_notes_or_upgrade_telemetry_prompt(self):
         shell = (ROOT / "shell.qml").read_text()

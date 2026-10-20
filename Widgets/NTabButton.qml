@@ -27,14 +27,33 @@ Rectangle {
   Layout.fillHeight: true
   implicitWidth: contentLayout.implicitWidth + Style.margin2M
 
-  topLeftRadius: Style.materialControls ? Style.iRadiusL : (isFirst ? Style.iRadiusM : Style.iRadiusXXXS)
-  bottomLeftRadius: Style.materialControls ? Style.iRadiusL : (isFirst ? Style.iRadiusM : Style.iRadiusXXXS)
-  topRightRadius: Style.materialControls ? Style.iRadiusL : (isLast ? Style.iRadiusM : Style.iRadiusXXXS)
-  bottomRightRadius: Style.materialControls ? Style.iRadiusL : (isLast ? Style.iRadiusM : Style.iRadiusXXXS)
+  readonly property var groupRadii: Style.getButtonGroupRadii(height, checked, isFirst, isLast)
+  property real groupLeftRadius: groupRadii ? groupRadii.left : (isFirst ? Style.iRadiusM : Style.iRadiusXXXS)
+  property real groupRightRadius: groupRadii ? groupRadii.right : (isLast ? Style.iRadiusM : Style.iRadiusXXXS)
 
-  color: root.isHovered && !Style.materialControls ? ShellColors.mHover : (root.checked ? ShellColors.mPrimary : ShellColors.smartAlpha(ShellColors.mSurface))
+  topLeftRadius: groupLeftRadius
+  bottomLeftRadius: groupLeftRadius
+  topRightRadius: groupRightRadius
+  bottomRightRadius: groupRightRadius
+
+  color: root.isHovered && !Style.materialControls ? ShellColors.mHover : (root.checked ? ShellColors.mPrimary : (Style.materialControls ? ShellColors.mTonalContainer : ShellColors.smartAlpha(ShellColors.mSurface)))
   border.color: root.checked ? ShellColors.mPrimary : ShellColors.mOutline
-  border.width: Style.borderS
+  border.width: Style.materialControls ? 0 : Style.borderS
+
+  Behavior on groupLeftRadius {
+    enabled: Style.materialControls
+    NumberAnimation {
+      duration: Style.animationFast
+      easing.type: Easing.OutCubic
+    }
+  }
+  Behavior on groupRightRadius {
+    enabled: Style.materialControls
+    NumberAnimation {
+      duration: Style.animationFast
+      easing.type: Easing.OutCubic
+    }
+  }
 
   Behavior on color {
     enabled: !ShellColors.isTransitioning
@@ -45,7 +64,10 @@ Rectangle {
   }
 
   NMaterialStateLayer {
-    radius: Style.iRadiusL
+    topLeftRadius: root.groupLeftRadius
+    bottomLeftRadius: root.groupLeftRadius
+    topRightRadius: root.groupRightRadius
+    bottomRightRadius: root.groupRightRadius
     hovered: root.isHovered
     pressed: tabMouse.pressed
     tint: root.checked ? ShellColors.mOnPrimary : ShellColors.mPrimary

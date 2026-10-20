@@ -241,7 +241,7 @@ RowLayout {
         // Prefix text (non-editable)
         NText {
           text: root.prefix
-          family: Settings.data.ui.fontFixed
+          family: Style.fontFixed
           pointSize: Style.fontSizeM
           font.weight: Style.fontWeightMedium
           color: Qt.alpha(ShellColors.mOnSurface, root.enabled ? 1.0 : 0.6)
@@ -254,7 +254,7 @@ RowLayout {
         TextInput {
           id: valueInput
           text: valueInput.focus ? valueInput.text : root.value.toString()
-          font.family: Settings.data.ui.fontFixed
+          font.family: Style.fontFixed
           font.pointSize: Style.fontSizeM
           font.weight: Style.fontWeightMedium
           color: Qt.alpha(ShellColors.mOnSurface, root.enabled ? 1.0 : 0.6)
@@ -300,7 +300,7 @@ RowLayout {
         // Suffix text (non-editable)
         NText {
           text: root.suffix
-          family: Settings.data.ui.fontFixed
+          family: Style.fontFixed
           pointSize: Style.fontSizeM
           font.weight: Style.fontWeightMedium
           color: Qt.alpha(ShellColors.mOnSurface, root.enabled ? 1.0 : 0.6)

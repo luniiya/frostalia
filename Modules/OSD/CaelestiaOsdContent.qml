@@ -32,7 +32,7 @@ Item {
 
       TextMetrics {
         id: percentageMetrics
-        font.family: Settings.data.ui.fontFixed
+        font.family: Style.fontFixed
         font.pointSize: Style.fontSizeS * (Settings.data.ui.fontFixedScale * Style.uiScaleRatio)
         text: "150%"
       }
@@ -102,7 +102,7 @@ Item {
         text: root.valueText
         color: ShellColors.mOnSurface
         pointSize: Style.fontSizeS
-        family: Settings.data.ui.fontFixed
+        family: Style.fontFixed
         Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
         horizontalAlignment: Text.AlignRight
         verticalAlignment: Text.AlignVCenter
@@ -140,7 +140,7 @@ Item {
             text: modelData || ""
             color: root.accentColor
             pointSize: Style.fontSizeS
-            family: Settings.data.ui.fontFixed
+            family: Style.fontFixed
             Layout.fillWidth: true
             Layout.preferredHeight: {
               const fontSize = Style.fontSizeS * Settings.data.ui.fontFixedScale * Style.uiScaleRatio;
@@ -158,7 +158,7 @@ Item {
         text: root.valueText
         color: ShellColors.mOnSurface
         pointSize: Style.fontSizeS
-        family: Settings.data.ui.fontFixed
+        family: Style.fontFixed
         Layout.fillWidth: true
         Layout.alignment: Qt.AlignHCenter
         horizontalAlignment: Text.AlignHCenter

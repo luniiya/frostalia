@@ -1,5 +1,9 @@
 {
   "actions": {
+    "undo-desktop-widget-change": "Undo widget change (Ctrl+Z)",
+    "redo-desktop-widget-change": "Redo widget change (Ctrl+Shift+Z)",
+    "edit-desktop-widgets": "Edit desktop widgets",
+    "finish-editing-desktop-widgets": "Finish editing desktop widgets",
     "clear-history": "Clear history",
     "close-app": "Close {app}",
     "connect-vpn": "Connect to {name}",
@@ -63,8 +67,6 @@
       "hide-if-not-detected-description": "Hide the widget when no battery is detected on the system.",
       "hide-if-not-detected-label": "Hide when not detected",
       "low-battery-threshold-label": "Low battery warning threshold",
-      "show-frostalia-performance-description": "Display the Frostalia performance mode toggle inside the battery panel.<br>Disables shadows and animations in Frostalia to reduce resource usage.",
-      "show-frostalia-performance-label": "Show Frostalia Performance toggle",
       "show-power-profile-description": "Display the power profile selection inside the battery panel.",
       "show-power-profile-label": "Show power profile controls"
     },
@@ -352,6 +354,13 @@
     },
     "weather": {
       "display-mode-description": "Show the temperature always, on hover, or only as a weather icon."
+    },
+    "kdeconnect": {
+      "display-mode-description": "Show the phone battery next to the icon.",
+      "hide-when-offline-label": "Hide when the phone is offline",
+      "hide-when-offline-description": "Only show the widget while a paired phone is connected.",
+      "show-unread-label": "Show unread messages",
+      "show-unread-description": "Add the number of unread SMS threads next to the battery."
     }
   },
   "battery": {
@@ -389,25 +398,6 @@
       "signal-text-poor": "Signal: Poor",
       "signal-text-unknown": "Signal: Unknown",
       "signal-text-very-poor": "Signal: Very poor"
-    }
-  },
-  "changelog": {
-    "error": {
-      "fetch-failed": "Unable to load changelog data. Please try again later.",
-      "rate-limit": "GitHub rate limit exceeded. Please try again in a few minutes."
-    },
-    "panel": {
-      "buttons-discord": "Join our Discord",
-      "buttons-dismiss": "OK",
-      "buttons-feedback": "Give feedback",
-      "empty": "Release notes are not available yet.",
-      "highlight-title": "Highlights",
-      "released": "Released on {date}",
-      "subtitle-fresh": "Thanks for installing Frostalia! Here is what’s included in this build.",
-      "subtitle-updated": "Updated from {previousVersion}",
-      "title": "What's new in {version}",
-      "version": "Version {version}",
-      "version-new-user": "Fresh install"
     }
   },
   "common": {
@@ -673,6 +663,123 @@
       "windows-search-description": "Search and focus open windows"
     }
   },
+  "kdeconnect": {
+    "title": "KDE Connect",
+    "open": "Open",
+    "pair-new-device": "Pair a new device",
+    "drop-to-send": "Drop to send to {device}",
+    "send-files": "Send files",
+    "unknown-caller": "Unknown caller",
+    "actions": {
+      "ring": "Ring",
+      "ping": "Ping",
+      "clipboard": "Clipboard",
+      "share": "Send file"
+    },
+    "status": {
+      "offline": "Offline",
+      "battery": "Battery {battery}",
+      "connected-to": "Connected to {device}",
+      "daemon-missing": "KDE Connect isn't running",
+      "daemon-missing-description": "Install kdeconnect and start it, then this panel connects on its own.",
+      "start-daemon": "Start KDE Connect",
+      "helper-missing": "The KDE Connect helper isn't running",
+      "helper-missing-description": "Build it with ./install.sh or cargo build --release in Tools/kdeconnect, then check the shell log.",
+      "no-device": "No phone paired yet",
+      "no-device-description": "Install KDE Connect on your phone and open it on the same network. It shows up below.",
+      "device-offline": "{device} is offline",
+      "device-offline-description": "Make sure the phone is on the same network and KDE Connect is open."
+    },
+    "messages": {
+      "title": "Messages",
+      "new": "New message",
+      "recent": "Recent messages",
+      "see-all": "See all",
+      "search": "Search conversations",
+      "loading": "Loading conversations…",
+      "empty": "No conversations",
+      "unread": "{count} unread",
+      "you": "You: {text}",
+      "attachment": "Attachment",
+      "placeholder": "Text message",
+      "sending": "Sending…",
+      "sent": "Message sent",
+      "today": "Today",
+      "recipient": "Name or phone number",
+      "no-contacts": "No contacts synced",
+      "no-contacts-description": "Type a phone number, or enable the Contacts plugin on the phone to pick people by name."
+    },
+    "notifications": {
+      "title": "Phone notifications",
+      "count": "{count} notifications",
+      "empty": "No notifications",
+      "reply": "Reply"
+    },
+    "media": {
+      "title": "Media",
+      "nothing-playing": "Nothing playing"
+    },
+    "remote": {
+      "title": "Remote input",
+      "subtitle": "Touchpad and keyboard",
+      "touchpad-hint": "Drag to move · tap to click · scroll to scroll",
+      "left-click": "Left",
+      "middle-click": "Middle",
+      "right-click": "Right",
+      "keyboard-hint": "Click here, then type on the phone",
+      "keyboard-active": "Typing on the phone · Esc to stop",
+      "keyboard-inactive": "Keyboard not open on the phone",
+      "unavailable": "Remote input is off",
+      "unavailable-description": "Enable the Remote control or Remote keyboard plugin in the device settings."
+    },
+    "files": {
+      "title": "Files",
+      "subtitle": "Browse the phone, send files",
+      "phone-storage": "Phone storage",
+      "not-mounted": "Not mounted",
+      "mounted": "Phone storage mounted",
+      "mount": "Mount",
+      "open": "Open",
+      "send-title": "Send to {device}",
+      "drop-hint": "You can also drop files anywhere on this panel.",
+      "send-text": "Send text or a link"
+    },
+    "device": {
+      "title": "Device",
+      "this-computer": "This computer",
+      "computer-name": "Name shown on the phone",
+      "nearby": "Pairing",
+      "plugins": "Plugins",
+      "plugins-offline": "Connect the phone to change its plugins.",
+      "commands": "Commands",
+      "commands-description": "Commands the phone can run on this computer.",
+      "command-name": "Name",
+      "command-line": "Command",
+      "details": "Details",
+      "id": "Device ID",
+      "addresses": "Addresses",
+      "verification-key": "Verification key",
+      "unpair-confirm": "Click again to unpair {device}"
+    },
+    "pairing": {
+      "available": "Available to pair",
+      "waiting": "Waiting for the phone to accept…",
+      "wants-to-pair": "Wants to pair",
+      "accept": "Accept",
+      "reject": "Reject",
+      "verification-key": "Key: {key}",
+      "none-nearby": "No other devices found. Open KDE Connect on the phone to make it visible."
+    },
+    "toast": {
+      "pairing-request": "Pairing request",
+      "pairing-request-description": "A device wants to pair. Open the KDE Connect panel to accept.",
+      "pairing-failed": "Pairing failed",
+      "file-received": "File received from phone",
+      "incoming-call": "Incoming call",
+      "missed-call": "Missed call",
+      "clipboard-sent": "Clipboard sent to phone"
+    }
+  },
   "model-usage": {
     "all-time": "All time",
     "cache-read": "Cache read",
@@ -755,7 +862,7 @@
   "options": {
     "ui-style": {
       "caelestia": "Caelestia",
-      "material": "Material UI"
+      "material": "Material"
     },
     "bar": {
       "density-comfortable": "Comfortable",
@@ -821,16 +928,10 @@
       "advanced": "Advanced"
     },
     "about": {
-      "become-supporter": "Become a supporter",
-      "changelog": "View changelog",
-      "changelog-on-startup": "Show changelog on update",
-      "changelog-on-startup-desc": "Automatically show the changelog when Frostalia is updated",
       "contributors-description": "Shout-out to our {count} <b>awesome</b> contributor!",
       "contributors-description-plural": "Shout-out to our {count} <b>awesome</b> contributors!",
-      "copy-info": "Copy info",
       "debug-disabled": "Debug mode disabled",
       "debug-enabled": "Debug mode enabled",
-      "info-copied": "Info copied to clipboard",
       "noctalia-qs-version": "Noctalia QS version:",
       "frostalia-available": "Available:",
       "frostalia-desc": "A sleek and minimal desktop shell thoughtfully crafted for Wayland, built with Quickshell.",
@@ -838,12 +939,6 @@
       "frostalia-installed-version": "Installed version:",
       "frostalia-latest-version": "Latest version:",
       "frostalia-title": "Frostalia Shell",
-      "privacy-policy": "Privacy policy",
-      "support": "Support upstream Noctalia",
-      "supporter-badge": "Supporter",
-      "supporters-desc": "A huge thank you to our amazing supporter!",
-      "supporters-desc-plural": "A huge thank you to our <b>{count} amazing</b> supporters!",
-      "supporters-loading": "Loading supporters...",
       "system-board": "Board:",
       "system-cpu": "CPU:",
       "system-disk": "Disk:",
@@ -861,11 +956,6 @@
       "system-title": "System Information",
       "system-uptime": "Uptime:",
       "system-wm": "WM:",
-      "telemetry-data-copied": "Telemetry data copied to clipboard",
-      "telemetry-desc": "Send anonymous usage data only when a custom FROSTALIA_TELEMETRY_ENDPOINT is configured. Disabled by default.",
-      "telemetry-enabled": "Send anonymous system information",
-      "telemetry-show-data": "View data",
-      "telemetry-title": "Privacy",
       "title": "About",
       "up-to-date": "You're up to date!",
       "update-available": "Update available",
@@ -990,6 +1080,7 @@
       "behavior-right-click-description": "Choose what right click does on empty areas of the bar.",
       "behavior-right-click-follow-mouse-description": "Open the selected right-click panel at the cursor position.",
       "behavior-right-click-follow-mouse-label": "Right click follow mouse",
+      "behavior-right-click-menu": "Settings and desktop widgets menu",
       "behavior-right-click-label": "Bar right click action",
       "behavior-wheel-wrap-description": "When enabled, scrolling continues from the last item to the first.",
       "behavior-wheel-wrap-label": "Wrap around",
@@ -1089,7 +1180,12 @@
       "hide-unnamed-devices-label": "Hide unnamed devices",
       "pin-instructions": "Please enter the PIN code displayed on your device.",
       "title": "Connections",
-      "wifi-header-text": "Use Wi-Fi to see available networks and connect to the internet."
+      "wifi-header-text": "Use Wi-Fi to see available networks and connect to the internet.",
+      "kdeconnect-enabled-label": "KDE Connect",
+      "kdeconnect-enabled-description": "Show your phone in Frostalia: battery, SMS, notifications, media, files and remote input. Needs kdeconnect running.",
+      "kdeconnect-touchpad-sensitivity-label": "Touchpad sensitivity",
+      "kdeconnect-touchpad-sensitivity-description": "How far the phone's cursor moves when you drag on the remote touchpad.",
+      "kdeconnect-widgets-hint": "Add the KDE Connect widget to the bar or the control center shortcuts to open the panel."
     },
     "control-center": {
       "cards-desc": "Customize which controls appear in the control center and in what order.",
@@ -1143,7 +1239,8 @@
       "clock-width-description": "Width of the clock widget in pixels.",
       "cpu-intensive-note": "Widgets marked with ! use more CPU and should be enabled mindfully.",
       "edit-mode-button-label": "Enter edit mode",
-      "edit-mode-controls-explanation": "Left-click & drag: Move or resize the widget.\nRight-click: Open the context menu options.",
+      "edit-mode-controls-explanation": "Drag a widget to move it. Drag edges to resize supported axes, or corners to scale.\nScaling snaps to 10% steps; edges snap to size steps or the grid. Hold Shift for precise sizing.\nRight-click for widget options.\nUndo: Ctrl+Z · Redo: Ctrl+Shift+Z",
+      "size-feedback": "{widthScale}× wide · {heightScale}× tall · {width} × {height} px",
       "edit-mode-description": "Enable edit mode to move and reposition desktop widgets. When enabled, widgets show a drag outline and can be repositioned.",
       "edit-mode-exit-button": "Exit edit mode",
       "edit-mode-grid-snap-label": "Grid snap",
@@ -1163,6 +1260,14 @@
       "media-player-show-buttons-label": "Show buttons",
       "media-player-show-visualizer-description": "Show the audio visualizer overlay.",
       "media-player-visualizer-type-description": "Choose a visualization type.",
+      "names": {
+        "AudioVisualizer": "Audio visualizer",
+        "Clock": "Clock",
+        "MediaPlayer": "Media player",
+        "SystemStat": "System stat",
+        "Weather": "Weather",
+        "WeatherDetails": "Weather details"
+      },
       "overview-enabled-description": "Show desktop widgets while the compositor overview is open.",
       "overview-enabled-label": "Show in overview",
       "system-stat-layout-bottom": "Bottom",
@@ -1176,9 +1281,34 @@
       "system-stat-stat-type-description": "Choose which system statistic to display.",
       "system-stat-stat-type-label": "Statistic Type",
       "title": "Desktop Widgets",
+      "weather-animated-sky-description": "Animate the sky behind the current conditions.",
+      "weather-view-label": "View",
+      "weather-view-description": "Choose current conditions, an hourly forecast, or a daily forecast.",
+      "weather-view-current": "Current conditions",
+      "weather-view-hourly": "Hourly forecast",
+      "weather-view-daily": "Daily forecast",
+      "weather-animated-sky-label": "Animated sky",
+      "weather-compact-description": "Lay the days out side by side instead of in rows.",
+      "weather-compact-label": "Compact",
+      "weather-days-description": "How many days the widget shows.",
+      "weather-days-label": "Days",
+      "weather-detail-description": "Which weather detail the tile shows.",
+      "weather-detail-label": "Detail",
       "weather-enabled-description": "Show a weather widget on the desktop.",
       "weather-enabled-label": "Enable weather widget",
-      "weather-show-background-description": "Show the background container for the weather widget."
+      "weather-forecast-days-description": "Days shown in a strip below the current conditions. 0 hides it.",
+      "weather-forecast-days-label": "Forecast days",
+      "weather-hours-description": "How many hours the widget covers. It scrolls when they don't fit.",
+      "weather-hours-label": "Hours",
+      "weather-show-background-description": "Show the background container for the weather widget.",
+      "weather-show-condition-description": "Show the weather condition below the temperature.",
+      "weather-show-condition-label": "Show condition",
+      "weather-show-feels-like-description": "Show the apparent temperature.",
+      "weather-show-feels-like-label": "Show feels like",
+      "weather-show-high-low-description": "Show today's highest and lowest temperature.",
+      "weather-show-high-low-label": "Show high and low",
+      "weather-show-precipitation-description": "Show the chance of precipitation.",
+      "weather-show-precipitation-label": "Show rain chance"
     },
     "display": {
       "monitors-backlight-device-auto-option": "Default",
@@ -1288,7 +1418,10 @@
       "title": "Dock"
     },
     "general": {
-      "copy-settings": "Copy settings",
+      "export-settings": "Export settings",
+      "export-toml-filter": "TOML settings (*.toml)",
+      "export-invalid-path": "Choose a local TOML file.",
+      "export-failed": "Could not export settings",
       "external-lock-command-label": "Lock command",
       "external-lock-command-description": "Command used to lock the session, including before suspend. Suspend starts one second after the command. Leave empty to skip locking.",
       "fonts-default-description": "Main font used throughout the interface.",
@@ -1340,7 +1473,7 @@
       "screen-corners-solid-black-description": "Use solid black instead of the bar background color.",
       "screen-corners-solid-black-label": "Solid black corners",
       "screen-corners-title": "Screen corners",
-      "settings-copied": "Settings copied to clipboard",
+      "settings-exported": "Settings exported",
       "smooth-scrolling-description": "Animate list scrolling for a smoother wheel experience.",
       "smooth-scrolling-label": "Smooth scrolling",
       "tab-basics": "Basics",
@@ -1356,10 +1489,10 @@
       "frostalia-started-description": "Command to execute when Frostalia has finished loading.",
       "frostalia-started-label": "Frostalia started",
       "frostalia-started-placeholder": "e.g. notify-send 'Frostalia Loaded'",
-      "performance-mode-disabled-description": "Command to be executed when Frostalia performance mode is disabled.",
+      "performance-mode-disabled-description": "Command to be executed when leaving the Performance power profile turns off Frostalia performance mode.",
       "performance-mode-disabled-label": "Performance mode disabled",
       "performance-mode-disabled-placeholder": "e.g. notify-send \"Performance\" \"Mode disabled\"",
-      "performance-mode-enabled-description": "Command to be executed when Frostalia performance mode is enabled.",
+      "performance-mode-enabled-description": "Command to be executed when the Performance power profile turns on Frostalia performance mode.",
       "performance-mode-enabled-label": "Performance mode enabled",
       "performance-mode-enabled-placeholder": "e.g., notify-send \"Performance\" \"Mode enabled\"",
       "session-description": "Command to be executed before shutdown or reboot. Receives action type as $1 (shutdown/reboot).",
@@ -1496,6 +1629,8 @@
       "location-search-label": "Search for a location",
       "location-search-placeholder": "Enter the location name",
       "location-title": "Your location",
+      "weather-daily-count-description": "How many days the daily forecast covers.",
+      "weather-daily-count-label": "Days",
       "weather-desc": "Choose your preferred temperature unit.",
       "weather-enabled-description": "Show weather information throughout the interface and fetch weather data. When disabled, all weather elements will be hidden and no network requests will be made.",
       "weather-enabled-label": "Enable weather",
@@ -1505,12 +1640,22 @@
       "weather-hide-city-label": "Hide city name",
       "weather-hide-timezone-description": "Hide the timezone abbreviation from weather displays throughout the interface.",
       "weather-hide-timezone-label": "Hide timezone",
-      "weather-show-effects-description": "Show additional visual effects (like rain, snow, or lightning) on the weather card.",
-      "weather-show-effects-label": "Display weather effects",
+      "weather-hourly-count-description": "How many hours the hourly forecast covers.",
+      "weather-hourly-count-label": "Hours",
+      "weather-panel-desc": "Choose what the weather panel shows below the current conditions.",
+      "weather-panel-title": "Weather panel",
+      "weather-show-daily-description": "Show the daily forecast with temperature ranges.",
+      "weather-show-daily-label": "Show daily forecast",
+      "weather-show-details-description": "Show detail tiles. Check, uncheck and drag them to choose which appear and in what order.",
+      "weather-show-details-label": "Show details",
+      "weather-show-effects-description": "Animate the sky behind the current conditions (clouds, rain, snow, lightning, stars).",
+      "weather-show-effects-label": "Animated sky",
+      "weather-show-hourly-description": "Show the hourly temperature curve with rain chances.",
+      "weather-show-hourly-label": "Show hourly forecast",
       "weather-show-in-calendar-description": "Show the daily weather forecast directly in your calendar view.",
       "weather-show-in-calendar-label": "Display weather in calendar",
-      "weather-talia-mascot-always-description": "Always use Talia emojis instead of tabler icons.",
-      "weather-talia-mascot-always-label": "Always show Talia weather emojis"
+      "weather-wind-unit-description": "Unit used for wind speed and gusts.",
+      "weather-wind-unit-label": "Wind speed unit"
     },
     "network": {
       "bluetooth-description": "Activate Bluetooth management.",
@@ -1750,13 +1895,15 @@
       "ai-usage-openrouter-key-label": "OpenRouter API key",
       "ai-usage-openrouter-label": "OpenRouter",
       "ai-usage-refresh-description": "How often usage is polled when file watching misses a change.",
+      "ai-usage-providers-description": "Check a provider to track it. Drag to change the tab order in the AI usage panel.",
+      "ai-usage-providers-label": "Providers",
       "ai-usage-refresh-label": "Refresh interval",
       "ai-usage-title": "AI usage",
       "ai-usage-zen-description": "Checks your OpenCode Zen API key. Zen does not report usage.",
       "ai-usage-zen-key-description": "OPENCODE_ZEN_API_KEY, OPENCODE_API_KEY or ZEN_API_KEY take precedence. Keys are stored in plain text in your settings file.",
       "ai-usage-zen-key-label": "Zen API key",
       "ai-usage-zen-label": "Zen (opencode.ai)",
-      "frostalia-performance-disable-desktop-widgets-description": "Keep desktop widgets visible while Frostalia performance mode is enabled.",
+      "frostalia-performance-disable-desktop-widgets-description": "Keep desktop widgets visible while the Performance power profile is active.",
       "frostalia-performance-disable-desktop-widgets-label": "Enable desktop widgets in performance mode",
       "frostalia-performance-disable-wallpaper-description": "Keep desktop, overview, and lock screen wallpapers visible while Frostalia performance mode is enabled.",
       "frostalia-performance-disable-wallpaper-label": "Enable wallpaper rendering in performance mode",
@@ -1786,6 +1933,10 @@
       "warning-color-label": "Warning color"
     },
     "user-interface": {
+      "glass-panel-opacity-description": "How opaque panels, the bar and the launcher are with frosted glass. Lower shows more of the blurred background. Light mode is a little more transparent.",
+      "glass-panel-opacity-label": "Glass panel opacity",
+      "glass-surface-opacity-description": "How opaque cards, buttons and other widgets inside panels are with frosted glass.",
+      "glass-surface-opacity-label": "Glass card opacity",
       "ui-style-label": "UI style",
       "ui-style-description": "Choose the look of interface controls, shapes, and typography. Each style keeps its own appearance settings.",
       "allow-panels-without-bar-description": "When enabled, panels can open on any screen. When disabled, panels will only open on screens that have a bar, which can reduce memory usage.",
@@ -1838,6 +1989,8 @@
       "title": "User Interface",
       "tooltips-description": "Enable or disable tooltips throughout the interface.",
       "tooltips-label": "Show tooltips",
+      "frosted-glass-description": "Material only. Make panels and cards translucent so the blurred background shows through. Overrides panel opacity and translucent widgets; adjust it with the sliders below.",
+      "frosted-glass-label": "Frosted glass",
       "translucent-widgets-description": "Make buttons, tabs, and other widgets inside panels semi-transparent.",
       "translucent-widgets-label": "Translucent widgets"
     },
@@ -1902,6 +2055,8 @@
       "view-mode-single": "Root directory"
     },
     "bubbles": {
+      "reserve-space-description": "Keep windows from going under this bubble, like the bar does.",
+      "reserve-space-label": "Reserve space",
       "title": "Bubbles",
       "enabled-label": "Enable bubbles",
       "enabled-description": "Small widget overlays that leave applications the whole screen.",
@@ -2017,10 +2172,6 @@
       "subheader": "Adjust bar position, density, scaling and more."
     },
     "skip-setup": "Skip Setup",
-    "telemetry-wizard-done": "Got it!",
-    "telemetry-wizard-note": "You're in control — enable or disable this anytime in settings",
-    "telemetry-wizard-subtitle": "We've added anonymous analytics to help improve Frostalia",
-    "telemetry-wizard-title": "Privacy Update",
     "wallpaper": {
       "choose-dir": "Choose a directory containing your wallpaper images",
       "dir-browse": "Browse for wallpaper folder",
@@ -2109,7 +2260,6 @@
       "enabled": "Do Not Disturb enabled",
       "enabled-desc": "You'll find these notifications in your history"
     },
-    "donation-opened": "Donation page opened in your browser",
     "internet-limited": "Connected without internet",
     "keyboard-layout": {
       "changed": "Keyboard layout changed to {layout}",
@@ -2123,11 +2273,6 @@
       "forced": "Forced activation",
       "normal": "Normal mode",
       "not-installed": "wlsunset not installed"
-    },
-    "frostalia-performance": {
-      "disabled": "Performance mode disabled",
-      "enabled": "Performance mode enabled",
-      "label": "Frostalia Performance"
     },
     "power-profile": {
       "changed": "Power profile changed",
@@ -2188,7 +2333,6 @@
     "next-media": "Next track",
     "next-month": "Next month",
     "night-light-not-installed": "Night Light (not available)",
-    "frostalia-performance-enabled": "Frostalia performance mode",
     "open-annotation-tool": "Open with annotation tool",
     "open-control-center": "Control center",
     "open-notification-history-enable-dnd": "Notification history",
@@ -2296,16 +2440,72 @@
     }
   },
   "weather": {
+    "aqi": {
+      "extremely-poor": "Extremely poor",
+      "fair": "Fair",
+      "good": "Good",
+      "moderate": "Moderate",
+      "poor": "Poor",
+      "very-poor": "Very poor"
+    },
     "clear-sky": "Clear sky",
+    "daily": "{count}-day forecast",
+    "details": {
+      "actual": "Actual {value}",
+      "airQuality": "Air quality",
+      "cloud-cover": "Cloud cover {value}%",
+      "dew-point": "Dew point {value}",
+      "feelsLike": "Feels like",
+      "humidity": "Humidity",
+      "illumination": "{value}% illuminated",
+      "moon": "Moon",
+      "precipitation": "Precipitation",
+      "precipitation-sum": "{value} mm today",
+      "pressure": "Pressure",
+      "pressure-high": "High",
+      "pressure-low": "Low",
+      "pressure-normal": "Normal",
+      "sun": "Sun",
+      "sunrise": "Sunrise",
+      "sunrise-caption": "Sunrise {time}",
+      "sunset": "Sunset",
+      "sunset-caption": "Sunset {time}",
+      "uv": "UV index",
+      "visibility": "Visibility",
+      "wind": "Wind",
+      "wind-caption": "Gusts {gusts} · {direction}"
+    },
     "drizzle": "Drizzle",
+    "feels-like": "Feels like {value}",
     "fog": "Fog",
+    "high-low": "H {high}  L {low}",
+    "hourly": "Hourly forecast",
     "mainly-clear": "Mainly clear",
+    "moon": {
+      "first-quarter": "First quarter",
+      "full": "Full moon",
+      "last-quarter": "Last quarter",
+      "new": "New moon",
+      "waning-crescent": "Waning crescent",
+      "waning-gibbous": "Waning gibbous",
+      "waxing-crescent": "Waxing crescent",
+      "waxing-gibbous": "Waxing gibbous"
+    },
+    "now": "Now",
     "overcast": "Overcast",
     "partly-cloudy": "Partly cloudy",
     "rain-showers": "Rain showers",
     "snow": "Snow",
     "thunderstorm": "Thunderstorm",
-    "unknown": "Unknown weather"
+    "today": "Today",
+    "unknown": "Unknown weather",
+    "uv": {
+      "extreme": "Extreme",
+      "high": "High",
+      "low": "Low",
+      "moderate": "Moderate",
+      "very-high": "Very high"
+    }
   },
   "widgets": {
     "color-picker": {

@@ -2,16 +2,18 @@
 
 // Style tokens and default appearance preferences are independent of colors.
 // Add a complete entry here to offer another style in Settings.
-var defaultStyle = "caelestia";
+var defaultStyle = "material";
 var definitions = {
   "caelestia": {
     "labelKey": "options.ui-style.caelestia",
+    "settingsDefaults": { "ui": { "fontDefault": "Rubik", "boxBorderEnabled": true, "panelBackgroundOpacity": 0.93, "frostedGlass": false } },
     "views": {
       "controlCenter": "Modules/Panels/ControlCenter/CaelestiaControlCenter.qml",
       "mediaCard": "Modules/Cards/CaelestiaMediaCard.qml",
       "mediaPlayer": "Modules/Panels/Media/CaelestiaMediaPlayerContent.qml",
       "osd": "Modules/OSD/CaelestiaOsdContent.qml",
-      "notificationContent": "Modules/Notification/CaelestiaNotificationContent.qml"
+      "notificationContent": "Modules/Notification/CaelestiaNotificationContent.qml",
+      "kdeConnectHome": "Modules/Panels/KdeConnect/CaelestiaKdeConnectHome.qml"
     },
     "tokens": {
       "controls": { "renderer": "caelestia" },
@@ -21,7 +23,6 @@ var definitions = {
       "fixedFontFamily": "monospace",
       "radii": { "XXXS": 3, "XXS": 4, "XS": 8, "S": 12, "M": 16, "L": 20 },
       "inputRadii": { "XXXS": 3, "XXS": 4, "XS": 8, "S": 12, "M": 16, "L": 20 },
-      "screenRadius": 20,
       "borders": { "S": 1, "M": 2, "L": 3 },
       "margins": { "XXXS": 1, "XXS": 2, "XS": 4, "S": 6, "M": 9, "L": 13, "XL": 18 },
       "animations": { "Faster": 75, "Fast": 150, "Normal": 300, "Slow": 450, "Slowest": 750 },
@@ -50,9 +51,10 @@ var definitions = {
       "mediaCard": "Modules/Cards/MaterialMediaCard.qml",
       "mediaPlayer": "Modules/Panels/Media/MaterialMediaPlayerContent.qml",
       "osd": "Modules/OSD/MaterialOsdContent.qml",
-      "notificationContent": "Modules/Notification/MaterialNotificationContent.qml"
+      "notificationContent": "Modules/Notification/MaterialNotificationContent.qml",
+      "kdeConnectHome": "Modules/Panels/KdeConnect/MaterialKdeConnectHome.qml"
     },
-    "settingsDefaults": { "ui": { "fontDefault": "Roboto", "boxBorderEnabled": false, "panelBackgroundOpacity": 1.0 } },
+    "settingsDefaults": { "ui": { "fontDefault": "Roboto", "boxBorderEnabled": false, "panelBackgroundOpacity": 1.0, "frostedGlass": true } },
     "tokens": {
       "controls": {
         "renderer": "material"
@@ -91,7 +93,6 @@ var definitions = {
         "M": 12,
         "L": 28
       },
-      "screenRadius": 28,
       "borders": {
         "S": 1,
         "M": 2,
@@ -136,6 +137,33 @@ var definitions = {
         "handleOn": 24,
         "handlePressed": 28,
         "border": 2
+      },
+      "buttonGroup": {
+        "gap": 2,
+        "innerRadius": 8
+      },
+      "expandable": {
+        "gap": 2,
+        "outerRadius": 24,
+        "innerRadius": 4
+      },
+      "field": {
+        "radius": 12,
+        "focusBorderWidth": 1
+      },
+      "weather": {
+        "radius": 28,
+        "tileRadius": 24,
+        "cookieLobes": 9,
+        "cookieDepth": 0.1
+      },
+      "menu": {
+        "radius": 16,
+        "padding": 8
+      },
+      "frostedGlass": {
+        "panelOpacity": 0.85,
+        "surfaceOpacity": 0.7
       }
     }
   }
@@ -146,7 +174,7 @@ function resolveId(id) {
 }
 
 function choices() {
-  return Object.keys(definitions).map(id => ({ "key": id, "labelKey": definitions[id].labelKey }));
+  return Object.keys(definitions).sort((a, b) => a === defaultStyle ? -1 : b === defaultStyle ? 1 : 0).map(id => ({ "key": id, "labelKey": definitions[id].labelKey }));
 }
 
 // Consumers treat tokens as read-only. Editable preferences live in each style’s TOML file.
@@ -215,6 +243,63 @@ function splitSliderTrack(width, hitWidth, visualPosition, gap, mirrored) {
     "start": inset,
     "end": end,
     "center": center
+  };
+}
+
+// Material 3 connected button group: outer ends and the selected button are
+// fully rounded, inner corners stay small.
+function buttonGroupRadii(id, height, checked, isFirst, isLast) {
+  const group = tokens(id).buttonGroup;
+  if (!group)
+    return null;
+  const full = height / 2;
+  const inner = Math.min(group.innerRadius, full);
+  return { "left": checked || isFirst ? full : inner, "right": checked || isLast ? full : inner };
+}
+
+// Frosted glass: translucent panels and cards over the compositor blur.
+// Null when the style has no glass look or it is turned off. `custom` holds the
+// user's panelOpacity and surfaceOpacity; missing or invalid values use the style's.
+function glass(id, enabled, custom) {
+  const frosted = enabled ? tokens(id).frostedGlass : null;
+  if (!frosted)
+    return null;
+  const pick = key => {
+    const value = custom ? Number(custom[key]) : NaN;
+    return isFinite(value) && custom[key] !== null && custom[key] !== "" ? Math.max(0, Math.min(1, value)) : frosted[key];
+  };
+  return { "panelOpacity": pick("panelOpacity"), "surfaceOpacity": pick("surfaceOpacity") };
+}
+
+// Panel background opacity before light-mode adaptation.
+function panelOpacity(id, configured, glassEnabled, custom) {
+  const frosted = glass(id, glassEnabled, custom);
+  return frosted ? frosted.panelOpacity : configured;
+}
+
+// Filled fields keep their rounded shape on focus and use an outline for feedback.
+function fieldShape(id, focused, cornerRadius) {
+  const field = tokens(id).field;
+  if (!field)
+    return null;
+  return {
+    "radius": cornerRadius === undefined ? field.radius : cornerRadius,
+    "borderWidth": focused ? field.focusBorderWidth : 0
+  };
+}
+
+// Material 3 Expressive expandable card: the header stands alone when
+// collapsed and joins the content as one connected card when expanded.
+function expandableShape(id, expanded) {
+  const shape = tokens(id).expandable;
+  if (!shape)
+    return null;
+  return {
+    "gap": shape.gap,
+    "headerTop": shape.outerRadius,
+    "headerBottom": expanded ? shape.innerRadius : shape.outerRadius,
+    "contentTop": shape.innerRadius,
+    "contentBottom": shape.outerRadius
   };
 }
 

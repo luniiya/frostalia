@@ -3,6 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
+import "../../../../../Helpers/ColorSchemeNames.js" as ColorSchemeNames
 import qs.Commons
 import qs.Services.System
 import qs.Services.Theming
@@ -26,17 +27,7 @@ ColumnLayout {
     var filename = pathParts[pathParts.length - 1];
     var schemeName = filename.replace(".json", "");
 
-    if (schemeName === "Frostalia-default") {
-      schemeName = "Frostalia (default)";
-    } else if (schemeName === "Frostalia-legacy") {
-      schemeName = "Frostalia (legacy)";
-    } else if (schemeName === "Tokyo-Night") {
-      schemeName = "Tokyo Night";
-    } else if (schemeName === "Rosepine") {
-      schemeName = "Rose Pine";
-    }
-
-    return schemeName;
+    return ColorSchemeNames.displayName(schemeName);
   }
 
   function getSchemeColor(schemeName, colorKey) {

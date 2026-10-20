@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
+import "../../../Helpers/MemoryUsage.js" as MemoryUsage
 import qs.Commons
 import qs.Modules.DesktopWidgets
 import qs.Services.System
@@ -9,6 +10,10 @@ import qs.Widgets
 
 DraggableDesktopWidget {
   id: root
+  horizontalResizable: true
+  verticalResizable: true
+  minimumWidgetWidth: Math.round(180 * widgetScale)
+  minimumWidgetHeight: Math.round(96 * widgetScale)
 
   // Widget settings
   readonly property var widgetMetadata: DesktopWidgetRegistry.widgetMetadata["SystemStat"]
@@ -56,6 +61,11 @@ DraggableDesktopWidget {
               icon: "memory",
               text: Math.round(SystemStatService.memPercent) + "%",
               color: root.color
+            },
+            {
+              text: MemoryUsage.label(SystemStatService.memGb, SystemStatService.memTotalGb),
+              color: root.color,
+              opacity: 0.8
             }
           ];
     case "Disk":
@@ -163,8 +173,6 @@ DraggableDesktopWidget {
 
   implicitWidth: Math.round(240 * widgetScale)
   implicitHeight: Math.round(120 * widgetScale)
-  width: implicitWidth
-  height: implicitHeight
 
   // Update interval per stat type
   readonly property int graphUpdateInterval: {
@@ -234,7 +242,7 @@ DraggableDesktopWidget {
             text: modelData.text
             color: modelData.color
             pointSize: Style.fontSizeS * root.widgetScale
-            font.family: Settings.data.ui.fontFixed
+            font.family: Style.fontFixed
             font.weight: modelData.bold ? Style.fontWeightBold : Style.fontWeightRegular
             opacity: modelData.opacity !== undefined ? modelData.opacity : 1.0
             elide: modelData.elide ? Text.ElideMiddle : Text.ElideNone
@@ -292,7 +300,7 @@ DraggableDesktopWidget {
             text: modelData.text
             color: modelData.color
             pointSize: Style.fontSizeS * root.widgetScale
-            font.family: Settings.data.ui.fontFixed
+            font.family: Style.fontFixed
             font.weight: modelData.bold ? Style.fontWeightBold : Style.fontWeightRegular
             opacity: modelData.opacity !== undefined ? modelData.opacity : 1.0
             elide: modelData.elide ? Text.ElideMiddle : Text.ElideNone

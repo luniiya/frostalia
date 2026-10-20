@@ -97,7 +97,7 @@ SmartPanel {
               text: `${Math.round(SystemStatService.cpuUsage)}% (${SystemStatService.cpuFreq.replace(/[^0-9.]/g, "")} GHz)`
               pointSize: Style.fontSizeXS
               color: ShellColors.mPrimary
-              font.family: Settings.data.ui.fontFixed
+              font.family: Style.fontFixed
             }
 
             NIcon {
@@ -110,7 +110,7 @@ SmartPanel {
               text: `${Math.round(SystemStatService.cpuTemp)}°C`
               pointSize: Style.fontSizeXS
               color: ShellColors.mSecondary
-              font.family: Settings.data.ui.fontFixed
+              font.family: Style.fontFixed
               Layout.rightMargin: Style.marginS
             }
 
@@ -169,7 +169,7 @@ SmartPanel {
               text: `${Math.round(SystemStatService.memPercent)}% (${(SystemStatService.memGb).toFixed(1)} GiB)`
               pointSize: Style.fontSizeXS
               color: ShellColors.mPrimary
-              font.family: Settings.data.ui.fontFixed
+              font.family: Style.fontFixed
             }
 
             Item {
@@ -223,7 +223,7 @@ SmartPanel {
               text: SystemStatService.formatSpeed(SystemStatService.rxSpeed).replace(/([0-9.]+)([A-Za-z]+)/, "$1 $2") + "/s"
               pointSize: Style.fontSizeXS
               color: ShellColors.mPrimary
-              font.family: Settings.data.ui.fontFixed
+              font.family: Style.fontFixed
               Layout.rightMargin: Style.marginS
             }
 
@@ -237,7 +237,7 @@ SmartPanel {
               text: SystemStatService.formatSpeed(SystemStatService.txSpeed).replace(/([0-9.]+)([A-Za-z]+)/, "$1 $2") + "/s"
               pointSize: Style.fontSizeXS
               color: ShellColors.mSecondary
-              font.family: Settings.data.ui.fontFixed
+              font.family: Style.fontFixed
             }
 
             Item {

@@ -49,17 +49,17 @@ fn complete_shell_defaults_round_trip() {
 }
 
 #[test]
-fn host_seed_precedes_generic_and_hosts_stay_independent() {
+fn seeds_precede_defaults_and_hosts_stay_independent() {
     let directory = tempdir().unwrap();
-    let host_json = directory.path().join("host.json");
-    let legacy_json = directory.path().join("settings.json");
-    fs::write(&host_json, "{\"value\": 2}").unwrap();
-    fs::write(&legacy_json, "{\"value\": 1}").unwrap();
+    let first_seed = directory.path().join("first-seed.toml");
+    let second_seed = directory.path().join("second-seed.toml");
+    fs::write(&first_seed, "value = 2\n").unwrap();
+    fs::write(&second_seed, "value = 1\n").unwrap();
     let first = directory.path().join("first.toml");
     let second = directory.path().join("second.toml");
     let result = load(
         &first,
-        &[host_json.clone(), legacy_json.clone()],
+        &[first_seed.clone(), second_seed.clone()],
         request(json!({"value": 0, "new": true}), None),
     )
     .unwrap();
@@ -67,7 +67,7 @@ fn host_seed_precedes_generic_and_hosts_stay_independent() {
     assert_eq!(result.settings, json!({"value": 2, "new": true}));
     load(
         &second,
-        std::slice::from_ref(&legacy_json),
+        std::slice::from_ref(&second_seed),
         request(json!({}), None),
     )
     .unwrap();
@@ -77,11 +77,10 @@ fn host_seed_precedes_generic_and_hosts_stay_independent() {
             .settings["value"],
         1
     );
-    assert_eq!(read(&host_json), "{\"value\": 2}");
-    assert_eq!(read(&legacy_json), "{\"value\": 1}");
-    // Once created, hosts do not get reseeded.
+    assert_eq!(read(&first_seed), "value = 2\n");
+    assert_eq!(read(&second_seed), "value = 1\n");
     assert_eq!(
-        load(&first, &[legacy_json], request(json!({}), None))
+        load(&first, &[second_seed], request(json!({}), None))
             .unwrap()
             .settings["value"],
         2
@@ -267,4 +266,64 @@ fn cli_reads_one_json_line_and_reports_errors_on_stderr() {
     assert!(!output.status.success());
     assert!(output.stdout.is_empty());
     assert!(!output.stderr.is_empty());
+}
+
+#[test]
+fn json_settings_and_seeds_are_rejected_even_when_valid() {
+    let dir = tempdir().unwrap();
+    let seed = dir.path().join("settings.json");
+    fs::write(&seed, r#"{"value":1}"#).unwrap();
+    let host = dir.path().join("host.toml");
+    assert!(load(&host, std::slice::from_ref(&seed), request(json!({}), None)).is_err());
+    assert!(!host.exists());
+    assert!(load(&seed, &[], request(json!({}), None)).is_err());
+    assert!(save(&seed, request(json!({}), None)).is_err());
+    assert_eq!(read(&seed), r#"{"value":1}"#);
+}
+
+#[test]
+fn export_is_a_complete_private_toml_snapshot_without_stale_keys() {
+    let dir = tempdir().unwrap();
+    let path = dir.path().join("export.toml");
+    fs::write(&path, "stale = true\n").unwrap();
+    let settings = json!({"settingsVersion":71,"general":{"lockCommand":"hyprlock","scaleRatio":1.1},"ui":{"style":"material","fontDefault":"Roboto"},"desktopWidgets":{"monitorWidgets":[{"name":"DP-1","widgets":[{"id":"Weather","view":"detail","detail":"moon"}]}]}});
+    let result = frostalia_settings::export(&path, request(settings.clone(), None)).unwrap();
+    assert_eq!(result.settings, settings);
+    assert_eq!(
+        load(&path, &[], request(json!({}), None)).unwrap().settings,
+        settings
+    );
+    assert!(!read(&path).contains("stale"));
+    let new_path = dir.path().join("new-export.toml");
+    frostalia_settings::export(&new_path, request(settings, None)).unwrap();
+    assert_eq!(
+        fs::metadata(&new_path).unwrap().permissions().mode() & 0o777,
+        0o600
+    );
+    let bad_path = dir.path().join("export.json");
+    assert!(frostalia_settings::export(&bad_path, request(json!({}), None)).is_err());
+    assert!(!bad_path.exists());
+}
+
+#[test]
+fn export_command_writes_toml_to_selected_file() {
+    use std::process::{Command, Stdio};
+    let dir = tempdir().unwrap();
+    let path = dir.path().join("my settings.toml");
+    let settings = json!({"ui":{"style":"material","fontDefault":"Roboto"},"general":{"lockCommand":"hyprlock"}});
+    let mut child = Command::new(env!("CARGO_BIN_EXE_frostalia-settings"))
+        .arg("export")
+        .arg(&path)
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .spawn()
+        .unwrap();
+    serde_json::to_writer(child.stdin.take().unwrap(), &json!({"settings": settings})).unwrap();
+    let output = child.wait_with_output().unwrap();
+    assert!(output.status.success());
+    assert_eq!(
+        load(&path, &[], request(json!({}), None)).unwrap().settings,
+        settings
+    );
+    assert!(read(&path).contains("[general]"));
 }

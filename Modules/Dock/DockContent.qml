@@ -103,11 +103,11 @@ Item {
         }
       }
 
-      ScrollBar.horizontal: ScrollBar {
+      ScrollBar.horizontal: NScrollBar {
         visible: !dockRoot.isVertical && dock.interactive
         policy: ScrollBar.AsNeeded
       }
-      ScrollBar.vertical: ScrollBar {
+      ScrollBar.vertical: NScrollBar {
         visible: dockRoot.isVertical && dock.interactive
         policy: ScrollBar.AsNeeded
       }

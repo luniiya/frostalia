@@ -192,21 +192,15 @@ RowLayout {
       combo.Keys.returnPressed(event);
     }
 
-    background: Rectangle {
+    background: NFieldBackground {
+      id: comboFrame
       implicitWidth: Math.round(Style.baseWidgetSize * 3.75 * Style.uiScaleRatio)
       implicitHeight: Math.round(root.preferredHeight * Style.uiScaleRatio)
-      color: Style.materialControls ? ShellColors.mSurfaceVariant : ShellColors.mSurface
-      border.color: combo.activeFocus ? (Style.materialControls ? ShellColors.mPrimary : ShellColors.mSecondary) : ShellColors.mOutline
-      border.width: Style.materialControls && combo.activeFocus ? Style.borderM : Style.borderS
-      radius: Style.iRadiusM
-
-      Behavior on border.color {
-        ColorAnimation {
-          duration: Style.animationFast
-        }
-      }
+      active: combo.activeFocus || combo.popup.visible
+      hovered: comboHover.containsMouse
 
       MouseArea {
+        id: comboHover
         anchors.fill: parent
         hoverEnabled: true
         acceptedButtons: Qt.NoButton
@@ -244,13 +238,25 @@ RowLayout {
       y: combo.topPadding + (combo.availableHeight - height) / 2
       icon: "caret-down"
       pointSize: Style.fontSizeL
+      color: Style.materialControls ? (combo.popup.visible ? ShellColors.mPrimary : ShellColors.mOnSurfaceVariant) : ShellColors.mOnSurface
+      rotation: Style.materialControls && combo.popup.visible ? 180 : 0
+
+      Behavior on rotation {
+        enabled: Style.materialControls
+        NumberAnimation {
+          duration: Style.animationFast
+          easing.type: Easing.OutCubic
+        }
+      }
     }
 
     popup: Popup {
-      y: combo.height + Style.marginS
+      readonly property var menu: Style.uiStyleTokens.menu
+
+      y: combo.height + (menu ? Style.marginXS : Style.marginS)
       implicitWidth: combo.width
-      implicitHeight: Math.min(Math.round(root.popupHeight * Style.uiScaleRatio), listView.contentHeight + Style.margin2M)
-      padding: Style.marginM
+      implicitHeight: Math.min(Math.round(root.popupHeight * Style.uiScaleRatio), listView.contentHeight + padding * 2)
+      padding: menu ? menu.padding : Style.marginM
 
       onOpened: {
         listView.currentIndex = combo.currentIndex;
@@ -264,15 +270,14 @@ RowLayout {
         highlightMoveDuration: 0
         //showGradientMasks: false
 
-        delegate: Rectangle {
+        delegate: NMenuItemBackground {
           id: delegateRect
           required property int index
-          property bool isHighlighted: listView.currentIndex === index
 
           width: listView.availableWidth
-          height: delegateText.implicitHeight + Style.margin2S
-          radius: Style.iRadiusS
-          color: isHighlighted ? ShellColors.mHover : "transparent"
+          highlighted: listView.currentIndex === index
+          selected: combo.currentIndex === index
+          height: delegateText.implicitHeight + (Style.materialControls ? Style.margin2M : Style.margin2S)
 
           NText {
             id: delegateText
@@ -282,7 +287,7 @@ RowLayout {
             verticalAlignment: Text.AlignVCenter
             elide: Text.ElideRight
             pointSize: Style.fontSizeM
-            color: delegateRect.isHighlighted ? ShellColors.mOnHover : ShellColors.mOnSurface
+            color: delegateRect.contentColor
             text: {
               var item = root.getItem(delegateRect.index);
               return item && item.name ? item.name : "";
@@ -298,23 +303,23 @@ RowLayout {
               }
             }
             onClicked: {
-              var item = root.getItem(delegateRect.index);
+              // Capture everything first: selecting can rebuild the model and
+              // destroy this delegate before the handler finishes.
+              const index = delegateRect.index;
+              const box = combo;
+              const owner = root;
+              const item = owner.getItem(index);
               if (item && item.key !== undefined) {
-                root.selected(item.key);
-                listView.comboBox.currentIndex = delegateRect.index;
-                listView.comboBox.popup.close();
+                box.currentIndex = index;
+                box.popup.close();
+                owner.selected(item.key);
               }
             }
           }
         }
       }
 
-      background: Rectangle {
-        color: ShellColors.mSurfaceVariant
-        border.color: ShellColors.mOutline
-        border.width: Style.borderS
-        radius: Style.iRadiusM
-      }
+      background: NMenuSurface {}
     }
 
     Connections {

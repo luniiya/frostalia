@@ -86,7 +86,7 @@ Item {
             NText {
               visible: text !== ""
               text: modelData
-              family: useCustomFont && customFont ? customFont : Settings.data.ui.fontDefault
+              family: useCustomFont && customFont ? customFont : Style.fontDefault
               Binding on pointSize {
                 value: {
                   if (repeater.model.length == 1) {
@@ -126,7 +126,7 @@ Item {
             delegate: NText {
               visible: text !== ""
               text: modelData
-              family: useCustomFont && customFont ? customFont : Settings.data.ui.fontDefault
+              family: useCustomFont && customFont ? customFont : Style.fontDefault
               pointSize: barFontSize
               applyUiScale: false
               color: textColor

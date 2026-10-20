@@ -9,7 +9,11 @@ TestCase {
   function test_defaultsAndResetValuesAreStyleSpecific() {
     compare(UiStyleSettings.defaultValue("caelestia", "ui.panelBackgroundOpacity"), 0.93);
     compare(UiStyleSettings.defaultValue("material", "ui.panelBackgroundOpacity"), 1);
-    compare(UiStyleSettings.defaultValue("unknown", "ui.panelBackgroundOpacity"), 0.93);
+    compare(UiStyleSettings.defaultValue("unknown", "ui.panelBackgroundOpacity"), 1);
+    compare(UiStyleSettings.defaultValue("material", "ui.frostedGlass"), true);
+    compare(UiStyleSettings.defaultValue("caelestia", "ui.frostedGlass"), false);
+    compare(UiStyleSettings.defaultValue("material", "ui.glassPanelOpacity"), 0.85);
+    compare(UiStyleSettings.defaultValue("material", "ui.glassSurfaceOpacity"), 0.7);
     compare(UiStyleSettings.defaultValue("material", "general.scaleRatio"), undefined);
     compare(UiStyleSettings.defaultValue("material", "ui.fontDefaultScale"), undefined);
     compare(UiStyleSettings.defaultValue("material", "general.screenRadiusRatio"), undefined);
@@ -50,7 +54,7 @@ TestCase {
       compare(UiStyleSettings.forStyle("caelestia").general.radiusRatio, 1);
       const config = UiStyleSettings.configuration("/tmp/settings/UI");
       compare(config.directory, "/tmp/settings/UI");
-      compare(config.default_style, "caelestia");
+      compare(config.default_style, "material");
       compare(config.defaults.squareFixture.general.radiusRatio, 0);
     } finally {
       delete UiStyles.definitions.squareFixture;

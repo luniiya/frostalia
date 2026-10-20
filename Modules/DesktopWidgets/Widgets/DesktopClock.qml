@@ -8,6 +8,8 @@ import qs.Widgets
 
 DraggableDesktopWidget {
   id: root
+  horizontalResizable: false
+  verticalResizable: false
 
   readonly property var now: Time.now
   readonly property var widgetMetadata: DesktopWidgetRegistry.widgetMetadata["Clock"]
@@ -24,8 +26,6 @@ DraggableDesktopWidget {
   readonly property real contentPadding: Math.round((clockStyle === "minimal" ? Style.marginL : Style.marginXL) * widgetScale)
   implicitWidth: contentLoader.item ? Math.round((contentLoader.item.implicitWidth || contentLoader.item.width || 0) + contentPadding * 2) : 0
   implicitHeight: contentLoader.item ? Math.round((contentLoader.item.implicitHeight || contentLoader.item.height || 0) + contentPadding * 2) : 0
-  width: implicitWidth
-  height: implicitHeight
 
   Component {
     id: nclockComponent
@@ -55,7 +55,7 @@ DraggableDesktopWidget {
         delegate: NText {
           visible: text !== ""
           text: modelData
-          family: root.useCustomFont && root.customFont ? root.customFont : Settings.data.ui.fontDefault
+          family: root.useCustomFont && root.customFont ? root.customFont : Style.fontDefault
           pointSize: {
             if (model.length == 1) {
               return Math.round(Style.fontSizeXXL * root.widgetScale);

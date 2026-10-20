@@ -155,7 +155,7 @@ Item {
         return centerX + offset;
       }
       text: root.text + root.suffix
-      family: Settings.data.ui.fontFixed
+      family: Style.fontFixed
       pointSize: root.barFontSize
       applyUiScale: false
       color: root.textFgColor

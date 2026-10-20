@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
+import "../../../../../Helpers/ModelUsageOrder.js" as ModelUsageOrder
 import qs.Commons
 import qs.Widgets
 
@@ -9,6 +10,14 @@ ColumnLayout {
   spacing: Style.marginL
   Layout.fillWidth: true
 
+  readonly property var labelKeys: ({
+                                      "claude": "panels.system.ai-usage-claude-label",
+                                      "codex": "panels.system.ai-usage-codex-label",
+                                      "copilot": "panels.system.ai-usage-copilot-label",
+                                      "gemini": "panels.system.ai-usage-gemini-label",
+                                      "openrouter": "panels.system.ai-usage-openrouter-label",
+                                      "zen": "panels.system.ai-usage-zen-label"
+                                    })
   readonly property bool openrouterKeyFromEnv: (Quickshell.env("OPENROUTER_API_KEY") || "") !== ""
   readonly property bool zenKeyFromEnv: (Quickshell.env("OPENCODE_ZEN_API_KEY") || Quickshell.env("OPENCODE_API_KEY") || Quickshell.env("ZEN_API_KEY") || "") !== ""
 
@@ -20,49 +29,27 @@ ColumnLayout {
     Layout.fillWidth: true
   }
 
-  NToggle {
+  NLabel {
     Layout.fillWidth: true
-    label: I18n.tr("panels.system.ai-usage-claude-label")
-    description: I18n.tr("panels.system.ai-usage-claude-description")
-    checked: Settings.data.modelUsage.claudeEnabled
-    defaultValue: Settings.getDefaultValue("modelUsage.claudeEnabled")
-    onToggled: checked => Settings.data.modelUsage.claudeEnabled = checked
+    label: I18n.tr("panels.system.ai-usage-providers-label")
+    description: I18n.tr("panels.system.ai-usage-providers-description")
   }
 
-  NToggle {
+  // Check to enable a provider, drag to set its tab order in the AI usage panel
+  NReorderCheckboxes {
     Layout.fillWidth: true
-    label: I18n.tr("panels.system.ai-usage-codex-label")
-    description: I18n.tr("panels.system.ai-usage-codex-description")
-    checked: Settings.data.modelUsage.codexEnabled
-    defaultValue: Settings.getDefaultValue("modelUsage.codexEnabled")
-    onToggled: checked => Settings.data.modelUsage.codexEnabled = checked
-  }
-
-  NToggle {
-    Layout.fillWidth: true
-    label: I18n.tr("panels.system.ai-usage-copilot-label")
-    description: I18n.tr("panels.system.ai-usage-copilot-description")
-    checked: Settings.data.modelUsage.copilotEnabled
-    defaultValue: Settings.getDefaultValue("modelUsage.copilotEnabled")
-    onToggled: checked => Settings.data.modelUsage.copilotEnabled = checked
-  }
-
-  NToggle {
-    Layout.fillWidth: true
-    label: I18n.tr("panels.system.ai-usage-gemini-label")
-    description: I18n.tr("panels.system.ai-usage-gemini-description")
-    checked: Settings.data.modelUsage.geminiEnabled
-    defaultValue: Settings.getDefaultValue("modelUsage.geminiEnabled")
-    onToggled: checked => Settings.data.modelUsage.geminiEnabled = checked
-  }
-
-  NToggle {
-    Layout.fillWidth: true
-    label: I18n.tr("panels.system.ai-usage-openrouter-label")
-    description: I18n.tr("panels.system.ai-usage-openrouter-description")
-    checked: Settings.data.modelUsage.openrouterEnabled
-    defaultValue: Settings.getDefaultValue("modelUsage.openrouterEnabled")
-    onToggled: checked => Settings.data.modelUsage.openrouterEnabled = checked
+    model: ModelUsageOrder.orderedIds(Settings.data.modelUsage.providerOrder).map(id => ({
+                                                                                          "id": id,
+                                                                                          "text": I18n.tr(root.labelKeys[id]),
+                                                                                          "enabled": Settings.data.modelUsage[id + "Enabled"]
+                                                                                        }))
+    onItemToggled: (index, enabled) => {
+                     const id = ModelUsageOrder.orderedIds(Settings.data.modelUsage.providerOrder)[index];
+                     Settings.data.modelUsage[id + "Enabled"] = enabled;
+                   }
+    onItemsReordered: (fromIndex, toIndex) => {
+                        Settings.data.modelUsage.providerOrder = ModelUsageOrder.moved(Settings.data.modelUsage.providerOrder, fromIndex, toIndex);
+                      }
   }
 
   NTextInput {
@@ -82,15 +69,6 @@ ColumnLayout {
       if (!root.openrouterKeyFromEnv)
         Settings.data.modelUsage.openrouterApiKey = text;
     }
-  }
-
-  NToggle {
-    Layout.fillWidth: true
-    label: I18n.tr("panels.system.ai-usage-zen-label")
-    description: I18n.tr("panels.system.ai-usage-zen-description")
-    checked: Settings.data.modelUsage.zenEnabled
-    defaultValue: Settings.getDefaultValue("modelUsage.zenEnabled")
-    onToggled: checked => Settings.data.modelUsage.zenEnabled = checked
   }
 
   NTextInput {

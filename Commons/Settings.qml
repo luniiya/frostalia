@@ -31,7 +31,7 @@ Singleton {
   - Appearance: ~/.config/frostalia/settings/UI/<style>.toml
   */
   readonly property alias data: adapter  // Used to access via Settings.data.xxx.yyy
-  readonly property int settingsVersion: 67
+  readonly property int settingsVersion: 73
   property bool isDebug: Quickshell.env("FROSTALIA_DEBUG") === "1"
   readonly property string shellName: "frostalia"
   readonly property string configDir: ensureTrailingSlash(Quickshell.env("FROSTALIA_CONFIG_DIR") || (Quickshell.env("XDG_CONFIG_HOME") || Quickshell.env("HOME") + "/.config") + "/" + shellName + "/")
@@ -49,6 +49,44 @@ Singleton {
   signal settingsLoaded
   signal settingsSaved
   signal settingsReloaded
+  signal settingsExported(string path)
+  signal settingsExportFailed(string message)
+
+  readonly property bool exportingSettings: settingsExportProcess.running
+
+  function exportSettings(path) {
+    if (exportingSettings)
+      return;
+    if (!path) {
+      settingsExportFailed(I18n.tr("panels.general.export-invalid-path"));
+      return;
+    }
+    settingsExportProcess.destination = path;
+    settingsExportProcess.snapshot = QtObj2JS.qtObjectToPlainObject(root.data);
+    settingsExportProcess.command = [settingsStore.helper, "export", path];
+    settingsExportProcess.running = true;
+  }
+
+  Process {
+    id: settingsExportProcess
+    property string destination: ""
+    property var snapshot: null
+    stdinEnabled: true
+    onStarted: write(JSON.stringify({
+                                      settings: snapshot
+                                    }) + "\n")
+    stdout: StdioCollector {}
+    stderr: StdioCollector {
+      id: settingsExportErrors
+    }
+    onExited: function (exitCode) {
+      if (exitCode === 0)
+        root.settingsExported(destination);
+      else
+        root.settingsExportFailed(settingsExportErrors.text.trim());
+      snapshot = null;
+    }
+  }
 
   // -----------------------------------------------------
   // -----------------------------------------------------
@@ -106,7 +144,7 @@ Singleton {
     uiProfiles: UiStyleSettings.configuration(root.settingsDir + "UI")
     configFile: root.settingsFile
     active: root.settingsPathReady
-    seedFiles: root.settingsEnvOverride ? [] : SettingsPaths.seedFiles(root.configDir, root.hostName)
+    seedFiles: root.settingsEnvOverride ? [] : SettingsPaths.seedFiles(root.configDir)
     onChanged: saveTimer.start()
     onSaved: root.settingsSaved()
     onFailed: message => Logger.e("Settings", message)
@@ -178,6 +216,7 @@ Singleton {
         property string transition: "up"
         property int transitionDuration: 220
         property bool hideOnFullscreen: true
+        property bool reserveSpace: true
       }
     }
 
@@ -275,7 +314,7 @@ Singleton {
       property string middleClickAction: "none"
       property bool middleClickFollowMouse: false
       property string middleClickCommand: ""
-      property string rightClickAction: "none"
+      property string rightClickAction: "contextMenu"
       property bool rightClickFollowMouse: true
       property string rightClickCommand: ""
       // Per-screen overrides for position and widgets
@@ -304,7 +343,6 @@ Singleton {
       property int shadowOffsetY: 3
       property string language: ""
       property bool allowPanelsOnScreenWithoutBar: true
-      property bool telemetryEnabled: false
       property JsonObject keybinds: JsonObject {
         property list<string> keyUp: ["Up"]
         property list<string> keyDown: ["Down"]
@@ -320,20 +358,23 @@ Singleton {
 
     // ui
     property JsonObject ui: JsonObject {
-      property string style: "caelestia"
-      property string fontDefault: "Rubik"
+      property string style: "material"
+      property string fontDefault: "Roboto"
       property string fontFixed: ""
       property real fontDefaultScale: 1.0
       property real fontFixedScale: 1.0
       property bool tooltipsEnabled: true
       property bool scrollbarAlwaysVisible: true
-      property bool boxBorderEnabled: true
+      property bool boxBorderEnabled: false
       property int boxBorderWidth: 1 // 1-6, scaled with the UI
       property string boxBorderColor: "outline" // "outline", "primary", "secondary", "tertiary", "error"
       property int boxBorderBrightness: 0 // -100 (black) to 100 (white)
       property int boxBorderOpacity: 100 // percent
-      property real panelBackgroundOpacity: 0.93
+      property real panelBackgroundOpacity: 1.0
       property bool translucentWidgets: false
+      property bool frostedGlass: true
+      property real glassPanelOpacity: 0.85
+      property real glassSurfaceOpacity: 0.7
       property bool panelsAttachedToBar: true
       property bool settingsPanelSideBarCardStyle: false
     }
@@ -343,7 +384,13 @@ Singleton {
       property string name: ""
       property bool weatherEnabled: true
       property bool weatherShowEffects: true
-      property bool weatherTaliaMascotAlways: false
+      property bool weatherShowHourly: true
+      property bool weatherShowDaily: true
+      property bool weatherShowDetails: true
+      property int weatherHourlyCount: 24
+      property int weatherDailyCount: 7
+      property list<var> weatherDetails: [] // [{ id, enabled }] in display order; empty = every detail
+      property string windSpeedUnit: "kmh" // kmh, ms, mph, kn
       property bool useFahrenheit: false
       property bool use12hourFormat: false
       property bool showWeekNumberInCalendar: false
@@ -420,7 +467,15 @@ Singleton {
             "id": "Bluetooth"
           },
           {
-            "id": "FrostaliaPerformance"
+            "id": "CustomButton",
+            "icon": "wall",
+            "generalTooltipText": "random wallpaper",
+            "onClicked": "",
+            "onRightClicked": "",
+            "onMiddleClicked": "",
+            "stateChecksJson": "[]",
+            "enableOnStateLogic": false,
+            "showExecTooltip": true
           }
         ]
         property list<var> right: [
@@ -456,8 +511,12 @@ Singleton {
           "enabled": false
         },
         {
+          "id": "kdeconnect-card",
+          "enabled": false
+        },
+        {
           "id": "weather-card",
-          "enabled": true
+          "enabled": false
         },
         {
           "id": "media-sysmon-card",
@@ -465,11 +524,11 @@ Singleton {
         },
         {
           "id": "notification-card",
-          "enabled": true
+          "enabled": false
         },
         {
           "id": "calendar-month-card",
-          "enabled": true
+          "enabled": false
         }
       ]
     }
@@ -510,6 +569,7 @@ Singleton {
       property bool zenEnabled: false
       property string openrouterApiKey: ""
       property string zenApiKey: ""
+      property list<string> providerOrder: ["claude", "codex", "copilot", "gemini", "openrouter", "zen"]
     }
 
     // performance
@@ -560,6 +620,13 @@ Singleton {
       property bool bluetoothHideUnnamedDevices: false
       property bool disableDiscoverability: false
       property bool bluetoothAutoConnect: true
+    }
+
+    // kde connect
+    property JsonObject kdeConnect: JsonObject {
+      property bool enabled: false
+      property string device: "" // id of the last phone picked in the panel
+      property real touchpadSensitivity: 1.5
     }
 
     // session menu
@@ -686,7 +753,7 @@ Singleton {
 
     property JsonObject colorSchemes: JsonObject {
       property bool useWallpaperColors: false
-      property string predefinedScheme: "Frostalia (default)"
+      property string predefinedScheme: "Eldritch"
       property bool darkMode: true
       property string schedulingMode: "off"
       property string manualSunrise: "06:30"

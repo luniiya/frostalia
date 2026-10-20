@@ -3,6 +3,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Services.UPower
+import "../../Helpers/PerformanceMode.js" as PerformanceMode
 import qs.Commons
 import qs.Services.UI
 
@@ -13,8 +14,9 @@ Singleton {
   readonly property bool available: powerProfiles && powerProfiles.hasPerformanceProfile
   property int profile: powerProfiles ? powerProfiles.profile : PowerProfile.Balanced
 
-  // Not a power profile but a volatile property to quickly disable shadows, animations, etc..
-  property bool frostaliaPerformanceMode: false
+  // Not a power profile: disables shadows, animations, notification popups, etc.
+  // while the Performance profile is active.
+  readonly property bool frostaliaPerformanceMode: PerformanceMode.enabled(available, profile, PowerProfile.Performance)
 
   function getName(p) {
     if (!available)
@@ -107,26 +109,6 @@ Singleton {
                                           "profile": profileName
                                         }), I18n.tr("toast.power-profile.changed"), profileName.toLowerCase().replace(" ", ""));
       }
-    }
-  }
-
-  // Frostalia Performance Mode
-  // - Turning shadow off
-  // - Turning animation off
-  // - Do Not Disturb
-  function toggleFrostaliaPerformance() {
-    frostaliaPerformanceMode = !frostaliaPerformanceMode;
-  }
-
-  function setFrostaliaPerformance(value) {
-    frostaliaPerformanceMode = value;
-  }
-
-  onFrostaliaPerformanceModeChanged: {
-    if (frostaliaPerformanceMode) {
-      ToastService.showNotice(I18n.tr("toast.frostalia-performance.label"), I18n.tr("toast.frostalia-performance.enabled"), "rocket");
-    } else {
-      ToastService.showNotice(I18n.tr("toast.frostalia-performance.label"), I18n.tr("toast.frostalia-performance.disabled"), "rocket-off");
     }
   }
 }

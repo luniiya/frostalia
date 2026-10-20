@@ -13,8 +13,10 @@ Item {
   property var tooltipText
   property color backgroundColor: ShellColors.mPrimary
   property color textColor: ShellColors.mOnPrimary
-  property color hoverColor: Style.materialControls ? backgroundColor : ShellColors.mHover
-  property color textHoverColor: Style.materialControls ? (outlined ? backgroundColor : textColor) : ShellColors.mOnHover
+  // Material: outlined buttons become tonal buttons (tinted pill, no border)
+  readonly property bool _tonal: Style.materialControls && outlined
+  property color hoverColor: Style.materialControls ? (outlined ? Qt.alpha(backgroundColor, 0.16) : backgroundColor) : ShellColors.mHover
+  property color textHoverColor: Style.materialControls ? (outlined ? ShellColors.mOnSurface : textColor) : ShellColors.mOnHover
   property real fontSize: Style.fontSizeM
   property int fontWeight: Style.fontWeightSemiBold
   property real iconSize: Style.fontSizeL
@@ -37,6 +39,9 @@ Item {
     }
     if (root.hovered) {
       return root.textHoverColor;
+    }
+    if (root._tonal) {
+      return ShellColors.mOnSurface;
     }
     if (root.outlined) {
       return root.backgroundColor;
@@ -72,10 +77,12 @@ Item {
         return root.outlined ? "transparent" : Qt.lighter(ShellColors.mSurfaceVariant, 1.2);
       if (root.hovered)
         return root.hoverColor;
+      if (root._tonal)
+        return Qt.alpha(root.backgroundColor, 0.16);
       return root.outlined ? "transparent" : root.backgroundColor;
     }
 
-    border.width: root.outlined ? Style.borderS : 0
+    border.width: root.outlined && !root._tonal ? Style.borderS : 0
     border.color: {
       if (!root.enabled)
         return ShellColors.mOutline;
@@ -103,7 +110,7 @@ Item {
     NMaterialStateLayer {
       hovered: root.hovered
       pressed: mouseArea.pressed
-      tint: root.outlined ? root.backgroundColor : root.textColor
+      tint: root._tonal ? ShellColors.mOnSurface : (root.outlined ? root.backgroundColor : root.textColor)
     }
 
     // Content

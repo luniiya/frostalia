@@ -42,6 +42,18 @@ TestCase {
                                              ]), []);
   }
 
+  function test_phoneTileIsWide() {
+    const rows = ControlCenterLayout.shortcutRows([
+                                                    {
+                                                      id: "KdeConnect"
+                                                    },
+                                                    {
+                                                      id: "DarkMode"
+                                                    }
+                                                  ], []);
+    compare(rows.map(row => row.map(entry => entry.span)), [[2, 1]]);
+  }
+
   function test_gridWidthsDoNotOverflow_data() {
     return [
           {
@@ -143,7 +155,7 @@ TestCase {
       verify(UiStyles.view("caelestia", surface).length > 0);
       verify(UiStyles.view("material", surface).length > 0);
       verify(UiStyles.view("caelestia", surface) !== UiStyles.view("material", surface));
-      compare(UiStyles.view("unknown", surface), UiStyles.view("caelestia", surface));
+      compare(UiStyles.view("unknown", surface), UiStyles.view("material", surface));
     }
     compare(UiStyles.view("material", "unknown"), "");
   }
@@ -218,6 +230,41 @@ TestCase {
                                              ], false, false).length, 1);
   }
 
+  function test_insertMissingCardsUsesDefaultPosition() {
+    const ids = list => list.map(card => card.id);
+    const defaults = ["profile-card", "brightness-card", "kdeconnect-card", "weather-card", "calendar-month-card"].map(id => ({
+      id: id,
+      enabled: false
+    }));
+    const saved = ["weather-card", "brightness-card", "profile-card"].map(id => ({
+      id: id,
+      enabled: true
+    }));
+    compare(ids(ControlCenterLayout.insertMissingCards(saved, defaults)), ["weather-card", "calendar-month-card", "brightness-card", "kdeconnect-card", "profile-card"], "saved order kept, new cards after their default predecessor");
+    compare(ids(saved), ["weather-card", "brightness-card", "profile-card"], "input not mutated");
+    compare(ids(ControlCenterLayout.insertMissingCards([], defaults)), ids(defaults));
+    compare(ids(ControlCenterLayout.insertMissingCards(null, defaults.slice(2))), ["kdeconnect-card", "weather-card", "calendar-month-card"]);
+    compare(ids(ControlCenterLayout.insertMissingCards(defaults, defaults)), ids(defaults));
+  }
+
+  function test_kdeConnectCardNeedsIntegration() {
+    const cards = [
+            {
+              id: "kdeconnect-card",
+              enabled: true
+            }
+          ];
+    compare(ControlCenterLayout.visibleCards(cards, true, true, false), [], "hidden while KDE Connect is disabled");
+    compare(ControlCenterLayout.visibleCards(cards, true, true).length, 0);
+    compare(ControlCenterLayout.visibleCards(cards, true, true, true).map(card => card.id), ["kdeconnect-card"]);
+    compare(ControlCenterLayout.visibleCards([
+                                               {
+                                                 id: "kdeconnect-card",
+                                                 enabled: false
+                                               }
+                                             ], true, true, true), []);
+  }
+
   function test_additionalCardsPreserveSavedOrderAndDisabledState() {
     const saved = [
             {
@@ -248,5 +295,51 @@ TestCase {
                 enabled: true
               }
             ]);
+  }
+
+  function test_equalWidth_data() {
+    return [
+          {
+            tag: "four stats",
+            width: 400,
+            gap: 8,
+            count: 4,
+            expected: 94
+          },
+          {
+            tag: "no gap",
+            width: 100,
+            gap: 0,
+            count: 4,
+            expected: 25
+          },
+          {
+            tag: "too narrow",
+            width: 10,
+            gap: 8,
+            count: 4,
+            expected: 0
+          },
+          {
+            tag: "empty",
+            width: 400,
+            gap: 8,
+            count: 0,
+            expected: 0
+          }
+        ];
+  }
+
+  // Regression: system monitor stats were sized by label width.
+  function test_equalWidth(data) {
+    compare(ControlCenterLayout.equalWidth(data.width, data.gap, data.count), data.expected);
+  }
+
+  // Regression: the sliders card added one padding but anchored with two,
+  // leaving no space below the microphone slider.
+  function test_paddedHeight() {
+    compare(ControlCenterLayout.paddedHeight(90, 8), 106);
+    compare(ControlCenterLayout.paddedHeight(0, 8), 16);
+    compare(ControlCenterLayout.paddedHeight(-5, -2), 0);
   }
 }

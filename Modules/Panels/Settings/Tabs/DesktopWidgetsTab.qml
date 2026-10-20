@@ -13,6 +13,17 @@ ColumnLayout {
 
   spacing: Style.marginL
 
+  Shortcut {
+    sequence: "Ctrl+Z"
+    enabled: DesktopWidgetRegistry.canUndo && !DesktopWidgetRegistry.currentSettingsDialog
+    onActivated: DesktopWidgetRegistry.undo()
+  }
+  Shortcut {
+    sequences: ["Ctrl+Shift+Z", "Ctrl+Y"]
+    enabled: DesktopWidgetRegistry.canRedo && !DesktopWidgetRegistry.currentSettingsDialog
+    onActivated: DesktopWidgetRegistry.redo()
+  }
+
   // Available widgets model - declared early so Repeater delegates can access it
   property alias availableWidgetsModel: availableWidgets
   ListModel {
@@ -53,14 +64,31 @@ ColumnLayout {
       description: I18n.tr("panels.desktop-widgets.cpu-intensive-note")
     }
 
-    NButton {
+    RowLayout {
       Layout.fillWidth: true
-      Layout.topMargin: Style.marginM
-      Layout.bottomMargin: Style.marginM
-      text: DesktopWidgetRegistry.editMode ? I18n.tr("panels.desktop-widgets.edit-mode-exit-button") : I18n.tr("panels.desktop-widgets.edit-mode-button-label")
-      icon: "edit"
-      onClicked: {
-        DesktopWidgetRegistry.editMode = !DesktopWidgetRegistry.editMode;
+      spacing: Style.marginS
+
+      NIconButton {
+        icon: "arrow-back-up"
+        tooltipText: I18n.tr("actions.undo-desktop-widget-change")
+        enabled: DesktopWidgetRegistry.canUndo
+        onClicked: DesktopWidgetRegistry.undo()
+      }
+      NIconButton {
+        icon: "arrow-forward-up"
+        tooltipText: I18n.tr("actions.redo-desktop-widget-change")
+        enabled: DesktopWidgetRegistry.canRedo
+        onClicked: DesktopWidgetRegistry.redo()
+      }
+      NButton {
+        Layout.fillWidth: true
+        Layout.topMargin: Style.marginM
+        Layout.bottomMargin: Style.marginM
+        text: DesktopWidgetRegistry.editMode ? I18n.tr("panels.desktop-widgets.edit-mode-exit-button") : I18n.tr("panels.desktop-widgets.edit-mode-button-label")
+        icon: "edit"
+        onClicked: {
+          DesktopWidgetRegistry.editMode = !DesktopWidgetRegistry.editMode;
+        }
       }
     }
 

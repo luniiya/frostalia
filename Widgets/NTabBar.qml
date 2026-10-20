@@ -67,16 +67,18 @@ Rectangle {
 
   // Styling
   Layout.margins: Style.borderS
-  implicitWidth: tabRow.implicitWidth + (margins * 2)
-  implicitHeight: tabHeight + (margins * 2)
-  color: ShellColors.smartAlpha(ShellColors.mSurfaceVariant)
+  // Material draws a connected button group without a container.
+  readonly property real _margins: Style.materialControls ? 0 : margins
+  implicitWidth: tabRow.implicitWidth + (_margins * 2)
+  implicitHeight: tabHeight + (_margins * 2)
+  color: Style.materialControls ? "transparent" : ShellColors.smartAlpha(ShellColors.mSurfaceVariant)
   radius: Style.iRadiusM
 
   RowLayout {
     id: tabRow
     anchors.fill: parent
-    anchors.margins: margins
-    spacing: root.spacing
+    anchors.margins: root._margins
+    spacing: Style.materialControls ? Style.uiStyleTokens.buttonGroup.gap : root.spacing
 
     onChildrenChanged: {
       for (var i = 0; i < children.length; i++) {

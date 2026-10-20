@@ -35,6 +35,11 @@ ColumnLayout {
       tabIndex: 2
       checked: subTabBar.currentIndex === 2
     }
+    NTabButton {
+      text: I18n.tr("panels.hooks.title")
+      tabIndex: 3
+      checked: subTabBar.currentIndex === 3
+    }
   }
 
   Item {
@@ -48,5 +53,6 @@ ColumnLayout {
     BasicsSubTab {}
     KeybindsSubTab {}
     ScreenCornersSubTab {}
+    HooksSubTab {}
   }
 }

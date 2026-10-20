@@ -1215,7 +1215,7 @@ Item {
                       anchors.right: parent.right
                       anchors.verticalCenter: parent.verticalCenter
                       anchors.margins: Style.marginS
-                      font.family: Settings.data.ui.fontFixed
+                      font.family: Style.fontFixed
                       font.pointSize: Style.fontSizeS
                       color: ShellColors.mOnSurface
                       selectByMouse: true
@@ -1256,7 +1256,7 @@ Item {
                   anchors.right: parent.right
                   anchors.verticalCenter: parent.verticalCenter
                   anchors.margins: Style.marginS
-                  font.family: Settings.data.ui.fontFixed
+                  font.family: Style.fontFixed
                   font.pointSize: Style.fontSizeS
                   color: ShellColors.mOnSurface
                   selectByMouse: true
@@ -1290,7 +1290,7 @@ Item {
                   anchors.right: parent.right
                   anchors.verticalCenter: parent.verticalCenter
                   anchors.margins: Style.marginS
-                  font.family: Settings.data.ui.fontFixed
+                  font.family: Style.fontFixed
                   font.pointSize: Style.fontSizeS
                   color: ShellColors.mOnSurface
                   selectByMouse: true
@@ -1326,7 +1326,7 @@ Item {
                   anchors.right: parent.right
                   anchors.verticalCenter: parent.verticalCenter
                   anchors.margins: Style.marginS
-                  font.family: Settings.data.ui.fontFixed
+                  font.family: Style.fontFixed
                   font.pointSize: Style.fontSizeS
                   color: ShellColors.mOnSurface
                   echoMode: TextInput.Password

@@ -162,7 +162,7 @@ Item {
                 Layout.fillWidth: true
                 text: slotArea.keybindText
                 color: slotArea.isRecordingThis ? ShellColors.mOnSecondary : (slotArea.isOccupied ? ShellColors.mOnSurface : ShellColors.mOnSurfaceVariant)
-                font.family: slotArea.isOccupied && !slotArea.isRecordingThis ? Settings.data.ui.fontFixed : Settings.data.ui.fontDefault
+                font.family: slotArea.isOccupied && !slotArea.isRecordingThis ? Style.fontFixed : Style.fontDefault
                 font.pointSize: slotArea.isOccupied ? Style.fontSizeM : Style.fontSizeS
                 font.weight: slotArea.isOccupied ? Style.fontWeightBold : Style.fontWeightRegular
                 elide: Text.ElideRight

@@ -16,6 +16,7 @@
   lib,
   stdenvNoCC,
   rustPlatform,
+  dbus,
   # build
   qt6,
   quickshell,
@@ -47,6 +48,7 @@ let
       !(builtins.any (prefix: lib.path.hasPrefix (../. + prefix) (/. + path)) [
         /Tools/settings/target
         /Tools/theming/target
+        /Tools/kdeconnect/target
         /.github
         /.gitignore
         /Assets/Screenshots
@@ -80,6 +82,16 @@ let
     cargoLock.lockFile = ../Tools/theming/Cargo.lock;
   };
 
+  kdeconnectHelper = rustPlatform.buildRustPackage {
+    pname = "frostalia-kdeconnect";
+    inherit version src;
+    cargoRoot = "Tools/kdeconnect";
+    buildAndTestSubdir = "Tools/kdeconnect";
+    cargoLock.lockFile = ../Tools/kdeconnect/Cargo.lock;
+    # Integration tests run a private dbus-daemon.
+    nativeCheckInputs = [ dbus ];
+  };
+
   giTypelibPath = lib.makeSearchPath "lib/girepository-1.0" [
     evolution-data-server
     libical
@@ -108,6 +120,7 @@ stdenvNoCC.mkDerivation {
     ln -s ${quickshell}/bin/qs $out/bin/frostalia
     install -m 755 ${settingsHelper}/bin/frostalia-settings $out/bin/frostalia-settings
     install -m 755 ${themingHelper}/bin/frostalia-theming $out/bin/frostalia-theming
+    install -m 755 ${kdeconnectHelper}/bin/frostalia-kdeconnect $out/bin/frostalia-kdeconnect
   '';
 
   preFixup = ''
@@ -117,6 +130,7 @@ stdenvNoCC.mkDerivation {
       --set-default QS_CONFIG_PATH "$out/share/frostalia"
       --set FROSTALIA_SETTINGS_HELPER "$out/bin/frostalia-settings"
       --set FROSTALIA_THEMING_HELPER "$out/bin/frostalia-theming"
+      --set FROSTALIA_KDECONNECT_HELPER "$out/bin/frostalia-kdeconnect"
       ${lib.optionalString calendarSupport "--prefix GI_TYPELIB_PATH : ${giTypelibPath}"}
     )
   '';
@@ -124,7 +138,7 @@ stdenvNoCC.mkDerivation {
   meta = {
     description = "A sleek and minimal desktop shell thoughtfully crafted for Wayland, built with Quickshell.";
     homepage = "https://github.com/luniiya/frostalia";
-    license = lib.licenses.mit;
+    license = lib.licenses.gpl3Only;
     mainProgram = "frostalia";
   };
 }

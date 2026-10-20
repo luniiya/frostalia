@@ -1,6 +1,6 @@
 .pragma library
 
-// Five-cell rows mix compact toggles with labeled Bluetooth/power tiles.
+// Five-cell rows mix compact toggles with labeled Bluetooth/power/phone tiles.
 var columns = 5;
 function shortcutRows(left, right) {
   const rows = [];
@@ -11,7 +11,7 @@ function shortcutRows(left, right) {
     const settings = shortcuts[index];
     if (!settings || !settings.id)
       continue;
-    const span = ["Bluetooth", "PowerProfile"].includes(settings.id) ? 2 : 1;
+    const span = ["Bluetooth", "PowerProfile", "KdeConnect"].includes(settings.id) ? 2 : 1;
     if (used + span > columns) {
       rows.push(row);
       row = [];
@@ -27,6 +27,18 @@ function shortcutRows(left, right) {
 
 function cellWidth(width, gap, span) {
   return Math.max(0, (width - (columns - 1) * gap) / columns * span + (span - 1) * gap);
+}
+
+// Equal share of a row for count items separated by gap.
+function equalWidth(width, gap, count) {
+  if (!(count > 0))
+    return 0;
+  return Math.max(0, (width - (count - 1) * gap) / count);
+}
+
+// Card height with the same padding above and below its content.
+function paddedHeight(contentHeight, padding) {
+  return Math.max(0, contentHeight) + 2 * Math.max(0, padding);
 }
 
 function cardEnabled(cards, id) {
@@ -55,12 +67,33 @@ function notificationHeight(count, scale) {
 }
 
 // Keep enabled cards in saved order; unavailable cards must not reserve space.
-function visibleCards(cards, weatherEnabled, hasShortcuts) {
+function visibleCards(cards, weatherEnabled, hasShortcuts, kdeConnectEnabled) {
   const supported = ["profile-card", "shortcuts-card", "audio-card", "brightness-card",
-                     "weather-card", "media-sysmon-card", "notification-card", "calendar-month-card"];
+                     "weather-card", "media-sysmon-card", "notification-card", "calendar-month-card", "kdeconnect-card"];
   return (cards || []).filter(card => card && card.enabled && supported.includes(card.id)
     && (card.id !== "weather-card" || weatherEnabled)
-    && (card.id !== "shortcuts-card" || hasShortcuts));
+    && (card.id !== "shortcuts-card" || hasShortcuts)
+    && (card.id !== "kdeconnect-card" || !!kdeConnectEnabled));
+}
+
+// Settings list: cards missing from the saved list go right after the default
+// card that precedes them, so a new card shows up where the defaults put it.
+function insertMissingCards(saved, defaults) {
+  const result = (saved || []).slice();
+  (defaults || []).forEach((card, index) => {
+    if (result.some(c => c.id === card.id))
+      return;
+    let at = 0;
+    for (let i = index - 1; i >= 0; i--) {
+      const prev = result.findIndex(c => c.id === defaults[i].id);
+      if (prev >= 0) {
+        at = prev + 1;
+        break;
+      }
+    }
+    result.splice(at, 0, card);
+  });
+  return result;
 }
 
 function withAdditionalCards(cards) {

@@ -64,19 +64,12 @@ ColumnLayout {
     focusPolicy: Qt.StrongFocus
     hoverEnabled: true
 
-    background: Rectangle {
+    background: NFieldBackground {
       id: frame
-
-      radius: root.radius
-      color: Style.materialControls ? ShellColors.mSurfaceVariant : ShellColors.mSurface
-      border.color: input.activeFocus ? (Style.materialControls ? ShellColors.mPrimary : ShellColors.mSecondary) : ShellColors.mOutline
-      border.width: root.outlined ? (Style.materialControls && input.activeFocus ? Style.borderM : Style.borderS) : 0
-
-      Behavior on border.color {
-        ColorAnimation {
-          duration: Style.animationFast
-        }
-      }
+      active: input.activeFocus
+      hovered: backgroundCapture.containsMouse
+      outlined: root.outlined
+      cornerRadius: root.radius
     }
 
     contentItem: Item {

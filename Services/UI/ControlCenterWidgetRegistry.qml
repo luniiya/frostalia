@@ -14,13 +14,13 @@ Singleton {
                            "Bluetooth": bluetoothComponent,
                            "CustomButton": customButtonComponent,
                            "DarkMode": darkModeComponent,
+                           "KdeConnect": kdeConnectComponent,
                            "KeepAwake": keepAwakeComponent,
                            "NightLight": nightLightComponent,
                            "Notifications": notificationsComponent,
                            "PowerProfile": powerProfileComponent,
                            "WiFi": networkComponent,
-                           "Network": networkComponent,
-                           "FrostaliaPerformance": frostaliaPerformanceComponent
+                           "Network": networkComponent
                          })
 
   property var widgetMetadata: ({
@@ -51,6 +51,9 @@ Singleton {
   property Component darkModeComponent: Component {
     DarkMode {}
   }
+  property Component kdeConnectComponent: Component {
+    KdeConnect {}
+  }
   property Component keepAwakeComponent: Component {
     KeepAwake {}
   }
@@ -65,9 +68,6 @@ Singleton {
   }
   property Component networkComponent: Component {
     Network {}
-  }
-  property Component frostaliaPerformanceComponent: Component {
-    FrostaliaPerformance {}
   }
 
   function init() {

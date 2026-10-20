@@ -24,7 +24,7 @@ PopupWindow {
 
   // Font scale calculation matching NText behavior
   readonly property real gridFontScale: {
-    const baseScale = (tooltipText.family === Settings.data.ui.fontDefault ? Settings.data.ui.fontDefaultScale : Settings.data.ui.fontFixedScale);
+    const baseScale = (tooltipText.family === Style.fontDefault ? Settings.data.ui.fontDefaultScale : Settings.data.ui.fontFixedScale);
     return baseScale * Style.uiScaleRatio;
   }
 
@@ -196,7 +196,7 @@ PopupWindow {
       direction = "auto";
     }
 
-    tooltipText.family = fontFamily ? fontFamily : Settings.data.ui.fontDefault;
+    tooltipText.family = fontFamily ? fontFamily : Style.fontDefault;
   }
 
   // Calculate grid dimensions using measurements that match actual NText rendering
@@ -658,7 +658,7 @@ PopupWindow {
         anchors.margins: root.padding
         text: root.text
         pointSize: Style.fontSizeS
-        family: Settings.data.ui.fontFixed
+        family: Style.fontFixed
         color: ShellColors.mOnSurfaceVariant
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
