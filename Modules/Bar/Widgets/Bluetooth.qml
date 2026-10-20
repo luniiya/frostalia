@@ -83,8 +83,8 @@ Item {
     screen: root.screen
     section: root.section
     oppositeDirection: BarService.getPillDirection(root)
-    customIconColor: Color.resolveColorKeyOptional(root.iconColorKey)
-    customTextColor: Color.resolveColorKeyOptional(root.textColorKey)
+    customIconColor: ShellColors.resolveColorKeyOptional(root.iconColorKey)
+    customTextColor: ShellColors.resolveColorKeyOptional(root.textColorKey)
     icon: !BluetoothService.enabled ? "bluetooth-off" : ((BluetoothService.connectedDevices && BluetoothService.connectedDevices.length > 0) ? "bluetooth-connected" : "bluetooth")
     text: {
       if (BluetoothService.connectedDevices && BluetoothService.connectedDevices.length > 0) {

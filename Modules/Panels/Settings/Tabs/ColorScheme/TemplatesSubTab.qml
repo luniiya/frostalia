@@ -218,8 +218,8 @@ ColumnLayout {
       icon: "filter"
       tooltipText: root.showOnlyActive ? I18n.tr("actions.show-all") : I18n.tr("actions.show-active-only")
 
-      colorBg: root.showOnlyActive ? Color.mPrimary : Color.mSurface
-      colorFg: root.showOnlyActive ? Color.mOnPrimary : Color.mOnSurface
+      colorBg: root.showOnlyActive ? ShellColors.mPrimary : ShellColors.mSurface
+      colorFg: root.showOnlyActive ? ShellColors.mOnPrimary : ShellColors.mOnSurface
 
       onClicked: root.showOnlyActive = !root.showOnlyActive
     }
@@ -240,8 +240,8 @@ ColumnLayout {
         Layout.fillWidth: true
         Layout.preferredHeight: Math.round(Style.baseWidgetSize * 0.9)
         radius: Style.iRadiusM
-        color: chipMouse.containsMouse ? Color.mHover : (isActive ? Color.mPrimary : Color.mSurface)
-        border.color: isActive ? Color.mPrimary : Color.mOutline
+        color: chipMouse.containsMouse ? ShellColors.mHover : (isActive ? ShellColors.mPrimary : ShellColors.mSurface)
+        border.color: isActive ? ShellColors.mPrimary : ShellColors.mOutline
         border.width: Style.borderS
 
         required property int index
@@ -260,7 +260,7 @@ ColumnLayout {
           width: parent.width - Style.margin2L
           text: chip.modelData.name
           pointSize: Style.fontSizeS
-          color: chipMouse.containsMouse ? Color.mOnHover : (isActive ? Color.mOnPrimary : Color.mOnSurface)
+          color: chipMouse.containsMouse ? ShellColors.mOnHover : (isActive ? ShellColors.mOnPrimary : ShellColors.mOnSurface)
           horizontalAlignment: Text.AlignHCenter
           elide: Text.ElideRight
 
@@ -294,7 +294,7 @@ ColumnLayout {
   NText {
     visible: filteredTemplates.length === 0 && searchText.trim() !== ""
     text: I18n.tr("common.no-results")
-    color: Color.mOnSurfaceVariant
+    color: ShellColors.mOnSurfaceVariant
   }
 
   NDivider {

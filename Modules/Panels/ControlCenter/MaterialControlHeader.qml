@@ -29,7 +29,7 @@ Item {
       Layout.preferredWidth: uptimeRow.implicitWidth + Style.margin2L
       Layout.fillHeight: true
       radius: height / 2
-      color: Color.mSurfaceVariant
+      color: ShellColors.mSurfaceVariant
       RowLayout {
         id: uptimeRow
         anchors.centerIn: parent
@@ -37,7 +37,7 @@ Item {
         NIcon {
           icon: "clock"
           pointSize: Style.fontSizeL
-          color: Color.mOnSurfaceVariant
+          color: ShellColors.mOnSurfaceVariant
         }
         NText {
           text: I18n.tr("system.uptime", {
@@ -54,7 +54,7 @@ Item {
       Layout.preferredWidth: actions.implicitWidth + Style.marginS
       Layout.fillHeight: true
       radius: height / 2
-      color: Color.mSurfaceVariant
+      color: ShellColors.mSurfaceVariant
       RowLayout {
         id: actions
         anchors.centerIn: parent

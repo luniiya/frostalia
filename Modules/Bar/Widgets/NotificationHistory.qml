@@ -38,7 +38,7 @@ NIconButton {
   readonly property string unreadBadgeColor: widgetSettings.unreadBadgeColor !== undefined ? widgetSettings.unreadBadgeColor : widgetMetadata.unreadBadgeColor
   readonly property string iconColorKey: widgetSettings.iconColor !== undefined ? widgetSettings.iconColor : widgetMetadata.iconColor
 
-  readonly property color badgeColor: Color.resolveColorKey(unreadBadgeColor)
+  readonly property color badgeColor: ShellColors.resolveColorKey(unreadBadgeColor)
 
   function computeUnreadCount() {
     var since = NotificationService.lastSeenTs;
@@ -67,10 +67,10 @@ NIconButton {
     }
   }
   tooltipDirection: BarService.getTooltipDirection(screen?.name, section)
-  colorBgHover: Style.widgetBackground(root.section, Color.mHover)
+  colorBgHover: Style.widgetBackground(root.section, ShellColors.mHover)
   colorBorderHover: Style.widgetBorder(root.section, Style.capsuleBorderColor)
   colorBg: Style.widgetBackground(root.section, Style.capsuleColor)
-  colorFg: Color.resolveColorKey(iconColorKey)
+  colorFg: ShellColors.resolveColorKey(iconColorKey)
   border.color: Style.widgetBorder(root.section, Style.capsuleBorderColor)
   border.width: Style.capsuleBorderWidth
   visible: !((hideWhenZero && NotificationService.historyModel.count === 0) || (hideWhenZeroUnread && count === 0))
@@ -132,8 +132,8 @@ NIconButton {
       height: 7
       width: height
       radius: Style.radiusXS
-      color: root.hovering ? Color.mOnHover : (root.badgeColor || Color.mError)
-      border.color: Color.mSurface
+      color: root.hovering ? ShellColors.mOnHover : (root.badgeColor || ShellColors.mError)
+      border.color: ShellColors.mSurface
       border.width: Style.borderS
       visible: count > 0
     }

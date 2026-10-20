@@ -5,7 +5,7 @@ function windowMetrics(material, scale) {
   return {
     width: Math.round((material ? 1100 : 840) * scale),
     height: Math.round((material ? 750 : 910) * scale),
-    minimumWidth: Math.round((material ? 760 : 840) * scale),
+    minimumWidth: Math.round((material ? 560 : 500) * scale),
     minimumHeight: Math.round((material ? 520 : 910) * scale)
   };
 }
@@ -45,9 +45,10 @@ function homeGrid(width, scale, material) {
   return { columns: columns, spacing: spacing, cardWidth: Math.max(0, (width - spacing * (columns - 1)) / columns) };
 }
 
-function profile(displayName, username, osName, osFallback) {
+function profile(displayName, username, osName, osFallback, hostname) {
   return {
     name: String(displayName || "").trim() || String(username || "").trim(),
-    os: String(osName || "").trim() || osFallback
+    os: String(osName || "").trim() || osFallback,
+    hostname: String(hostname || "").trim()
   };
 }

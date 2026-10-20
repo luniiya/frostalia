@@ -11,8 +11,8 @@ RowLayout {
   property real to: 1
   property real value: 0
   property real stepSize: 0.01
-  property var cutoutColor: Color.mSurface
-  property color fillColor: Color.mPrimary
+  property var cutoutColor: ShellColors.mSurface
+  property color fillColor: ShellColors.mPrimary
   property bool snapAlways: true
   property real heightRatio: 0.7
   property string text: ""

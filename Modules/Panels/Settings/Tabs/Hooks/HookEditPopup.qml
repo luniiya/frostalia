@@ -28,9 +28,9 @@ Popup {
   property var _testSlot: null
 
   background: Rectangle {
-    color: Color.mSurface
+    color: ShellColors.mSurface
     radius: Style.radiusL
-    border.color: Color.mOutline
+    border.color: ShellColors.mOutline
     border.width: Style.borderS
   }
 
@@ -61,7 +61,7 @@ Popup {
     // Description/Help
     NText {
       text: root.hookDescription
-      color: Color.mOnSurfaceVariant
+      color: ShellColors.mOnSurfaceVariant
       wrapMode: Text.WordWrap
       Layout.fillWidth: true
     }
@@ -106,8 +106,8 @@ Popup {
       NButton {
         text: I18n.tr("common.save")
         icon: "check"
-        backgroundColor: Color.mPrimary
-        textColor: Color.mOnPrimary
+        backgroundColor: ShellColors.mPrimary
+        textColor: ShellColors.mOnPrimary
         onClicked: {
           root.saved(commandInput.text);
           root.close();

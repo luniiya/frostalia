@@ -7,7 +7,7 @@ Slider {
   id: root
   property string icon: "volume-high"
   property string label: ""
-  property color fillColor: Color.mPrimary
+  property color fillColor: ShellColors.mPrimary
   property real wheelStep: 0.01
   signal iconClicked
 
@@ -33,21 +33,21 @@ Slider {
       width: Math.max(0, root.mirrored ? parent.width - x : parent.split - 6 * Style.uiScaleRatio)
       height: parent.height
       radius: Math.min(Style.iRadiusS, height / 2)
-      color: root.enabled ? root.fillColor : Color.mOutline
+      color: root.enabled ? root.fillColor : ShellColors.mOutline
     }
     Rectangle {
       x: root.mirrored ? 0 : parent.split + 6 * Style.uiScaleRatio
       width: Math.max(0, root.mirrored ? parent.split - 6 * Style.uiScaleRatio : parent.width - x)
       height: parent.height
       radius: Math.min(Style.iRadiusS, height / 2)
-      color: Qt.tint(Color.mSurfaceVariant, Qt.alpha(root.fillColor, 0.18))
+      color: Qt.tint(ShellColors.mSurfaceVariant, Qt.alpha(root.fillColor, 0.18))
     }
     NIcon {
       anchors.right: parent.right
       anchors.rightMargin: Math.round(12 * Style.uiScaleRatio)
       anchors.verticalCenter: parent.verticalCenter
       icon: root.icon
-      color: root.visualPosition > 0.92 ? Color.mOnPrimary : Color.mOnSurfaceVariant
+      color: root.visualPosition > 0.92 ? ShellColors.mOnPrimary : ShellColors.mOnSurfaceVariant
       pointSize: Style.fontSizeL
     }
   }
@@ -58,7 +58,7 @@ Slider {
     width: Math.round((root.pressed ? 3 : 4) * Style.uiScaleRatio)
     height: root.height - Math.round(2 * Style.uiScaleRatio)
     radius: width / 2
-    color: root.enabled ? root.fillColor : Color.mOutline
+    color: root.enabled ? root.fillColor : ShellColors.mOutline
   }
 
   // Wheel changes use the same moved signal as drag and keyboard edits.

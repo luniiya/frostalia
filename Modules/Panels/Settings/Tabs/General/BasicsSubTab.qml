@@ -23,7 +23,7 @@ ColumnLayout {
       radius: width / 2
       imagePath: Settings.preprocessPath(Settings.data.general.avatarImage)
       fallbackIcon: "person"
-      borderColor: Color.mPrimary
+      borderColor: ShellColors.mPrimary
       borderWidth: Style.borderM
       Layout.alignment: Qt.AlignTop
     }
@@ -32,7 +32,7 @@ ColumnLayout {
       NText {
         text: HostService.displayName
         pointSize: Style.fontSizeM
-        color: Color.mPrimary
+        color: ShellColors.mPrimary
       }
 
       NTextInputButton {

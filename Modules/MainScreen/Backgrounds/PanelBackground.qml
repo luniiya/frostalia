@@ -26,7 +26,7 @@ ShapePath {
   required property var shapeContainer
 
   // Default background color (used if panel doesn't specify one)
-  property color defaultBackgroundColor: Color.mSurface
+  property color defaultBackgroundColor: ShellColors.mSurface
 
   // Corner radius (from Style)
   readonly property real radius: Style.radiusL

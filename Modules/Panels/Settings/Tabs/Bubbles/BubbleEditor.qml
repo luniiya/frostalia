@@ -68,7 +68,7 @@ NBox {
                         number: root.number
                       }) + " · " + root.monitorName
         font.weight: Style.fontWeightBold
-        color: Color.mPrimary
+        color: ShellColors.mPrimary
       }
       NIconButton {
         icon: root.vertical ? "arrow-up" : "arrow-left"
@@ -296,8 +296,8 @@ NBox {
         enabled: !root.bubble.oledMode
         label: I18n.tr("panels.bubbles.background-color-label")
         description: I18n.tr("panels.bubbles.background-color-description")
-        noneColor: Color.mSurface
-        noneOnColor: Color.mOnSurface
+        noneColor: ShellColors.mSurface
+        noneOnColor: ShellColors.mOnSurface
         currentKey: root.bubble.backgroundColorKey
         defaultValue: Settings.getDefaultValue("bubbles.defaults.backgroundColorKey")
         onSelected: key => root.change("backgroundColorKey", key)

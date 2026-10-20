@@ -25,8 +25,8 @@ Item {
   property real preferredHeight: 900
   property real preferredWidthRatio
   property real preferredHeightRatio
-  property color panelBackgroundColor: Color.mSurface
-  property color panelBorderColor: Color.mOutline
+  property color panelBackgroundColor: ShellColors.mSurface
+  property color panelBorderColor: ShellColors.mOutline
   property var buttonItem: null
   property var bubbleContext: null
   property bool forceAttachToBar: false

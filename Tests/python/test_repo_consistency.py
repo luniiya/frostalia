@@ -27,6 +27,22 @@ def lookup(tree, key):
     return node
 
 
+class ShellColorTests(unittest.TestCase):
+    def test_theme_singleton_has_an_unambiguous_name(self):
+        # QtQuick exports its own Color singleton starting with Qt 6.12.
+        self.assertFalse((ROOT / "Commons" / "Color.qml").exists())
+        source = (ROOT / "Commons" / "ShellColors.qml").read_text(encoding="utf-8")
+        self.assertIn("pragma Singleton", source)
+        self.assertIn("property color mPrimary:", source)
+
+    def test_widgets_do_not_resolve_the_qtquick_color_singleton(self):
+        for path in qml_files():
+            with self.subTest(file=str(path.relative_to(ROOT))):
+                source = path.read_text(encoding="utf-8")
+                self.assertNotRegex(source, r"\bColor\s*[.\[]")
+                self.assertNotRegex(source, r"target:\s*Color\b")
+
+
 class TranslationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -211,6 +227,25 @@ class BoxOutlineTests(unittest.TestCase):
 
 class SettingsWindowTests(unittest.TestCase):
     """Settings always open in their own compositor window, never inside the bar."""
+
+    def test_toolbar_vertical_spacing_matches_the_window_inset(self):
+        source = (ROOT / "Modules/Panels/Settings/SettingsContent.qml").read_text(encoding="utf-8")
+        layout = source.split("// Main UI", 1)[1].split("// Shared toolbar", 1)[0]
+        # Center the toolbar between the top edge and the content pane in
+        # both styles, including when interface scaling changes the inset.
+        self.assertRegex(layout, r"spacing:\s*anchors\.margins\b")
+
+    def test_profile_details_are_in_separate_horizontal_groups(self):
+        source = (ROOT / "Modules/Panels/Settings/SettingsHome.qml").read_text(encoding="utf-8")
+        row = source.split("id: profileRow", 1)[1]
+        for name in ("profileName", "profileHost", "profileOs"):
+            with self.subTest(group=name):
+                before = row.split(f"id: {name}", 1)[0]
+                self.assertIn(f"id: {name}", row)
+                # Each group belongs directly to the same row, rather than
+                # being nested in a shared column below the user name.
+                self.assertEqual(before.count("{") - before.count("}"), 1)
+        self.assertNotIn("profileCardWidth", source)
 
     def test_panel_mode_setting_is_gone(self):
         # A leftover read of the removed setting silently evaluates to undefined

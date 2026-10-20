@@ -14,8 +14,8 @@ Item {
   readonly property string valueText: viewModel.valueText || ""
   readonly property real value: viewModel.value || 0
   readonly property real maximum: viewModel.maximum || 1
-  readonly property color accentColor: viewModel.accentColor || Color.mPrimary
-  readonly property color onAccentColor: viewModel.onAccentColor || Color.mOnPrimary
+  readonly property color accentColor: viewModel.accentColor || ShellColors.mPrimary
+  readonly property color onAccentColor: viewModel.onAccentColor || ShellColors.mOnPrimary
 
   readonly property real unit: Style.uiScaleRatio
 
@@ -60,7 +60,7 @@ Item {
           visible: !root.lockKey
           text: root.valueText
           pointSize: Style.fontSizeS
-          color: Color.mOnSurfaceVariant
+          color: ShellColors.mOnSurfaceVariant
         }
       }
 
@@ -71,7 +71,7 @@ Item {
         value: root.value
         maximum: root.maximum
         activeColor: root.accentColor
-        inactiveColor: Color.mSurfaceVariant
+        inactiveColor: ShellColors.mSurfaceVariant
         markerColor: root.onAccentColor
         animationDuration: Style.animationFast
       }
@@ -98,7 +98,7 @@ Item {
       value: root.value
       maximum: root.maximum
       activeColor: root.accentColor
-      inactiveColor: Color.mSurfaceVariant
+      inactiveColor: ShellColors.mSurfaceVariant
       markerColor: root.onAccentColor
       animationDuration: Style.animationFast
     }

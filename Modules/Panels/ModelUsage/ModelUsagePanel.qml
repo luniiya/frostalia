@@ -23,10 +23,10 @@ SmartPanel {
     function usageColor(percent) {
       const level = ModelUsageLogic.usageLevel(percent);
       if (level === "critical")
-        return Color.mError;
+        return ShellColors.mError;
       if (level === "warning")
-        return Qt.alpha(Color.mError, 0.72);
-      return Color.mPrimary;
+        return Qt.alpha(ShellColors.mError, 0.72);
+      return ShellColors.mPrimary;
     }
 
     ColumnLayout {
@@ -48,14 +48,14 @@ SmartPanel {
           NIcon {
             icon: "ai"
             pointSize: Style.fontSizeXXL
-            color: Color.mPrimary
+            color: ShellColors.mPrimary
           }
 
           NText {
             text: I18n.tr("model-usage.title")
             pointSize: Style.fontSizeL
             font.weight: Style.fontWeightBold
-            color: Color.mOnSurface
+            color: ShellColors.mOnSurface
             Layout.fillWidth: true
           }
 
@@ -98,7 +98,7 @@ SmartPanel {
         visible: !panelContent.provider
         text: I18n.tr("model-usage.no-providers")
         pointSize: Style.fontSizeM
-        color: Color.mOnSurfaceVariant
+        color: ShellColors.mOnSurfaceVariant
         wrapMode: Text.WordWrap
         horizontalAlignment: Text.AlignHCenter
         Layout.fillWidth: true
@@ -129,13 +129,13 @@ SmartPanel {
               text: details.p ? details.p.providerName : ""
               pointSize: Style.fontSizeL
               font.weight: Style.fontWeightBold
-              color: Color.mOnSurface
+              color: ShellColors.mOnSurface
               Layout.fillWidth: true
             }
 
             Rectangle {
               visible: details.p && details.p.tierLabel !== ""
-              color: Qt.alpha(Color.mPrimary, 0.15)
+              color: Qt.alpha(ShellColors.mPrimary, 0.15)
               radius: Style.radiusXS
               implicitWidth: tierText.implicitWidth + Style.marginL
               implicitHeight: tierText.implicitHeight + Style.marginS
@@ -146,7 +146,7 @@ SmartPanel {
                 text: details.p ? details.p.tierLabel : ""
                 pointSize: Style.fontSizeS
                 font.weight: Style.fontWeightSemiBold
-                color: Color.mPrimary
+                color: ShellColors.mPrimary
               }
             }
           }
@@ -155,14 +155,14 @@ SmartPanel {
             visible: details.p && !details.p.ready && details.p.statusText === ""
             text: I18n.tr("model-usage.waiting")
             pointSize: Style.fontSizeS
-            color: Color.mOnSurfaceVariant
+            color: ShellColors.mOnSurfaceVariant
           }
 
           // Problem with auth or the API
           NBox {
             visible: details.p && details.p.statusText !== ""
             Layout.fillWidth: true
-            color: Qt.alpha(Color.mError, 0.12)
+            color: Qt.alpha(ShellColors.mError, 0.12)
             implicitHeight: statusColumn.implicitHeight + Style.margin2L
 
             ColumnLayout {
@@ -175,13 +175,13 @@ SmartPanel {
                 text: details.p ? details.p.statusText : ""
                 pointSize: Style.fontSizeM
                 font.weight: Style.fontWeightSemiBold
-                color: Color.mError
+                color: ShellColors.mError
               }
 
               NText {
                 text: details.p ? details.p.helpText : ""
                 pointSize: Style.fontSizeXS
-                color: Color.mOnSurfaceVariant
+                color: ShellColors.mOnSurfaceVariant
                 wrapMode: Text.WordWrap
                 Layout.fillWidth: true
               }
@@ -204,7 +204,7 @@ SmartPanel {
                 text: I18n.tr("model-usage.rate-limits")
                 pointSize: Style.fontSizeL
                 font.weight: Style.fontWeightSemiBold
-                color: Color.mPrimary
+                color: ShellColors.mPrimary
               }
 
               Repeater {
@@ -221,7 +221,7 @@ SmartPanel {
                     NText {
                       text: ModelUsageService.limitLabel(modelData)
                       pointSize: Style.fontSizeS
-                      color: Color.mOnSurfaceVariant
+                      color: ShellColors.mOnSurfaceVariant
                       Layout.fillWidth: true
                     }
 
@@ -229,14 +229,14 @@ SmartPanel {
                       text: Math.round(modelData.percent * 100) + "%"
                       pointSize: Style.fontSizeS
                       font.weight: Style.fontWeightBold
-                      color: ModelUsageLogic.usageLevel(modelData.percent) === "normal" ? Color.mOnSurface : panelContent.usageColor(modelData.percent)
+                      color: ModelUsageLogic.usageLevel(modelData.percent) === "normal" ? ShellColors.mOnSurface : panelContent.usageColor(modelData.percent)
                     }
                   }
 
                   Rectangle {
                     Layout.fillWidth: true
                     implicitHeight: 8
-                    color: Qt.alpha(Color.mOutline, 0.2)
+                    color: Qt.alpha(ShellColors.mOutline, 0.2)
                     radius: Style.radiusXXS
 
                     Rectangle {
@@ -263,7 +263,7 @@ SmartPanel {
                                                                                             "time": resetIn
                                                                                           })
                     pointSize: Style.fontSizeXS
-                    color: Color.mOnSurfaceVariant
+                    color: ShellColors.mOnSurfaceVariant
                   }
                 }
               }
@@ -286,7 +286,7 @@ SmartPanel {
                 text: I18n.tr("model-usage.today")
                 pointSize: Style.fontSizeL
                 font.weight: Style.fontWeightSemiBold
-                color: Color.mPrimary
+                color: ShellColors.mPrimary
               }
 
               RowLayout {
@@ -316,12 +316,12 @@ SmartPanel {
                       text: modelData.value
                       pointSize: Style.fontSizeXXL
                       font.weight: Style.fontWeightBold
-                      color: Color.mOnSurface
+                      color: ShellColors.mOnSurface
                     }
                     NText {
                       text: modelData.label
                       pointSize: Style.fontSizeXS
-                      color: Color.mOnSurfaceVariant
+                      color: ShellColors.mOnSurfaceVariant
                     }
                   }
                 }
@@ -337,7 +337,7 @@ SmartPanel {
                   NText {
                     text: ModelUsageLogic.friendlyModelName(modelData.key)
                     pointSize: Style.fontSizeS
-                    color: Color.mOnSurfaceVariant
+                    color: ShellColors.mOnSurfaceVariant
                     Layout.fillWidth: true
                   }
                   NText {
@@ -346,7 +346,7 @@ SmartPanel {
                                   })
                     pointSize: Style.fontSizeS
                     font.weight: Style.fontWeightSemiBold
-                    color: Color.mOnSurface
+                    color: ShellColors.mOnSurface
                   }
                 }
               }
@@ -377,7 +377,7 @@ SmartPanel {
                 text: I18n.tr("model-usage.last-7-days")
                 pointSize: Style.fontSizeL
                 font.weight: Style.fontWeightSemiBold
-                color: Color.mPrimary
+                color: ShellColors.mPrimary
               }
 
               Repeater {
@@ -392,14 +392,14 @@ SmartPanel {
                   NText {
                     text: modelData.date ? I18n.locale.toString(new Date(modelData.date + "T00:00:00"), "ddd dd/MM") : ""
                     pointSize: Style.fontSizeXS
-                    color: Color.mOnSurfaceVariant
+                    color: ShellColors.mOnSurfaceVariant
                     Layout.preferredWidth: Math.round(64 * Style.uiScaleRatio)
                   }
 
                   Rectangle {
                     Layout.fillWidth: true
                     implicitHeight: 12
-                    color: Qt.alpha(Color.mOutline, 0.2)
+                    color: Qt.alpha(ShellColors.mOutline, 0.2)
                     radius: Style.radiusXXS
 
                     Rectangle {
@@ -407,7 +407,7 @@ SmartPanel {
                       anchors.top: parent.top
                       anchors.bottom: parent.bottom
                       radius: Style.radiusXXS
-                      color: Color.mPrimary
+                      color: ShellColors.mPrimary
                       width: parent.width * ((dayRow.modelData.messageCount || 0) / weekBox.maxCount)
                     }
                   }
@@ -416,7 +416,7 @@ SmartPanel {
                     text: ModelUsageLogic.formatTokenCount(modelData.messageCount || 0)
                     pointSize: Style.fontSizeXS
                     font.weight: Style.fontWeightSemiBold
-                    color: Color.mOnSurface
+                    color: ShellColors.mOnSurface
                     horizontalAlignment: Text.AlignRight
                     Layout.preferredWidth: Math.round(36 * Style.uiScaleRatio)
                   }
@@ -441,7 +441,7 @@ SmartPanel {
                 text: I18n.tr("model-usage.all-time")
                 pointSize: Style.fontSizeL
                 font.weight: Style.fontWeightSemiBold
-                color: Color.mPrimary
+                color: ShellColors.mPrimary
               }
 
               RowLayout {
@@ -468,12 +468,12 @@ SmartPanel {
                       text: modelData.value
                       pointSize: Style.fontSizeXL
                       font.weight: Style.fontWeightBold
-                      color: Color.mOnSurface
+                      color: ShellColors.mOnSurface
                     }
                     NText {
                       text: modelData.label
                       pointSize: Style.fontSizeXS
-                      color: Color.mOnSurfaceVariant
+                      color: ShellColors.mOnSurfaceVariant
                     }
                   }
                 }
@@ -491,7 +491,7 @@ SmartPanel {
                     text: ModelUsageLogic.friendlyModelName(modelData.key)
                     pointSize: Style.fontSizeM
                     font.weight: Style.fontWeightSemiBold
-                    color: Color.mOnSurface
+                    color: ShellColors.mOnSurface
                   }
 
                   ColumnLayout {
@@ -526,14 +526,14 @@ SmartPanel {
                         NText {
                           text: modelData.label
                           pointSize: Style.fontSizeXS
-                          color: Color.mOnSurfaceVariant
+                          color: ShellColors.mOnSurfaceVariant
                           Layout.preferredWidth: Math.round(80 * Style.uiScaleRatio)
                         }
                         NText {
                           text: ModelUsageLogic.formatTokenCount(modelData.value || 0)
                           pointSize: Style.fontSizeXS
                           font.weight: Style.fontWeightSemiBold
-                          color: Color.mOnSurface
+                          color: ShellColors.mOnSurface
                         }
                       }
                     }

@@ -42,9 +42,9 @@ ColumnLayout {
         width: Math.max(Math.round(topContributorsFlow.width / 2 - Style.marginM - 1), Math.round(Style.baseWidgetSize * 4))
         height: Math.round(Style.baseWidgetSize * 2.3)
         radius: Style.radiusM
-        color: contributorArea.containsMouse ? Color.mHover : "transparent"
+        color: contributorArea.containsMouse ? ShellColors.mHover : "transparent"
         border.width: 1
-        border.color: contributorArea.containsMouse ? Color.mPrimary : Color.mOutline
+        border.color: contributorArea.containsMouse ? ShellColors.mPrimary : ShellColors.mOutline
 
         Behavior on color {
           ColorAnimation {
@@ -113,7 +113,7 @@ ColumnLayout {
                 visible: !root.contributors[index].avatar_url || root.contributors[index].avatar_url === ""
                 icon: "person"
                 pointSize: Style.fontSizeL
-                color: Color.mPrimary
+                color: ShellColors.mPrimary
               }
             }
 
@@ -123,7 +123,7 @@ ColumnLayout {
               color: "transparent"
               radius: width * 0.5
               border.width: Style.borderM
-              border.color: Color.mPrimary
+              border.color: ShellColors.mPrimary
             }
           }
 
@@ -136,7 +136,7 @@ ColumnLayout {
             NText {
               text: root.contributors[index].login || "Unknown"
               font.weight: Style.fontWeightBold
-              color: contributorArea.containsMouse ? Color.mOnHover : Color.mOnSurface
+              color: contributorArea.containsMouse ? ShellColors.mOnHover : ShellColors.mOnSurface
               elide: Text.ElideRight
               Layout.fillWidth: true
               pointSize: Style.fontSizeS
@@ -149,13 +149,13 @@ ColumnLayout {
               NIcon {
                 icon: "git-commit"
                 pointSize: Style.fontSizeXS
-                color: contributorArea.containsMouse ? Color.mOnHover : Color.mOnSurfaceVariant
+                color: contributorArea.containsMouse ? ShellColors.mOnHover : ShellColors.mOnSurfaceVariant
               }
 
               NText {
                 text: `${(root.contributors[index].contributions || 0).toString()} commits`
                 pointSize: Style.fontSizeXS
-                color: contributorArea.containsMouse ? Color.mOnHover : Color.mOnSurfaceVariant
+                color: contributorArea.containsMouse ? ShellColors.mOnHover : ShellColors.mOnSurfaceVariant
               }
             }
           }
@@ -165,7 +165,7 @@ ColumnLayout {
             Layout.alignment: Qt.AlignVCenter
             icon: "arrow-right"
             pointSize: Style.fontSizeS
-            color: Color.mPrimary
+            color: ShellColors.mPrimary
             opacity: contributorArea.containsMouse ? 1.0 : 0.0
 
             Behavior on opacity {
@@ -206,9 +206,9 @@ ColumnLayout {
         width: nameText.implicitWidth + Style.margin2M
         height: nameText.implicitHeight + Style.margin2S
         radius: Style.radiusS
-        color: nameArea.containsMouse ? Color.mHover : "transparent"
+        color: nameArea.containsMouse ? ShellColors.mHover : "transparent"
         border.width: Style.borderS
-        border.color: nameArea.containsMouse ? Color.mPrimary : Color.mOutline
+        border.color: nameArea.containsMouse ? ShellColors.mPrimary : ShellColors.mOutline
 
         Behavior on color {
           ColorAnimation {
@@ -227,7 +227,7 @@ ColumnLayout {
           anchors.centerIn: parent
           text: root.contributors[index + root.topContributorsCount].login || "Unknown"
           pointSize: Style.fontSizeXS
-          color: nameArea.containsMouse ? Color.mOnHover : Color.mOnSurface
+          color: nameArea.containsMouse ? ShellColors.mOnHover : ShellColors.mOnSurface
           font.weight: Style.fontWeightMedium
 
           Behavior on color {

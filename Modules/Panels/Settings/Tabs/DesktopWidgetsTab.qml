@@ -184,13 +184,13 @@ ColumnLayout {
         if (isPlugin) {
           badges.push({
                         "icon": "plugin",
-                        "color": Color.mSecondary
+                        "color": ShellColors.mSecondary
                       });
         }
         if (DesktopWidgetRegistry.isCpuIntensive(widgetId)) {
           badges.push({
                         "icon": "cpu-intensive",
-                        "color": Color.mSecondary
+                        "color": ShellColors.mSecondary
                       });
         }
 

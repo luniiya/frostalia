@@ -62,9 +62,9 @@ ColumnLayout {
         width: Math.max(Math.round(supportersFlow.width / 2 - Style.marginL - 1), Math.round(Style.baseWidgetSize * 4.5))
         height: Math.round(Style.baseWidgetSize * 2.6)
         radius: Style.radiusM
-        color: supporterArea.containsMouse && hasGithub ? Color.mHover : Qt.alpha(Color.mPrimary, 0.05)
+        color: supporterArea.containsMouse && hasGithub ? ShellColors.mHover : Qt.alpha(ShellColors.mPrimary, 0.05)
         border.width: Style.borderM
-        border.color: supporterArea.containsMouse && hasGithub ? Color.mPrimary : Qt.alpha(Color.mPrimary, 0.5)
+        border.color: supporterArea.containsMouse && hasGithub ? ShellColors.mPrimary : Qt.alpha(ShellColors.mPrimary, 0.5)
 
         Behavior on color {
           ColorAnimation {
@@ -128,7 +128,7 @@ ColumnLayout {
                 anchors.fill: parent
                 visible: !supporterCard.hasGithub
                 radius: width * 0.5
-                color: Qt.alpha(Color.mPrimary, 0.15)
+                color: Qt.alpha(ShellColors.mPrimary, 0.15)
 
                 Image {
                   anchors.centerIn: parent
@@ -148,7 +148,7 @@ ColumnLayout {
               color: "transparent"
               radius: width * 0.5
               border.width: Style.borderM
-              border.color: Color.mPrimary
+              border.color: ShellColors.mPrimary
             }
 
             // Heart badge
@@ -160,13 +160,13 @@ ColumnLayout {
               width: Style.fontSizeM + Style.marginS
               height: width
               radius: width * 0.5
-              color: Color.mPrimary
+              color: ShellColors.mPrimary
 
               NIcon {
                 anchors.centerIn: parent
                 icon: "heart-filled"
                 pointSize: Style.fontSizeXS
-                color: Color.mOnPrimary
+                color: ShellColors.mOnPrimary
               }
             }
           }
@@ -180,7 +180,7 @@ ColumnLayout {
             NText {
               text: root.supporters[index].name || root.supporters[index].github_username || "Unknown"
               font.weight: Style.fontWeightBold
-              color: supporterArea.containsMouse && supporterCard.hasGithub ? Color.mOnHover : Color.mOnSurface
+              color: supporterArea.containsMouse && supporterCard.hasGithub ? ShellColors.mOnHover : ShellColors.mOnSurface
               elide: Text.ElideRight
               Layout.fillWidth: true
               pointSize: Style.fontSizeS
@@ -189,7 +189,7 @@ ColumnLayout {
             NText {
               text: I18n.tr("panels.about.supporter-badge")
               pointSize: Style.fontSizeXS
-              color: Color.mPrimary
+              color: ShellColors.mPrimary
               font.weight: Style.fontWeightMedium
             }
           }
@@ -199,7 +199,7 @@ ColumnLayout {
             Layout.alignment: Qt.AlignVCenter
             icon: "arrow-right"
             pointSize: Style.fontSizeS
-            color: Color.mPrimary
+            color: ShellColors.mPrimary
             visible: supporterCard.hasGithub
             opacity: supporterArea.containsMouse ? 1.0 : 0.0
 

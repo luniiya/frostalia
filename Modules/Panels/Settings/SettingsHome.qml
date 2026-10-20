@@ -11,7 +11,7 @@ NScrollView {
   required property var tabs
   readonly property bool material: Style.materialControls
   readonly property var homeMetrics: SettingsWindowLayout.homeMetrics(availableWidth, Style.uiScaleRatio, material)
-  readonly property var profile: SettingsWindowLayout.profile(HostService.displayName, HostService.username, HostService.osPretty, I18n.tr("panels.settings.os"))
+  readonly property var profile: SettingsWindowLayout.profile(HostService.displayName, HostService.username, HostService.osPretty, I18n.tr("panels.settings.os"), HostService.hostName)
   signal tabRequested(int index)
 
   horizontalPolicy: ScrollBar.AlwaysOff
@@ -35,7 +35,7 @@ NScrollView {
         text: I18n.tr("common.settings")
         pointSize: root.material ? Style.fontSizeXXXL : Style.fontSizeXL
         font.weight: root.material ? Style.fontWeightRegular : Style.fontWeightBold
-        color: root.material ? Color.mOnSurface : Color.mPrimary
+        color: root.material ? ShellColors.mOnSurface : ShellColors.mPrimary
       }
     }
 
@@ -43,7 +43,7 @@ NScrollView {
       Layout.fillWidth: true
       implicitHeight: profileRow.implicitHeight + Style.margin2L
       radius: Style.radiusM
-      color: root.material ? Qt.tint(Color.mSurfaceVariant, Qt.alpha(Color.mOnSurface, 0.035)) : Color.mSurface
+      color: root.material ? Qt.tint(ShellColors.mSurfaceVariant, Qt.alpha(ShellColors.mOnSurface, 0.035)) : ShellColors.mSurface
       border.width: root.material ? 0 : Style.boxBorderWidth
       border.color: Style.boxBorderColor
 
@@ -59,25 +59,55 @@ NScrollView {
           radius: width / 2
           imagePath: Settings.preprocessPath(Settings.data.general.avatarImage || Settings.defaultAvatar)
           fallbackIcon: "person"
-          borderColor: root.material ? "transparent" : Color.mPrimary
+          borderColor: root.material ? "transparent" : ShellColors.mPrimary
           borderWidth: root.material ? 0 : Style.borderS
         }
-        ColumnLayout {
+        NText {
+          id: profileName
           Layout.fillWidth: true
+          Layout.preferredWidth: 0
+          text: root.profile.name
+          pointSize: Style.fontSizeXL
+          font.weight: root.material ? Style.fontWeightRegular : Style.fontWeightSemiBold
+          color: ShellColors.mOnSurface
+          elide: Text.ElideRight
+        }
+        ColumnLayout {
+          id: profileHost
+          Layout.fillWidth: true
+          Layout.preferredWidth: 0
+          visible: root.profile.hostname !== ""
           spacing: Style.marginS
           NText {
             Layout.fillWidth: true
-            text: root.profile.name
-            pointSize: Style.fontSizeXL
-            font.weight: root.material ? Style.fontWeightRegular : Style.fontWeightSemiBold
-            color: Color.mOnSurface
+            text: I18n.tr("panels.about.system-host")
+            pointSize: Style.fontSizeS
+            color: ShellColors.mOnSurfaceVariant
+          }
+          NText {
+            Layout.fillWidth: true
+            text: root.profile.hostname
+            pointSize: Style.fontSizeM
+            color: ShellColors.mOnSurface
             elide: Text.ElideRight
+          }
+        }
+        ColumnLayout {
+          id: profileOs
+          Layout.fillWidth: true
+          Layout.preferredWidth: 0
+          spacing: Style.marginS
+          NText {
+            Layout.fillWidth: true
+            text: I18n.tr("panels.settings.os")
+            pointSize: Style.fontSizeS
+            color: ShellColors.mOnSurfaceVariant
           }
           NText {
             Layout.fillWidth: true
             text: root.profile.os
             pointSize: Style.fontSizeM
-            color: Color.mOnSurfaceVariant
+            color: ShellColors.mOnSurface
             elide: Text.ElideRight
           }
         }
@@ -102,14 +132,14 @@ NScrollView {
           Layout.fillWidth: true
           implicitHeight: Math.round((root.material ? 112 : 100) * Style.uiScaleRatio)
           radius: Style.radiusM
-          color: root.material ? Qt.tint(Color.mSurfaceVariant, Qt.alpha(Color.mOnSurface, 0.035)) : categoryMouse.containsMouse ? Color.mHover : Color.mSurface
+          color: root.material ? Qt.tint(ShellColors.mSurfaceVariant, Qt.alpha(ShellColors.mOnSurface, 0.035)) : categoryMouse.containsMouse ? ShellColors.mHover : ShellColors.mSurface
           border.width: root.material ? 0 : Style.boxBorderWidth
           border.color: Style.boxBorderColor
 
           NMaterialStateLayer {
             hovered: categoryMouse.containsMouse
             pressed: categoryMouse.pressed
-            tint: Color.mOnSurface
+            tint: ShellColors.mOnSurface
           }
 
           ColumnLayout {
@@ -118,7 +148,7 @@ NScrollView {
             spacing: Style.marginS
             NIcon {
               icon: category.modelData.icon
-              color: root.material ? Color.mOnSurface : categoryMouse.containsMouse ? Color.mOnHover : Color.mPrimary
+              color: root.material ? ShellColors.mOnSurface : categoryMouse.containsMouse ? ShellColors.mOnHover : ShellColors.mPrimary
               pointSize: Style.fontSizeXXL
             }
             NText {
@@ -126,7 +156,7 @@ NScrollView {
               text: I18n.tr(category.modelData.label)
               pointSize: Style.fontSizeM
               font.weight: root.material ? Style.fontWeightRegular : Style.fontWeightSemiBold
-              color: root.material ? Color.mOnSurface : categoryMouse.containsMouse ? Color.mOnHover : Color.mOnSurface
+              color: root.material ? ShellColors.mOnSurface : categoryMouse.containsMouse ? ShellColors.mOnHover : ShellColors.mOnSurface
               elide: Text.ElideRight
             }
           }

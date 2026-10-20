@@ -196,8 +196,8 @@ SmartPanel {
             layer.enabled: panelContent.widgetSettings.colorizeIcons !== false
             layer.effect: ShaderEffect {
               readonly property var params: TrayIcon.colorizeParams(panelContent.colorizeStyle, Settings.data.colorSchemes.darkMode)
-              property color targetColor: Color[params.highRole]
-              property color lowColor: Color[params.lowRole]
+              property color targetColor: ShellColors[params.highRole]
+              property color lowColor: ShellColors[params.lowRole]
               property real colorizeMode: params.mode
               fragmentShader: Qt.resolvedUrl(Quickshell.shellDir + "/Shaders/qsb/appicon_colorize.frag.qsb")
             }
@@ -209,7 +209,7 @@ SmartPanel {
               icon: "apps"
               pointSize: root.cellSize * 0.5
               applyUiScale: false
-              color: Color.mOnSurface
+              color: ShellColors.mOnSurface
             }
 
             MouseArea {

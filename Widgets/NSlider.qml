@@ -8,15 +8,15 @@ Slider {
   id: root
 
   readonly property bool sliderActive: activeFocus || pressed
-  property color fillColor: Color.mPrimary
-  property var cutoutColor: Color.mSurface
+  property color fillColor: ShellColors.mPrimary
+  property var cutoutColor: ShellColors.mSurface
   property bool snapAlways: true
   property real heightRatio: Style.sliderStyle.heightRatio
   property var tooltipText
   property string tooltipDirection: "auto"
   property bool hovering: false
 
-  readonly property color effectiveFillColor: enabled ? fillColor : Color.mOutline
+  readonly property color effectiveFillColor: enabled ? fillColor : ShellColors.mOutline
 
   readonly property var sliderGeometry: Style.getSliderGeometry(heightRatio)
   readonly property real knobDiameter: sliderGeometry.knobDiameter
@@ -49,9 +49,9 @@ Slider {
 
       ShapePath {
         id: bgPath
-        strokeColor: Qt.alpha(Color.mOutline, Style.sliderStyle.trackOpacity)
+        strokeColor: Qt.alpha(ShellColors.mOutline, Style.sliderStyle.trackOpacity)
         strokeWidth: Style.borderS
-        fillColor: Qt.alpha(Color.mSurface, Style.sliderStyle.trackOpacity)
+        fillColor: Qt.alpha(ShellColors.mSurface, Style.sliderStyle.trackOpacity)
 
         readonly property real w: bgContainer.width
         readonly property real h: bgContainer.height
@@ -201,7 +201,7 @@ Slider {
         width: parent.segments.inactiveWidth
         height: parent.height
         radius: Math.min(root.trackRadius, width / 2)
-        color: root.enabled ? Qt.tint(Color.mSurfaceVariant, Qt.alpha(root.fillColor, 0.18)) : Qt.alpha(Color.mOutline, 0.25)
+        color: root.enabled ? Qt.tint(ShellColors.mSurfaceVariant, Qt.alpha(root.fillColor, 0.18)) : Qt.alpha(ShellColors.mOutline, 0.25)
       }
       Rectangle {
         width: 4 * Style.uiScaleRatio
@@ -210,7 +210,7 @@ Slider {
         x: (root.mirrored ? parent.segments.start : parent.segments.end) - width / 2
         anchors.verticalCenter: parent.verticalCenter
         visible: parent.segments.inactiveWidth > width * 2
-        color: root.enabled ? Color.mOnSurfaceVariant : Color.mOutline
+        color: root.enabled ? ShellColors.mOnSurfaceVariant : ShellColors.mOutline
       }
     }
 
@@ -221,7 +221,7 @@ Slider {
       implicitWidth: root.knobDiameter + root.cutoutExtra
       implicitHeight: root.knobDiameter + root.cutoutExtra
       radius: Math.min(Style.iRadiusL, width / 2)
-      color: root.cutoutColor !== undefined ? root.cutoutColor : Color.mSurface
+      color: root.cutoutColor !== undefined ? root.cutoutColor : ShellColors.mSurface
       x: root.visualPosition * (root.availableWidth - root.knobDiameter) - root.cutoutExtra / 2
       anchors.verticalCenter: parent.verticalCenter
     }
@@ -238,7 +238,7 @@ Slider {
       implicitWidth: Style.materialControls ? (root.pressed ? root.sliderGeometry.pressedHandleWidth : root.sliderGeometry.handleWidth) : knobDiameter
       implicitHeight: Style.materialControls ? root.sliderGeometry.handleHeight : knobDiameter
       radius: Math.min(Style.iRadiusL, width / 2)
-      color: Style.materialControls ? root.effectiveFillColor : (root.pressed ? Color.mHover : Color.mSurface)
+      color: Style.materialControls ? root.effectiveFillColor : (root.pressed ? ShellColors.mHover : ShellColors.mSurface)
       border.color: effectiveFillColor
       border.width: Style.materialControls ? 0 : Style.borderL
 

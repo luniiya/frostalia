@@ -26,7 +26,7 @@ Text {
   font.weight: Style.fontWeightMedium
   font.pointSize: Math.max(1, root.pointSize * fontScale)
   font.features: root.features
-  color: Color.mOnSurface
+  color: ShellColors.mOnSurface
 
   Binding {
     target: root

@@ -13,7 +13,7 @@ Rectangle {
   readonly property var monitor: screen ? BrightnessService.getMonitorForScreen(screen) : null
   implicitHeight: sliders.implicitHeight + Math.round(8 * Style.uiScaleRatio)
   radius: Style.radiusM
-  color: Color.mSurfaceVariant
+  color: ShellColors.mSurfaceVariant
 
   ColumnLayout {
     id: sliders
@@ -51,7 +51,7 @@ Rectangle {
       from: 0
       to: AudioService.maxVolume
       wheelStep: Settings.data.audio.volumeStep / 100
-      fillColor: AudioService.isAboveNormalVolume(value) ? Color.mError : Color.mPrimary
+      fillColor: AudioService.isAboveNormalVolume(value) ? ShellColors.mError : ShellColors.mPrimary
       onMoved: AudioService.setVolume(value)
       onIconClicked: AudioService.setOutputMuted(!AudioService.muted)
       Binding {

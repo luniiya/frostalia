@@ -189,8 +189,8 @@ RowLayout {
     background: Rectangle {
       implicitWidth: Math.round(Style.baseWidgetSize * 3.75 * Style.uiScaleRatio)
       implicitHeight: Math.round(root.preferredHeight * Style.uiScaleRatio)
-      color: Color.mSurface
-      border.color: combo.activeFocus ? Color.mSecondary : Color.mOutline
+      color: ShellColors.mSurface
+      border.color: combo.activeFocus ? ShellColors.mSecondary : ShellColors.mOutline
       border.width: Style.borderS
       radius: Style.iRadiusM
 
@@ -212,7 +212,7 @@ RowLayout {
       readonly property int sourceIndex: root.findIndexByKey(root.currentKey)
       readonly property bool hasSelection: root.model && sourceIndex >= 0 && sourceIndex < root.model.count
 
-      color: hasSelection ? Color.mOnSurface : Color.mOnSurfaceVariant
+      color: hasSelection ? ShellColors.mOnSurface : ShellColors.mOnSurfaceVariant
       text: hasSelection ? root.model.get(sourceIndex).name : root.placeholder
     }
 
@@ -332,7 +332,7 @@ RowLayout {
                 NText {
                   text: name
                   pointSize: Style.fontSizeM
-                  color: highlighted ? Color.mOnHover : Color.mOnSurface
+                  color: highlighted ? ShellColors.mOnHover : ShellColors.mOnSurface
                   verticalAlignment: Text.AlignVCenter
                   elide: Text.ElideRight
                   Layout.fillWidth: true
@@ -379,7 +379,7 @@ RowLayout {
                         else
                           return Style.fontSizeXS;
                       }
-                      color: highlighted ? Color.mOnHover : (badgeData && badgeData.color ? badgeData.color : Color.mOnSurface)
+                      color: highlighted ? ShellColors.mOnHover : (badgeData && badgeData.color ? badgeData.color : ShellColors.mOnSurface)
                       Layout.preferredWidth: Math.round(Style.baseWidgetSize * 0.6)
                       Layout.preferredHeight: Math.round(Style.baseWidgetSize * 0.6)
                       visible: badgeData && badgeData.icon !== undefined && badgeData.icon !== ""
@@ -389,7 +389,7 @@ RowLayout {
               }
               background: Rectangle {
                 anchors.fill: parent
-                color: highlighted ? Color.mHover : "transparent"
+                color: highlighted ? ShellColors.mHover : "transparent"
                 radius: Style.iRadiusS
               }
             }
@@ -398,8 +398,8 @@ RowLayout {
       }
 
       background: Rectangle {
-        color: Color.mSurfaceVariant
-        border.color: Color.mOutline
+        color: ShellColors.mSurfaceVariant
+        border.color: ShellColors.mOutline
         border.width: Style.borderS
         radius: Style.iRadiusM
       }

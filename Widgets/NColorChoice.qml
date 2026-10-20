@@ -13,8 +13,8 @@ RowLayout {
   property var defaultValue: undefined
   property var noneColor: undefined      // color declared as var so we can nullify
   property var noneOnColor: undefined    // color declared as var so we can nullify
-  // Choices as [{ key, name }]; keys are resolved with Color.resolveColorKey
-  property var model: Color.colorKeyModel
+  // Choices as [{ key, name }]; keys are resolved with ShellColors.resolveColorKey
+  property var model: ShellColors.colorKeyModel
 
   readonly property bool isValueChanged: (defaultValue !== undefined) && (currentKey !== defaultValue)
   readonly property string indicatorTooltip: {
@@ -53,8 +53,8 @@ RowLayout {
         implicitWidth: root.diameter
         implicitHeight: root.diameter
         radius: root.diameter * 0.5
-        color: (modelData.key === "none" && root.noneColor !== undefined) ? root.noneColor : Color.resolveColorKey(modelData.key)
-        border.color: (isSelected || isHovered) ? Color.mOnSurface : Color.mOutline
+        color: (modelData.key === "none" && root.noneColor !== undefined) ? root.noneColor : ShellColors.resolveColorKey(modelData.key)
+        border.color: (isSelected || isHovered) ? ShellColors.mOnSurface : ShellColors.mOutline
         border.width: Style.borderM
 
         MouseArea {
@@ -75,7 +75,7 @@ RowLayout {
           anchors.centerIn: parent
           icon: "check"
           pointSize: Math.max(Style.fontSizeXS, colorCircle.width * 0.4)
-          color: (modelData.key === "none" && root.noneOnColor !== undefined) ? root.noneOnColor : Color.resolveOnColorKey(modelData.key)
+          color: (modelData.key === "none" && root.noneOnColor !== undefined) ? root.noneOnColor : ShellColors.resolveOnColorKey(modelData.key)
           font.weight: Style.fontWeightBold
           visible: colorCircle.isSelected
         }

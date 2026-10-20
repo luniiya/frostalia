@@ -706,9 +706,9 @@ Variants {
                 id: cardBackground
                 anchors.fill: parent
                 radius: notifWindow.material ? Math.round(28 * Style.uiScaleRatio) : Style.radiusL
-                border.color: Qt.alpha(Color.mOutline, Color.adaptiveOpacity(Settings.data.notifications.backgroundOpacity) || 1.0)
+                border.color: Qt.alpha(ShellColors.mOutline, ShellColors.adaptiveOpacity(Settings.data.notifications.backgroundOpacity) || 1.0)
                 border.width: notifWindow.material ? 0 : Style.borderS
-                color: Qt.alpha(notifWindow.material ? Color.mSurfaceVariant : Color.mSurface, Color.adaptiveOpacity(Settings.data.notifications.backgroundOpacity) || 1.0)
+                color: Qt.alpha(notifWindow.material ? ShellColors.mSurfaceVariant : ShellColors.mSurface, ShellColors.adaptiveOpacity(Settings.data.notifications.backgroundOpacity) || 1.0)
 
                 // Progress bar
                 Rectangle {
@@ -727,8 +727,8 @@ Variants {
                     width: progressWidth * model.progress
 
                     color: {
-                      var baseColor = model.urgency === 2 ? Color.mError : model.urgency === 0 ? Color.mOnSurface : Color.mPrimary;
-                      return Qt.alpha(baseColor, Color.adaptiveOpacity(Settings.data.notifications.backgroundOpacity) || 1.0);
+                      var baseColor = model.urgency === 2 ? ShellColors.mError : model.urgency === 0 ? ShellColors.mOnSurface : ShellColors.mPrimary;
+                      return Qt.alpha(baseColor, ShellColors.adaptiveOpacity(Settings.data.notifications.backgroundOpacity) || 1.0);
                     }
 
                     antialiasing: true

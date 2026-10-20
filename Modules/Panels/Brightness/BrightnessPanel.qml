@@ -116,14 +116,14 @@ SmartPanel {
           NIcon {
             icon: "settings-display"
             pointSize: Style.fontSizeXXL
-            color: Color.mPrimary
+            color: ShellColors.mPrimary
           }
 
           NText {
             text: I18n.tr("panels.display.title")
             pointSize: Style.fontSizeL
             font.weight: Style.fontWeightBold
-            color: Color.mOnSurface
+            color: ShellColors.mOnSurface
             Layout.fillWidth: true
           }
 
@@ -146,7 +146,7 @@ SmartPanel {
         verticalPolicy: ScrollBar.AsNeeded
         contentWidth: availableWidth
         reserveScrollbarSpace: false
-        gradientColor: Color.mSurface
+        gradientColor: ShellColors.mSurface
 
         // AudioService Devices
         ColumnLayout {
@@ -178,7 +178,7 @@ SmartPanel {
                 NIcon {
                   icon: panelContent.getIcon(panelContent.globalBrightness)
                   pointSize: Style.fontSizeXL
-                  color: Color.mOnSurface
+                  color: ShellColors.mOnSurface
                 }
 
                 NValueSlider {
@@ -233,7 +233,7 @@ SmartPanel {
 
                 NLabel {
                   label: modelData.name || "Unknown"
-                  labelColor: Color.mPrimary
+                  labelColor: ShellColors.mPrimary
                   description: {
                     I18n.tr("system.monitor-description", {
                               "model": modelData.model,
@@ -251,7 +251,7 @@ SmartPanel {
                   NIcon {
                     icon: getIcon(brightnessMonitor ? brightnessMonitor.brightness : 0)
                     pointSize: Style.fontSizeXL
-                    color: Color.mOnSurface
+                    color: ShellColors.mOnSurface
                   }
 
                   NValueSlider {

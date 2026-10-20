@@ -37,10 +37,10 @@ NIconButton {
   baseSize: Style.getCapsuleHeightForScreen(screen?.name, section)
   applyUiScale: false
   customRadius: Style.radiusL
-  colorBgHover: Style.widgetBackground(root.section, Color.mHover)
+  colorBgHover: Style.widgetBackground(root.section, ShellColors.mHover)
   colorBorderHover: Style.widgetBorder(root.section, Style.capsuleBorderColor)
-  colorBg: Style.widgetBackground(root.section, PowerProfileService.frostaliaPerformanceMode ? Color.mPrimary : Style.capsuleColor)
-  colorFg: PowerProfileService.frostaliaPerformanceMode ? Color.mOnPrimary : Color.resolveColorKey(iconColorKey)
+  colorBg: Style.widgetBackground(root.section, PowerProfileService.frostaliaPerformanceMode ? ShellColors.mPrimary : Style.capsuleColor)
+  colorFg: PowerProfileService.frostaliaPerformanceMode ? ShellColors.mOnPrimary : ShellColors.resolveColorKey(iconColorKey)
   border.color: Style.widgetBorder(root.section, Style.capsuleBorderColor)
   border.width: Style.capsuleBorderWidth
 

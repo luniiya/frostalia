@@ -42,8 +42,8 @@ NIconButton {
 
   readonly property color iconColor: {
     if (!enableColorization)
-      return Color.mOnSurface;
-    return Color.resolveColorKey(colorizeSystemIcon);
+      return ShellColors.mOnSurface;
+    return ShellColors.resolveColorKey(colorizeSystemIcon);
   }
 
   // If we have a custom path and not using distro logo, use the theme icon.
@@ -62,8 +62,8 @@ NIconButton {
   customRadius: Style.radiusL
   colorBg: Style.widgetBackground(root.section, Style.capsuleColor)
   colorFg: iconColor
-  colorBgHover: Style.widgetBackground(root.section, Color.mHover)
-  colorFgHover: Color.mOnHover
+  colorBgHover: Style.widgetBackground(root.section, ShellColors.mHover)
+  colorFgHover: ShellColors.mOnHover
   colorBorder: Style.widgetBorder(root.section, Style.capsuleBorderColor)
   colorBorderHover: Style.widgetBorder(root.section, Style.capsuleBorderColor)
 
@@ -135,7 +135,7 @@ NIconButton {
     asynchronous: true
     layer.enabled: (enableColorization) && (useDistroLogo || customIconPath !== "")
     layer.effect: ShaderEffect {
-      property color targetColor: !hovering ? iconColor : Color.mOnHover
+      property color targetColor: !hovering ? iconColor : ShellColors.mOnHover
       property real colorizeMode: 2.0
 
       fragmentShader: Qt.resolvedUrl(Quickshell.shellDir + "/Shaders/qsb/appicon_colorize.frag.qsb")

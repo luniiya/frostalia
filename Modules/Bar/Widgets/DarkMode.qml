@@ -34,10 +34,10 @@ NIconButton {
   baseSize: Style.getCapsuleHeightForScreen(screen?.name, section)
   applyUiScale: false
   customRadius: Style.radiusL
-  colorBgHover: Style.widgetBackground(root.section, Color.mHover)
+  colorBgHover: Style.widgetBackground(root.section, ShellColors.mHover)
   colorBorderHover: Style.widgetBorder(root.section, Style.capsuleBorderColor)
   colorBg: Style.widgetBackground(root.section, Style.capsuleColor)
-  colorFg: Color.resolveColorKey(iconColorKey)
+  colorFg: ShellColors.resolveColorKey(iconColorKey)
   onClicked: Settings.data.colorSchemes.darkMode = !Settings.data.colorSchemes.darkMode
 
   border.color: Style.widgetBorder(root.section, Style.capsuleBorderColor)

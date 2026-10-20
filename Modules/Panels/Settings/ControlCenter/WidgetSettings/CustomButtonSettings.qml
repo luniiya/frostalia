@@ -264,11 +264,11 @@ ColumnLayout {
               icon: "close"
               tooltipText: I18n.tr("panels.control-center.shortcuts-custom-button-state-checks-remove")
               baseSize: Style?.buttonSizeS ?? 24
-              colorBorder: Qt.alpha(Color.mOutline, Style.opacityLight)
-              colorBg: Color.mError
-              colorFg: Color.mOnError
-              colorBgHover: Qt.alpha(Color.mError, Style.opacityMedium)
-              colorFgHover: Color.mOnError
+              colorBorder: Qt.alpha(ShellColors.mOutline, Style.opacityLight)
+              colorBg: ShellColors.mError
+              colorFg: ShellColors.mOnError
+              colorBgHover: Qt.alpha(ShellColors.mError, Style.opacityMedium)
+              colorFgHover: ShellColors.mOnError
               onClicked: {
                 removeStateCheck(currentIndex);
               }

@@ -29,7 +29,7 @@ ColumnLayout {
       id: monitorCard
       Layout.fillWidth: true
       implicitHeight: cardContent.implicitHeight + Style.margin2L
-      color: Color.mSurface
+      color: ShellColors.mSurface
 
       required property var modelData
       readonly property string screenName: modelData.name || "Unknown"
@@ -66,7 +66,7 @@ ColumnLayout {
               text: monitorCard.screenName
               pointSize: Style.fontSizeM
               font.weight: Style.fontWeightBold
-              color: Color.mOnSurface
+              color: ShellColors.mOnSurface
             }
 
             NText {
@@ -79,7 +79,7 @@ ColumnLayout {
                                });
               }
               pointSize: Style.fontSizeS
-              color: Color.mOnSurfaceVariant
+              color: ShellColors.mOnSurfaceVariant
             }
           }
 

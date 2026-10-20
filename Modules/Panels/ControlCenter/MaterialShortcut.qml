@@ -50,7 +50,7 @@ Rectangle {
   }
   implicitHeight: Math.round(60 * Style.uiScaleRatio)
   radius: Math.min(Style.iRadiusL, height / 2)
-  color: active ? Color.mPrimary : Qt.tint(Color.mSurfaceVariant, Qt.alpha(Color.mOnSurface, 0.035))
+  color: active ? ShellColors.mPrimary : Qt.tint(ShellColors.mSurfaceVariant, Qt.alpha(ShellColors.mOnSurface, 0.035))
   opacity: available ? 1 : 0.45
   Accessible.name: title + ", " + subtitle
   Accessible.role: Accessible.Button
@@ -59,7 +59,7 @@ Rectangle {
   NMaterialStateLayer {
     hovered: pointer.containsMouse
     pressed: pointer.pressed
-    tint: root.active ? Color.mOnPrimary : Color.mOnSurface
+    tint: root.active ? ShellColors.mOnPrimary : ShellColors.mOnSurface
   }
 
   RowLayout {
@@ -73,7 +73,7 @@ Rectangle {
       horizontalAlignment: Text.AlignHCenter
       icon: root.action?.icon || "settings"
       pointSize: Style.fontSizeXL
-      color: root.active ? Color.mOnPrimary : Color.mOnSurface
+      color: root.active ? ShellColors.mOnPrimary : ShellColors.mOnSurface
     }
     ColumnLayout {
       visible: root.wide
@@ -84,14 +84,14 @@ Rectangle {
         Layout.fillWidth: true
         text: root.title
         pointSize: Style.fontSizeS
-        color: root.active ? Color.mOnPrimary : Color.mOnSurface
+        color: root.active ? ShellColors.mOnPrimary : ShellColors.mOnSurface
         elide: Text.ElideRight
       }
       NText {
         Layout.fillWidth: true
         text: root.subtitle
         pointSize: Style.fontSizeXS
-        color: root.active ? Color.mOnPrimary : Color.mOnSurfaceVariant
+        color: root.active ? ShellColors.mOnPrimary : ShellColors.mOnSurfaceVariant
         elide: Text.ElideRight
       }
     }

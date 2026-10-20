@@ -26,10 +26,10 @@ Item {
   property var defaults: pluginApi?.manifest?.metadata?.defaultSettings || ({})
 
   readonly property string iconColorKey: cfg.iconColor ?? defaults.iconColor ?? "none"
-  readonly property color iconColor: Color.resolveColorKey(iconColorKey)
+  readonly property color iconColor: ShellColors.resolveColorKey(iconColorKey)
 
   readonly property string textColorKey: cfg.textColor ?? defaults.textColor ?? "none"
-  readonly property color textColor: Color.resolveColorKey(textColorKey)
+  readonly property color textColor: ShellColors.resolveColorKey(textColorKey)
 
   // Bar positioning properties
   readonly property string screenName: screen ? screen.name : ""
@@ -70,7 +70,7 @@ Item {
     y: Style.pixelAlignCenter(parent.height, height)
     width: root.contentWidth
     height: root.contentHeight
-    color: mouseArea.containsMouse ? Color.mHover : Style.capsuleColor
+    color: mouseArea.containsMouse ? ShellColors.mHover : Style.capsuleColor
     radius: Style.radiusL
     border.color: Style.capsuleBorderColor
     border.width: Style.capsuleBorderWidth
@@ -93,7 +93,7 @@ Item {
           return "hourglass";
         }
         applyUiScale: false
-        color: mouseArea.containsMouse ? Color.mOnHover : root.iconColor
+        color: mouseArea.containsMouse ? ShellColors.mOnHover : root.iconColor
       }
 
       ColumnLayout {
@@ -109,7 +109,7 @@ Item {
             pointSize: root.barFontSize
             applyUiScale: false
             font.weight: Style.fontWeightBold
-            color: mouseArea.containsMouse ? Color.mOnHover : root.textColor
+            color: mouseArea.containsMouse ? ShellColors.mOnHover : root.textColor
             Layout.alignment: Qt.AlignHCenter
           }
         }
@@ -120,7 +120,7 @@ Item {
         family: Settings.data.ui.fontFixed
         pointSize: root.barFontSize
         font.weight: Style.fontWeightBold
-        color: mouseArea.containsMouse ? Color.mOnHover : root.textColor
+        color: mouseArea.containsMouse ? ShellColors.mOnHover : root.textColor
         text: {
           if (!mainInstance)
             return "";

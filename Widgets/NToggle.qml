@@ -35,7 +35,7 @@ RowLayout {
     label: root.label
     description: root.description
     icon: root.icon
-    iconColor: root.checked ? Color.mPrimary : Color.mOnSurface
+    iconColor: root.checked ? ShellColors.mPrimary : ShellColors.mOnSurface
     visible: root.label !== "" || root.description !== ""
     showIndicator: root.isValueChanged
     indicatorTooltip: root.indicatorTooltip
@@ -50,8 +50,8 @@ RowLayout {
     implicitWidth: root.geometry.width
     implicitHeight: root.geometry.height
     radius: Math.min(Style.iRadiusL, height / 2)
-    color: root.checked ? Color.mPrimary : (Style.materialControls ? Color.mSurfaceVariant : Color.mSurface)
-    border.color: Style.materialControls && root.checked ? Color.mPrimary : Color.mOutline
+    color: root.checked ? ShellColors.mPrimary : (Style.materialControls ? ShellColors.mSurfaceVariant : ShellColors.mSurface)
+    border.color: Style.materialControls && root.checked ? ShellColors.mPrimary : ShellColors.mOutline
     border.width: Style.materialControls ? Style.toggleStyle.border * root.baseSize / 26 : Style.borderS
 
     Behavior on color {
@@ -70,8 +70,8 @@ RowLayout {
       implicitWidth: root.geometry.handle
       implicitHeight: root.geometry.handle
       radius: Math.min(Style.iRadiusL, height / 2)
-      color: root.checked ? Color.mOnPrimary : (Style.materialControls ? Color.mOutline : Color.mPrimary)
-      border.color: root.checked ? Color.mSurface : Color.mSurface
+      color: root.checked ? ShellColors.mOnPrimary : (Style.materialControls ? ShellColors.mOutline : ShellColors.mPrimary)
+      border.color: root.checked ? ShellColors.mSurface : ShellColors.mSurface
       border.width: Style.materialControls ? 0 : Style.borderM
       anchors.verticalCenter: parent.verticalCenter
       anchors.verticalCenterOffset: 0
@@ -82,7 +82,7 @@ RowLayout {
         visible: Style.materialControls && root.checked
         icon: "check"
         pointSize: parent.width * 0.55 / Style.uiScaleRatio
-        color: Color.mPrimary
+        color: ShellColors.mPrimary
       }
 
       Behavior on implicitWidth {

@@ -52,8 +52,8 @@ Item {
     screen: root.screen
     section: root.section
     oppositeDirection: BarService.getPillDirection(root)
-    customIconColor: Color.resolveColorKeyOptional(root.iconColorKey)
-    customTextColor: Color.resolveColorKeyOptional(root.textColorKey)
+    customIconColor: ShellColors.resolveColorKeyOptional(root.iconColorKey)
+    customTextColor: ShellColors.resolveColorKeyOptional(root.textColorKey)
     icon: root.weather.ready ? LocationService.weatherSymbolFromCode(root.weather.code) : root.weather.fallbackIcon
     text: root.weather.text
     forceOpen: root.displayMode === "alwaysShow"

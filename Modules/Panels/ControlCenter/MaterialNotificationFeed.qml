@@ -11,7 +11,7 @@ Rectangle {
   id: root
   implicitHeight: ControlCenterLayout.notificationHeight(NotificationService.historyModel.count, Style.uiScaleRatio)
   radius: Style.radiusM
-  color: Color.mSurfaceVariant
+  color: ShellColors.mSurfaceVariant
 
   ColumnLayout {
     anchors.fill: parent
@@ -32,7 +32,7 @@ Rectangle {
         width: list.width
         height: content.implicitHeight + Style.margin2M
         radius: Style.radiusS
-        color: Qt.tint(Color.mSurfaceVariant, Qt.alpha(Color.mOnSurface, 0.035))
+        color: Qt.tint(ShellColors.mSurfaceVariant, Qt.alpha(ShellColors.mOnSurface, 0.035))
         MaterialNotificationContent {
           id: content
           anchors.left: parent.left
@@ -52,7 +52,7 @@ Rectangle {
         anchors.centerIn: parent
         visible: list.count === 0
         text: I18n.tr("notifications.panel.no-notifications")
-        color: Color.mOnSurfaceVariant
+        color: ShellColors.mOnSurfaceVariant
         pointSize: Style.fontSizeS
       }
     }

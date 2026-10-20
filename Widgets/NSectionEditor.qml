@@ -120,7 +120,7 @@ NBox {
   signal dragPotentialEnded
   signal openPluginSettingsRequested(var pluginManifest, string settingsEntryPoint)
 
-  color: Color.mSurface
+  color: ShellColors.mSurface
   Layout.fillWidth: true
   z: flowDragArea.dragStarted ? 5000 : 0
 
@@ -189,9 +189,9 @@ NBox {
   // Generate widget color from name checksum
   function getWidgetColor(widget) {
     if (widget.id.startsWith('plugin:')) {
-      return [Color.mSecondary, Color.mOnSecondary];
+      return [ShellColors.mSecondary, ShellColors.mOnSecondary];
     }
-    return [Color.mPrimary, Color.mOnPrimary];
+    return [ShellColors.mPrimary, ShellColors.mOnPrimary];
   }
 
   // Check if widget has settings (either core widget with metadata or plugin with settings entry point)
@@ -334,7 +334,7 @@ NBox {
           text: sectionName
           pointSize: Style.fontSizeL
           font.weight: Style.fontWeightBold
-          color: Color.mOnSurface
+          color: ShellColors.mOnSurface
           elide: Text.ElideRight
           Layout.fillWidth: true
         }
@@ -343,7 +343,7 @@ NBox {
           visible: sectionSubtitle !== ""
           text: sectionSubtitle
           pointSize: Style.fontSizeS
-          color: Color.mOnSurfaceVariant
+          color: ShellColors.mOnSurfaceVariant
           elide: Text.ElideRight
           Layout.fillWidth: true
         }
@@ -354,7 +354,7 @@ NBox {
         visible: root.maxWidgets >= 0
         text: root.maxWidgets === 0 ? "(LOCKED)" : "(" + widgetModel.length + "/" + root.maxWidgets + ")"
         pointSize: Style.fontSizeS
-        color: root.isAtMaxCapacity ? Color.mError : Color.mOnSurfaceVariant
+        color: root.isAtMaxCapacity ? ShellColors.mError : ShellColors.mOnSurfaceVariant
         Layout.alignment: Qt.AlignVCenter
         Layout.leftMargin: Style.marginXS
       }
@@ -392,10 +392,10 @@ NBox {
 
       NIconButton {
         icon: "add"
-        colorBg: Color.mPrimary
-        colorFg: Color.mOnPrimary
-        colorBgHover: Color.mSecondary
-        colorFgHover: Color.mOnSecondary
+        colorBg: ShellColors.mPrimary
+        colorFg: ShellColors.mOnPrimary
+        colorBgHover: ShellColors.mSecondary
+        colorFgHover: ShellColors.mOnSecondary
         enabled: comboBox.currentKey !== "" && !root.isAtMaxCapacity
         tooltipText: root.isAtMaxCapacity ? I18n.tr("tooltips.max-widgets-reached") : I18n.tr("tooltips.add-widget")
         Layout.alignment: Qt.AlignVCenter
@@ -432,8 +432,8 @@ NBox {
       Rectangle {
         anchors.fill: parent
         radius: Style.iRadiusL
-        color: Qt.alpha(Color.mSecondary, 0.12)
-        border.color: Color.mSecondary
+        color: Qt.alpha(ShellColors.mSecondary, 0.12)
+        border.color: ShellColors.mSecondary
         border.width: Style.borderM
         visible: root.showCrossSectionDropHint
         z: 1500
@@ -466,7 +466,7 @@ NBox {
             height: root.widgetItemHeight
             radius: Style.iRadiusL
             color: root.getWidgetColor(modelData)[0]
-            border.color: Color.mOutline
+            border.color: ShellColors.mOutline
             border.width: Style.borderS
 
             // Store the widget index for drag operations
@@ -629,11 +629,11 @@ NBox {
                     icon: "settings"
                     tooltipText: I18n.tr("actions.widget-settings")
                     baseSize: miniButtonSize
-                    colorBorder: Qt.alpha(Color.mOutline, Style.opacityLight)
-                    colorBg: Color.mOnSurface
-                    colorFg: Color.mOnPrimary
-                    colorBgHover: Qt.alpha(Color.mOnPrimary, Style.opacityLight)
-                    colorFgHover: Color.mOnPrimary
+                    colorBorder: Qt.alpha(ShellColors.mOutline, Style.opacityLight)
+                    colorBg: ShellColors.mOnSurface
+                    colorFg: ShellColors.mOnPrimary
+                    colorBgHover: Qt.alpha(ShellColors.mOnPrimary, Style.opacityLight)
+                    colorFgHover: ShellColors.mOnPrimary
                     onClicked: {
                       root.openWidgetSettings(index, modelData);
                     }
@@ -652,7 +652,7 @@ NBox {
         height: Style.baseWidgetSize * 1.15
         radius: Style.iRadiusL
         color: "transparent"
-        border.color: Color.mOutline
+        border.color: ShellColors.mOutline
         border.width: Style.borderS
         opacity: 0.7
         visible: flowDragArea.dragStarted
@@ -663,7 +663,7 @@ NBox {
           id: ghostText
           anchors.centerIn: parent
           pointSize: Style.fontSizeS
-          color: Color.mOnPrimary
+          color: ShellColors.mOnPrimary
         }
       }
 
@@ -673,7 +673,7 @@ NBox {
         width: 3
         height: Style.baseWidgetSize * 1.15
         radius: Style.iRadiusXXS
-        color: Color.mSecondary
+        color: ShellColors.mSecondary
         opacity: 0
         visible: opacity > 0
         z: 1999

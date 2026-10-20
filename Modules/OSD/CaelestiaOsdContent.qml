@@ -13,8 +13,8 @@ Item {
   readonly property string valueText: viewModel.valueText || ""
   readonly property real value: viewModel.value || 0
   readonly property real maximum: viewModel.maximum || 1
-  readonly property color accentColor: viewModel.accentColor || Color.mPrimary
-  readonly property color iconColor: viewModel.iconColor || Color.mOnSurface
+  readonly property color accentColor: viewModel.accentColor || ShellColors.mPrimary
+  readonly property color iconColor: viewModel.iconColor || ShellColors.mOnSurface
   readonly property real barThickness: viewModel.barThickness || 8
 
   Loader {
@@ -71,7 +71,7 @@ Item {
         Layout.alignment: Qt.AlignVCenter
         height: root.barThickness
         radius: Math.min(Style.iRadiusL, root.barThickness / 2)
-        color: Color.mSurfaceVariant
+        color: ShellColors.mSurfaceVariant
 
         Rectangle {
           anchors.left: parent.left
@@ -100,7 +100,7 @@ Item {
       NText {
         visible: !root.lockKey
         text: root.valueText
-        color: Color.mOnSurface
+        color: ShellColors.mOnSurface
         pointSize: Style.fontSizeS
         family: Settings.data.ui.fontFixed
         Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
@@ -156,7 +156,7 @@ Item {
       NText {
         visible: !root.lockKey
         text: root.valueText
-        color: Color.mOnSurface
+        color: ShellColors.mOnSurface
         pointSize: Style.fontSizeS
         family: Settings.data.ui.fontFixed
         Layout.fillWidth: true
@@ -177,7 +177,7 @@ Item {
           anchors.bottom: parent.bottom
           width: root.barThickness
           radius: Math.min(Style.iRadiusL, root.barThickness / 2)
-          color: Color.mSurfaceVariant
+          color: ShellColors.mSurfaceVariant
 
           Rectangle {
             anchors.left: parent.left

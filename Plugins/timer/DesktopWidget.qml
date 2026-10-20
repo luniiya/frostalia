@@ -44,8 +44,8 @@ DraggableDesktopWidget {
 
       readonly property real lineWidth: Math.max(2, Math.round(5 * root.widgetScale))
       readonly property real progressRatio: root.ratio
-      readonly property color trackColor: Qt.alpha(Color.mOnSurface, 0.1)
-      readonly property color fillColor: root.ringing ? Color.mError : Color.mPrimary
+      readonly property color trackColor: Qt.alpha(ShellColors.mOnSurface, 0.1)
+      readonly property color fillColor: root.ringing ? ShellColors.mError : ShellColors.mPrimary
 
       onProgressRatioChanged: requestPaint()
       onFillColorChanged: requestPaint()
@@ -97,7 +97,7 @@ DraggableDesktopWidget {
         icon: root.ringing ? "bell-ringing" : (root.mainInstance?.timerPomodoroMode ? "clock" : (root.stopwatchMode ? "stopwatch" : "hourglass"))
         tooltipText: root.pluginApi?.tr("panel." + (root.stopwatchMode ? "pomodoro" : (root.mainInstance?.timerPomodoroMode ? "countdown" : "stopwatch")))
         colorBg: "transparent"
-        colorFg: root.ringing ? Color.mError : Color.mOnSurfaceVariant
+        colorFg: root.ringing ? ShellColors.mError : ShellColors.mOnSurfaceVariant
         border.width: 0
         enabled: root.mainInstance && !root.running && !root.ringing
         onClicked: root.mainInstance.timerMode = TimerLogic.nextMode(root.mainInstance.timerMode)
@@ -110,7 +110,7 @@ DraggableDesktopWidget {
         applyUiScale: false
         pointSize: Math.round(root.fontSize * (root.timeText.length > 5 ? 0.24 : 0.32))
         font.weight: Style.fontWeightBold
-        color: root.ringing ? Color.mError : Color.mOnSurface
+        color: root.ringing ? ShellColors.mError : ShellColors.mOnSurface
       }
 
       NText {
@@ -118,7 +118,7 @@ DraggableDesktopWidget {
         Layout.alignment: Qt.AlignHCenter
         text: root.pluginApi?.tr(root.mainInstance?.pmPhase === "break" ? "pomodoro.break" : "pomodoro.work") ?? ""
         pointSize: Style.fontSizeS
-        color: Color.mPrimary
+        color: ShellColors.mPrimary
       }
 
       RowLayout {
@@ -131,8 +131,8 @@ DraggableDesktopWidget {
           icon: (root.running || root.ringing) ? "media-pause" : "media-play"
           tooltipText: root.running ? root.pluginApi?.tr("panel.pause") : root.pluginApi?.tr("panel.start")
           enabled: root.canStart
-          colorBg: Color.mPrimary
-          colorFg: Color.mOnPrimary
+          colorBg: ShellColors.mPrimary
+          colorFg: ShellColors.mOnPrimary
           border.width: 0
           onClicked: {
             if (root.running || root.ringing)
@@ -148,8 +148,8 @@ DraggableDesktopWidget {
           icon: "refresh"
           tooltipText: root.pluginApi?.tr("panel.reset")
           enabled: root.mainInstance && (TimerLogic.isActive(root.mainInstance) || root.ringing)
-          colorBg: Color.mSurfaceVariant
-          colorFg: Color.mPrimary
+          colorBg: ShellColors.mSurfaceVariant
+          colorFg: ShellColors.mPrimary
           border.width: 0
           onClicked: root.mainInstance.timerReset()
         }

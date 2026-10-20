@@ -195,8 +195,8 @@ RowLayout {
     background: Rectangle {
       implicitWidth: Math.round(Style.baseWidgetSize * 3.75 * Style.uiScaleRatio)
       implicitHeight: Math.round(root.preferredHeight * Style.uiScaleRatio)
-      color: Style.materialControls ? Color.mSurfaceVariant : Color.mSurface
-      border.color: combo.activeFocus ? (Style.materialControls ? Color.mPrimary : Color.mSecondary) : Color.mOutline
+      color: Style.materialControls ? ShellColors.mSurfaceVariant : ShellColors.mSurface
+      border.color: combo.activeFocus ? (Style.materialControls ? ShellColors.mPrimary : ShellColors.mSecondary) : ShellColors.mOutline
       border.width: Style.materialControls && combo.activeFocus ? Style.borderM : Style.borderS
       radius: Style.iRadiusM
 
@@ -229,7 +229,7 @@ RowLayout {
       pointSize: Style.fontSizeM
       verticalAlignment: Text.AlignVCenter
       elide: Text.ElideRight
-      color: combo.currentIndex >= 0 ? Color.mOnSurface : Color.mOnSurfaceVariant
+      color: combo.currentIndex >= 0 ? ShellColors.mOnSurface : ShellColors.mOnSurfaceVariant
       text: {
         if (combo.currentIndex >= 0 && combo.currentIndex < root.itemCount()) {
           var item = root.getItem(combo.currentIndex);
@@ -272,7 +272,7 @@ RowLayout {
           width: listView.availableWidth
           height: delegateText.implicitHeight + Style.margin2S
           radius: Style.iRadiusS
-          color: isHighlighted ? Color.mHover : "transparent"
+          color: isHighlighted ? ShellColors.mHover : "transparent"
 
           NText {
             id: delegateText
@@ -282,7 +282,7 @@ RowLayout {
             verticalAlignment: Text.AlignVCenter
             elide: Text.ElideRight
             pointSize: Style.fontSizeM
-            color: delegateRect.isHighlighted ? Color.mOnHover : Color.mOnSurface
+            color: delegateRect.isHighlighted ? ShellColors.mOnHover : ShellColors.mOnSurface
             text: {
               var item = root.getItem(delegateRect.index);
               return item && item.name ? item.name : "";
@@ -310,8 +310,8 @@ RowLayout {
       }
 
       background: Rectangle {
-        color: Color.mSurfaceVariant
-        border.color: Color.mOutline
+        color: ShellColors.mSurfaceVariant
+        border.color: ShellColors.mOutline
         border.width: Style.borderS
         radius: Style.iRadiusM
       }

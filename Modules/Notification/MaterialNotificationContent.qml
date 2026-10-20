@@ -39,7 +39,7 @@ ColumnLayout {
     NText {
       Layout.fillWidth: true
       text: root.notificationData.appName || I18n.tr("common.notifications")
-      color: root.notificationData.urgency === 2 ? Color.mError : Color.mPrimary
+      color: root.notificationData.urgency === 2 ? ShellColors.mError : ShellColors.mPrimary
       pointSize: Style.fontSizeXS
       font.weight: Style.fontWeightMedium
       elide: Text.ElideRight
@@ -47,7 +47,7 @@ ColumnLayout {
 
     NText {
       text: Time.formatRelativeTime(root.notificationData.timestamp)
-      color: Color.mOnSurfaceVariant
+      color: ShellColors.mOnSurfaceVariant
       pointSize: Style.fontSizeXXS
     }
 
@@ -64,7 +64,7 @@ ColumnLayout {
     text: root.notificationData.summary || I18n.tr("common.no-summary")
     pointSize: Style.fontSizeM
     font.weight: Style.fontWeightSemiBold
-    color: Color.mOnSurface
+    color: ShellColors.mOnSurface
     textFormat: Text.StyledText
     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
     maximumLineCount: root.compact ? 1 : 3
@@ -76,7 +76,7 @@ ColumnLayout {
     visible: text.length > 0
     text: root.notificationData.body || ""
     pointSize: Style.fontSizeM
-    color: Color.mOnSurfaceVariant
+    color: ShellColors.mOnSurfaceVariant
     textFormat: Text.StyledText
     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
     maximumLineCount: root.compact ? 2 : 5
@@ -95,8 +95,8 @@ ColumnLayout {
         required property var modelData
         text: modelData.text || I18n.tr("common.actions")
         fontSize: Style.fontSizeS
-        backgroundColor: Qt.alpha(Color.mPrimary, 0.12)
-        textColor: Color.mPrimary
+        backgroundColor: Qt.alpha(ShellColors.mPrimary, 0.12)
+        textColor: ShellColors.mPrimary
         buttonRadius: height / 2
         implicitHeight: Math.round(34 * Style.uiScaleRatio)
         onClicked: root.actionRequested(modelData.identifier)

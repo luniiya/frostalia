@@ -30,9 +30,9 @@ Popup {
   property var _savedSlot: null
 
   background: Rectangle {
-    color: Color.mSurface
+    color: ShellColors.mSurface
     radius: Style.radiusL
-    border.color: Color.mOutline
+    border.color: ShellColors.mOutline
     border.width: Style.borderS
   }
 
@@ -126,8 +126,8 @@ Popup {
       NButton {
         text: I18n.tr("common.save")
         icon: "check"
-        backgroundColor: Color.mPrimary
-        textColor: Color.mOnPrimary
+        backgroundColor: ShellColors.mPrimary
+        textColor: ShellColors.mOnPrimary
         onClicked: {
           root.saved(timeoutSpinBox.value, commandInput.text, resumeCommandInput.text, nameInput.text);
           root.close();

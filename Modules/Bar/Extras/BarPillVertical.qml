@@ -60,10 +60,10 @@ Item {
   readonly property bool hasIcon: root.icon !== ""
 
   // Always prioritize hover color, then the custom one and finally the fallback color
-  readonly property color bgColor: Style.widgetBackground(section, hovered ? Color.mHover : (customBackgroundColor.a > 0) ? customBackgroundColor : Style.capsuleColor)
-  readonly property color fgColor: hovered ? Color.mOnHover : (customTextIconColor.a > 0) ? customTextIconColor : Color.mOnSurface
-  readonly property color iconFgColor: hovered ? Color.mOnHover : (customIconColor.a > 0) ? customIconColor : (customTextIconColor.a > 0) ? customTextIconColor : Color.mOnSurface
-  readonly property color textFgColor: hovered ? Color.mOnHover : (customTextColor.a > 0) ? customTextColor : (customTextIconColor.a > 0) ? customTextIconColor : Color.mOnSurface
+  readonly property color bgColor: Style.widgetBackground(section, hovered ? ShellColors.mHover : (customBackgroundColor.a > 0) ? customBackgroundColor : Style.capsuleColor)
+  readonly property color fgColor: hovered ? ShellColors.mOnHover : (customTextIconColor.a > 0) ? customTextIconColor : ShellColors.mOnSurface
+  readonly property color iconFgColor: hovered ? ShellColors.mOnHover : (customIconColor.a > 0) ? customIconColor : (customTextIconColor.a > 0) ? customTextIconColor : ShellColors.mOnSurface
+  readonly property color textFgColor: hovered ? ShellColors.mOnHover : (customTextColor.a > 0) ? customTextColor : (customTextIconColor.a > 0) ? customTextIconColor : ShellColors.mOnSurface
 
   readonly property real iconSize: Style.toOdd(pillHeight * 0.48)
 
@@ -109,7 +109,7 @@ Item {
     anchors.horizontalCenter: parent.horizontalCenter
 
     Behavior on color {
-      enabled: !Color.isTransitioning
+      enabled: !ShellColors.isTransitioning
       ColorAnimation {
         duration: Style.animationFast
         easing.type: Easing.InOutQuad

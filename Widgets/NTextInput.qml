@@ -12,8 +12,8 @@ ColumnLayout {
   property string inputIconName: ""
   property bool readOnly: false
   property bool outlined: true
-  property color labelColor: Color.mOnSurface
-  property color descriptionColor: Color.mOnSurfaceVariant
+  property color labelColor: ShellColors.mOnSurface
+  property color descriptionColor: ShellColors.mOnSurfaceVariant
   property string fontFamily: Style.fontDefault
   property real fontSize: Style.fontSizeS
   property int fontWeight: Style.fontWeightRegular
@@ -68,8 +68,8 @@ ColumnLayout {
       id: frame
 
       radius: root.radius
-      color: Style.materialControls ? Color.mSurfaceVariant : Color.mSurface
-      border.color: input.activeFocus ? (Style.materialControls ? Color.mPrimary : Color.mSecondary) : Color.mOutline
+      color: Style.materialControls ? ShellColors.mSurfaceVariant : ShellColors.mSurface
+      border.color: input.activeFocus ? (Style.materialControls ? ShellColors.mPrimary : ShellColors.mSecondary) : ShellColors.mOutline
       border.width: root.outlined ? (Style.materialControls && input.activeFocus ? Style.borderM : Style.borderS) : 0
 
       Behavior on border.color {
@@ -152,8 +152,8 @@ ColumnLayout {
 
             echoMode: TextInput.Normal
             readOnly: root.readOnly
-            placeholderTextColor: Qt.alpha(Color.mOnSurfaceVariant, 0.6)
-            color: enabled ? Color.mOnSurface : Qt.alpha(Color.mOnSurface, 0.4)
+            placeholderTextColor: Qt.alpha(ShellColors.mOnSurfaceVariant, 0.6)
+            color: enabled ? ShellColors.mOnSurface : Qt.alpha(ShellColors.mOnSurface, 0.4)
 
             selectByMouse: true
 
@@ -221,8 +221,8 @@ ColumnLayout {
 
             colorBg: "transparent"
             colorBgHover: "transparent"
-            colorFg: Color.mOnSurface
-            colorFgHover: Color.mError
+            colorFg: ShellColors.mOnSurface
+            colorFgHover: ShellColors.mError
 
             visible: root.showClearButton && input.text.length > 0 && !root.readOnly
             enabled: input.text.length > 0 && !root.readOnly && root.enabled

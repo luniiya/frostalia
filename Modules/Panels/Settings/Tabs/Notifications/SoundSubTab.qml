@@ -31,7 +31,7 @@ ColumnLayout {
 
       NIcon {
         icon: "warning"
-        color: Color.mOnSurfaceVariant
+        color: ShellColors.mOnSurfaceVariant
         pointSize: Style.fontSizeXL
         Layout.alignment: Qt.AlignVCenter
       }

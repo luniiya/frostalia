@@ -55,21 +55,21 @@ Item {
             Layout.preferredHeight: 6
             Layout.alignment: Qt.AlignVCenter
             radius: Style.radiusXS
-            color: model.urgency === 2 ? Color.mError : model.urgency === 0 ? Color.mOnSurface : Color.mPrimary
+            color: model.urgency === 2 ? ShellColors.mError : model.urgency === 0 ? ShellColors.mOnSurface : ShellColors.mPrimary
           }
 
           NText {
             text: model.appName || "Unknown App"
             pointSize: Style.fontSizeXS
             font.weight: Style.fontWeightBold
-            color: Color.mSecondary
+            color: ShellColors.mSecondary
           }
 
           NText {
             textFormat: Text.PlainText
             text: " " + Time.formatRelativeTime(model.timestamp)
             pointSize: Style.fontSizeXXS
-            color: Color.mOnSurfaceVariant
+            color: ShellColors.mOnSurfaceVariant
             Layout.alignment: Qt.AlignBottom
           }
 
@@ -82,7 +82,7 @@ Item {
           text: model.summary || I18n.tr("common.no-summary")
           pointSize: Style.fontSizeM
           font.weight: Style.fontWeightMedium
-          color: Color.mOnSurface
+          color: ShellColors.mOnSurface
           textFormat: Text.StyledText
           wrapMode: Text.WrapAtWordBoundaryOrAnywhere
           maximumLineCount: 3
@@ -95,7 +95,7 @@ Item {
         NText {
           text: model.body || ""
           pointSize: Style.fontSizeM
-          color: Color.mOnSurface
+          color: ShellColors.mOnSurface
           textFormat: Text.StyledText
           wrapMode: Text.WrapAtWordBoundaryOrAnywhere
 
@@ -137,9 +137,9 @@ Item {
                 return actionText;
               }
               fontSize: Style.fontSizeS
-              backgroundColor: Color.mPrimary
-              textColor: hovered ? Color.mOnHover : Color.mOnPrimary
-              hoverColor: Color.mHover
+              backgroundColor: ShellColors.mPrimary
+              textColor: hovered ? ShellColors.mOnHover : ShellColors.mOnPrimary
+              hoverColor: ShellColors.mHover
               outlined: false
               implicitHeight: 24
               onClicked: {
@@ -196,7 +196,7 @@ Item {
         text: model.summary || I18n.tr("common.no-summary")
         pointSize: Style.fontSizeM
         font.weight: Style.fontWeightMedium
-        color: Color.mOnSurface
+        color: ShellColors.mOnSurface
         textFormat: Text.StyledText
         maximumLineCount: 1
         elide: Text.ElideRight
@@ -208,7 +208,7 @@ Item {
         Layout.fillWidth: true
         text: model.body || ""
         pointSize: Style.fontSizeS
-        color: Color.mOnSurfaceVariant
+        color: ShellColors.mOnSurfaceVariant
         textFormat: Text.StyledText
         wrapMode: Text.Wrap
         maximumLineCount: 2

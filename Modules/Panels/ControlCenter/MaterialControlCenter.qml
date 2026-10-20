@@ -87,7 +87,7 @@ Item {
       Layout.fillWidth: true
       implicitHeight: tiles.implicitHeight + Style.margin2S
       radius: Style.radiusM
-      color: Color.mSurfaceVariant
+      color: ShellColors.mSurfaceVariant
       ColumnLayout {
         id: tiles
         anchors.left: parent.left

@@ -19,7 +19,7 @@ Rectangle {
   implicitWidth: Math.round(416 * Style.uiScaleRatio)
   implicitHeight: Math.round((expanded ? 380 : 220) * Style.uiScaleRatio)
   radius: Style.radiusL
-  color: Qt.tint(Color.mSurfaceVariant, Qt.alpha(Color.mPrimary, 0.08))
+  color: Qt.tint(ShellColors.mSurfaceVariant, Qt.alpha(ShellColors.mPrimary, 0.08))
   clip: true
 
   onNeedsSpectrumChanged: {
@@ -65,11 +65,11 @@ Rectangle {
       gradient: Gradient {
         GradientStop {
           position: 0
-          color: Qt.alpha(Color.mSurface, 0.35)
+          color: Qt.alpha(ShellColors.mSurface, 0.35)
         }
         GradientStop {
           position: 1
-          color: Qt.alpha(Color.mSurface, 0.85)
+          color: Qt.alpha(ShellColors.mSurface, 0.85)
         }
       }
     }
@@ -84,21 +84,21 @@ Rectangle {
       Layout.fillWidth: true
       NIcon {
         icon: "disc"
-        color: Color.mPrimary
+        color: ShellColors.mPrimary
         pointSize: Style.fontSizeS
       }
       NText {
         Layout.fillWidth: true
         text: MediaService.currentPlayer?.identity || I18n.tr("control-center.media-title")
         pointSize: Style.fontSizeS
-        color: Color.mOnSurfaceVariant
+        color: ShellColors.mOnSurfaceVariant
         elide: Text.ElideRight
       }
       Rectangle {
         Layout.preferredWidth: Math.round(136 * Style.uiScaleRatio)
         Layout.preferredHeight: Math.round(26 * Style.uiScaleRatio)
         radius: height / 2
-        color: Qt.tint(Color.mSurfaceVariant, Qt.alpha(Color.mPrimary, 0.16))
+        color: Qt.tint(ShellColors.mSurfaceVariant, Qt.alpha(ShellColors.mPrimary, 0.16))
         RowLayout {
           id: outputLabel
           anchors.fill: parent
@@ -107,7 +107,7 @@ Rectangle {
           NIcon {
             icon: "headphones"
             pointSize: Style.fontSizeXS
-            color: Color.mOnSurface
+            color: ShellColors.mOnSurface
           }
           NText {
             Layout.fillWidth: true
@@ -155,7 +155,7 @@ Rectangle {
           text: MediaService.trackArtist
           visible: text !== ""
           pointSize: Style.fontSizeS
-          color: Color.mOnSurfaceVariant
+          color: ShellColors.mOnSurfaceVariant
           elide: Text.ElideRight
         }
         NText {
@@ -163,7 +163,7 @@ Rectangle {
           visible: root.expanded && text !== ""
           text: MediaService.trackAlbum
           pointSize: Style.fontSizeS
-          color: Color.mOnSurfaceVariant
+          color: ShellColors.mOnSurfaceVariant
           elide: Text.ElideRight
         }
       }
@@ -179,18 +179,18 @@ Rectangle {
         Layout.preferredWidth: Math.round(64 * Style.uiScaleRatio)
         Layout.preferredHeight: Math.round(52 * Style.uiScaleRatio)
         radius: Math.min(Style.iRadiusM, height / 2)
-        color: Color.mPrimary
+        color: ShellColors.mPrimary
         opacity: MediaService.canPlay || MediaService.canPause ? 1 : 0.45
         NMaterialStateLayer {
           hovered: playPointer.containsMouse
           pressed: playPointer.pressed
-          tint: Color.mOnPrimary
+          tint: ShellColors.mOnPrimary
         }
         NIcon {
           anchors.centerIn: parent
           icon: MediaService.isPlaying ? "media-pause" : "media-play"
           pointSize: Style.fontSizeXXL
-          color: Color.mOnPrimary
+          color: ShellColors.mOnPrimary
         }
         Accessible.role: Accessible.Button
         Accessible.name: I18n.tr(MediaService.isPlaying ? "common.pause" : "common.play")
@@ -219,8 +219,8 @@ Rectangle {
         playing: MediaService.isPlaying
         motionEnabled: !Settings.data.general.animationDisabled
         unit: Style.uiScaleRatio
-        accent: Color.mPrimary
-        trackColor: Color.mOutline
+        accent: ShellColors.mPrimary
+        trackColor: ShellColors.mOutline
         Accessible.name: I18n.tr("control-center.seek")
         enabled: root.hasPlayer && MediaService.trackLength > 0 && MediaService.canSeek
         property real pendingRatio: 0
@@ -257,7 +257,7 @@ Rectangle {
       Layout.preferredHeight: Math.round(18 * Style.uiScaleRatio)
       visible: root.expanded && root.needsSpectrum && MediaService.isPlaying
       values: SpectrumService.values
-      fillColor: Color.mPrimary
+      fillColor: ShellColors.mPrimary
       opacity: 0.35
     }
 
@@ -268,7 +268,7 @@ Rectangle {
         Layout.fillWidth: true
         text: root.hasPlayer ? MediaService.positionString + " / " + MediaService.lengthString : ""
         pointSize: Style.fontSizeXS
-        color: Color.mOnSurfaceVariant
+        color: ShellColors.mOnSurfaceVariant
       }
       NIconButton {
         icon: "media-prev"

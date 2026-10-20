@@ -6,7 +6,7 @@ Rectangle {
   id: root
   property bool hovered: false
   property bool pressed: false
-  property color tint: Color.mPrimary
+  property color tint: ShellColors.mPrimary
   anchors.fill: parent
   radius: parent.radius
   visible: Style.materialControls

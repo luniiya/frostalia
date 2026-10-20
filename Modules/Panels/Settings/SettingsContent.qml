@@ -767,7 +767,7 @@ Item {
   ColumnLayout {
     anchors.fill: parent
     anchors.margins: root.material ? Math.round(8 * Style.uiScaleRatio) : Style.marginL
-    spacing: root.material ? Math.round(8 * Style.uiScaleRatio) : 0
+    spacing: anchors.margins
 
     // Shared toolbar keeps navigation controls and search in a fixed place.
     Item {
@@ -833,7 +833,7 @@ Item {
         Layout.alignment: Qt.AlignTop
 
         radius: root.sidebarCardStyle ? Style.radiusM : 0
-        color: root.sidebarCardStyle ? Color.mSurfaceVariant : "transparent"
+        color: root.sidebarCardStyle ? ShellColors.mSurfaceVariant : "transparent"
         border.color: root.sidebarCardStyle ? Style.boxBorderColor : "transparent"
 
         Behavior on expandedWidth {
@@ -853,8 +853,8 @@ Item {
             Layout.fillWidth: true
             text: root.sidebarExpanded ? I18n.tr("panels.settings.home") : ""
             icon: "home"
-            backgroundColor: root.homeVisible ? Color.mPrimary : "transparent"
-            textColor: root.homeVisible ? Color.mOnPrimary : Color.mOnSurface
+            backgroundColor: root.homeVisible ? ShellColors.mPrimary : "transparent"
+            textColor: root.homeVisible ? ShellColors.mOnPrimary : ShellColors.mOnSurface
             onClicked: root.showHome()
           }
 
@@ -900,10 +900,10 @@ Item {
                 radius: Style.iRadiusS
                 readonly property bool selected: index === root.searchSelectedIndex
                 readonly property bool effectiveHover: !root.ignoreMouseHover && resultMouseArea.containsMouse
-                color: (effectiveHover || selected) ? Color.mHover : "transparent"
+                color: (effectiveHover || selected) ? ShellColors.mHover : "transparent"
 
                 Behavior on color {
-                  enabled: !Color.isTransitioning
+                  enabled: !ShellColors.isTransitioning
                   ColorAnimation {
                     duration: Style.animationFast
                     easing.type: Easing.InOutQuad
@@ -923,7 +923,7 @@ Item {
                     text: I18n.tr(modelData.labelKey)
                     pointSize: Style.fontSizeM
                     font.weight: Style.fontWeightSemiBold
-                    color: (resultItem.effectiveHover || resultItem.selected) ? Color.mOnHover : Color.mOnSurface
+                    color: (resultItem.effectiveHover || resultItem.selected) ? ShellColors.mOnHover : ShellColors.mOnSurface
                     Layout.fillWidth: true
                     elide: Text.ElideRight
                     maximumLineCount: 1
@@ -937,7 +937,7 @@ Item {
                       return t;
                     }
                     pointSize: Style.fontSizeXS
-                    color: (resultItem.effectiveHover || resultItem.selected) ? Color.mOnHover : Color.mOnSurfaceVariant
+                    color: (resultItem.effectiveHover || resultItem.selected) ? ShellColors.mOnHover : ShellColors.mOnSurfaceVariant
                     Layout.fillWidth: true
                     elide: Text.ElideRight
                     maximumLineCount: 1
@@ -980,10 +980,10 @@ Item {
                 width: sidebarList.width
                 height: root.material ? root.materialRail.rowHeight : tabEntryRow.implicitHeight + Style.margin2XS
                 radius: root.material ? height / 2 : Style.iRadiusS
-                color: root.material ? "transparent" : selected ? Color.mPrimary : (tabItem.hovering ? Color.mHover : "transparent")
+                color: root.material ? "transparent" : selected ? ShellColors.mPrimary : (tabItem.hovering ? ShellColors.mHover : "transparent")
                 readonly property bool selected: !root.homeVisible && index === root.currentTabIndex
                 property bool hovering: false
-                property color tabTextColor: root.material ? Color.mOnSurface : selected ? Color.mOnPrimary : (tabItem.hovering ? Color.mOnHover : Color.mOnSurface)
+                property color tabTextColor: root.material ? ShellColors.mOnSurface : selected ? ShellColors.mOnPrimary : (tabItem.hovering ? ShellColors.mOnHover : ShellColors.mOnSurface)
 
                 Rectangle {
                   id: railIndicator
@@ -993,17 +993,17 @@ Item {
                   width: parent.width
                   height: parent.height
                   radius: height / 2
-                  color: tabItem.selected ? Qt.tint(Color.mSurfaceVariant, Qt.alpha(Color.mSecondary, 0.22)) : "transparent"
+                  color: tabItem.selected ? Qt.tint(ShellColors.mSurfaceVariant, Qt.alpha(ShellColors.mSecondary, 0.22)) : "transparent"
 
                   NMaterialStateLayer {
                     hovered: tabItem.hovering
                     pressed: tabMouseArea.pressed
-                    tint: Color.mOnSurface
+                    tint: ShellColors.mOnSurface
                   }
                 }
 
                 Behavior on color {
-                  enabled: !Color.isTransitioning
+                  enabled: !ShellColors.isTransitioning
                   ColorAnimation {
                     duration: Style.animationFast
                     easing.type: Easing.InOutQuad
@@ -1011,7 +1011,7 @@ Item {
                 }
 
                 Behavior on tabTextColor {
-                  enabled: !Color.isTransitioning
+                  enabled: !ShellColors.isTransitioning
                   ColorAnimation {
                     duration: Style.animationFast
                     easing.type: Easing.InOutQuad
@@ -1113,7 +1113,7 @@ Item {
         Layout.fillHeight: true
         Layout.alignment: Qt.AlignTop
         radius: Style.radiusM
-        color: Color.mSurfaceVariant
+        color: ShellColors.mSurfaceVariant
         border.width: root.material ? 0 : Style.boxBorderWidth
 
         SettingsHome {
@@ -1153,7 +1153,7 @@ Item {
             NIcon {
               icon: root.tabsModel[currentTabIndex]?.icon ?? ""
               visible: !root.material
-              color: Color.mPrimary
+              color: ShellColors.mPrimary
               pointSize: Style.fontSizeXXL
             }
 
@@ -1161,7 +1161,7 @@ Item {
               text: root.tabsModel[root.currentTabIndex]?.label ? I18n.tr(root.tabsModel[root.currentTabIndex].label) : ""
               pointSize: root.material ? Style.fontSizeXXXL : Style.fontSizeXL
               font.weight: root.material ? Style.fontWeightRegular : Style.fontWeightBold
-              color: root.material ? Color.mOnSurface : Color.mPrimary
+              color: root.material ? ShellColors.mOnSurface : ShellColors.mPrimary
               Layout.fillWidth: true
               Layout.alignment: Qt.AlignVCenter
             }
@@ -1248,8 +1248,8 @@ Item {
               id: highlightOverlay
               visible: opacity > 0
               opacity: 0
-              color: Qt.alpha(Color.mSecondary, 0.2)
-              border.color: Qt.alpha(Color.mSecondary, 0.6)
+              color: Qt.alpha(ShellColors.mSecondary, 0.2)
+              border.color: Qt.alpha(ShellColors.mSecondary, 0.6)
               border.width: Style.borderM
               radius: Style.radiusS
               z: 100

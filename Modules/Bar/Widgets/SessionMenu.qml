@@ -44,10 +44,10 @@ NIconButton {
       return I18n.tr("tooltips.session-menu");
   }
   tooltipDirection: BarService.getTooltipDirection(screenName, section)
-  colorBgHover: Style.widgetBackground(root.section, Color.mHover)
+  colorBgHover: Style.widgetBackground(root.section, ShellColors.mHover)
   colorBorderHover: Style.widgetBorder(root.section, Style.capsuleBorderColor)
   colorBg: Style.widgetBackground(root.section, Style.capsuleColor)
-  colorFg: Color.resolveColorKey(iconColorKey)
+  colorFg: ShellColors.resolveColorKey(iconColorKey)
   border.color: Style.widgetBorder(root.section, Style.capsuleBorderColor)
   border.width: Style.capsuleBorderWidth
 

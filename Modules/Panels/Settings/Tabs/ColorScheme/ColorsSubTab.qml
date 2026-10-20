@@ -56,16 +56,16 @@ ColumnLayout {
     }
 
     if (colorKey === "mSurface")
-      return Color.mSurfaceVariant;
+      return ShellColors.mSurfaceVariant;
     if (colorKey === "mPrimary")
-      return Color.mPrimary;
+      return ShellColors.mPrimary;
     if (colorKey === "mSecondary")
-      return Color.mSecondary;
+      return ShellColors.mSecondary;
     if (colorKey === "mTertiary")
-      return Color.mTertiary;
+      return ShellColors.mTertiary;
     if (colorKey === "mError")
-      return Color.mError;
-    return Color.mOnSurfaceVariant;
+      return ShellColors.mError;
+    return ShellColors.mOnSurfaceVariant;
   }
 
   function schemeLoaded(schemeName, jsonData) {
@@ -174,7 +174,7 @@ ColumnLayout {
       NText {
         text: I18n.tr("panels.display.night-light-manual-schedule-sunrise")
         pointSize: Style.fontSizeM
-        color: Color.mOnSurfaceVariant
+        color: ShellColors.mOnSurfaceVariant
       }
 
       NComboBox {
@@ -192,7 +192,7 @@ ColumnLayout {
       NText {
         text: I18n.tr("panels.display.night-light-manual-schedule-sunset")
         pointSize: Style.fontSizeM
-        color: Color.mOnSurfaceVariant
+        color: ShellColors.mOnSurfaceVariant
       }
 
       NComboBox {
@@ -271,7 +271,7 @@ ColumnLayout {
     visible: Settings.data.colorSchemes.useWallpaperColors
     Layout.fillWidth: true
     implicitHeight: descriptionColumn.implicitHeight + Style.margin2L
-    color: Color.mSurface
+    color: ShellColors.mSurface
 
     Column {
       id: descriptionColumn
@@ -286,7 +286,7 @@ ColumnLayout {
         wrapMode: Text.WordWrap
         text: I18n.tr("panels.color-scheme.method-description." + Settings.data.colorSchemes.generationMethod)
         pointSize: Style.fontSizeS
-        color: Color.mOnSurfaceVariant
+        color: ShellColors.mOnSurfaceVariant
       }
 
       Row {
@@ -296,7 +296,7 @@ ColumnLayout {
         property int diameter: 16 * Style.uiScaleRatio
 
         Repeater {
-          model: [Color.mPrimary, Color.mSecondary, Color.mTertiary, Color.mError]
+          model: [ShellColors.mPrimary, ShellColors.mSecondary, ShellColors.mTertiary, ShellColors.mError]
 
           Rectangle {
             width: colorPreviewRow.diameter
@@ -348,12 +348,12 @@ ColumnLayout {
           border.width: Style.borderL
           border.color: {
             if ((Settings.data.colorSchemes.predefinedScheme === schemeName) && schemeItem.enabled) {
-              return Color.mSecondary;
+              return ShellColors.mSecondary;
             }
             if (itemMouseArea.containsMouse) {
-              return Color.mHover;
+              return ShellColors.mHover;
             }
-            return Color.mOutline;
+            return ShellColors.mOutline;
           }
 
           RowLayout {
@@ -365,7 +365,7 @@ ColumnLayout {
             NText {
               text: schemeItem.schemeName
               pointSize: Style.fontSizeS
-              color: Color.mOnSurface
+              color: ShellColors.mOnSurface
               Layout.fillWidth: true
               elide: Text.ElideRight
               verticalAlignment: Text.AlignVCenter
@@ -428,14 +428,14 @@ ColumnLayout {
             width: 20
             height: 20
             radius: Math.min(Style.radiusL, width / 2)
-            color: Color.mSecondary
+            color: ShellColors.mSecondary
             border.width: Style.borderS
-            border.color: Color.mOnSecondary
+            border.color: ShellColors.mOnSecondary
 
             NIcon {
               icon: "check"
               pointSize: Style.fontSizeXS
-              color: Color.mOnSecondary
+              color: ShellColors.mOnSecondary
               anchors.centerIn: parent
             }
           }

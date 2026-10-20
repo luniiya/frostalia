@@ -41,10 +41,10 @@ NIconButton {
                          "profile": PowerProfileService.getName()
                        })
   tooltipDirection: BarService.getTooltipDirection(screen?.name, section)
-  colorBgHover: Style.widgetBackground(root.section, Color.mHover)
+  colorBgHover: Style.widgetBackground(root.section, ShellColors.mHover)
   colorBorderHover: Style.widgetBorder(root.section, Style.capsuleBorderColor)
-  colorBg: Style.widgetBackground(root.section, (PowerProfileService.profile === PowerProfile.Balanced) ? Style.capsuleColor : Color.mPrimary)
-  colorFg: (PowerProfileService.profile === PowerProfile.Balanced) ? Color.resolveColorKey(iconColorKey) : Color.mOnPrimary
+  colorBg: Style.widgetBackground(root.section, (PowerProfileService.profile === PowerProfile.Balanced) ? Style.capsuleColor : ShellColors.mPrimary)
+  colorFg: (PowerProfileService.profile === PowerProfile.Balanced) ? ShellColors.resolveColorKey(iconColorKey) : ShellColors.mOnPrimary
   border.color: Style.widgetBorder(root.section, Style.capsuleBorderColor)
   border.width: Style.capsuleBorderWidth
   onClicked: PowerProfileService.cycleProfile()

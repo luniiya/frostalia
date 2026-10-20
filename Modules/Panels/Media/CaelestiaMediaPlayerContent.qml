@@ -52,20 +52,20 @@ Item {
         NIcon {
           icon: "music"
           pointSize: Style.fontSizeL
-          color: Color.mPrimary
+          color: ShellColors.mPrimary
         }
 
         NText {
           text: I18n.tr("common.media-player")
           font.weight: Style.fontWeightBold
           pointSize: Style.fontSizeL
-          color: Color.mOnSurface
+          color: ShellColors.mOnSurface
           Layout.fillWidth: true
         }
 
         Rectangle {
           radius: Style.radiusS
-          color: playerSelectorMouse.containsMouse ? Color.mPrimary : "transparent"
+          color: playerSelectorMouse.containsMouse ? ShellColors.mPrimary : "transparent"
           implicitWidth: playerRow.implicitWidth + Style.marginM
           implicitHeight: Style.baseWidgetSize * 0.8
           visible: MediaService.getAvailablePlayers().length > 1
@@ -78,12 +78,12 @@ Item {
             NText {
               text: MediaService.currentPlayer ? MediaService.currentPlayer.identity : "Select Player"
               pointSize: Style.fontSizeXS
-              color: playerSelectorMouse.containsMouse ? Color.mOnPrimary : Color.mOnSurfaceVariant
+              color: playerSelectorMouse.containsMouse ? ShellColors.mOnPrimary : ShellColors.mOnSurfaceVariant
             }
             NIcon {
               icon: "chevron-down"
               pointSize: Style.fontSizeXS
-              color: playerSelectorMouse.containsMouse ? Color.mOnPrimary : Color.mOnSurfaceVariant
+              color: playerSelectorMouse.containsMouse ? ShellColors.mOnPrimary : ShellColors.mOnSurfaceVariant
             }
           }
 
@@ -103,8 +103,8 @@ Item {
             padding: Style.marginS
 
             background: Rectangle {
-              color: Color.mSurfaceVariant
-              border.color: Color.mOutline
+              color: ShellColors.mSurfaceVariant
+              border.color: ShellColors.mOutline
               border.width: Style.borderS
               radius: Style.iRadiusM
             }
@@ -120,7 +120,7 @@ Item {
 
                   Rectangle {
                     anchors.fill: parent
-                    color: itemMouse.containsMouse ? Color.mPrimary : "transparent"
+                    color: itemMouse.containsMouse ? ShellColors.mPrimary : "transparent"
                     radius: Style.iRadiusS
                   }
 
@@ -132,14 +132,14 @@ Item {
                     NIcon {
                       visible: MediaService.currentPlayer && MediaService.currentPlayer.identity === modelData.identity
                       icon: "check"
-                      color: itemMouse.containsMouse ? Color.mOnPrimary : Color.mPrimary
+                      color: itemMouse.containsMouse ? ShellColors.mOnPrimary : ShellColors.mPrimary
                       pointSize: Style.fontSizeS
                     }
 
                     NText {
                       text: modelData.identity
                       pointSize: Style.fontSizeS
-                      color: itemMouse.containsMouse ? Color.mOnPrimary : Color.mOnSurface
+                      color: itemMouse.containsMouse ? ShellColors.mOnPrimary : ShellColors.mOnSurface
                       Layout.fillWidth: true
                       elide: Text.ElideRight
                     }
@@ -280,7 +280,7 @@ Item {
               delegate: NText {
                 pointSize: panel.compactMode ? Style.fontSizeL : Style.fontSizeXL
                 font.weight: Style.fontWeightBold
-                color: Color.mOnSurface
+                color: ShellColors.mOnSurface
                 horizontalAlignment: panel.isSideBySide ? Text.AlignLeft : Text.AlignHCenter
                 elide: Text.ElideNone
                 wrapMode: Text.NoWrap
@@ -310,7 +310,7 @@ Item {
 
               delegate: NText {
                 pointSize: panel.compactMode ? Style.fontSizeS : Style.fontSizeM
-                color: Color.mOnSurfaceVariant
+                color: ShellColors.mOnSurfaceVariant
                 horizontalAlignment: panel.isSideBySide ? Text.AlignLeft : Text.AlignHCenter
                 elide: Text.ElideNone
                 wrapMode: Text.NoWrap
@@ -402,7 +402,7 @@ Item {
                 NText {
                   text: MediaService.positionString || "0:00"
                   pointSize: Style.fontSizeXS
-                  color: Color.mOnSurfaceVariant
+                  color: ShellColors.mOnSurfaceVariant
                   visible: progressWrapper.visible
                 }
 
@@ -414,7 +414,7 @@ Item {
                 NText {
                   text: MediaService.lengthString || "0:00"
                   pointSize: Style.fontSizeXS
-                  color: Color.mOnSurfaceVariant
+                  color: ShellColors.mOnSurfaceVariant
                   horizontalAlignment: Text.AlignRight
                   visible: progressWrapper.visible
                 }
@@ -440,20 +440,20 @@ Item {
               implicitWidth: panel.compactMode ? (Style.baseWidgetSize * 1.3) : (Style.baseWidgetSize * 1.8)
               implicitHeight: panel.compactMode ? (Style.baseWidgetSize * 1.3) : (Style.baseWidgetSize * 1.8)
               radius: panel.compactMode ? Style.iRadiusM : Style.iRadiusL
-              color: Color.mPrimary
+              color: ShellColors.mPrimary
 
               NIcon {
                 anchors.centerIn: parent
                 icon: MediaService.isPlaying ? "media-pause" : "media-play"
                 pointSize: panel.compactMode ? Style.fontSizeL : Style.fontSizeXXL
-                color: Color.mOnPrimary
+                color: ShellColors.mOnPrimary
               }
 
               MouseArea {
                 anchors.fill: parent
                 cursorShape: Qt.PointingHandCursor
                 hoverEnabled: true
-                onEntered: parent.color = Color.mPrimary
+                onEntered: parent.color = ShellColors.mPrimary
                 onClicked: MediaService.playPause()
               }
             }
@@ -476,7 +476,7 @@ Item {
       width: parent.width - Style.marginS
       height: 20
       values: SpectrumService.values
-      fillColor: Color.mPrimary
+      fillColor: ShellColors.mPrimary
       opacity: 0.4
       barPosition: Settings.getBarPositionForScreen(panel.screen?.name)
       mirrored: Settings.data.audio.spectrumMirrored
@@ -489,7 +489,7 @@ Item {
       width: parent.width - Style.marginS
       height: parent.height - Style.marginS
       values: SpectrumService.values
-      fillColor: Color.mPrimary
+      fillColor: ShellColors.mPrimary
       opacity: 0.4
       mirrored: Settings.data.audio.spectrumMirrored
     }
@@ -501,7 +501,7 @@ Item {
       width: parent.width - Style.marginS
       height: parent.height - Style.marginS
       values: SpectrumService.values
-      fillColor: Color.mPrimary
+      fillColor: ShellColors.mPrimary
       opacity: 0.4
       mirrored: Settings.data.audio.spectrumMirrored
     }

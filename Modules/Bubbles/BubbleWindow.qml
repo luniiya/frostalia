@@ -115,7 +115,7 @@ PanelWindow {
     preferredRendererType: Shape.CurveRenderer
 
     ShapePath {
-      fillColor: Qt.alpha(BubbleLogic.backgroundColor(root.configuration, root.configuration.backgroundColorKey === "none" ? Color.mSurface : Color.resolveColorKey(root.configuration.backgroundColorKey)), BubbleLogic.backgroundOpacity(root.configuration))
+      fillColor: Qt.alpha(BubbleLogic.backgroundColor(root.configuration, root.configuration.backgroundColorKey === "none" ? ShellColors.mSurface : ShellColors.resolveColorKey(root.configuration.backgroundColorKey)), BubbleLogic.backgroundOpacity(root.configuration))
       strokeColor: "transparent"
       strokeWidth: 0
       PathSvg {

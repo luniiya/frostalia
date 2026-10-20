@@ -82,7 +82,7 @@ ColumnLayout {
         }
         badges.push({
                       "icon": "plugin",
-                      "color": Color.mSecondary
+                      "color": ShellColors.mSecondary
                     });
       }
       availableWidgets.append({

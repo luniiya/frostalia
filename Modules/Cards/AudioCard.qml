@@ -153,17 +153,17 @@ NBox {
         NIconButton {
           icon: AudioService.muted ? "volume-off" : "volume-high"
           baseSize: Style.baseWidgetSize * 0.5
-          colorFg: AudioService.muted ? Color.mError : Color.mOnSurface
+          colorFg: AudioService.muted ? ShellColors.mError : ShellColors.mOnSurface
           colorBg: "transparent"
-          colorBgHover: Color.mHover
-          colorFgHover: Color.mOnHover
+          colorBgHover: ShellColors.mHover
+          colorFgHover: ShellColors.mOnHover
           onClicked: AudioService.setOutputMuted(!AudioService.muted)
         }
 
         NText {
           text: AudioService.sink ? AudioService.sink.description : "No output device"
           pointSize: Style.fontSizeXS
-          color: Color.mOnSurfaceVariant
+          color: ShellColors.mOnSurfaceVariant
           elide: Text.ElideRight
           Layout.fillWidth: true
           Layout.preferredWidth: 0
@@ -177,7 +177,7 @@ NBox {
         from: 0
         to: AudioService.maxVolume
         value: localOutputVolume
-        fillColor: AudioService.isAboveNormalVolume(localOutputVolume) ? Color.mError : Color.mPrimary
+        fillColor: AudioService.isAboveNormalVolume(localOutputVolume) ? ShellColors.mError : ShellColors.mPrimary
         stepSize: 0.01
         heightRatio: 0.5
         onMoved: localOutputVolume = value
@@ -222,17 +222,17 @@ NBox {
         NIconButton {
           icon: AudioService.inputMuted ? "microphone-off" : "microphone"
           baseSize: Style.baseWidgetSize * 0.5
-          colorFg: AudioService.inputMuted ? Color.mError : Color.mOnSurface
+          colorFg: AudioService.inputMuted ? ShellColors.mError : ShellColors.mOnSurface
           colorBg: "transparent"
-          colorBgHover: Color.mHover
-          colorFgHover: Color.mOnHover
+          colorBgHover: ShellColors.mHover
+          colorFgHover: ShellColors.mOnHover
           onClicked: AudioService.setInputMuted(!AudioService.inputMuted)
         }
 
         NText {
           text: AudioService.source ? AudioService.source.description : "No input device"
           pointSize: Style.fontSizeXS
-          color: Color.mOnSurfaceVariant
+          color: ShellColors.mOnSurfaceVariant
           elide: Text.ElideRight
           Layout.fillWidth: true
           Layout.preferredWidth: 0

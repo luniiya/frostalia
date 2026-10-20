@@ -642,8 +642,8 @@ PopupWindow {
     Rectangle {
       anchors.fill: parent
       anchors.margins: border.width
-      color: Color.mSurface
-      border.color: Color.mOutline
+      color: ShellColors.mSurface
+      border.color: ShellColors.mOutline
       border.width: Style.borderS
       radius: Math.min(Style.radiusS, Math.min(width, height) / 3)
 
@@ -659,7 +659,7 @@ PopupWindow {
         text: root.text
         pointSize: Style.fontSizeS
         family: Settings.data.ui.fontFixed
-        color: Color.mOnSurfaceVariant
+        color: ShellColors.mOnSurfaceVariant
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
         wrapMode: Text.WordWrap
@@ -683,7 +683,7 @@ PopupWindow {
             text: modelData
             pointSize: Style.fontSizeS
             family: tooltipText.family
-            color: Color.mOnSurfaceVariant
+            color: ShellColors.mOnSurfaceVariant
             Layout.preferredHeight: rowHeightMeasure.implicitHeight
           }
         }

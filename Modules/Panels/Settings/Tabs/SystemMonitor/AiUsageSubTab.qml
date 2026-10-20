@@ -15,7 +15,7 @@ ColumnLayout {
   NText {
     text: I18n.tr("panels.system.ai-usage-intro")
     pointSize: Style.fontSizeS
-    color: Color.mOnSurfaceVariant
+    color: ShellColors.mOnSurfaceVariant
     wrapMode: Text.WordWrap
     Layout.fillWidth: true
   }

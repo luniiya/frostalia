@@ -113,7 +113,7 @@ Item {
     width: root.contentWidth
     height: root.contentHeight
     radius: Style.radiusL
-    color: Style.widgetBackground(root.section, mouseArea.containsMouse ? Color.mHover : Style.capsuleColor)
+    color: Style.widgetBackground(root.section, mouseArea.containsMouse ? ShellColors.mHover : Style.capsuleColor)
     border.color: Style.widgetBorder(root.section, Style.capsuleBorderColor)
     border.width: Style.capsuleBorderWidth
 
@@ -130,7 +130,7 @@ Item {
         icon: root.provider ? root.provider.providerIcon : "ai"
         pointSize: root.barFontSize
         applyUiScale: false
-        color: mouseArea.containsMouse ? Color.mOnHover : Color.mPrimary
+        color: mouseArea.containsMouse ? ShellColors.mOnHover : ShellColors.mPrimary
         Layout.alignment: Qt.AlignCenter
       }
 
@@ -139,7 +139,7 @@ Item {
         pointSize: root.barFontSize
         applyUiScale: false
         font.weight: Style.fontWeightSemiBold
-        color: mouseArea.containsMouse ? Color.mOnHover : Color.mOnSurface
+        color: mouseArea.containsMouse ? ShellColors.mOnHover : ShellColors.mOnSurface
         Layout.alignment: Qt.AlignCenter
       }
     }

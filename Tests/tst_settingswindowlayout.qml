@@ -8,12 +8,12 @@ TestCase {
   function test_window_data() {
     return [
           {
-            tag: "Caelestia unchanged",
+            tag: "Caelestia two-column minimum",
             material: false,
             scale: 1,
             width: 840,
             height: 910,
-            minimumWidth: 840,
+            minimumWidth: 500,
             minimumHeight: 910
           },
           {
@@ -22,7 +22,7 @@ TestCase {
             scale: 1.25,
             width: 1050,
             height: 1138,
-            minimumWidth: 1050,
+            minimumWidth: 625,
             minimumHeight: 1138
           },
           {
@@ -31,7 +31,7 @@ TestCase {
             scale: 1,
             width: 1100,
             height: 750,
-            minimumWidth: 760,
+            minimumWidth: 560,
             minimumHeight: 520
           },
           {
@@ -40,7 +40,7 @@ TestCase {
             scale: 1.5,
             width: 1650,
             height: 1125,
-            minimumWidth: 1140,
+            minimumWidth: 840,
             minimumHeight: 780
           }
         ];
@@ -54,6 +54,41 @@ TestCase {
     compare(metrics.minimumHeight, data.minimumHeight);
     verify(metrics.minimumWidth <= metrics.width);
     verify(metrics.minimumHeight <= metrics.height);
+  }
+
+  function test_minimumWindowFitsTwoCards_data() {
+    return [
+          {
+            tag: "Caelestia",
+            material: false,
+            scale: 1
+          },
+          {
+            tag: "Caelestia scaled",
+            material: false,
+            scale: 1.25
+          },
+          {
+            tag: "Material",
+            material: true,
+            scale: 1
+          },
+          {
+            tag: "Material scaled",
+            material: true,
+            scale: 1.5
+          }
+        ];
+  }
+
+  function test_minimumWindowFitsTwoCards(data) {
+    const window = SettingsWindowLayout.windowMetrics(data.material, data.scale);
+    const outerMargin = Math.round((data.material ? 8 : 13) * data.scale);
+    const homePadding = Math.round((data.material ? 24 : 13) * data.scale);
+    const width = window.minimumWidth - 2 * (outerMargin + homePadding);
+    const grid = SettingsWindowLayout.homeGrid(width, data.scale, data.material);
+    compare(grid.columns, 2);
+    verify(grid.cardWidth >= Math.round((data.material ? 210 : 160) * data.scale));
   }
 
   function test_rail_data() {
@@ -366,6 +401,8 @@ TestCase {
             displayName: "Aya",
             username: "ayaya",
             os: "CachyOS",
+            hostname: "cubeberry",
+            expectedHostname: "cubeberry",
             name: "Aya",
             expectedOs: "CachyOS"
           },
@@ -374,6 +411,8 @@ TestCase {
             displayName: "",
             username: "ayaya",
             os: "",
+            hostname: "",
+            expectedHostname: "",
             name: "ayaya",
             expectedOs: "Operating system"
           },
@@ -382,6 +421,8 @@ TestCase {
             displayName: "  Aya  ",
             username: "user",
             os: "  Linux  ",
+            hostname: "  cubeberry  ",
+            expectedHostname: "cubeberry",
             name: "Aya",
             expectedOs: "Linux"
           },
@@ -390,6 +431,8 @@ TestCase {
             displayName: " ",
             username: "",
             os: " ",
+            hostname: undefined,
+            expectedHostname: "",
             name: "",
             expectedOs: "Operating system"
           }
@@ -397,8 +440,9 @@ TestCase {
   }
 
   function test_profile(data) {
-    const profile = SettingsWindowLayout.profile(data.displayName, data.username, data.os, "Operating system");
+    const profile = SettingsWindowLayout.profile(data.displayName, data.username, data.os, "Operating system", data.hostname);
     compare(profile.name, data.name);
     compare(profile.os, data.expectedOs);
+    compare(profile.hostname, data.expectedHostname);
   }
 }

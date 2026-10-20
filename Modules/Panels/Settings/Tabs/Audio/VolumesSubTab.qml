@@ -43,7 +43,7 @@ ColumnLayout {
       from: 0
       to: AudioService.maxVolume
       value: localVolume
-      fillColor: AudioService.isAboveNormalVolume(localVolume) ? Color.mError : Color.mPrimary
+      fillColor: AudioService.isAboveNormalVolume(localVolume) ? ShellColors.mError : ShellColors.mPrimary
       stepSize: 0.01
       text: Math.round(AudioService.volume * 100) + "%"
       onMoved: value => localVolume = value

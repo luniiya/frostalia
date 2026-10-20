@@ -8,7 +8,7 @@ Rectangle {
   id: root
   implicitHeight: Math.round(76 * Style.uiScaleRatio)
   radius: Style.radiusM
-  color: Color.mSurfaceVariant
+  color: ShellColors.mSurfaceVariant
   readonly property string disk: Settings.data.controlCenter.diskPath || "/"
   Component.onCompleted: SystemStatService.registerComponent("material-control-center")
   Component.onDestruction: SystemStatService.unregisterComponent("material-control-center")
@@ -47,7 +47,7 @@ Rectangle {
         NIcon {
           Layout.alignment: Qt.AlignHCenter
           icon: modelData.icon
-          color: Color.mPrimary
+          color: ShellColors.mPrimary
           pointSize: Style.fontSizeL
         }
         NText {
@@ -60,7 +60,7 @@ Rectangle {
           Layout.fillWidth: true
           horizontalAlignment: Text.AlignHCenter
           text: modelData.label
-          color: Color.mOnSurfaceVariant
+          color: ShellColors.mOnSurfaceVariant
           pointSize: Style.fontSizeXXS
           elide: Text.ElideRight
         }

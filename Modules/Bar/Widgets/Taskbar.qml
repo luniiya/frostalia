@@ -691,8 +691,8 @@ Item {
           readonly property real contentWidth: shouldShowTitle ? root.itemSize + itemSpacing + root.titleWidth : root.itemSize
 
           readonly property string title: modelData.title || modelData.appId || "Unknown application"
-          readonly property color titleBgColor: Style.widgetBackground(root.section, (isHovered || isFocused) ? Color.mHover : Style.capsuleColor)
-          readonly property color titleFgColor: (isHovered || isFocused) ? Color.mOnHover : Color.mOnSurface
+          readonly property color titleBgColor: Style.widgetBackground(root.section, (isHovered || isFocused) ? ShellColors.mHover : Style.capsuleColor)
+          readonly property color titleFgColor: (isHovered || isFocused) ? ShellColors.mOnHover : ShellColors.mOnSurface
 
           Layout.preferredWidth: root.isVerticalBar ? root.barHeight : (root.showTitle ? Math.round(contentWidth + Style.margin2M) : Math.round(contentWidth)) // Add margins for both pinned and running apps
           Layout.preferredHeight: root.isVerticalBar ? root.itemSize : root.barHeight
@@ -860,7 +860,7 @@ Item {
                     // Apply dock shader to all taskbar icons
                     layer.enabled: widgetSettings.colorizeIcons !== false
                     layer.effect: ShaderEffect {
-                      property color targetColor: Settings.data.colorSchemes.darkMode ? Color.mOnSurface : Color.mSurfaceVariant
+                      property color targetColor: Settings.data.colorSchemes.darkMode ? ShellColors.mOnSurface : ShellColors.mSurfaceVariant
                       property real colorizeMode: 0.0 // Dock mode (grayscale)
 
                       fragmentShader: Qt.resolvedUrl(Quickshell.shellDir + "/Shaders/qsb/appicon_colorize.frag.qsb")
@@ -875,7 +875,7 @@ Item {
                     anchors.horizontalCenter: parent.horizontalCenter
                     width: Style.toOdd(root.itemSize * 0.25)
                     height: 4
-                    color: taskbarItem.isFocused ? Color.mPrimary : (taskbarItem.isHovered ? Color.mHover : "transparent")
+                    color: taskbarItem.isFocused ? ShellColors.mPrimary : (taskbarItem.isHovered ? ShellColors.mHover : "transparent")
                     radius: Math.min(Style.radiusXXS, width / 2)
 
                     Behavior on color {

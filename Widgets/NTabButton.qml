@@ -32,12 +32,12 @@ Rectangle {
   topRightRadius: Style.materialControls ? Style.iRadiusL : (isLast ? Style.iRadiusM : Style.iRadiusXXXS)
   bottomRightRadius: Style.materialControls ? Style.iRadiusL : (isLast ? Style.iRadiusM : Style.iRadiusXXXS)
 
-  color: root.isHovered && !Style.materialControls ? Color.mHover : (root.checked ? Color.mPrimary : Color.smartAlpha(Color.mSurface))
-  border.color: root.checked ? Color.mPrimary : Color.mOutline
+  color: root.isHovered && !Style.materialControls ? ShellColors.mHover : (root.checked ? ShellColors.mPrimary : ShellColors.smartAlpha(ShellColors.mSurface))
+  border.color: root.checked ? ShellColors.mPrimary : ShellColors.mOutline
   border.width: Style.borderS
 
   Behavior on color {
-    enabled: !Color.isTransitioning
+    enabled: !ShellColors.isTransitioning
     ColorAnimation {
       duration: Style.animationFast
       easing.type: Easing.OutCubic
@@ -48,7 +48,7 @@ Rectangle {
     radius: Style.iRadiusL
     hovered: root.isHovered
     pressed: tabMouse.pressed
-    tint: root.checked ? Color.mOnPrimary : Color.mPrimary
+    tint: root.checked ? ShellColors.mOnPrimary : ShellColors.mPrimary
   }
 
   // Content
@@ -63,10 +63,10 @@ Rectangle {
       Layout.alignment: Qt.AlignVCenter
       icon: root.icon
       pointSize: root.pointSize * 1.2
-      color: root.isHovered && !Style.materialControls ? Color.mOnHover : (root.checked ? Color.mOnPrimary : Color.mOnSurface)
+      color: root.isHovered && !Style.materialControls ? ShellColors.mOnHover : (root.checked ? ShellColors.mOnPrimary : ShellColors.mOnSurface)
 
       Behavior on color {
-        enabled: !Color.isTransitioning
+        enabled: !ShellColors.isTransitioning
         ColorAnimation {
           duration: Style.animationFast
           easing.type: Easing.OutCubic
@@ -81,12 +81,12 @@ Rectangle {
       text: root.text
       pointSize: root.pointSize
       font.weight: Style.fontWeightSemiBold
-      color: root.isHovered && !Style.materialControls ? Color.mOnHover : (root.checked ? Color.mOnPrimary : Color.mOnSurface)
+      color: root.isHovered && !Style.materialControls ? ShellColors.mOnHover : (root.checked ? ShellColors.mOnPrimary : ShellColors.mOnSurface)
       horizontalAlignment: Text.AlignHCenter
       verticalAlignment: Text.AlignVCenter
 
       Behavior on color {
-        enabled: !Color.isTransitioning
+        enabled: !ShellColors.isTransitioning
         ColorAnimation {
           duration: Style.animationFast
           easing.type: Easing.OutCubic

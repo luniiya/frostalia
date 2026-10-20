@@ -127,46 +127,46 @@ Variants {
     function getProgressColor() {
       const isMutedState = (currentOSDType === OSD.Type.Volume && isMuted) || (currentOSDType === OSD.Type.InputVolume && isInputMuted);
       if (isMutedState) {
-        return Color.mError;
+        return ShellColors.mError;
       }
       // When volumeOverdrive is enabled, show error color if volume is above 100%
       if ((currentOSDType === OSD.Type.Volume || currentOSDType === OSD.Type.InputVolume) && getMaxValue() > 1.0) {
         const value = getCurrentValue();
         if (value > 1.0) {
-          return Color.mError;
+          return ShellColors.mError;
         }
       }
       // For lock keys, use a different color to indicate the lock state
       if (currentOSDType === OSD.Type.LockKey) {
         // Check the specific lock key that was changed
         if (lastLockKeyChanged.startsWith("CAPS")) {
-          return LockKeysService.capsLockOn ? Color.mPrimary : Color.mOnSurfaceVariant;
+          return LockKeysService.capsLockOn ? ShellColors.mPrimary : ShellColors.mOnSurfaceVariant;
         } else if (lastLockKeyChanged.startsWith("NUM")) {
-          return LockKeysService.numLockOn ? Color.mPrimary : Color.mOnSurfaceVariant;
+          return LockKeysService.numLockOn ? ShellColors.mPrimary : ShellColors.mOnSurfaceVariant;
         } else if (lastLockKeyChanged.startsWith("SCROLL")) {
-          return LockKeysService.scrollLockOn ? Color.mPrimary : Color.mOnSurfaceVariant;
+          return LockKeysService.scrollLockOn ? ShellColors.mPrimary : ShellColors.mOnSurfaceVariant;
         }
       }
-      return Color.mPrimary;
+      return ShellColors.mPrimary;
     }
 
     function getIconColor() {
       const isMutedState = (currentOSDType === OSD.Type.Volume && isMuted) || (currentOSDType === OSD.Type.InputVolume && isInputMuted);
       if (isMutedState)
-        return Color.mError;
+        return ShellColors.mError;
 
       if (currentOSDType === OSD.Type.LockKey) {
         // Check the specific lock key that was changed
         if (lastLockKeyChanged.startsWith("CAPS")) {
-          return LockKeysService.capsLockOn ? Color.mPrimary : Color.mOnSurfaceVariant;
+          return LockKeysService.capsLockOn ? ShellColors.mPrimary : ShellColors.mOnSurfaceVariant;
         } else if (lastLockKeyChanged.startsWith("NUM")) {
-          return LockKeysService.numLockOn ? Color.mPrimary : Color.mOnSurfaceVariant;
+          return LockKeysService.numLockOn ? ShellColors.mPrimary : ShellColors.mOnSurfaceVariant;
         } else if (lastLockKeyChanged.startsWith("SCROLL")) {
-          return LockKeysService.scrollLockOn ? Color.mPrimary : Color.mOnSurfaceVariant;
+          return LockKeysService.scrollLockOn ? ShellColors.mPrimary : ShellColors.mOnSurfaceVariant;
         }
       }
 
-      return Color.mOnSurface;
+      return ShellColors.mOnSurface;
     }
 
     // Brightness Handling
@@ -578,8 +578,8 @@ Variants {
           anchors.fill: parent
           anchors.margins: panel.material ? 6 * Style.uiScaleRatio : Style.marginM * 1.5
           radius: panel.material ? 32 * Style.uiScaleRatio : Style.radiusL
-          color: Qt.alpha(Color.mSurface, Color.adaptiveOpacity(Settings.data.osd.backgroundOpacity) || 1.0)
-          border.color: Qt.alpha(Color.mOutline, Color.adaptiveOpacity(Settings.data.osd.backgroundOpacity) || 1.0)
+          color: Qt.alpha(ShellColors.mSurface, ShellColors.adaptiveOpacity(Settings.data.osd.backgroundOpacity) || 1.0)
+          border.color: Qt.alpha(ShellColors.mOutline, ShellColors.adaptiveOpacity(Settings.data.osd.backgroundOpacity) || 1.0)
           border.width: {
             if (panel.material)
               return 0;
@@ -615,7 +615,7 @@ Variants {
                     value: root.getCurrentValue(),
                     maximum: root.getMaxValue(),
                     accentColor: root.getProgressColor(),
-                    onAccentColor: root.getProgressColor() === Color.mError ? Color.mOnError : Color.mOnPrimary,
+                    onAccentColor: root.getProgressColor() === ShellColors.mError ? ShellColors.mOnError : ShellColors.mOnPrimary,
                     barThickness: panel.barThickness
                   })
         }

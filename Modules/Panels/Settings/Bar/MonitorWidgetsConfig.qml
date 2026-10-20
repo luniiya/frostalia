@@ -18,7 +18,7 @@ NBox {
   readonly property string barPosition: Settings.getBarPositionForScreen(screenName)
   readonly property bool barIsVertical: barPosition === "left" || barPosition === "right"
 
-  color: Color.mSurfaceVariant
+  color: ShellColors.mSurfaceVariant
   Layout.fillWidth: true
   implicitHeight: content.implicitHeight + Style.margin2L
 
@@ -128,13 +128,13 @@ NBox {
         }
         badges.push({
                       "icon": "plugin",
-                      "color": Color.mSecondary
+                      "color": ShellColors.mSecondary
                     });
       }
       if (BarWidgetRegistry.isCpuIntensive(id)) {
         badges.push({
                       "icon": "cpu-intensive",
-                      "color": Color.mSecondary
+                      "color": ShellColors.mSecondary
                     });
       }
       availableWidgetsModel.append({

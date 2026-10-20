@@ -44,7 +44,7 @@ ColumnLayout {
         NText {
           Layout.fillWidth: true
           text: monitorSection.modelData.name
-          color: Color.mPrimary
+          color: ShellColors.mPrimary
           font.weight: Style.fontWeightBold
         }
         NButton {

@@ -23,7 +23,7 @@ ColumnLayout {
       delegate: NBox {
         Layout.fillWidth: true
         implicitHeight: sourceRow.implicitHeight + Style.margin2L
-        color: Color.mSurface
+        color: ShellColors.mSurface
 
         RowLayout {
           id: sourceRow
@@ -42,14 +42,14 @@ ColumnLayout {
 
             NText {
               text: modelData.name
-              color: Color.mOnSurface
+              color: ShellColors.mOnSurface
               Layout.fillWidth: true
             }
 
             NText {
               text: modelData.url
               font.pointSize: Style.fontSizeXS
-              color: Color.mOnSurfaceVariant
+              color: ShellColors.mOnSurfaceVariant
               Layout.fillWidth: true
               elide: Text.ElideRight
             }
@@ -101,9 +101,9 @@ ColumnLayout {
     padding: Style.marginL
 
     background: Rectangle {
-      color: Color.mSurface
+      color: ShellColors.mSurface
       radius: Style.radiusS
-      border.color: Color.mPrimary
+      border.color: ShellColors.mPrimary
       border.width: Style.borderM
     }
 
@@ -145,8 +145,8 @@ ColumnLayout {
 
         NButton {
           text: I18n.tr("common.add")
-          backgroundColor: Color.mPrimary
-          textColor: Color.mOnPrimary
+          backgroundColor: ShellColors.mPrimary
+          textColor: ShellColors.mOnPrimary
           enabled: sourceNameInput.text.length > 0 && sourceUrlInput.text.length > 0
           onClicked: {
             if (PluginRegistry.addPluginSource(sourceNameInput.text, sourceUrlInput.text)) {
