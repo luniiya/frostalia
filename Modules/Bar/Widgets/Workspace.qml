@@ -6,6 +6,7 @@ import QtQuick.Window
 import Quickshell
 import Quickshell.Io
 import Quickshell.Widgets
+import "../../../Helpers/WorkspaceGeometry.js" as WorkspaceGeometry
 import qs.Commons
 import qs.Modules.Bar.Extras
 import qs.Services.Compositor
@@ -123,6 +124,7 @@ Item {
   property color effectColor: ShellColors.mPrimary
 
   property int horizontalPadding: Style.marginS
+  readonly property real pillPadding: WorkspaceGeometry.capsulePadding(capsuleHeight, Style.toOdd(capsuleHeight * baseDimensionRatio))
   property int spacingBetweenPills: Style.marginXS
 
   // Wheel scroll handling
@@ -199,8 +201,8 @@ Item {
       total += getWorkspaceWidth(ws);
     }
     total += Math.max(localWorkspaces.count - 1, 0) * spacingBetweenPills;
-    total += horizontalPadding * 2;
-    return Style.toOdd(total);
+    total += pillPadding * 2;
+    return total;
   }
 
   function computeHeight() {
@@ -210,8 +212,8 @@ Item {
       total += getWorkspaceHeight(ws);
     }
     total += Math.max(localWorkspaces.count - 1, 0) * spacingBetweenPills;
-    total += horizontalPadding * 2;
-    return Style.toOdd(total);
+    total += pillPadding * 2;
+    return total;
   }
 
   function getFocusedLocalIndex() {
@@ -601,7 +603,7 @@ Item {
   Row {
     id: pillRow
     spacing: spacingBetweenPills
-    x: horizontalPadding
+    x: root.pillPadding
     y: 0
     visible: !isVertical && !appVisible
     scale: visible ? 1.0 : 0.8
@@ -645,7 +647,7 @@ Item {
     id: pillColumn
     spacing: spacingBetweenPills
     x: 0
-    y: horizontalPadding
+    y: root.pillPadding
     visible: isVertical && !appVisible
     scale: visible ? 1.0 : 0.8
     Behavior on scale {
