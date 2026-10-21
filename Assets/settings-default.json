@@ -565,7 +565,7 @@
       "transition": "up",
       "transitionDuration": 220,
       "hideOnFullscreen": true,
-      "reserveSpace": true,
+      "reserveSpace": false,
       "backgroundColorKey": "none"
     }
   }

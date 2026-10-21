@@ -2055,7 +2055,7 @@
       "view-mode-single": "Root directory"
     },
     "bubbles": {
-      "reserve-space-description": "Keep windows from going under this bubble, like the bar does.",
+      "reserve-space-description": "Push windows away from this screen edge. Leave disabled to overlay windows.",
       "reserve-space-label": "Reserve space",
       "title": "Bubbles",
       "enabled-label": "Enable bubbles",

@@ -65,7 +65,7 @@ function bounded(value, fallback, minimum, maximum) {
 function effective(bubble, defaults) {
   var result = Object.assign({}, defaults, bubble || {});
   result.oledMode = result.oledMode === true;
-  result.reserveSpace = result.reserveSpace !== false;
+  result.reserveSpace = result.reserveSpace === true;
   if (["top", "bottom", "left", "right"].indexOf(result.position) < 0)
     result.position = "top";
   if (["start", "center", "end"].indexOf(result.alignment) < 0)
@@ -88,6 +88,13 @@ function effective(bubble, defaults) {
   // JsonAdapter exposes saved arrays as QML sequences, which fail Array.isArray.
   result.widgets = result.widgets && typeof result.widgets.length === "number" ? Array.prototype.slice.call(result.widgets) : [];
   return result;
+}
+
+// Older bubbles copied the space-reserving default into every saved entry.
+function migrateOverlayConfigurations(configurations) {
+  return (configurations || []).map(function (bubble) {
+    return Object.assign({}, bubble, { reserveSpace: false });
+  });
 }
 
 function nextIndex(index, count, step) {

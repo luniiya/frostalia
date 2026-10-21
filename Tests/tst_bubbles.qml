@@ -1,5 +1,6 @@
 import QtQuick
 import QtTest
+import "../Commons/Migrations" as Migrations
 import "../Helpers/BubbleLogic.js" as Bubbles
 
 TestCase {
@@ -571,6 +572,7 @@ TestCase {
   function test_layoutEdges(data) {
     var configs = [bubble("a", "DP-1", {
                             position: data.position,
+                            reserveSpace: true,
                             style: data.style,
                             alignment: "center"
                           })];
@@ -1184,28 +1186,116 @@ TestCase {
     compare(Bubbles.panelPosition(button, "left", 300, 200, 1000, 700, 8).x, 42);
   }
 
-  function test_reserveSpaceDefaultsOn() {
-    verify(Bubbles.effective({}, defaults).reserveSpace);
-    verify(!Bubbles.effective({ reserveSpace: false }, defaults).reserveSpace);
+  Migrations.Migration74 {
+    id: overlayMigration
+  }
+
+  function test_overlayMigration() {
+    var configs = [bubble("a", "DP-1", {
+                            reserveSpace: true
+                          }), bubble("b", "DP-2", {
+                                       reserveSpace: false
+                                     }), bubble("c", "DP-1")];
+    var target = {
+      bubbles: {
+        defaults: {
+          reserveSpace: true
+        },
+        configurations: configs
+      }
+    };
+    verify(overlayMigration.migrate(target, {
+                                      i: function () {}
+                                    }, {}));
+    compare(target.bubbles.defaults.reserveSpace, false);
+    target.bubbles.configurations.forEach(function (entry, index) {
+      compare(entry.reserveSpace, false);
+      compare(entry.id, configs[index].id);
+      compare(entry.monitor, configs[index].monitor);
+      compare(entry.widgets, configs[index].widgets);
+    });
+    compare(configs[0].reserveSpace, true);
+    compare(Bubbles.reservedEdges(true, target.bubbles.configurations, target.bubbles.defaults, {}, "DP-1", 1000, 700), {
+              top: 0,
+              bottom: 0,
+              left: 0,
+              right: 0
+            });
+    compare(Bubbles.migrateOverlayConfigurations(undefined), []);
+  }
+
+  function test_reserveSpaceDefaultsOff() {
+    verify(!Bubbles.effective({}, defaults).reserveSpace);
+    verify(Bubbles.effective({
+                               reserveSpace: true
+                             }, defaults).reserveSpace);
+    verify(Bubbles.effective({}, {
+                               reserveSpace: true
+                             }).reserveSpace);
+    compare(Bubbles.reservedEdges(true, [bubble("a", "DP-1")], defaults, {}, "DP-1", 1000, 700), {
+              top: 0,
+              bottom: 0,
+              left: 0,
+              right: 0
+            });
+    verify(!Bubbles.effective({
+                                reserveSpace: false
+                              }, defaults).reserveSpace);
   }
 
   function test_reservedEdges_data() {
     // Bubble measured at 200x50 on a 1000x700 screen
     return [
-          { tag: "floating top", position: "top", style: "floating", edge: "top", size: 58 },
-          { tag: "floating bottom", position: "bottom", style: "floating", edge: "bottom", size: 58 },
-          { tag: "attached top", position: "top", style: "attached", edge: "top", size: 50 },
-          { tag: "floating left", position: "left", style: "floating", edge: "left", size: 208 },
-          { tag: "floating right", position: "right", style: "floating", edge: "right", size: 208 }
+          {
+            tag: "floating top",
+            position: "top",
+            style: "floating",
+            edge: "top",
+            size: 58
+          },
+          {
+            tag: "floating bottom",
+            position: "bottom",
+            style: "floating",
+            edge: "bottom",
+            size: 58
+          },
+          {
+            tag: "attached top",
+            position: "top",
+            style: "attached",
+            edge: "top",
+            size: 50
+          },
+          {
+            tag: "floating left",
+            position: "left",
+            style: "floating",
+            edge: "left",
+            size: 208
+          },
+          {
+            tag: "floating right",
+            position: "right",
+            style: "floating",
+            edge: "right",
+            size: 208
+          }
         ];
   }
 
   function test_reservedEdges(data) {
     var configs = [bubble("a", "DP-1", {
                             position: data.position,
+                            reserveSpace: true,
                             style: data.style
                           })];
-    var sizes = { "DP-1|a": { width: 200, height: 50 } };
+    var sizes = {
+      "DP-1|a": {
+        width: 200,
+        height: 50
+      }
+    };
     var edges = Bubbles.reservedEdges(true, configs, defaults, sizes, "DP-1", 1000, 700);
     ["top", "bottom", "left", "right"].forEach(function (edge) {
       compare(edges[edge], edge === data.edge ? data.size : 0, edge);
@@ -1213,17 +1303,43 @@ TestCase {
   }
 
   function test_reservedEdgesSkipsBubbles() {
-    var sizes = { "DP-1|a": { width: 200, height: 50 }, "DP-1|b": { width: 100, height: 30 } };
-    var none = { top: 0, bottom: 0, left: 0, right: 0 };
-    var configs = [bubble("a", "DP-1", { reserveSpace: false })];
+    var sizes = {
+      "DP-1|a": {
+        width: 200,
+        height: 50
+      },
+      "DP-1|b": {
+        width: 100,
+        height: 30
+      }
+    };
+    var none = {
+      top: 0,
+      bottom: 0,
+      left: 0,
+      right: 0
+    };
+    var configs = [bubble("a", "DP-1", {
+                            reserveSpace: false
+                          })];
     compare(Bubbles.reservedEdges(true, configs, defaults, sizes, "DP-1", 1000, 700), none, "opted out");
-    compare(Bubbles.reservedEdges(false, [bubble("a", "DP-1")], defaults, sizes, "DP-1", 1000, 700), none, "bubbles disabled");
-    compare(Bubbles.reservedEdges(true, [bubble("a", "DP-1")], defaults, sizes, "DP-2", 1000, 700), none, "other monitor");
-    var empty = bubble("a", "DP-1");
+    compare(Bubbles.reservedEdges(false, [bubble("a", "DP-1", {
+                                                   reserveSpace: true
+                                                 })], defaults, sizes, "DP-1", 1000, 700), none, "bubbles disabled");
+    compare(Bubbles.reservedEdges(true, [bubble("a", "DP-1", {
+                                                  reserveSpace: true
+                                                })], defaults, sizes, "DP-2", 1000, 700), none, "other monitor");
+    var empty = bubble("a", "DP-1", {
+                         reserveSpace: true
+                       });
     empty.widgets = [];
     compare(Bubbles.reservedEdges(true, [empty], defaults, sizes, "DP-1", 1000, 700), none, "no widgets");
     // Two bubbles on the same edge: the deeper one wins
-    var both = [bubble("a", "DP-1"), bubble("b", "DP-1")];
+    var both = [bubble("a", "DP-1", {
+                         reserveSpace: true
+                       }), bubble("b", "DP-1", {
+                                    reserveSpace: true
+                                  })];
     compare(Bubbles.reservedEdges(true, both, defaults, sizes, "DP-1", 1000, 700).top, 58, "largest reach");
   }
 }
