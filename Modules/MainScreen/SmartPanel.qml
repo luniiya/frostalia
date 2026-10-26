@@ -683,17 +683,17 @@ Item {
       calculatedY = bubblePanelPosition.y;
     }
 
-    // Notch bar: keep attached panels out of the bar's rounded end zones
+    // Notch bar: a panel stopping just short of a bar end snaps to the screen edge, so there is one notch
     if (Settings.data.bar.barType === "notch" && panelContent.allowAttachToBar && root.barShouldShow) {
       var notchInset = Style.getBarNotchInsetForScreen(root.screen);
       if (root.barIsVertical) {
         var againstBarV = root.barPosition === "left" ? Math.abs(calculatedX - leftBarEdgeWithOverlap) <= 1 : Math.abs(calculatedX + panelWidth - rightBarEdgeWithOverlap) <= 1;
         if (againstBarV)
-          calculatedY = NotchGeometry.avoidCornerZone(calculatedY, panelHeight, notchInset, root.height, Style.radiusL);
+          calculatedY = NotchGeometry.snapToBarEnds(calculatedY, panelHeight, notchInset, root.height, Style.radiusL);
       } else {
         var againstBarH = root.barPosition === "top" ? Math.abs(calculatedY - topBarEdgeWithOverlap) <= 1 : Math.abs(calculatedY + panelHeight - bottomBarEdgeWithOverlap) <= 1;
         if (againstBarH)
-          calculatedX = NotchGeometry.avoidCornerZone(calculatedX, panelWidth, notchInset, root.width, Style.radiusL);
+          calculatedX = NotchGeometry.snapToBarEnds(calculatedX, panelWidth, notchInset, root.width, Style.radiusL);
       }
     }
 

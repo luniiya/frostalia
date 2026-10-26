@@ -341,49 +341,49 @@ TestCase {
     compare(r.end, 0);
   }
 
-  // ----- avoidCornerZone (gap 50, radius 30, edge 1504: zones 50..80 and 1424..1454) -----
+  // ----- snapToBarEnds (gap 50, radius 30, edge 1504: snap zones 50..110 at the start, 1394..1454 at the end) -----
 
-  function test_avoidCornerZone_middleUnchanged() {
-    compare(NotchGeometry.avoidCornerZone(600, 200, 50, 1504, 30), 600);
-    compare(NotchGeometry.avoidCornerZone(80, 200, 50, 1504, 30), 80); // right at the zone edge
-    compare(NotchGeometry.avoidCornerZone(1224, 200, 50, 1504, 30), 1224); // ends exactly at 1424
+  function test_snapToBarEnds_middleUnchanged() {
+    compare(NotchGeometry.snapToBarEnds(600, 200, 50, 1504, 30), 600);
+    compare(NotchGeometry.snapToBarEnds(110, 200, 50, 1504, 30), 110); // right at the zone edge
+    compare(NotchGeometry.snapToBarEnds(1194, 200, 50, 1504, 30), 1194); // ends exactly at 1394
   }
 
-  function test_avoidCornerZone_movesOutOfStartZone() {
-    compare(NotchGeometry.avoidCornerZone(50, 200, 50, 1504, 30), 80);
-    compare(NotchGeometry.avoidCornerZone(79, 200, 50, 1504, 30), 80);
+  function test_snapToBarEnds_startZoneSnapsToTheScreenEdge() {
+    compare(NotchGeometry.snapToBarEnds(50, 200, 50, 1504, 30), 0);
+    compare(NotchGeometry.snapToBarEnds(80, 200, 50, 1504, 30), 0); // the one-notch-inside-a-notch case
+    compare(NotchGeometry.snapToBarEnds(109, 200, 50, 1504, 30), 0);
   }
 
-  function test_avoidCornerZone_movesOutOfEndZone() {
-    // Regression: the brightness panel ending at 1440 moves up to end at 1424
-    compare(NotchGeometry.avoidCornerZone(1240, 200, 50, 1504, 30), 1224);
-    compare(NotchGeometry.avoidCornerZone(1254, 200, 50, 1504, 30), 1224); // ends exactly at the bar end
+  function test_snapToBarEnds_endZoneSnapsToTheScreenEdge() {
+    compare(NotchGeometry.snapToBarEnds(1240, 200, 50, 1504, 30), 1304); // ends at 1440
+    compare(NotchGeometry.snapToBarEnds(1254, 200, 50, 1504, 30), 1304); // ends exactly at the bar end
+    compare(NotchGeometry.snapToBarEnds(1195, 200, 50, 1504, 30), 1304); // ends at 1395
   }
 
-  function test_avoidCornerZone_resultNeverTriggersFill() {
-    for (var start = 50; start <= 1254; start += 7) {
-      var moved = NotchGeometry.avoidCornerZone(start, 200, 50, 1504, 30);
-      var fill = NotchGeometry.fillInsets(50, 1504, true, moved, moved + 200);
-      compare(fill.start, 50, "start " + start);
-      compare(fill.end, 50, "start " + start);
-      verify(moved >= 80 && moved + 200 <= 1424, "start " + start + " -> " + moved);
+  function test_snapToBarEnds_snappedPanelFillsTheEnd() {
+    for (var start = 50; start < 110; start += 7) {
+      var snapped = NotchGeometry.snapToBarEnds(start, 200, 50, 1504, 30);
+      var fill = NotchGeometry.fillInsets(50, 1504, true, snapped, snapped + 200);
+      compare(fill.start, 0, "start " + start);
+    }
+    for (var s2 = 1195; s2 <= 1254; s2 += 7) {
+      var snappedEnd = NotchGeometry.snapToBarEnds(s2, 200, 50, 1504, 30);
+      var fillEnd = NotchGeometry.fillInsets(50, 1504, true, snappedEnd, snappedEnd + 200);
+      compare(fillEnd.end, 0, "start " + s2);
     }
   }
 
-  function test_avoidCornerZone_panelsPastTheBarKeepTheirPosition() {
-    compare(NotchGeometry.avoidCornerZone(0, 400, 50, 1504, 30), 0); // calendar at the top edge
-    compare(NotchGeometry.avoidCornerZone(20, 400, 50, 1504, 30), 20);
-    compare(NotchGeometry.avoidCornerZone(1104, 400, 50, 1504, 30), 1104); // reaches the bottom edge
+  function test_snapToBarEnds_panelsPastTheBarKeepTheirPosition() {
+    compare(NotchGeometry.snapToBarEnds(0, 400, 50, 1504, 30), 0); // calendar at the top edge
+    compare(NotchGeometry.snapToBarEnds(20, 400, 50, 1504, 30), 20);
+    compare(NotchGeometry.snapToBarEnds(1104, 400, 50, 1504, 30), 1104); // reaches the bottom edge
   }
 
-  function test_avoidCornerZone_tooTallPanelUnchanged() {
-    // 1504 - 2 * 80 = 1344 fits; 1345 doesn't
-    compare(NotchGeometry.avoidCornerZone(60, 1344, 50, 1504, 30), 80);
-    compare(NotchGeometry.avoidCornerZone(60, 1345, 50, 1504, 30), 60);
-  }
-
-  function test_avoidCornerZone_noRadiusUnchanged() {
-    compare(NotchGeometry.avoidCornerZone(55, 200, 50, 1504, 0), 55);
-    compare(NotchGeometry.avoidCornerZone(55, 200, 50, 1504, undefined), 55);
+  function test_snapToBarEnds_degenerateInputsUnchanged() {
+    compare(NotchGeometry.snapToBarEnds(55, 200, 50, 1504, 0), 55);
+    compare(NotchGeometry.snapToBarEnds(55, 200, 50, 1504, undefined), 55);
+    compare(NotchGeometry.snapToBarEnds(55, 0, 50, 1504, 30), 55);
+    compare(NotchGeometry.snapToBarEnds(0, 1504, 50, 1504, 30), 0);
   }
 }
