@@ -84,12 +84,37 @@ Item {
   Rectangle {
     id: visualCapsule
     anchors.centerIn: parent
-    color: Style.widgetBackground(root.section, Style.capsuleColor)
+    color: styleFace.loaded ? "transparent" : Style.widgetBackground(root.section, Style.capsuleColor)
     width: root.contentWidth
     height: root.contentHeight
     radius: Style.radiusM
     border.color: Style.widgetBorder(root.section, Style.capsuleBorderColor)
-    border.width: Style.capsuleBorderWidth
+    border.width: styleFace.loaded ? 0 : Style.capsuleBorderWidth
+
+    // Style face (Keycap: a key with indicator LEDs)
+    NStyleFace {
+      id: styleFace
+      anchors.fill: parent
+      view: "LockKeys"
+      host: root
+      faceData: ({
+                   "leds": [
+                     {
+                       "show": root.showCaps && (!root.hideWhenOff || LockKeysService.capsLockOn),
+                       "on": LockKeysService.capsLockOn
+                     },
+                     {
+                       "show": root.showNum && (!root.hideWhenOff || LockKeysService.numLockOn),
+                       "on": LockKeysService.numLockOn
+                     },
+                     {
+                       "show": root.showScroll && (!root.hideWhenOff || LockKeysService.scrollLockOn),
+                       "on": LockKeysService.scrollLockOn
+                     }
+                   ].filter(led => led.show)
+                 })
+      depth: KeycapKit.barDepth(root.screen?.name, root.section)
+    }
 
     Item {
       id: layout

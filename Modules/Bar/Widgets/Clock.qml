@@ -46,10 +46,14 @@ Item {
   readonly property string tooltipFormat: widgetSettings.tooltipFormat !== undefined ? widgetSettings.tooltipFormat : widgetMetadata.tooltipFormat
 
   readonly property color textColor: ShellColors.resolveColorKey(clockColor)
+  // Formatted lines (horizontal) or words (vertical), for style faces that draw the time
+  readonly property var displayLines: (isBarVertical ? I18n.locale.toString(now, formatVertical.trim()).split(" ") : I18n.locale.toString(now, formatHorizontal.trim()).split("\\n")).filter(line => line !== "")
+  readonly property string displayFamily: useCustomFont && customFont ? customFont : Style.fontDefault
+  readonly property bool faceOwnsContent: styleFace.ownsContent
 
   // Content dimensions for implicit sizing
-  readonly property real contentWidth: isBarVertical ? capsuleHeight : Math.round((isBarVertical ? verticalLoader.implicitWidth : horizontalLoader.implicitWidth) + Style.margin2M)
-  readonly property real contentHeight: isBarVertical ? Math.round(verticalLoader.implicitHeight + Style.margin2S) : capsuleHeight
+  readonly property real contentWidth: isBarVertical ? capsuleHeight : (faceOwnsContent ? Math.round(styleFace.item.naturalWidth) : Math.round((isBarVertical ? verticalLoader.implicitWidth : horizontalLoader.implicitWidth) + Style.margin2M))
+  readonly property real contentHeight: isBarVertical ? (faceOwnsContent ? Math.round(styleFace.item.naturalHeight) : Math.round(verticalLoader.implicitHeight + Style.margin2S)) : capsuleHeight
 
   // Size: use implicit width/height
   // BarWidgetLoader sets explicit width/height to extend click area
@@ -64,12 +68,24 @@ Item {
     anchors.centerIn: parent
 
     radius: Style.radiusL
-    color: Style.widgetBackground(root.section, Style.capsuleColor)
+    color: styleFace.loaded ? "transparent" : Style.widgetBackground(root.section, Style.capsuleColor)
     border.color: Style.widgetBorder(root.section, Style.capsuleBorderColor)
-    border.width: Style.capsuleBorderWidth
+    border.width: styleFace.loaded ? 0 : Style.capsuleBorderWidth
+
+    // Style face (Keycap: a row of flip cards that draws the time itself)
+    NStyleFace {
+      id: styleFace
+      anchors.fill: parent
+      view: "Clock"
+      host: root
+      hovered: clockMouseArea.containsMouse
+      pressed: clockMouseArea.pressed
+      depth: KeycapKit.barDepth(root.screenName, root.section)
+    }
 
     Item {
       id: clockContainer
+      visible: !root.faceOwnsContent
       anchors.centerIn: parent
 
       // Horizontal

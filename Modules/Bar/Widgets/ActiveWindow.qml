@@ -203,9 +203,20 @@ Item {
     width: isVerticalBar ? ((!hasFocusedWindow) && hideMode === "hidden" ? 0 : verticalSize) : ((!hasFocusedWindow) && (hideMode === "hidden") ? 0 : dynamicWidth)
     height: isVerticalBar ? ((!hasFocusedWindow) && hideMode === "hidden" ? 0 : verticalSize) : capsuleHeight
     radius: Style.radiusM
-    color: Style.widgetBackground(root.section, Style.capsuleColor)
+    color: styleFace.loaded ? "transparent" : Style.widgetBackground(root.section, Style.capsuleColor)
     border.color: Style.widgetBorder(root.section, Style.capsuleBorderColor)
-    border.width: Style.capsuleBorderWidth
+    border.width: styleFace.loaded ? 0 : Style.capsuleBorderWidth
+
+    // Style face (Keycap: label-maker tape)
+    NStyleFace {
+      id: styleFace
+      anchors.fill: parent
+      view: "ActiveWindow"
+      host: root
+      hovered: mainMouseArea.containsMouse
+      pressed: mainMouseArea.pressed
+      depth: KeycapKit.barDepth(root.screen?.name, root.section)
+    }
 
     // Smooth width transition
     Behavior on width {

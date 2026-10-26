@@ -73,6 +73,28 @@ Item {
     }
   ]
 
+  // Style face (Keycap: a chunky key, low dot or hollow ring per workspace)
+  NStyleFace {
+    id: keyFace
+    view: "WorkspaceKey"
+    host: pillContainer
+    width: pillContainer.pillWidth
+    height: pillContainer.pillHeight
+    x: Style.pixelAlignCenter(parent.width, width)
+    y: Style.pixelAlignCenter(parent.height, height)
+    hovered: pillMouseArea.containsMouse
+    pressed: pillMouseArea.pressed
+    depth: Math.max(1, Math.round(Style.keycapDepth * 0.67))
+    faceData: ({
+                 "focused": workspace.isFocused,
+                 "urgent": workspace.isUrgent,
+                 "occupied": workspace.isOccupied,
+                 "focusedColor": ShellColors.resolveColorKey(focusedColor),
+                 "occupiedColor": ShellColors.resolveColorKey(occupiedColor),
+                 "emptyColor": ShellColors.resolveColorKey(emptyColor)
+               })
+  }
+
   Rectangle {
     id: pill
     width: pillContainer.pillWidth
@@ -81,8 +103,13 @@ Item {
     y: Style.pixelAlignCenter(parent.height, height)
     radius: Style.radiusM
     z: 0
+    transform: Translate {
+      y: keyFace.sink
+    }
 
     color: {
+      if (keyFace.loaded)
+        return "transparent";
       if (pillMouseArea.containsMouse)
         return ShellColors.mHover;
       if (workspace.isFocused)
@@ -125,7 +152,7 @@ Item {
           verticalAlignment: Text.AlignVCenter
           wrapMode: Text.Wrap
           color: {
-            if (pillMouseArea.containsMouse)
+            if (pillMouseArea.containsMouse && !keyFace.loaded)
               return ShellColors.mOnHover;
             if (workspace.isFocused)
               return ShellColors.resolveOnColorKey(focusedColor);

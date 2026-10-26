@@ -25,8 +25,14 @@ Item {
   property color customTextIconColor: "transparent"
   property color customIconColor: "transparent"
   property color customTextColor: "transparent"
+  property string faceView: ""
+  property var faceData: ({})
 
   readonly property bool collapseToIcon: forceClose && !forceOpen
+  readonly property bool vertical: false
+  readonly property bool pressed: pillMouse.pressed
+  // Icon slot in the style face's coordinates
+  readonly property rect iconRect: Qt.rect(iconCircle.x - styleFace.x, iconCircle.y - styleFace.y, iconCircle.width, iconCircle.height)
 
   // Effective shown state (true if hovered/animated open or forced)
   readonly property bool revealed: !forceClose && (forceOpen || showPill)
@@ -51,11 +57,13 @@ Item {
   readonly property int pillOverlap: Math.round(pillHeight * 0.5)
   readonly property int pillMaxWidth: Math.max(1, Math.round(textItem.implicitWidth + pillPaddingHorizontal * 2 + pillOverlap))
 
-  // Always prioritize hover color, then the custom one and finally the fallback color
-  readonly property color bgColor: Style.widgetBackground(section, hovered ? ShellColors.mHover : (customBackgroundColor.a > 0) ? customBackgroundColor : Style.capsuleColor)
-  readonly property color fgColor: hovered ? ShellColors.mOnHover : (customTextIconColor.a > 0) ? customTextIconColor : ShellColors.mOnSurface
-  readonly property color iconFgColor: hovered ? ShellColors.mOnHover : (customIconColor.a > 0) ? customIconColor : (customTextIconColor.a > 0) ? customTextIconColor : ShellColors.mOnSurface
-  readonly property color textFgColor: hovered ? ShellColors.mOnHover : (customTextColor.a > 0) ? customTextColor : (customTextIconColor.a > 0) ? customTextIconColor : ShellColors.mOnSurface
+  // Always prioritize hover color, then the custom one and finally the fallback color.
+  // Style faces show hover with motion instead, and may pick the content color.
+  readonly property bool _hoverTint: hovered && !styleFace.loaded
+  readonly property color bgColor: Style.widgetBackground(section, _hoverTint ? ShellColors.mHover : (customBackgroundColor.a > 0) ? customBackgroundColor : Style.capsuleColor)
+  readonly property color fgColor: styleFace.contentColor.a > 0 ? styleFace.contentColor : _hoverTint ? ShellColors.mOnHover : (customTextIconColor.a > 0) ? customTextIconColor : ShellColors.mOnSurface
+  readonly property color iconFgColor: styleFace.contentColor.a > 0 ? styleFace.contentColor : _hoverTint ? ShellColors.mOnHover : (customIconColor.a > 0) ? customIconColor : (customTextIconColor.a > 0) ? customTextIconColor : ShellColors.mOnSurface
+  readonly property color textFgColor: styleFace.contentColor.a > 0 ? styleFace.contentColor : _hoverTint ? ShellColors.mOnHover : (customTextColor.a > 0) ? customTextColor : (customTextIconColor.a > 0) ? customTextIconColor : ShellColors.mOnSurface
 
   readonly property real iconSize: Style.toOdd(pillHeight * 0.48)
 
@@ -84,9 +92,25 @@ Item {
     }
   }
 
+  // Style face (e.g. Keycap); replaces the background and sinks the content when pressed
+  NStyleFace {
+    id: styleFace
+    view: root.faceView
+    fallbackView: "Plate"
+    host: root
+    hovered: root.hovered
+    pressed: root.pressed
+    faceData: root.faceData
+    depth: KeycapKit.barDepth(root.screen?.name, root.section)
+    width: pillBackground.width
+    height: pillHeight
+    anchors.verticalCenter: parent.verticalCenter
+  }
+
   // Unified background for the entire pill area to avoid overlapping opacity
   Rectangle {
     id: pillBackground
+    visible: !styleFace.loaded
     width: collapseToIcon ? pillHeight : root.width
     height: pillHeight
     radius: Style.radiusM
@@ -106,6 +130,9 @@ Item {
 
   Rectangle {
     id: pill
+    transform: Translate {
+      y: styleFace.sink
+    }
 
     width: revealed ? pillMaxWidth : 1
     height: pillHeight
@@ -180,6 +207,9 @@ Item {
 
   Rectangle {
     id: iconCircle
+    transform: Translate {
+      y: styleFace.sink
+    }
     width: hasIcon ? pillHeight : 0
     height: pillHeight
     radius: Math.min(Style.radiusL, width / 2)
@@ -191,6 +221,7 @@ Item {
 
     NIcon {
       icon: root.icon
+      opacity: styleFace.ownsIcon ? 0 : 1
       pointSize: iconSize
       applyUiScale: false
       color: root.iconFgColor
@@ -279,6 +310,7 @@ Item {
   }
 
   MouseArea {
+    id: pillMouse
     anchors.fill: parent
     hoverEnabled: true
     acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton

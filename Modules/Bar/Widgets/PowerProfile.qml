@@ -33,6 +33,11 @@ NIconButton {
   readonly property string iconColorKey: widgetSettings.iconColor !== undefined ? widgetSettings.iconColor : widgetMetadata.iconColor
 
   baseSize: Style.getCapsuleHeightForScreen(screen?.name, section)
+  faceView: "PowerProfile"
+  faceDepth: KeycapKit.barDepth(screen?.name, section)
+  faceData: ({
+               "profile": PowerProfileService.profile === PowerProfile.Performance ? "performance" : (PowerProfileService.profile === PowerProfile.PowerSaver ? "power-saver" : "balanced")
+             })
   applyUiScale: false
   customRadius: Style.radiusL
   visible: PowerProfileService.available

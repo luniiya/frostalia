@@ -58,6 +58,10 @@ TestCase {
                 labelKey: "options.ui-style.material"
               },
               {
+                key: "keycap",
+                labelKey: "options.ui-style.keycap"
+              },
+              {
                 key: "caelestia",
                 labelKey: "options.ui-style.caelestia"
               }
@@ -274,7 +278,7 @@ TestCase {
   function test_sliderGeometryHasCompleteShapeDuringStyleSwitches() {
     // QML bindings may observe the renderer and dimensions in either order.
     // Both styles must supply finite dimensions throughout a live switch.
-    for (const style of ["caelestia", "material", "unknown"]) {
+    for (const style of ["caelestia", "material", "keycap", "unknown"]) {
       const g = UiStyles.sliderGeometry(style, 33, 0.7, 1);
       for (const key of ["knobDiameter", "handleHeight", "handleWidth", "pressedHandleWidth", "trackHeight", "gap", "cutoutExtra"]) {
         verify(Number.isFinite(g[key]), style + ":" + key);

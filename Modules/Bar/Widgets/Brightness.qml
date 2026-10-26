@@ -138,6 +138,10 @@ Item {
 
   BarPill {
     id: pill
+    faceView: "Brightness"
+    faceData: ({
+                 "level": root.brightnessMonitor && !isNaN(root.brightnessMonitor.brightness) ? root.brightnessMonitor.brightness : 0
+               })
 
     screen: root.screen
     section: root.section

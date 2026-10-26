@@ -25,6 +25,9 @@ Item {
   property color customTextIconColor: "transparent"
   property color customIconColor: "transparent"
   property color customTextColor: "transparent"
+  // Style-specific face (UiStyles `barViews`) and the state it shows
+  property string faceView: ""
+  property var faceData: ({})
 
   readonly property string barPosition: Settings.getBarPositionForScreen(screen?.name, section)
   readonly property bool isVerticalBar: barPosition === "left" || barPosition === "right"
@@ -72,6 +75,8 @@ Item {
         customTextIconColor: root.customTextIconColor
         customIconColor: root.customIconColor
         customTextColor: root.customTextColor
+        faceView: root.faceView
+        faceData: root.faceData
         onShown: root.shown()
         onHidden: root.hidden()
         onEntered: root.entered()
@@ -102,6 +107,8 @@ Item {
         customTextIconColor: root.customTextIconColor
         customIconColor: root.customIconColor
         customTextColor: root.customTextColor
+        faceView: root.faceView
+        faceData: root.faceData
         onShown: root.shown()
         onHidden: root.hidden()
         onEntered: root.entered()

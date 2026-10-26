@@ -113,9 +113,20 @@ Item {
     width: root.contentWidth
     height: root.contentHeight
     radius: Style.radiusL
-    color: Style.widgetBackground(root.section, mouseArea.containsMouse ? ShellColors.mHover : Style.capsuleColor)
+    color: styleFace.loaded ? "transparent" : Style.widgetBackground(root.section, mouseArea.containsMouse ? ShellColors.mHover : Style.capsuleColor)
     border.color: Style.widgetBorder(root.section, Style.capsuleBorderColor)
-    border.width: Style.capsuleBorderWidth
+    border.width: styleFace.loaded ? 0 : Style.capsuleBorderWidth
+
+    // Style face (Keycap: a receipt)
+    NStyleFace {
+      id: styleFace
+      anchors.fill: parent
+      view: "ModelUsage"
+      host: root
+      hovered: mouseArea.containsMouse
+      pressed: mouseArea.pressed
+      depth: KeycapKit.barDepth(root.screen?.name, root.section)
+    }
 
     GridLayout {
       id: content

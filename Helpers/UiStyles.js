@@ -41,6 +41,104 @@ var definitions = {
         "heightRatio": 0.5,
         "handleRatio": 0.4,
         "handleInset": 3
+      },
+      // Desktop radial menu look; the shape preset fills the rest (Helpers/RadialMenu.js)
+      "radialMenu": { "shape": "orbit" }
+    }
+  },
+  // Keycap: bold sticker and keycap look. Every surface is an ink outline,
+  // a thin cream ring, a fill and a hard shadow straight down; things pop in
+  // with an overshoot. Panels reuse the Caelestia surface views, drawn with
+  // keycap controls; bar widgets get their own faces from `barViews`.
+  "keycap": {
+    "labelKey": "options.ui-style.keycap",
+    "settingsDefaults": { "ui": { "fontDefault": "Google Sans Flex", "boxBorderEnabled": true, "boxBorderWidth": 2, "panelBackgroundOpacity": 1.0, "frostedGlass": false } },
+    "views": {
+      "controlCenter": "Modules/Panels/ControlCenter/CaelestiaControlCenter.qml",
+      "mediaCard": "Modules/Cards/CaelestiaMediaCard.qml",
+      "mediaPlayer": "Modules/Panels/Media/CaelestiaMediaPlayerContent.qml",
+      "osd": "Modules/OSD/CaelestiaOsdContent.qml",
+      "notificationContent": "Modules/Notification/CaelestiaNotificationContent.qml",
+      "kdeConnectHome": "Modules/Panels/KdeConnect/CaelestiaKdeConnectHome.qml"
+    },
+    // Bar widget faces, keyed by the name a bar widget passes as `faceView`.
+    // "Plate" is the plain keycap used by widgets without a face of their own.
+    "barViews": {
+      "Plate": "Modules/Bar/Widgets/Keycap/PlateFace.qml",
+      "ActiveWindow": "Modules/Bar/Widgets/Keycap/ActiveWindowFace.qml",
+      "AudioVisualizer": "Modules/Bar/Widgets/Keycap/AudioVisualizerFace.qml",
+      "Battery": "Modules/Bar/Widgets/Keycap/BatteryFace.qml",
+      "Bluetooth": "Modules/Bar/Widgets/Keycap/BluetoothFace.qml",
+      "Brightness": "Modules/Bar/Widgets/Keycap/BrightnessFace.qml",
+      "Clock": "Modules/Bar/Widgets/Keycap/ClockFace.qml",
+      "ControlCenter": "Modules/Bar/Widgets/Keycap/ControlCenterFace.qml",
+      "DarkMode": "Modules/Bar/Widgets/Keycap/DarkModeFace.qml",
+      "KdeConnect": "Modules/Bar/Widgets/Keycap/KdeConnectFace.qml",
+      "KeepAwake": "Modules/Bar/Widgets/Keycap/KeepAwakeFace.qml",
+      "KeyboardLayout": "Modules/Bar/Widgets/Keycap/KeyboardLayoutFace.qml",
+      "Launcher": "Modules/Bar/Widgets/Keycap/LauncherFace.qml",
+      "LockKeys": "Modules/Bar/Widgets/Keycap/LockKeysFace.qml",
+      "MediaMini": "Modules/Bar/Widgets/Keycap/MediaMiniFace.qml",
+      "Microphone": "Modules/Bar/Widgets/Keycap/MicrophoneFace.qml",
+      "ModelUsage": "Modules/Bar/Widgets/Keycap/ModelUsageFace.qml",
+      "Network": "Modules/Bar/Widgets/Keycap/NetworkFace.qml",
+      "NightLight": "Modules/Bar/Widgets/Keycap/NightLightFace.qml",
+      "NotificationHistory": "Modules/Bar/Widgets/Keycap/NotificationHistoryFace.qml",
+      "PowerProfile": "Modules/Bar/Widgets/Keycap/PowerProfileFace.qml",
+      "SessionMenu": "Modules/Bar/Widgets/Keycap/SessionMenuFace.qml",
+      "Settings": "Modules/Bar/Widgets/Keycap/SettingsFace.qml",
+      "SystemMonitor": "Modules/Bar/Widgets/Keycap/SystemMonitorFace.qml",
+      "Taskbar": "Modules/Bar/Widgets/Keycap/TaskbarFace.qml",
+      "Volume": "Modules/Bar/Widgets/Keycap/VolumeFace.qml",
+      "VPN": "Modules/Bar/Widgets/Keycap/VpnFace.qml",
+      "Weather": "Modules/Bar/Widgets/Keycap/WeatherFace.qml",
+      "Workspace": "Modules/Bar/Widgets/Keycap/WorkspaceFace.qml",
+      "WorkspaceKey": "Modules/Bar/Widgets/Keycap/WorkspaceKeyFace.qml"
+    },
+    "tokens": {
+      "controls": { "renderer": "keycap" },
+      "fontSizes": { "XXS": 8, "XS": 9, "S": 10, "M": 11, "L": 14, "XL": 17, "XXL": 20, "XXXL": 26 },
+      "fontWeights": { "Regular": 500, "Medium": 600, "SemiBold": 700, "Bold": 800 },
+      "fontFamily": "Google Sans Flex",
+      // Tried in order when the preset font is not installed; Rubik is bundled.
+      "fontFallbacks": ["Google Sans Flex", "Google Sans", "Rubik"],
+      "fixedFontFamily": "monospace",
+      "radii": { "XXXS": 4, "XXS": 6, "XS": 10, "S": 14, "M": 18, "L": 22 },
+      "inputRadii": { "XXXS": 4, "XXS": 6, "XS": 9, "S": 12, "M": 14, "L": 18 },
+      "borders": { "S": 2, "M": 2, "L": 3 },
+      "margins": { "XXXS": 1, "XXS": 2, "XS": 4, "S": 7, "M": 10, "L": 14, "XL": 20 },
+      "animations": { "Faster": 80, "Fast": 160, "Normal": 280, "Slow": 420, "Slowest": 700 },
+      "baseWidgetSize": 33,
+      "sliderWidth": 200,
+      "slider": {
+        "heightRatio": 0.7,
+        "trackRatio": 0.45,
+        "cutoutRatio": 0,
+        "trackOpacity": 1,
+        "gradientDarkening": 1
+      },
+      "toggle": {
+        "sizeRatio": 0.8,
+        "widthRatio": 0.9,
+        "heightRatio": 0.5,
+        "handleRatio": 0.36,
+        "handleInset": 4
+      },
+      "keycap": {
+        // Hard shadow depth at rest and while pressed, and the hover lift (px at scale 1).
+        "depth": 3,
+        "pressedDepth": 1,
+        "hoverLift": 1,
+        // Depth of bar faces, limited by the slack around the capsule.
+        "barDepth": 2,
+        "outline": 2,
+        "ring": 1,
+        "cream": "#fff3dc",
+        // Easing.OutBack overshoot for release and pop-in animations.
+        "overshoot": 2.2,
+        "popOvershoot": 1.6,
+        // Maximum sticker tilt in degrees.
+        "tilt": 4
       }
     }
   },
@@ -164,7 +262,9 @@ var definitions = {
       "frostedGlass": {
         "panelOpacity": 0.85,
         "surfaceOpacity": 0.7
-      }
+      },
+      // Desktop radial menu look; the shape preset fills the rest (Helpers/RadialMenu.js)
+      "radialMenu": { "shape": "segment", "cornerRadius": 10, "fillOpacity": 0.96 }
     }
   }
 };
@@ -188,15 +288,30 @@ function view(id, surface) {
   return definitions[resolveId(id)].views?.[surface] || "";
 }
 
+// Style-specific face of a bar widget, or "" to keep the shared look.
+function barView(id, name) {
+  const views = definitions[resolveId(id)].barViews;
+  return views && name && Object.prototype.hasOwnProperty.call(views, name) ? views[name] : "";
+}
+
 function fontFamilies() {
   return Object.keys(definitions).map(id => definitions[id].tokens?.fontFamily).filter((family, index, families) => family && families.indexOf(family) === index);
 }
 
-function fontFamily(id, configuredFamily, fixed, applicationFamily) {
-  if (configuredFamily)
-    return configuredFamily;
+// `available` (optional) lists installed families. When the configured or
+// preset family is the style's preferred font and it is missing, the style's
+// `fontFallbacks` are tried in order; the last one is used regardless.
+function fontFamily(id, configuredFamily, fixed, applicationFamily, available) {
   const style = tokens(id);
-  return (fixed ? style.fixedFontFamily : style.fontFamily) || applicationFamily;
+  const family = configuredFamily || (fixed ? style.fixedFontFamily : style.fontFamily) || applicationFamily;
+  const fallbacks = fixed ? null : style.fontFallbacks;
+  if (!fallbacks || !fallbacks.length || !available || family !== fallbacks[0])
+    return family;
+  for (const candidate of fallbacks) {
+    if (available.indexOf(candidate) !== -1)
+      return candidate;
+  }
+  return fallbacks[fallbacks.length - 1];
 }
 
 function sliderGeometry(id, baseSize, heightRatio, scale) {

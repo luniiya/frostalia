@@ -98,7 +98,7 @@ class StyleViewTests(unittest.TestCase):
     def test_registered_views_exist(self):
         source = (ROOT / "Helpers/UiStyles.js").read_text()
         paths = re.findall(r'"(?:controlCenter|mediaCard|mediaPlayer|osd|notificationContent|kdeConnectHome)": "([^"]+\.qml)"', source)
-        self.assertEqual(len(paths), 12)
+        self.assertEqual(len(paths), 18)
         for path in paths:
             with self.subTest(path=path):
                 self.assertTrue((ROOT / path).is_file())

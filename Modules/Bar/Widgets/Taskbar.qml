@@ -654,9 +654,18 @@ Item {
     height: root.contentHeight
     anchors.centerIn: parent
     radius: Style.radiusM
-    color: Style.widgetBackground(root.section, Style.capsuleColor)
+    color: styleFace.loaded ? "transparent" : Style.widgetBackground(root.section, Style.capsuleColor)
     border.color: Style.widgetBorder(root.section, Style.capsuleBorderColor)
-    border.width: Style.capsuleBorderWidth
+    border.width: styleFace.loaded ? 0 : Style.capsuleBorderWidth
+
+    // Style face (Keycap: a film strip with sprocket holes)
+    NStyleFace {
+      id: styleFace
+      anchors.fill: parent
+      view: "Taskbar"
+      host: root
+      depth: KeycapKit.barDepth(root.screen?.name, root.section)
+    }
 
     GridLayout {
       id: taskbarLayout

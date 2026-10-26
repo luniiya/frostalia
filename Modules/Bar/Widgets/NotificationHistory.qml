@@ -56,6 +56,14 @@ NIconButton {
   readonly property int count: computeUnreadCount()
 
   baseSize: Style.getCapsuleHeightForScreen(screen?.name, section)
+  faceView: "NotificationHistory"
+  faceDepth: KeycapKit.barDepth(screen?.name, section)
+  faceData: ({
+               "count": root.count,
+               "showBadge": root.showUnreadBadge,
+               "dnd": NotificationService.doNotDisturb,
+               "badgeColor": root.badgeColor
+             })
   applyUiScale: false
   customRadius: Style.radiusL
   icon: NotificationService.doNotDisturb ? "bell-off" : "bell"
@@ -126,7 +134,8 @@ NIconButton {
     anchors.horizontalCenterOffset: parent.baseSize / 4
     anchors.verticalCenterOffset: -parent.baseSize / 4
     z: 2
-    active: showUnreadBadge
+    // Style faces draw their own count bubble
+    active: showUnreadBadge && !root.faceActive
     sourceComponent: Rectangle {
       id: badge
       height: 7

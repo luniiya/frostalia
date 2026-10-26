@@ -143,6 +143,11 @@ Item {
 
   BarPill {
     id: pill
+    faceView: "Volume"
+    faceData: ({
+                 "level": AudioService.maxVolume > 0 ? Math.min(1, AudioService.volume / Math.max(1, AudioService.maxVolume)) : 0,
+                 "muted": AudioService.muted
+               })
 
     screen: root.screen
     section: root.section

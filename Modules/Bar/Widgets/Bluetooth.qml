@@ -79,6 +79,11 @@ Item {
 
   BarPill {
     id: pill
+    faceView: "Bluetooth"
+    faceData: ({
+                 "enabled": BluetoothService.enabled,
+                 "devices": BluetoothService.connectedDevices ? BluetoothService.connectedDevices.length : 0
+               })
 
     screen: root.screen
     section: root.section

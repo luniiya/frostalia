@@ -35,6 +35,11 @@ NIconButton {
   readonly property string iconColorKey: widgetSettings.iconColor !== undefined ? widgetSettings.iconColor : widgetMetadata.iconColor
 
   baseSize: Style.getCapsuleHeightForScreen(screen?.name, section)
+  faceView: "NightLight"
+  faceDepth: KeycapKit.barDepth(screen?.name, section)
+  faceData: ({
+               "enabled": Settings.data.nightLight.enabled
+             })
   applyUiScale: false
   customRadius: Style.radiusL
   colorBgHover: Style.widgetBackground(root.section, ShellColors.mHover)

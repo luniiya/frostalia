@@ -865,6 +865,7 @@
   "options": {
     "ui-style": {
       "caelestia": "Caelestia",
+      "keycap": "Keycap",
       "material": "Material"
     },
     "bar": {
@@ -2164,6 +2165,41 @@
     "top-center": "Top center",
     "top-left": "Top left",
     "top-right": "Top right"
+  },
+  "radial-menu": {
+    "actions": {
+      "app": "App",
+      "command": "Command",
+      "control-center": "Control center",
+      "edit-desktop": "Edit desktop",
+      "folder": "Folder",
+      "launcher": "Launcher",
+      "lock": "Lock",
+      "session-menu": "Power",
+      "settings": "Settings",
+      "wallpaper": "Wallpaper"
+    },
+    "items": {
+      "apps": "Apps"
+    },
+    "settings": {
+      "add-item": "Add item",
+      "add-to-folder": "Add an item to this folder",
+      "app-placeholder": "Desktop entry, e.g. firefox",
+      "command-placeholder": "Shell command",
+      "description": "Right click the empty desktop to open a ring of shortcuts. Hold the button and flick towards an item to pick it without looking, or click. The center goes back up a level.",
+      "enabled-description": "Open the radial menu when you right click the empty desktop.",
+      "enabled-label": "Desktop radial menu",
+      "icon-tooltip": "Pick an icon (right click resets it)",
+      "items-description": "The first item points up and the rest follow clockwise. Folders open a nested ring.",
+      "items-label": "Items",
+      "move-down": "Move down",
+      "move-up": "Move up",
+      "remove": "Remove",
+      "reset": "Reset items",
+      "title": "Radial menu",
+      "wallpaper-placeholder": "Picker command (empty opens color settings)"
+    }
   },
   "session-menu": {
     "action-in-seconds": "{action} in {seconds} seconds...",

@@ -3,6 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
 import qs.Commons
+import qs.Modules.Panels.Settings.Tabs.DesktopWidgets
 import qs.Services.Compositor
 import qs.Services.Frostalia
 import qs.Services.UI
@@ -131,6 +132,11 @@ ColumnLayout {
         onOpenPluginSettingsRequested: (manifest, entryPoint) => pluginSettingsDialog.openPluginSettings(manifest, entryPoint)
       }
     }
+  }
+
+  // Right click menu on the empty desktop
+  RadialMenuSettings {
+    Layout.fillWidth: true
   }
 
   // Shared Plugin Settings Popup

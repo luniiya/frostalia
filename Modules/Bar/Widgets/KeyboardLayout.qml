@@ -72,6 +72,7 @@ Item {
 
   BarPill {
     id: pill
+    faceView: "KeyboardLayout"
     anchors.verticalCenter: parent.verticalCenter
     screen: root.screen
     section: root.section

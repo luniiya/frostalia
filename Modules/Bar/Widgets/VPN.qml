@@ -99,6 +99,10 @@ Item {
 
   BarPill {
     id: pill
+    faceView: "VPN"
+    faceData: ({
+                 "active": VPNService.hasActiveConnection
+               })
 
     screen: root.screen
     section: root.section

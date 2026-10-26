@@ -237,9 +237,20 @@ Item {
     width: Style.toOdd(isVertical ? (isHidden ? 0 : verticalSize) : (isHidden ? 0 : contentWidth))
     height: Style.toOdd(isVertical ? (isHidden ? 0 : verticalSize) : capsuleHeight)
     radius: Style.radiusM
-    color: Style.widgetBackground(root.section, Style.capsuleColor)
+    color: styleFace.loaded ? "transparent" : Style.widgetBackground(root.section, Style.capsuleColor)
     border.color: Style.widgetBorder(root.section, Style.capsuleBorderColor)
-    border.width: Style.capsuleBorderWidth
+    border.width: styleFace.loaded ? 0 : Style.capsuleBorderWidth
+
+    // Style face (Keycap: a ticket stub)
+    NStyleFace {
+      id: styleFace
+      anchors.fill: parent
+      view: "MediaMini"
+      host: root
+      hovered: mainMouseArea.containsMouse
+      pressed: mainMouseArea.pressed
+      depth: KeycapKit.barDepth(root.screen?.name, root.section)
+    }
 
     Behavior on width {
       NumberAnimation {

@@ -128,6 +128,10 @@ Item {
 
   BarPill {
     id: pill
+    faceView: "Microphone"
+    faceData: ({
+                 "muted": AudioService.inputMuted
+               })
 
     screen: root.screen
     section: root.section

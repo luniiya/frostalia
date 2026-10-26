@@ -29,6 +29,7 @@ import qs.Modules.OSD
 
 import qs.Modules.Panels.Launcher
 import qs.Modules.Panels.Settings
+import qs.Modules.RadialMenu
 import qs.Modules.Toast
 import qs.Services.Control
 import qs.Services.Frostalia
@@ -137,6 +138,7 @@ ShellRoot {
       Notification {}
       ToastOverlay {}
       OSD {}
+      RadialMenu {}
 
       // Launcher overlay window (for overlay layer mode)
       Loader {

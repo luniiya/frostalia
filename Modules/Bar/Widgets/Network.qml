@@ -79,6 +79,10 @@ Item {
 
   BarPill {
     id: pill
+    faceView: "Network"
+    faceData: ({
+                 "connected": NetworkService.wifiConnected || NetworkService.ethernetConnected
+               })
     screen: root.screen
     section: root.section
     oppositeDirection: BarService.getPillDirection(root)

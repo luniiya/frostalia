@@ -121,8 +121,28 @@ Item {
     width: BatteryLiquid.containerLength(root.capsuleHeight, 1)
     height: width
 
+    // Style face (Keycap: a round die-cut sticker around the liquid)
+    NStyleFace {
+      id: liquidFace
+      readonly property real inset: loaded && item.cut !== undefined ? item.cut : 0
+      anchors.fill: parent
+      view: root.liquid ? "Battery" : ""
+      host: liquidBox
+      hovered: liquidMouseArea.containsMouse
+      pressed: liquidMouseArea.pressed
+      faceData: ({
+                   "round": true,
+                   "alert": root.liquidState.low
+                 })
+      depth: KeycapKit.barDepth(root.screenName, root.section)
+    }
+
     NLiquidBattery {
       anchors.fill: parent
+      anchors.margins: liquidFace.inset
+      transform: Translate {
+        y: liquidFace.sink
+      }
       percentage: root.liquidState.percent
       ready: root.liquidState.ready
       charging: root.liquidState.charging
@@ -131,6 +151,7 @@ Item {
     }
 
     Rectangle {
+      visible: !liquidFace.loaded
       anchors.fill: parent
       radius: width / 2
       color: "transparent"
@@ -160,6 +181,7 @@ Item {
 
   BarPill {
     id: pill
+    faceView: "KdeConnect"
     visible: !root.liquid
 
     screen: root.screen

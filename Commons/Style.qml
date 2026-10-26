@@ -24,13 +24,31 @@ Singleton {
   readonly property var uiStyleChoices: UiStyles.choices()
   readonly property var uiStyleTokens: UiStyles.tokens(uiStyleId)
   readonly property bool materialControls: uiStyleTokens.controls.renderer === "material"
+  readonly property bool keycapControls: uiStyleTokens.controls.renderer === "keycap"
   readonly property var sliderStyle: uiStyleTokens.slider
   readonly property var toggleStyle: uiStyleTokens.toggle
-  readonly property string fontDefault: UiStyles.fontFamily(uiStyleId, Settings.data.ui.fontDefault, false, Qt.application.font.family)
+  // Installed families, only looked up for styles whose preset font may be missing.
+  // Waits for the bundled fallback font so it is part of the list.
+  readonly property var _installedFonts: uiStyleTokens.fontFallbacks && caelestiaFont.status === FontLoader.Ready ? Qt.fontFamilies() : null
+  readonly property string fontDefault: UiStyles.fontFamily(uiStyleId, Settings.data.ui.fontDefault, false, Qt.application.font.family, _installedFonts)
   readonly property string fontFixed: UiStyles.fontFamily(uiStyleId, Settings.data.ui.fontFixed, true, Qt.application.font.family)
+
+  // Keycap renderer: hard shadow depth, press depth and hover lift, scaled.
+  readonly property var keycapTokens: uiStyleTokens.keycap || null
+  readonly property int keycapDepth: keycapTokens ? Math.max(1, Math.round(keycapTokens.depth * uiScaleRatio)) : 0
+  readonly property int keycapPressedDepth: keycapTokens ? Math.round(keycapTokens.pressedDepth * uiScaleRatio) : 0
+  readonly property int keycapHoverLift: keycapTokens ? Math.round(keycapTokens.hoverLift * uiScaleRatio) : 0
+  readonly property int keycapOutline: keycapTokens ? Math.max(1, Math.round(keycapTokens.outline * uiScaleRatio)) : 0
+  readonly property int keycapRing: keycapTokens ? Math.max(1, Math.round(keycapTokens.ring * uiScaleRatio)) : 0
 
   function surfaceUrl(surface) {
     const path = UiStyles.view(uiStyleId, surface);
+    return path ? Quickshell.shellDir + "/" + path : "";
+  }
+
+  // Style-specific bar widget face, or "" when the style keeps the shared look.
+  function barViewUrl(name) {
+    const path = UiStyles.barView(uiStyleId, name);
     return path ? Quickshell.shellDir + "/" + path : "";
   }
 

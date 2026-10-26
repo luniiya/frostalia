@@ -538,9 +538,17 @@ Item {
     width: isVertical ? capsuleHeight : parent.width
     height: isVertical ? parent.height : capsuleHeight
     radius: Style.radiusM
-    color: Style.widgetBackground(root.section, Style.capsuleColor)
+    color: bedFace.loaded ? "transparent" : Style.widgetBackground(root.section, Style.capsuleColor)
     border.color: Style.widgetBorder(root.section, Style.capsuleBorderColor)
-    border.width: Style.capsuleBorderWidth
+    border.width: bedFace.loaded ? 0 : Style.capsuleBorderWidth
+
+    // Style face (Keycap: a recessed key bed for the workspace keys)
+    NStyleFace {
+      id: bedFace
+      anchors.fill: parent
+      view: "Workspace"
+      host: root
+    }
 
     x: isVertical ? Style.pixelAlignCenter(parent.width, width) : 0
     y: isVertical ? 0 : Style.pixelAlignCenter(parent.height, height)

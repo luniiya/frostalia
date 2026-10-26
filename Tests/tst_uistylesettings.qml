@@ -22,13 +22,19 @@ TestCase {
     compare(UiStyleSettings.defaultValue("material", "ui.fontDefault"), "Roboto");
     compare(UiStyleSettings.defaultValue("caelestia", "ui.boxBorderEnabled"), true);
     compare(UiStyleSettings.defaultValue("material", "ui.boxBorderEnabled"), false);
+    compare(UiStyleSettings.defaultValue("keycap", "ui.fontDefault"), "Google Sans Flex");
+    compare(UiStyleSettings.defaultValue("keycap", "ui.boxBorderEnabled"), true);
+    compare(UiStyleSettings.defaultValue("keycap", "ui.boxBorderWidth"), 2);
+    compare(UiStyleSettings.defaultValue("keycap", "ui.frostedGlass"), false);
+    compare(UiStyleSettings.defaultValue("keycap", "ui.panelBackgroundOpacity"), 1);
+    compare(UiStyleSettings.defaultValue("keycap", "general.radiusRatio"), 1);
   }
 
   function test_presetFontsAreDiscoverableWithoutSystemInstallation() {
-    compare(UiStyles.fontFamilies(), ["Rubik", "Roboto"]);
+    compare(UiStyles.fontFamilies(), ["Rubik", "Google Sans Flex", "Roboto"]);
     const families = UiStyles.fontFamilies();
     families[0] = "changed";
-    compare(UiStyles.fontFamilies(), ["Rubik", "Roboto"]);
+    compare(UiStyles.fontFamilies(), ["Rubik", "Google Sans Flex", "Roboto"]);
   }
 
   function test_squareStyleDefaultsAndIndependentCopies() {

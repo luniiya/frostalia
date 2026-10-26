@@ -49,6 +49,7 @@ Item {
 
   BarPill {
     id: pill
+    faceView: "Weather"
     screen: root.screen
     section: root.section
     oppositeDirection: BarService.getPillDirection(root)

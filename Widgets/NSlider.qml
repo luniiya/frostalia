@@ -49,8 +49,8 @@ Slider {
 
       ShapePath {
         id: bgPath
-        strokeColor: Qt.alpha(ShellColors.mOutline, Style.sliderStyle.trackOpacity)
-        strokeWidth: Style.borderS
+        strokeColor: Style.keycapControls ? KeycapKit.ink : Qt.alpha(ShellColors.mOutline, Style.sliderStyle.trackOpacity)
+        strokeWidth: Style.keycapControls ? Style.keycapOutline : Style.borderS
         fillColor: Qt.alpha(ShellColors.mSurface, Style.sliderStyle.trackOpacity)
 
         readonly property real w: bgContainer.width
@@ -233,14 +233,46 @@ Slider {
     x: root.leftPadding + (Style.materialControls ? Style.splitSliderTrack(root.availableWidth, width, root.visualPosition, root.sliderGeometry.gap, root.mirrored).center - width / 2 : root.visualPosition * (root.availableWidth - width))
     anchors.verticalCenter: parent.verticalCenter
 
+    // Keycap renderer: hard shadow under the knob; the knob sinks into it while pressed
+    Rectangle {
+      visible: Style.keycapControls
+      width: knob.width
+      height: knob.height
+      radius: knob.radius
+      x: (parent.width - width) / 2
+      y: (parent.height - height) / 2 + Style.keycapDepth
+      color: KeycapKit.ink
+    }
+
     Rectangle {
       id: knob
+      anchors.verticalCenterOffset: Style.keycapControls && root.pressed ? Style.keycapDepth - Style.keycapPressedDepth : 0
       implicitWidth: Style.materialControls ? (root.pressed ? root.sliderGeometry.pressedHandleWidth : root.sliderGeometry.handleWidth) : knobDiameter
       implicitHeight: Style.materialControls ? root.sliderGeometry.handleHeight : knobDiameter
       radius: Math.min(Style.iRadiusL, width / 2)
-      color: Style.materialControls ? root.effectiveFillColor : (root.pressed ? ShellColors.mHover : ShellColors.mSurface)
-      border.color: effectiveFillColor
-      border.width: Style.materialControls ? 0 : Style.borderL
+      color: Style.materialControls || Style.keycapControls ? root.effectiveFillColor : (root.pressed ? ShellColors.mHover : ShellColors.mSurface)
+      border.color: Style.keycapControls ? KeycapKit.ink : effectiveFillColor
+      border.width: Style.materialControls ? 0 : (Style.keycapControls ? Style.keycapOutline : Style.borderL)
+
+      // Cream ring just inside the outline
+      Rectangle {
+        visible: Style.keycapControls
+        anchors.fill: parent
+        anchors.margins: Style.keycapOutline
+        radius: Math.max(0, parent.radius - Style.keycapOutline)
+        color: "transparent"
+        border.color: KeycapKit.ringFor(root.effectiveFillColor)
+        border.width: Style.keycapRing
+      }
+
+      Behavior on anchors.verticalCenterOffset {
+        enabled: Style.keycapControls
+        NumberAnimation {
+          duration: root.pressed ? Style.animationFaster : Style.animationFast
+          easing.type: root.pressed ? Easing.OutQuad : Easing.OutBack
+          easing.overshoot: KeycapKit.overshoot
+        }
+      }
 
       Behavior on implicitWidth {
         enabled: Style.materialControls

@@ -34,6 +34,8 @@ NIconButton {
   readonly property string iconColorKey: (widgetSettings.iconColor !== undefined) ? widgetSettings.iconColor : widgetMetadata.iconColor
 
   baseSize: Style.getCapsuleHeightForScreen(screenName, section)
+  faceView: "SessionMenu"
+  faceDepth: KeycapKit.barDepth(screen?.name, section)
   applyUiScale: false
   customRadius: Style.radiusL
   icon: "power"

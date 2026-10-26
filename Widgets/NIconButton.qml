@@ -25,6 +25,12 @@ Item {
   property color colorBorder: ShellColors.mOutline
   property color colorBorderHover: ShellColors.mOutline
   property real customRadius: -1 // -1 means use default (iRadiusL), otherwise use this value
+  // Style-specific face (UiStyles `barViews`) for bar buttons, the state it shows and its depth
+  property string faceView: ""
+  property var faceData: ({})
+  property real faceDepth: Style.keycapDepth
+  readonly property bool pressed: iconMouse.pressed && enabled
+  readonly property bool faceActive: styleFace.active
 
   // Expose border properties for backwards compatibility (aliases to visualButton)
   property alias border: visualButton.border
@@ -48,9 +54,58 @@ Item {
 
   opacity: enabled ? 1.0 : 0.6
 
+  // Style face for this button (bar widgets), drawn instead of the visual button
+  NStyleFace {
+    id: styleFace
+    view: root.faceView
+    host: root
+    hovered: root.hovering
+    pressed: root.pressed
+    faceData: root.faceData
+    depth: root.faceDepth
+    width: root.buttonSize
+    height: root.buttonSize
+    anchors.centerIn: parent
+  }
+
+  // Keycap renderer: the button is a key that sinks while pressed
+  Loader {
+    active: Style.keycapControls && !styleFace.active
+    width: root.buttonSize
+    height: root.buttonSize
+    anchors.centerIn: parent
+    sourceComponent: NKeycap {
+      readonly property color baseFill: root.colorBg.a > 0.05 ? Qt.rgba(root.colorBg.r, root.colorBg.g, root.colorBg.b, 1) : KeycapKit.fill
+      y: -Math.round(depth / 2)
+      fillColor: baseFill
+      inkColor: KeycapKit.ink
+      ringColor: KeycapKit.ringFor(baseFill)
+      radius: Math.min((root.customRadius >= 0 ? root.customRadius : Style.iRadiusL), width / 2)
+      outlineWidth: Style.keycapOutline
+      ringWidth: Style.keycapRing
+      depth: Math.min(root.faceDepth, Style.keycapDepth)
+      pressedDepth: Style.keycapPressedDepth
+      hoverLift: Style.keycapHoverLift
+      pressed: root.pressed
+      hovered: root.hovering
+      duration: Style.animationFast
+      overshoot: KeycapKit.overshoot
+
+      NIcon {
+        icon: root.icon
+        pointSize: Style.toOdd(root.buttonSize * 0.48)
+        applyUiScale: root.applyUiScale
+        color: root.colorFg
+        x: Style.pixelAlignCenter(parent.width, width)
+        y: Style.pixelAlignCenter(parent.height, contentHeight)
+      }
+    }
+  }
+
   // Visual button - stays at buttonSize, centered in parent
   Rectangle {
     id: visualButton
+    visible: !Style.keycapControls && !styleFace.active
     width: root.buttonSize
     height: root.buttonSize
     anchors.centerIn: parent

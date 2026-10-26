@@ -143,6 +143,44 @@ Shared panels load their style’s registered `views` through `NStyleView`: cont
 
 Styles are registered in `Helpers/UiStyles.js`. Each entry has a translated label key and tokens for typography, radii, spacing, borders, animations, sliders and toggles. `Commons/Style.qml` exposes the active tokens to shared widgets; use it when adding controls instead of hardcoding style values. An unknown saved style falls back to Material for rendering without rewriting the saved choice. Add a complete registry entry, its English label in `Assets/Translations/en.json`, and tests in `Tests/tst_uistyles.qml` when implementing another style. The `controls.renderer` token selects the control rendering path; Material-specific rendering stays separate from Caelestia. Styles change live, saving pending appearance edits to the previous style and loading the selected style’s preferences. `Helpers/UiStyleSettings.js` defines the appearance fields and shared defaults; a registry entry can override them with `settingsDefaults` (for example, zero radius ratios for square corners). Reset buttons use the active style’s defaults. Material UI is an original implementation with Clavis Shell used as a visual reference. The weather views are adapted from Clavis Shell.
 
+#### Keycap
+
+Keycap is a bold sticker-and-keycap style. Every surface has an ink outline, a thin cream ring, a solid fill and a hard shadow pointing straight down (no blur). When pressed, a control sinks into its shadow and springs back with an overshoot when released. Faces pop in instead of fading. The style's controls renderer (`keycap`) draws `NButton`, `NIconButton`, `NToggle`, `NSlider`, input fields (`NFieldBackground`, so combo boxes, text inputs and spin boxes too) and `NBox` this way; `Widgets/NKeycap.qml` is the shared key. Panels reuse the Caelestia surface views drawn with keycap controls. The style defaults to Google Sans Flex. When that font isn't installed it falls back to Google Sans, then to bundled Rubik (the `fontFallbacks` token). Outlines are on at 2 px and panels are opaque. The bar fill comes from the capsule color key and ignores the capsule opacity, because keycaps are solid. Keycap adds no new settings.
+
+Bar widgets get style-specific faces. `barViews` in the registry maps a face name to a QML file in `Modules/Bar/Widgets/Keycap/`. `Widgets/NStyleFace.qml` loads the active style's face; other styles have no `barViews` and keep their look. A face only draws. The widget keeps its mouse areas, tooltips, menus and settings, and passes state through `faceData`. Faces get colors and metrics from `Commons/KeycapKit.qml` (`kit`) and import no shell singletons, so `Tests/tst_keycapfaces.qml` can load each one. Geometry, color and path logic lives in `Helpers/KeycapStyle.js`. The faces are:
+
+- Clock: a flip clock with one card per run of digits or letters; a card flips when its value changes.
+- Volume: a key that latches down when muted, with five level ticks.
+- Brightness: a round dial key ringed by eight sun-ray dots.
+- Microphone: a capsule key with an on-air lamp.
+- Battery: a thick die-cut sticker frame around the liquid, graphic or icon battery (round for KDE Connect liquid mode).
+- Network and Bluetooth: tilted badge stickers. Bluetooth shows one pip per connected device.
+- VPN: a luggage tag on a string.
+- Keyboard layout: a keyboard key with a homing bump.
+- Keep awake: a latching key.
+- Weather: an airmail postcard.
+- KDE Connect: a little phone.
+- Notification history: a bell sticker; the bell wiggles and the count bubble bounces when notifications arrive.
+- Dark mode: a split two-tone key.
+- Night light: a lamp key that glows.
+- Power profile: a gear-shift key with three dots.
+- Launcher: a primary start key with a spinning sparkle.
+- Control center: a d-pad key.
+- Settings: a postage stamp.
+- Session menu: an emergency stop button.
+- Workspaces: chunky keys in a recessed key bed.
+- Taskbar: a film strip.
+- System monitor: a recessed LCD plate.
+- Active window: label-maker tape.
+- Media: a ticket stub.
+- Audio visualizer: a speaker grille.
+- Lock keys: a key with indicator LEDs.
+- Model usage: a receipt.
+- Tray and custom buttons: a plain keycap (`Plate`).
+- Spacer: nothing.
+
+Keycap is inspired by the look of the SekaiPop rice but shares no code or assets with it.
+
 ## Credits and license
 
 Frostalia builds on Noctalia and its contributors' work. The inherited artwork remains credited to its original creators; see [CREDITS.md](CREDITS.md). A fresh Git history does not change that attribution.

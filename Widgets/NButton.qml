@@ -37,7 +37,7 @@ Item {
     if (!root.enabled) {
       return ShellColors.mOnSurfaceVariant;
     }
-    if (root.hovered) {
+    if (root.hovered && !Style.keycapControls) {
       return root.textHoverColor;
     }
     if (root._tonal) {
@@ -73,6 +73,8 @@ Item {
 
     radius: root.buttonRadius
     color: {
+      if (Style.keycapControls)
+        return "transparent";
       if (!root.enabled)
         return root.outlined ? "transparent" : Qt.lighter(ShellColors.mSurfaceVariant, 1.2);
       if (root.hovered)
@@ -82,7 +84,7 @@ Item {
       return root.outlined ? "transparent" : root.backgroundColor;
     }
 
-    border.width: root.outlined && !root._tonal ? Style.borderS : 0
+    border.width: root.outlined && !root._tonal && !Style.keycapControls ? Style.borderS : 0
     border.color: {
       if (!root.enabled)
         return ShellColors.mOutline;
@@ -113,10 +115,37 @@ Item {
       tint: root._tonal ? ShellColors.mOnSurface : (root.outlined ? root.backgroundColor : root.textColor)
     }
 
+    // Keycap renderer: filled key with a hard shadow that sinks while pressed.
+    // Outlined buttons become surface keys with the accent as content color.
+    Loader {
+      id: keycap
+      active: Style.keycapControls
+      anchors.fill: parent
+      z: -1
+      readonly property real sink: item ? item.sink : 0
+      sourceComponent: NKeycap {
+        readonly property color baseFill: !root.enabled ? ShellColors.mSurfaceVariant : (root.outlined ? ShellColors.mSurface : root.backgroundColor)
+        fillColor: root.hovered && root.enabled && !root.outlined ? Qt.lighter(baseFill, 1.08) : baseFill
+        inkColor: KeycapKit.ink
+        ringColor: KeycapKit.ringFor(baseFill)
+        radius: root.buttonRadius
+        outlineWidth: Style.keycapOutline
+        ringWidth: Style.keycapRing
+        depth: Style.keycapDepth
+        pressedDepth: Style.keycapPressedDepth
+        hoverLift: Style.keycapHoverLift
+        pressed: mouseArea.pressed
+        hovered: root.hovered && root.enabled
+        duration: Style.animationFast
+        overshoot: KeycapKit.overshoot
+      }
+    }
+
     // Content
     RowLayout {
       id: contentRow
       anchors.verticalCenter: parent.verticalCenter
+      anchors.verticalCenterOffset: keycap.sink
       anchors.left: root.horizontalAlignment === Qt.AlignLeft ? parent.left : undefined
       anchors.horizontalCenter: root.horizontalAlignment === Qt.AlignHCenter ? parent.horizontalCenter : undefined
       anchors.leftMargin: root.horizontalAlignment === Qt.AlignLeft ? Style.marginL : 0

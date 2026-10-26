@@ -94,9 +94,20 @@ Item {
     height: root.contentHeight
     anchors.centerIn: parent
     radius: Style.radiusS
-    color: Style.widgetBackground(root.section, Style.capsuleColor)
+    color: styleFace.loaded ? "transparent" : Style.widgetBackground(root.section, Style.capsuleColor)
     border.color: Style.widgetBorder(root.section, Style.capsuleBorderColor)
-    border.width: Style.capsuleBorderWidth
+    border.width: styleFace.loaded ? 0 : Style.capsuleBorderWidth
+
+    // Style face (Keycap: a speaker grille)
+    NStyleFace {
+      id: styleFace
+      anchors.fill: parent
+      view: "AudioVisualizer"
+      host: root
+      hovered: mouseArea.containsMouse
+      pressed: mouseArea.pressed
+      depth: KeycapKit.barDepth(root.screen?.name, root.section)
+    }
 
     // When visualizer type or playback changes, shouldShow updates automatically
     // The Loader dynamically loads the appropriate visualizer based on settings

@@ -51,8 +51,8 @@ RowLayout {
     implicitHeight: root.geometry.height
     radius: Math.min(Style.iRadiusL, height / 2)
     color: root.checked ? ShellColors.mPrimary : (Style.materialControls ? ShellColors.mSurfaceVariant : ShellColors.mSurface)
-    border.color: Style.materialControls && root.checked ? ShellColors.mPrimary : ShellColors.mOutline
-    border.width: Style.materialControls ? Style.toggleStyle.border * root.baseSize / 26 : Style.borderS
+    border.color: Style.keycapControls ? KeycapKit.ink : (Style.materialControls && root.checked ? ShellColors.mPrimary : ShellColors.mOutline)
+    border.width: Style.materialControls ? Style.toggleStyle.border * root.baseSize / 26 : (Style.keycapControls ? Style.keycapOutline : Style.borderS)
 
     Behavior on color {
       ColorAnimation {
@@ -66,16 +66,37 @@ RowLayout {
       }
     }
 
+    // Keycap renderer: the handle is a small key with a hard shadow; it sinks while pressed
     Rectangle {
+      visible: Style.keycapControls
+      width: handle.width
+      height: handle.height
+      radius: handle.radius
+      x: handle.x
+      y: handle.y - handle.anchors.verticalCenterOffset + Math.max(1, Math.round(Style.keycapDepth * 0.67))
+      color: KeycapKit.ink
+    }
+
+    Rectangle {
+      id: handle
       implicitWidth: root.geometry.handle
       implicitHeight: root.geometry.handle
       radius: Math.min(Style.iRadiusL, height / 2)
-      color: root.checked ? ShellColors.mOnPrimary : (Style.materialControls ? ShellColors.mOutline : ShellColors.mPrimary)
-      border.color: root.checked ? ShellColors.mSurface : ShellColors.mSurface
-      border.width: Style.materialControls ? 0 : Style.borderM
+      color: Style.keycapControls ? (root.checked ? ShellColors.mOnPrimary : ShellColors.mSurfaceVariant) : (root.checked ? ShellColors.mOnPrimary : (Style.materialControls ? ShellColors.mOutline : ShellColors.mPrimary))
+      border.color: Style.keycapControls ? KeycapKit.ink : ShellColors.mSurface
+      border.width: Style.materialControls ? 0 : (Style.keycapControls ? Style.keycapOutline : Style.borderM)
       anchors.verticalCenter: parent.verticalCenter
-      anchors.verticalCenterOffset: 0
+      anchors.verticalCenterOffset: Style.keycapControls && toggleMouse.pressed ? Math.round(Style.keycapDepth * 0.5) : 0
       x: root.geometry.x
+
+      Behavior on anchors.verticalCenterOffset {
+        enabled: Style.keycapControls
+        NumberAnimation {
+          duration: Style.animationFaster
+          easing.type: Easing.OutBack
+          easing.overshoot: KeycapKit.overshoot
+        }
+      }
 
       Behavior on implicitWidth {
         enabled: Style.materialControls
@@ -94,8 +115,9 @@ RowLayout {
 
       Behavior on x {
         NumberAnimation {
-          duration: Style.animationFast
-          easing.type: Easing.OutCubic
+          duration: Style.keycapControls ? Style.animationNormal : Style.animationFast
+          easing.type: Style.keycapControls ? Easing.OutBack : Easing.OutCubic
+          easing.overshoot: KeycapKit.popOvershoot
         }
       }
     }

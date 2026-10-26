@@ -545,6 +545,83 @@
     "gridSnapScale": false,
     "monitorWidgets": []
   },
+  "radialMenu": {
+    "enabled": true,
+    "items": [
+      {
+        "action": "editDesktop",
+        "label": "",
+        "labelKey": "",
+        "icon": "",
+        "arg": ""
+      },
+      {
+        "action": "folder",
+        "label": "",
+        "labelKey": "radial-menu.items.apps",
+        "icon": "apps",
+        "arg": "",
+        "children": [
+          {
+            "action": "app",
+            "label": "",
+            "labelKey": "",
+            "icon": "",
+            "arg": "brave-browser"
+          },
+          {
+            "action": "app",
+            "label": "",
+            "labelKey": "",
+            "icon": "",
+            "arg": "com.mitchellh.ghostty"
+          },
+          {
+            "action": "app",
+            "label": "",
+            "labelKey": "",
+            "icon": "",
+            "arg": "org.kde.dolphin"
+          },
+          {
+            "action": "app",
+            "label": "",
+            "labelKey": "",
+            "icon": "",
+            "arg": "obsidian"
+          }
+        ]
+      },
+      {
+        "action": "settings",
+        "label": "",
+        "labelKey": "",
+        "icon": "",
+        "arg": ""
+      },
+      {
+        "action": "sessionMenu",
+        "label": "",
+        "labelKey": "",
+        "icon": "",
+        "arg": ""
+      },
+      {
+        "action": "lock",
+        "label": "",
+        "labelKey": "",
+        "icon": "",
+        "arg": ""
+      },
+      {
+        "action": "wallpaper",
+        "label": "",
+        "labelKey": "",
+        "icon": "",
+        "arg": ""
+      }
+    ]
+  },
   "bubbles": {
     "enabled": false,
     "configurations": [],

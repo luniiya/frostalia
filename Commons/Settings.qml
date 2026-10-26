@@ -820,6 +820,86 @@ Singleton {
       property list<var> monitorWidgets: []
       // Format: [{ "name": "DP-1", "widgets": [...] }, { "name": "HDMI-1", "widgets": [...] }]
     }
+
+    // desktop radial menu (right click on the empty desktop), see Helpers/RadialMenu.js
+    property JsonObject radialMenu: JsonObject {
+      property bool enabled: true
+      // Item tree: [{ action, label, labelKey, icon, arg, children? }], first item points up
+      property list<var> items: [
+        {
+          "action": "editDesktop",
+          "label": "",
+          "labelKey": "",
+          "icon": "",
+          "arg": ""
+        },
+        {
+          "action": "folder",
+          "label": "",
+          "labelKey": "radial-menu.items.apps",
+          "icon": "apps",
+          "arg": "",
+          "children": [
+            {
+              "action": "app",
+              "label": "",
+              "labelKey": "",
+              "icon": "",
+              "arg": "brave-browser"
+            },
+            {
+              "action": "app",
+              "label": "",
+              "labelKey": "",
+              "icon": "",
+              "arg": "com.mitchellh.ghostty"
+            },
+            {
+              "action": "app",
+              "label": "",
+              "labelKey": "",
+              "icon": "",
+              "arg": "org.kde.dolphin"
+            },
+            {
+              "action": "app",
+              "label": "",
+              "labelKey": "",
+              "icon": "",
+              "arg": "obsidian"
+            }
+          ]
+        },
+        {
+          "action": "settings",
+          "label": "",
+          "labelKey": "",
+          "icon": "",
+          "arg": ""
+        },
+        {
+          "action": "sessionMenu",
+          "label": "",
+          "labelKey": "",
+          "icon": "",
+          "arg": ""
+        },
+        {
+          "action": "lock",
+          "label": "",
+          "labelKey": "",
+          "icon": "",
+          "arg": ""
+        },
+        {
+          "action": "wallpaper",
+          "label": "",
+          "labelKey": "",
+          "icon": "",
+          "arg": ""
+        }
+      ]
+    }
   }
 
   // -----------------------------------------------------

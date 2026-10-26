@@ -32,6 +32,11 @@ NIconButton {
   tooltipText: Settings.data.colorSchemes.darkMode ? I18n.tr("tooltips.switch-to-light-mode") : I18n.tr("tooltips.switch-to-dark-mode")
   tooltipDirection: BarService.getTooltipDirection(screen?.name, section)
   baseSize: Style.getCapsuleHeightForScreen(screen?.name, section)
+  faceView: "DarkMode"
+  faceDepth: KeycapKit.barDepth(screen?.name, section)
+  faceData: ({
+               "dark": Settings.data.colorSchemes.darkMode
+             })
   applyUiScale: false
   customRadius: Style.radiusL
   colorBgHover: Style.widgetBackground(root.section, ShellColors.mHover)

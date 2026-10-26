@@ -149,6 +149,23 @@ Item {
     }
   }
 
+  // Style face for the capsule modes (Keycap: a die-cut sticker frame around the battery)
+  NStyleFace {
+    id: capsuleFace
+    readonly property real inset: loaded && item.cut !== undefined ? item.cut : 0
+    view: root.useCapsuleMode ? "Battery" : ""
+    host: root
+    hovered: graphicMouseArea.containsMouse
+    pressed: graphicMouseArea.pressed
+    faceData: ({
+                 "alert": root.isLowBattery || root.isCriticalBattery
+               })
+    depth: KeycapKit.barDepth(root.screenName, root.section)
+    anchors.centerIn: root.useLiquidMode ? liquidBox : capsule
+    width: root.useLiquidMode ? liquidBox.width : capsule.width
+    height: root.useLiquidMode ? liquidBox.height : capsule.height
+  }
+
   // ==================== GRAPHIC MODE ====================
 
   // Capsule background (graphic mode only)
@@ -159,9 +176,9 @@ Item {
     width: root.isBarVertical ? root.capsuleHeight : nBattery.width + Style.margin2S
     height: root.isBarVertical ? nBattery.height + Style.margin2S : root.capsuleHeight
     radius: Math.min(Style.radiusL, width / 2)
-    color: Style.widgetBackground(root.section, graphicMouseArea.containsMouse ? ShellColors.mHover : Style.capsuleColor)
+    color: capsuleFace.loaded ? "transparent" : Style.widgetBackground(root.section, graphicMouseArea.containsMouse ? ShellColors.mHover : Style.capsuleColor)
     border.color: Style.widgetBorder(root.section, Style.capsuleBorderColor)
-    border.width: Style.capsuleBorderWidth
+    border.width: capsuleFace.loaded ? 0 : Style.capsuleBorderWidth
 
     Behavior on color {
       enabled: !ShellColors.isTransitioning
@@ -176,6 +193,9 @@ Item {
     id: nBattery
     visible: root.useGraphicMode
     anchors.centerIn: parent
+    transform: Translate {
+      y: capsuleFace.sink
+    }
     baseSize: (Style.getBarHeightForScreen(root.screenName, root.section) / root.capsuleHeight) * Style.fontSizeXXS
     showPercentageText: root.displayMode !== "graphic-clean"
     vertical: root.isBarVertical
@@ -201,7 +221,12 @@ Item {
 
     NLiquidBattery {
       anchors.fill: parent
-      radius: Math.min(Style.radiusL, Math.min(width, height) / 2)
+      // Inside a style face (sticker), the liquid fills the face's body and sinks with it
+      anchors.margins: capsuleFace.inset
+      transform: Translate {
+        y: capsuleFace.sink
+      }
+      radius: Math.min(capsuleFace.loaded ? Math.max(0, Style.radiusM - capsuleFace.inset) : Style.radiusL, Math.min(width, height) / 2)
       percentage: root.percent
       ready: root.isReady
       charging: root.isCharging
@@ -210,6 +235,7 @@ Item {
     }
 
     Rectangle {
+      visible: !capsuleFace.loaded
       anchors.fill: parent
       radius: Math.min(Style.radiusL, Math.min(width, height) / 2)
       color: "transparent"
@@ -260,6 +286,10 @@ Item {
 
   BarPill {
     id: pill
+    faceView: "Battery"
+    faceData: ({
+                 "alert": root.isLowBattery || root.isCriticalBattery
+               })
     visible: !root.useCapsuleMode
     screen: root.screen
     section: root.section

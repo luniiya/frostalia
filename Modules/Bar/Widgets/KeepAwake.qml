@@ -62,6 +62,10 @@ Item {
 
   BarPill {
     id: pill
+    faceView: "KeepAwake"
+    faceData: ({
+                 "on": IdleInhibitorService.isInhibited
+               })
 
     screen: root.screen
     section: root.section
