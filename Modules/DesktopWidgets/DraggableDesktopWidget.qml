@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Effects
 import Quickshell
 import "../../Helpers/DesktopWidgetEdit.js" as WidgetEdit
+import "../../Helpers/EditDesktopGeometry.js" as EditGeometry
 import qs.Commons
 import qs.Services.Frostalia
 import qs.Services.UI
@@ -13,6 +14,10 @@ Item {
   property ShellScreen screen
   property var widgetData: null
   property int widgetIndex: -1
+
+  // Only the instances shown on the Edit Desktop card can be edited
+  property bool editing: false
+  readonly property bool selected: editing && widgetIndex >= 0 && EditDesktopService.selectedIndex === widgetIndex
 
   property real defaultX: 100
   property real defaultY: 100
@@ -77,6 +82,33 @@ Item {
     property real lastScale: 1.0
     // Locks operation type to prevent switching between drag/scale mid-operation
     property string operationType: ""  // "drag" or "scale" or ""
+  }
+
+  // Distance (in desktop pixels) at which a dragged widget snaps to another widget
+  readonly property real snapThreshold: 8
+
+  // The other widgets of this layer, as rectangles
+  function siblingRects() {
+    var rects = [];
+    if (!root.parent)
+      return rects;
+    var kids = root.parent.children;
+    for (var i = 0; i < kids.length; i++) {
+      var k = kids[i];
+      if (k !== root && k.widgetData !== undefined && k.visible && k.width > 0 && k.height > 0)
+        rects.push({
+                     "x": k.x,
+                     "y": k.y,
+                     "width": k.width,
+                     "height": k.height
+                   });
+    }
+    return rects;
+  }
+
+  function clearGuides() {
+    if (root.parent && root.parent.guides !== undefined)
+      root.parent.guides = [];
   }
 
   function snapToGrid(coord) {
@@ -242,9 +274,9 @@ Item {
     id: decorationRect
     anchors.fill: parent
     anchors.margins: -outlineMargin
-    color: DesktopWidgetRegistry.editMode ? Qt.rgba(ShellColors.mPrimary.r, ShellColors.mPrimary.g, ShellColors.mPrimary.b, 0.1) : "transparent"
-    border.color: (DesktopWidgetRegistry.editMode || internal.isDragging) ? (internal.isDragging ? ShellColors.mOutline : ShellColors.mPrimary) : "transparent"
-    border.width: DesktopWidgetRegistry.editMode ? 3 : 0
+    color: root.editing ? Qt.rgba(ShellColors.mPrimary.r, ShellColors.mPrimary.g, ShellColors.mPrimary.b, root.selected ? 0.18 : 0.06) : "transparent"
+    border.color: (root.editing || internal.isDragging) ? (internal.isDragging ? ShellColors.mOutline : (root.selected ? ShellColors.mPrimary : Qt.alpha(ShellColors.mPrimary, 0.45))) : "transparent"
+    border.width: root.editing ? (root.selected ? 3 : 2) : 0
     radius: Math.min(Math.round(Style.radiusL * root.widgetScale), Style.radiusL, width / 2, height / 2)
     z: -1
   }
@@ -284,7 +316,7 @@ Item {
 
   Rectangle {
     id: sizeFeedback
-    visible: DesktopWidgetRegistry.editMode && (internal.isScaling || internal.isResizing || dragArea.containsMouse)
+    visible: root.editing && (internal.isScaling || internal.isResizing || dragArea.containsMouse)
     z: 3000
     width: sizeLabel.implicitWidth + Style.margin2M
     height: sizeLabel.implicitHeight + Style.margin2S
@@ -358,7 +390,7 @@ Item {
     id: dragArea
     anchors.fill: parent
     z: 1000
-    visible: DesktopWidgetRegistry.editMode
+    visible: root.editing
     cursorShape: internal.isDragging ? Qt.ClosedHandCursor : Qt.OpenHandCursor
     hoverEnabled: true
     acceptedButtons: Qt.LeftButton
@@ -372,6 +404,7 @@ Item {
       }
 
       pressPos = Qt.point(mouse.x, mouse.y);
+      EditDesktopService.select(root.widgetIndex);
       DesktopWidgetRegistry.manipulatingWidget = root;
       internal.operationType = "drag";
       internal.dragOffsetX = root.x;
@@ -401,17 +434,18 @@ Item {
           newY = Math.max(-scaledHeight + minVisibleY, Math.min(newY, root.parent.height - minVisibleY));
         }
 
-        if (Settings.data.desktopWidgets.gridSnap) {
-          newX = root.snapToGrid(newX);
-          newY = root.snapToGrid(newY);
-          // Re-clamp after snapping
-          if (root.parent && scaledWidth > 0 && scaledHeight > 0) {
-            var minVisibleX = scaledWidth * 0.25;
-            var minVisibleY = scaledHeight * 0.25;
-            newX = Math.max(-scaledWidth + minVisibleX, Math.min(newX, root.parent.width - minVisibleX));
-            newY = Math.max(-scaledHeight + minVisibleY, Math.min(newY, root.parent.height - minVisibleY));
-          }
-        }
+        // Snap to the other widgets' edges and centers, else to the grid
+        var snapped = EditGeometry.snap({
+                                          "x": newX,
+                                          "y": newY,
+                                          "width": scaledWidth,
+                                          "height": scaledHeight
+                                        }, root.siblingRects(), Settings.data.desktopWidgets.gridSnap ? root.gridSize : 0, root.snapThreshold);
+        var clamped = EditGeometry.clampPosition(snapped.x, snapped.y, scaledWidth, scaledHeight, root.parent ? root.parent.width : 0, root.parent ? root.parent.height : 0);
+        newX = clamped.x;
+        newY = clamped.y;
+        if (root.parent && root.parent.guides !== undefined)
+          root.parent.guides = snapped.guides;
 
         internal.dragOffsetX = newX;
         internal.dragOffsetY = newY;
@@ -431,6 +465,7 @@ Item {
         internal.baseY = roundedY;
         internal.isDragging = false;
         internal.operationType = "";
+        root.clearGuides();
         if (DesktopWidgetRegistry.manipulatingWidget === root)
           DesktopWidgetRegistry.manipulatingWidget = null;
       }
@@ -439,6 +474,7 @@ Item {
     onCanceled: {
       internal.isDragging = false;
       internal.operationType = "";
+      root.clearGuides();
       if (DesktopWidgetRegistry.manipulatingWidget === root)
         DesktopWidgetRegistry.manipulatingWidget = null;
     }
@@ -449,21 +485,14 @@ Item {
     id: contextMenuArea
     anchors.fill: parent
     z: 1001
-    visible: DesktopWidgetRegistry.editMode
+    visible: root.editing
     acceptedButtons: Qt.RightButton
     hoverEnabled: true
 
+    // The old popup menu would sit behind the Edit Desktop screen; the editor shows its own actions
     onPressed: mouse => {
-      if (mouse.button === Qt.RightButton) {
-        var popupMenuWindow = PanelService.getPopupMenuWindow(root.screen);
-        if (popupMenuWindow) {
-          // Map click position to screen coordinates
-          var globalPos = root.mapToItem(null, mouse.x, mouse.y);
-          // Use dynamic context menu (created in PopupMenuWindow's Top layer)
-          // This ensures input events work correctly for desktop widgets (Bottom layer)
-          popupMenuWindow.showDynamicContextMenu(root.contextMenuModel, globalPos.x, globalPos.y, root.handleContextMenuAction);
-        }
-      }
+      if (mouse.button === Qt.RightButton)
+        EditDesktopService.select(root.widgetIndex);
     }
   }
 
@@ -520,7 +549,7 @@ Item {
       required property var modelData
       required property int index
 
-      visible: DesktopWidgetRegistry.editMode && !internal.isDragging && !internal.isResizing
+      visible: root.editing && !internal.isDragging && !internal.isResizing
       // Position handles at corners of decoration rectangle (which extends by outlineMargin)
       x: modelData.xMult === 0 ? -outlineMargin : (root.width + outlineMargin - cornerHandleSize)
       y: modelData.yMult === 0 ? -outlineMargin : (root.height + outlineMargin - cornerHandleSize)
@@ -648,7 +677,7 @@ Item {
     Rectangle {
       id: edgeHandle
       required property var modelData
-      visible: DesktopWidgetRegistry.editMode && !internal.isDragging && !internal.isScaling && (modelData.horizontal ? root.horizontalResizable : root.verticalResizable)
+      visible: root.editing && !internal.isDragging && !internal.isScaling && (modelData.horizontal ? root.horizontalResizable : root.verticalResizable)
       width: modelData.horizontal ? 6 : 28
       height: modelData.horizontal ? 28 : 6
       radius: 3

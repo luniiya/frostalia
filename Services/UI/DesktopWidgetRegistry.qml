@@ -353,7 +353,8 @@ Singleton {
 
   property var currentSettingsDialog: null
 
-  function openWidgetSettings(screen, widgetIndex, widgetId, widgetData) {
+  // dialogParent: an item to host the dialog in (the Edit Desktop window); by default the popup menu window hosts it
+  function openWidgetSettings(screen, widgetIndex, widgetId, widgetData, dialogParent) {
     if (!widgetId || !screen) {
       return;
     }
@@ -380,20 +381,20 @@ Singleton {
       return;
     }
 
-    var popupMenuWindow = PanelService.getPopupMenuWindow(screen);
-    if (!popupMenuWindow) {
+    var popupMenuWindow = dialogParent ? null : PanelService.getPopupMenuWindow(screen);
+    if (!dialogParent && !popupMenuWindow) {
       Logger.e("DesktopWidgetRegistry", "No popup menu window found for screen");
       return;
     }
 
-    if (popupMenuWindow.hideDynamicMenu) {
+    if (popupMenuWindow && popupMenuWindow.hideDynamicMenu) {
       popupMenuWindow.hideDynamicMenu();
     }
 
     var component = Qt.createComponent(Quickshell.shellDir + "/Modules/Panels/Settings/DesktopWidgets/DesktopWidgetSettingsDialog.qml");
 
     function instantiateAndOpen() {
-      var dialog = component.createObject(popupMenuWindow.dialogParent, {
+      var dialog = component.createObject(dialogParent ? dialogParent : popupMenuWindow.dialogParent, {
                                             "widgetIndex": widgetIndex,
                                             "widgetData": widgetData,
                                             "widgetId": widgetId,
@@ -406,10 +407,13 @@ Singleton {
         dialog.updateWidgetSettings.connect((sec, idx, settings) => {
           root.updateWidgetData(sec, idx, settings);
         });
-        popupMenuWindow.hasDialog = true;
+        if (popupMenuWindow)
+          popupMenuWindow.hasDialog = true;
         dialog.closed.connect(() => {
-          popupMenuWindow.hasDialog = false;
-          popupMenuWindow.close();
+          if (popupMenuWindow) {
+            popupMenuWindow.hasDialog = false;
+            popupMenuWindow.close();
+          }
           if (root.currentSettingsDialog === dialog) {
             root.currentSettingsDialog = null;
           }

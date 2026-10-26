@@ -1,11 +1,7 @@
 import QtQuick
-import QtQuick.Effects
-import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
-import "../../Helpers/DesktopWidgetEdit.js" as WidgetEdit
 import qs.Commons
-import qs.Modules.Panels.Settings
 import qs.Services.Compositor
 import qs.Services.Frostalia
 import qs.Services.Power
@@ -15,9 +11,6 @@ import qs.Widgets
 Variants {
   id: root
   model: Quickshell.screens
-
-  // Direct binding to registry's widgets property for reactivity
-  readonly property var registeredWidgets: DesktopWidgetRegistry.widgets
 
   // Force reload counter - incremented when plugin widget registry changes
   property int pluginReloadCounter: 0
@@ -52,13 +45,13 @@ Variants {
 
     // Only create PanelWindow if enabled AND (screen has widgets OR in edit mode)
     // During compositor overview, show widgets only when overviewEnabled is true.
-    active: modelData && Settings.data.desktopWidgets.enabled && (screenWidgets.length > 0 || DesktopWidgetRegistry.editMode) && (!CompositorService.overviewActive || Settings.data.desktopWidgets.overviewEnabled) && (!PowerProfileService.frostaliaPerformanceMode || !Settings.data.frostaliaPerformance.disableDesktopWidgets)
+    active: modelData && Settings.data.desktopWidgets.enabled && screenWidgets.length > 0 && (!CompositorService.overviewActive || Settings.data.desktopWidgets.overviewEnabled) && (!PowerProfileService.frostaliaPerformanceMode || !Settings.data.frostaliaPerformance.disableDesktopWidgets)
 
     sourceComponent: PanelWindow {
       id: window
       color: "transparent"
       screen: screenLoader.modelData
-      mask: DesktopWidgetRegistry.editMode ? null : widgetsMask
+      mask: widgetsMask
 
       // Dynamic mask: combine clickable regions for each loaded widget
       property var _maskRegions: []
@@ -73,7 +66,7 @@ Variants {
         regions: window._maskRegions
       }
 
-      WlrLayershell.keyboardFocus: DesktopWidgetRegistry.editMode ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
+      WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
       WlrLayershell.layer: WlrLayer.Bottom
       WlrLayershell.exclusionMode: ExclusionMode.Ignore
       WlrLayershell.namespace: "frostalia-desktop-widgets-" + (screen?.name || "unknown")
@@ -89,415 +82,28 @@ Variants {
         Logger.d("DesktopWidgets", "Created panel window for", screen?.name);
       }
 
-      Shortcut {
-        sequence: "Ctrl+Z"
-        enabled: DesktopWidgetRegistry.editMode && DesktopWidgetRegistry.canUndo
-        onActivated: DesktopWidgetRegistry.undo()
-      }
-      Shortcut {
-        sequences: ["Ctrl+Shift+Z", "Ctrl+Y"]
-        enabled: DesktopWidgetRegistry.editMode && DesktopWidgetRegistry.canRedo
-        onActivated: DesktopWidgetRegistry.redo()
-      }
-
-      // Add a new widget to the current screen
-      function addWidgetToCurrentScreen(widgetId) {
-        var monitorName = window.screen.name;
-        var newWidget = {
-          "id": widgetId
-        };
-
-        // Load default metadata if available
-        var metadata = DesktopWidgetRegistry.widgetMetadata[widgetId];
-        if (metadata) {
-          Object.keys(metadata).forEach(function (key) {
-            newWidget[key] = metadata[key];
-          });
-        }
-
-        // Place at screen center
-        newWidget.x = (window.screen.width / 2) - 100;
-        newWidget.y = (window.screen.height / 2) - 100;
-        newWidget.scale = 1.0;
-
-        // Get current widgets and add new one
-        var monitorWidgets = Settings.data.desktopWidgets.monitorWidgets || [];
-        var newMonitorWidgets = monitorWidgets.slice();
-        var found = false;
-
-        for (var i = 0; i < newMonitorWidgets.length; i++) {
-          if (newMonitorWidgets[i].name === monitorName) {
-            var widgets = (newMonitorWidgets[i].widgets || []).slice();
-            widgets.push(newWidget);
-            newMonitorWidgets[i] = {
-              "name": monitorName,
-              "widgets": widgets
-            };
-            found = true;
-            break;
-          }
-        }
-
-        if (!found) {
-          newMonitorWidgets.push({
-                                   "name": monitorName,
-                                   "widgets": [newWidget]
-                                 });
-        }
-
-        Settings.data.desktopWidgets.monitorWidgets = newMonitorWidgets;
-        Logger.i("DesktopWidgets", "Added widget", widgetId, "to", monitorName);
-      }
-
       Item {
         id: widgetsContainer
         anchors.fill: parent
 
-        // Visual grid overlay - shown when grid snap is enabled in edit mode
-        // Using Loader to properly unload Canvas when not needed
-        Loader {
-          id: gridOverlayLoader
-          active: DesktopWidgetRegistry.editMode && Settings.data.desktopWidgets.enabled && Settings.data.desktopWidgets.gridSnap
+        // Load widgets dynamically from per-monitor array. They are edited on the Edit Desktop screen.
+        DesktopWidgetsLayer {
           anchors.fill: parent
-          z: -1  // Behind widgets but above background
-          asynchronous: false
+          screen: window.screen
+          widgets: screenLoader.screenWidgets
+          editing: false
 
-          sourceComponent: Canvas {
-            id: gridOverlay
-            anchors.fill: parent
-            opacity: 0.3
-
-            // Same grid as the widgets snap to
-            readonly property int gridSize: WidgetEdit.gridSize(window.screen ? window.screen.width : 0, window.screen ? window.screen.height : 0)
-
-            onPaint: {
-              const ctx = getContext("2d");
-              ctx.reset();
-              ctx.strokeStyle = ShellColors.mPrimary;
-              ctx.lineWidth = 1;
-
-              // Draw vertical lines
-              for (let x = 0; x <= width; x += gridSize) {
-                ctx.beginPath();
-                ctx.moveTo(x, 0);
-                ctx.lineTo(x, height);
-                ctx.stroke();
-              }
-
-              // Draw horizontal lines
-              for (let y = 0; y <= height; y += gridSize) {
-                ctx.beginPath();
-                ctx.moveTo(0, y);
-                ctx.lineTo(width, y);
-                ctx.stroke();
-              }
-            }
-
-            // Repaint when size changes
-            onWidthChanged: requestPaint()
-            onHeightChanged: requestPaint()
-
-            Component.onCompleted: {
-              requestPaint();
-            }
-
-            Connections {
-              target: Settings.data.desktopWidgets
-              function onGridSnapChanged() {
-                if (gridOverlayLoader.active) {
-                  gridOverlay.requestPaint();
-                }
-              }
-            }
-
-            Connections {
-              target: DesktopWidgetRegistry
-              function onEditModeChanged() {
-                if (gridOverlayLoader.active) {
-                  gridOverlay.requestPaint();
-                }
-              }
-            }
-          }
-        }
-
-        // Load widgets dynamically from per-monitor array
-        Repeater {
-          model: screenLoader.screenWidgets
-
-          delegate: Loader {
-            id: widgetLoader
-            // Bind to registeredWidgets and pluginReloadCounter to re-evaluate when plugins register/unregister
-            active: (modelData.id in root.registeredWidgets) && (root.pluginReloadCounter >= 0)
-
-            required property var modelData
-            required property int index
-            property var _maskRegion: null
-            readonly property bool _isPlugin: DesktopWidgetRegistry.isPluginWidget(modelData.id)
-
-            // All widgets use setSource() so that screen, widgetData, and
-            // widgetIndex are set as initial properties, available during
-            // Component.onCompleted. This prevents registration-key
-            // mismatches in widgets that build IDs from screen.name.
-            Component.onCompleted: _loadWidget()
-
-            onActiveChanged: {
-              if (active)
-                _loadWidget();
-            }
-
-            function _loadWidget() {
-              var widgetId = modelData.id;
-              var comp = root.registeredWidgets[widgetId];
-              if (!comp)
-                return;
-
-              var props = {
-                "screen": window.screen,
-                "widgetData": modelData,
-                "widgetIndex": index
-              };
-
-              if (_isPlugin) {
-                var pluginId = widgetId.replace("plugin:", "");
-                var api = PluginService.getPluginAPI(pluginId);
-                if (api)
-                  props.pluginApi = api;
-                setSource(comp.url, props);
-              } else {
-                // Core widgets: use explicit URL (inline Component.url
-                // returns the registry file, not the widget file)
-                var url = DesktopWidgetRegistry.widgetUrls[widgetId];
-                if (url)
-                  setSource(url, props);
-              }
-            }
-
-            onLoaded: {
-              if (item) {
-                item.parent = widgetsContainer;
-
-                // Create mask region so this widget receives mouse input
-                _maskRegion = maskRegionComponent.createObject(window);
-                _maskRegion.item = item;
-                var newRegions = window._maskRegions.slice();
-                newRegions.push(_maskRegion);
-                window._maskRegions = newRegions;
-              }
-            }
-
-            // Clean up mask region when widget unloads
-            onItemChanged: {
-              if (!item && _maskRegion) {
-                var region = _maskRegion;
-                _maskRegion = null;
-                window._maskRegions = window._maskRegions.filter(function (r) {
-                  return r !== region;
-                });
-                region.destroy();
-              }
-            }
-          }
-        }
-
-        // Edit mode controls panel
-        Rectangle {
-          id: editModeControlsPanel
-          visible: DesktopWidgetRegistry.editMode && Settings.data.desktopWidgets.enabled
-
-          readonly property string barPos: Settings.getBarPositionForScreen(window.screen?.name)
-          readonly property bool barFloating: Settings.data.bar.barType === "floating"
-          readonly property real barHeight: Style.getBarHeightForScreen(window.screen?.name)
-
-          readonly property int barOffsetTop: {
-            if (barPos !== "top")
-              return Style.marginM;
-            const floatMarginV = barFloating ? Math.ceil(Settings.data.bar.marginVertical) : 0;
-            return barHeight + floatMarginV + Style.marginM;
-          }
-          readonly property int barOffsetRight: {
-            if (barPos !== "right")
-              return Style.marginM;
-            const floatMarginH = barFloating ? Math.ceil(Settings.data.bar.marginHorizontal) : 0;
-            return barHeight + floatMarginH + Style.marginM;
+          onWidgetAdded: item => {
+            // Create mask region so this widget receives mouse input
+            var region = maskRegionComponent.createObject(window);
+            region.item = item;
+            window._maskRegions = window._maskRegions.concat([region]);
           }
 
-          // Internal state for drag tracking (session-only, resets on restart)
-          QtObject {
-            id: panelInternal
-            property bool isDragging: false
-            property real dragOffsetX: 0
-            property real dragOffsetY: 0
-            // Default position: top-right corner accounting for bar
-            property real baseX: widgetsContainer.width - editModeControlsPanel.width - editModeControlsPanel.barOffsetRight
-            property real baseY: editModeControlsPanel.barOffsetTop
-          }
-
-          // Reset position when bar position changes
-          Connections {
-            target: Settings.data.bar
-            function onPositionChanged() {
-              panelInternal.baseX = widgetsContainer.width - editModeControlsPanel.width - editModeControlsPanel.barOffsetRight;
-              panelInternal.baseY = editModeControlsPanel.barOffsetTop;
-            }
-          }
-
-          x: panelInternal.isDragging ? panelInternal.dragOffsetX : panelInternal.baseX
-          y: panelInternal.isDragging ? panelInternal.dragOffsetY : panelInternal.baseY
-
-          width: controlsLayout.implicitWidth + Style.margin2XL
-          height: controlsLayout.implicitHeight + Style.margin2XL
-
-          color: Qt.rgba(ShellColors.mSurface.r, ShellColors.mSurface.g, ShellColors.mSurface.b, 0.85)
-          radius: Style.radiusL
-          border {
-            width: Style.borderS
-            color: ShellColors.mOutline
-          }
-          z: 9999
-
-          // Drag area for relocating the panel
-          MouseArea {
-            id: dragArea
-            anchors.fill: parent
-            cursorShape: panelInternal.isDragging ? Qt.ClosedHandCursor : Qt.OpenHandCursor
-
-            property point pressPos: Qt.point(0, 0)
-
-            onPressed: mouse => {
-              pressPos = mapToItem(widgetsContainer, mouse.x, mouse.y);
-              panelInternal.dragOffsetX = editModeControlsPanel.x;
-              panelInternal.dragOffsetY = editModeControlsPanel.y;
-              panelInternal.isDragging = true;
-            }
-
-            onPositionChanged: mouse => {
-              if (panelInternal.isDragging && pressed) {
-                var currentPos = mapToItem(widgetsContainer, mouse.x, mouse.y);
-                var deltaX = currentPos.x - pressPos.x;
-                var deltaY = currentPos.y - pressPos.y;
-
-                var newX = panelInternal.baseX + deltaX;
-                var newY = panelInternal.baseY + deltaY;
-
-                // Boundary clamping
-                newX = Math.max(0, Math.min(newX, widgetsContainer.width - editModeControlsPanel.width));
-                newY = Math.max(0, Math.min(newY, widgetsContainer.height - editModeControlsPanel.height));
-
-                panelInternal.dragOffsetX = newX;
-                panelInternal.dragOffsetY = newY;
-              }
-            }
-
-            onReleased: {
-              if (panelInternal.isDragging) {
-                panelInternal.baseX = panelInternal.dragOffsetX;
-                panelInternal.baseY = panelInternal.dragOffsetY;
-                panelInternal.isDragging = false;
-              }
-            }
-
-            onCanceled: {
-              panelInternal.isDragging = false;
-            }
-          }
-
-          ColumnLayout {
-            id: controlsLayout
-            anchors {
-              fill: parent
-              margins: Style.marginXL
-            }
-            spacing: Style.marginL
-
-            RowLayout {
-              Layout.alignment: Qt.AlignRight
-              spacing: Style.marginS
-
-              NIconButton {
-                icon: "arrow-back-up"
-                tooltipText: I18n.tr("actions.undo-desktop-widget-change")
-                enabled: DesktopWidgetRegistry.canUndo
-                onClicked: DesktopWidgetRegistry.undo()
-              }
-
-              NIconButton {
-                icon: "arrow-forward-up"
-                tooltipText: I18n.tr("actions.redo-desktop-widget-change")
-                enabled: DesktopWidgetRegistry.canRedo
-                onClicked: DesktopWidgetRegistry.redo()
-              }
-
-              NIconButton {
-                id: addWidgetButton
-                icon: "layout-grid-add"
-                tooltipText: I18n.tr("tooltips.add-widget")
-                onClicked: {
-                  var popupMenuWindow = PanelService.getPopupMenuWindow(window.screen);
-                  if (popupMenuWindow) {
-                    // Build menu items from registry
-                    var items = [];
-                    var widgets = DesktopWidgetRegistry.widgets;
-                    for (var id in widgets) {
-                      items.push({
-                                   action: id,
-                                   text: DesktopWidgetRegistry.getWidgetDisplayName(id),
-                                   icon: "layout-grid-add"
-                                 });
-                    }
-                    var globalPos = addWidgetButton.mapToItem(null, 0, addWidgetButton.height + Style.marginS);
-                    popupMenuWindow.showDynamicContextMenu(items, globalPos.x, globalPos.y, function (widgetId) {
-                      addWidgetToCurrentScreen(widgetId);
-                      return false;
-                    });
-                  }
-                }
-              }
-
-              NIconButton {
-                icon: "grid-3x3"
-                visible: Settings.data.desktopWidgets.gridSnap
-                tooltipText: I18n.tr("panels.desktop-widgets.edit-mode-grid-snap-scale-label")
-                colorBg: Settings.data.desktopWidgets.gridSnapScale ? ShellColors.mPrimary : ShellColors.mSurfaceVariant
-                colorFg: Settings.data.desktopWidgets.gridSnapScale ? ShellColors.mOnPrimary : ShellColors.mPrimary
-                onClicked: Settings.data.desktopWidgets.gridSnapScale = !Settings.data.desktopWidgets.gridSnapScale
-              }
-
-              NIconButton {
-                icon: "grid-4x4"
-                tooltipText: I18n.tr("panels.desktop-widgets.edit-mode-grid-snap-label")
-                colorBg: Settings.data.desktopWidgets.gridSnap ? ShellColors.mPrimary : ShellColors.mSurfaceVariant
-                colorFg: Settings.data.desktopWidgets.gridSnap ? ShellColors.mOnPrimary : ShellColors.mPrimary
-                onClicked: Settings.data.desktopWidgets.gridSnap = !Settings.data.desktopWidgets.gridSnap
-              }
-
-              NIconButton {
-                icon: "settings"
-                tooltipText: I18n.tr("actions.open-settings")
-                onClicked: {
-                  SettingsPanelService.toggle(SettingsPanel.Tab.DesktopWidgets, -1, screenLoader.modelData);
-                }
-              }
-
-              NButton {
-                text: I18n.tr("panels.desktop-widgets.edit-mode-exit-button")
-                icon: "logout"
-                outlined: false
-                fontSize: Style.fontSizeS
-                iconSize: Style.fontSizeM
-                onClicked: DesktopWidgetRegistry.editMode = false
-              }
-            }
-
-            NText {
-              Layout.alignment: Qt.AlignRight
-              Layout.maximumWidth: 300 * Style.uiScaleRatio
-              text: I18n.tr("panels.desktop-widgets.edit-mode-controls-explanation")
-              pointSize: Style.fontSizeS
-              color: ShellColors.mOnSurfaceVariant
-              horizontalAlignment: Text.AlignRight
-              wrapMode: Text.WordWrap
-            }
+          onWidgetRemoved: item => {
+            var gone = window._maskRegions.filter(r => r.item === item);
+            window._maskRegions = window._maskRegions.filter(r => r.item !== item);
+            gone.forEach(r => r.destroy());
           }
         }
       }

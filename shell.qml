@@ -21,6 +21,7 @@ import qs.Modules.Background
 import qs.Modules.Bar
 import qs.Modules.Bubbles
 import qs.Modules.DesktopWidgets
+import qs.Modules.EditDesktop
 import qs.Modules.Dock
 import qs.Modules.MainScreen
 import qs.Modules.Notification
@@ -129,6 +130,7 @@ ShellRoot {
       }
 
       DesktopWidgets {}
+      EditDesktopWindow {}
       Bubbles {}
       AllScreens {}
       Dock {}

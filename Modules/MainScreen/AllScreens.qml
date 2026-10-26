@@ -137,11 +137,6 @@ Variants {
     // PopupMenuWindow manages its own visibility internally.
     Loader {
       active: {
-        // Desktop widgets edit mode needs popup window on ALL screens
-        if (DesktopWidgetRegistry.editMode && Settings.data.desktopWidgets.enabled) {
-          return true;
-        }
-
         // Normal bar-based condition
         if (!parent.windowLoaded || !parent.shouldBeActive)
           return false;

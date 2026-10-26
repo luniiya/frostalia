@@ -280,7 +280,8 @@ class WallpaperTests(unittest.TestCase):
     def test_only_theming_reads_the_wallpaper(self):
         users = {str(p.relative_to(ROOT)) for p in qml_files()
                  if "WallpaperService." in p.read_text(encoding="utf-8")}
-        self.assertEqual(users, {"shell.qml", "Services/Theming/AppThemeService.qml"})
+        # The Edit Desktop card shows a copy of the wallpaper (the daemon draws the real one)
+        self.assertEqual(users, {"shell.qml", "Services/Theming/AppThemeService.qml", "Modules/EditDesktop/EditDesktopWindow.qml"})
 
 
 class PerformanceModeTests(unittest.TestCase):

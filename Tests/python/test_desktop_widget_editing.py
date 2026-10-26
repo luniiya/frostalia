@@ -35,7 +35,7 @@ class DesktopWidgetEditingTests(unittest.TestCase):
         self.assertIn("!manipulatingWidget", source)
 
     def test_history_controls_and_shortcuts_are_available_in_both_editors(self):
-        for name in ("Modules/DesktopWidgets/DesktopWidgets.qml", "Modules/Panels/Settings/Tabs/DesktopWidgetsTab.qml"):
+        for name in ("Modules/EditDesktop/EditDesktopWindow.qml", "Modules/Panels/Settings/Tabs/DesktopWidgetsTab.qml"):
             source = (ROOT / name).read_text()
             with self.subTest(path=name):
                 self.assertIn('sequence: "Ctrl+Z"', source)
