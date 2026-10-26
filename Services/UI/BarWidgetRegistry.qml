@@ -96,7 +96,7 @@ Singleton {
                                     "hideWhenIdle": false
                                   },
                                   "Battery": {
-                                    "displayMode": "graphic-clean",
+                                    "displayMode": "liquid",
                                     "deviceNativePath": "__default__",
                                     "showPowerProfiles": false,
                                     "hideIfNotDetected": true,

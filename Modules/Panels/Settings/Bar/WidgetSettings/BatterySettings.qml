@@ -58,6 +58,10 @@ ColumnLayout {
     minimumWidth: 240
     model: [
       {
+        "key": "liquid",
+        "name": I18n.tr("bar.battery.display-mode-liquid")
+      },
+      {
         "key": "graphic",
         "name": I18n.tr("bar.battery.display-mode-graphic")
       },

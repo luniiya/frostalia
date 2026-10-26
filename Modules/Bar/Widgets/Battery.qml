@@ -3,6 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Services.UPower
+import "../../../Helpers/BatteryLiquid.js" as BatteryLiquid
 import qs.Commons
 import qs.Modules.Bar.Extras
 import qs.Services.Hardware
@@ -40,6 +41,8 @@ Item {
 
   readonly property string displayMode: widgetSettings.displayMode !== undefined ? widgetSettings.displayMode : widgetMetadata.displayMode
   readonly property bool useGraphicMode: displayMode === "graphic" || displayMode === "graphic-clean"
+  readonly property bool useLiquidMode: displayMode === "liquid"
+  readonly property bool useCapsuleMode: useGraphicMode || useLiquidMode
 
   readonly property bool hideIfNotDetected: widgetSettings.hideIfNotDetected !== undefined ? widgetSettings.hideIfNotDetected : widgetMetadata.hideIfNotDetected
   readonly property bool hideIfIdle: widgetSettings.hideIfIdle !== undefined ? widgetSettings.hideIfIdle : widgetMetadata.hideIfIdle
@@ -122,8 +125,8 @@ Item {
   visible: shouldShow
   opacity: shouldShow ? 1.0 : 0.0
 
-  implicitWidth: useGraphicMode ? capsule.width : pill.width
-  implicitHeight: useGraphicMode ? capsule.height : pill.height
+  implicitWidth: useLiquidMode ? liquidBox.width : (useGraphicMode ? capsule.width : pill.width)
+  implicitHeight: useLiquidMode ? liquidBox.height : (useGraphicMode ? capsule.height : pill.height)
 
   NPopupContextMenu {
     id: contextMenu
@@ -186,9 +189,38 @@ Item {
     textColor: graphicMouseArea.containsMouse ? ShellColors.mHover : ShellColors.mSurface
   }
 
+  // ==================== LIQUID MODE ====================
+
+  Item {
+    id: liquidBox
+    visible: root.useLiquidMode
+    anchors.centerIn: parent
+    readonly property real length: BatteryLiquid.containerLength(root.capsuleHeight)
+    width: root.isBarVertical ? root.capsuleHeight : length
+    height: root.isBarVertical ? length : root.capsuleHeight
+
+    NLiquidBattery {
+      anchors.fill: parent
+      radius: Math.min(Style.radiusL, Math.min(width, height) / 2)
+      percentage: root.percent
+      ready: root.isReady
+      charging: root.isCharging
+      backgroundColor: Style.widgetBackground(root.section, graphicMouseArea.containsMouse ? ShellColors.mHover : Style.capsuleColor)
+      liquidColor: BatteryLiquid.liquidColorRole(root.isReady, root.isLowBattery, root.isCriticalBattery) === "error" ? ShellColors.mError : ShellColors.mPrimary
+    }
+
+    Rectangle {
+      anchors.fill: parent
+      radius: Math.min(Style.radiusL, Math.min(width, height) / 2)
+      color: "transparent"
+      border.color: Style.widgetBorder(root.section, Style.capsuleBorderColor)
+      border.width: Style.capsuleBorderWidth
+    }
+  }
+
   MouseArea {
     id: graphicMouseArea
-    visible: root.useGraphicMode
+    visible: root.useCapsuleMode
     anchors.fill: parent
     hoverEnabled: true
     acceptedButtons: Qt.LeftButton | Qt.RightButton
@@ -206,7 +238,7 @@ Item {
     onClicked: mouse => {
       TooltipService.hide();
       if (mouse.button === Qt.RightButton) {
-        PanelService.showContextMenu(contextMenu, nBattery, screen);
+        PanelService.showContextMenu(contextMenu, root.useLiquidMode ? liquidBox : nBattery, screen);
       } else {
         toggleBatteryPanel();
       }
@@ -228,7 +260,7 @@ Item {
 
   BarPill {
     id: pill
-    visible: !root.useGraphicMode
+    visible: !root.useCapsuleMode
     screen: root.screen
     section: root.section
     oppositeDirection: BarService.getPillDirection(root)
