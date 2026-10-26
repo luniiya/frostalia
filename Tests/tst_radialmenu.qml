@@ -371,6 +371,64 @@ TestCase {
     compare(RadialMenu.iconFor(tree[2]), "apps");
   }
 
+  function test_expandItemsBuildsTheStyleFolderFromEveryStyle() {
+    const styles = UiStyles.choices();
+    const tree = RadialMenu.expandItems(RadialMenu.normalizeItems([
+                                                                    {
+                                                                      "action": "folder",
+                                                                      "children": [
+                                                                        {
+                                                                          "action": "uiStyles"
+                                                                        }
+                                                                      ]
+                                                                    }
+                                                                  ]), styles);
+    const folder = tree[0].children[0];
+    verify(RadialMenu.isFolder(folder));
+    compare(folder.labelKey, "radial-menu.actions.ui-styles");
+    compare(folder.icon, "palette");
+    compare(folder.children.length, styles.length);
+    for (let i = 0; i < styles.length; i++) {
+      compare(folder.children[i].action, "uiStyle");
+      compare(folder.children[i].arg, styles[i].key);
+      compare(RadialMenu.labelKeyFor(folder.children[i]), styles[i].labelKey);
+    }
+    // A new style shows up without touching the saved tree
+    const more = RadialMenu.expandItems([
+                                          {
+                                            "action": "uiStyles",
+                                            "label": "Looks",
+                                            "icon": "brush"
+                                          }
+                                        ], styles.concat([
+                                                           {
+                                                             "key": "future",
+                                                             "labelKey": "options.ui-style.future"
+                                                           }
+                                                         ]))[0];
+    compare(more.children.length, styles.length + 1);
+    compare(more.children[styles.length].arg, "future");
+    compare(more.label, "Looks");
+    compare(more.labelKey, "");
+    compare(more.icon, "brush");
+  }
+
+  function test_uiStyleItemsAreNamedAfterTheirStyle() {
+    compare(RadialMenu.labelKeyFor({
+                                     "action": "uiStyle",
+                                     "arg": "keycap"
+                                   }), "options.ui-style.keycap");
+    compare(RadialMenu.labelKeyFor({
+                                     "action": "uiStyle",
+                                     "arg": ""
+                                   }), "radial-menu.actions.ui-style");
+    compare(RadialMenu.labelKeyFor({
+                                     "action": "uiStyle",
+                                     "arg": "keycap",
+                                     "label": "Mine"
+                                   }), "");
+  }
+
   function test_everyActionHasLabelAndIcon() {
     const ids = RadialMenu.actionIds();
     verify(ids.indexOf("editDesktop") >= 0);

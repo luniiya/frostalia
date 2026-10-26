@@ -49,7 +49,8 @@ class RadialMenuTests(unittest.TestCase):
 
     def test_default_tree_covers_the_requested_actions(self):
         actions = [item["action"] for item in walk(self.defaults["items"])]
-        for action in ("editDesktop", "settings", "wallpaper", "lock", "sessionMenu", "folder", "app"):
+        for action in ("editDesktop", "settings", "wallpaper", "lock", "sessionMenu", "folder", "app",
+                       "uiStyles", "darkMode", "nightLight", "doNotDisturb"):
             self.assertIn(action, actions)
         # TOML has no null: every field is a string, folders always carry children
         for item in walk(self.defaults["items"]):
@@ -65,6 +66,22 @@ class RadialMenuTests(unittest.TestCase):
         settings_ui = (ROOT / "Modules/Panels/Settings/Tabs/DesktopWidgets/RadialMenuSettings.qml").read_text()
         keys |= set(re.findall(r'I18n\.tr\("(radial-menu\.[^"]+)"', settings_ui))
         for key in sorted(keys):
+            self.lookup(key)
+
+    def test_every_action_is_run_by_the_menu(self):
+        helper = (ROOT / "Helpers/RadialMenu.js").read_text()
+        block = helper[helper.index("var actions = {"):helper.index("};", helper.index("var actions = {"))]
+        menu = (ROOT / "Modules/RadialMenu/RadialMenu.qml").read_text()
+        for action in re.findall(r'^  "(\w+)": \{', block, re.M):
+            # Folders open rings; uiStyles is expanded into a folder of uiStyle items
+            if action not in ("folder", "uiStyles"):
+                self.assertIn(f'case "{action}":', menu, action)
+
+    def test_service_expands_the_style_folder_from_every_style(self):
+        service = (ROOT / "Services/UI/RadialMenuService.qml").read_text()
+        self.assertIn("RadialMenu.expandItems(RadialMenu.normalizeItems(Settings.data.radialMenu.items), UiStyles.choices())", service)
+        styles = (ROOT / "Helpers/UiStyles.js").read_text()
+        for key in re.findall(r'"labelKey": "(options\.ui-style\.[a-z]+)"', styles):
             self.lookup(key)
 
     def test_tree_round_trips_through_the_toml_store(self):

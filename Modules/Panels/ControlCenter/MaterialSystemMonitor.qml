@@ -14,6 +14,8 @@ Rectangle {
   Component.onCompleted: SystemStatService.registerComponent("material-control-center")
   Component.onDestruction: SystemStatService.unregisterComponent("material-control-center")
 
+  NKeycapCard {}
+
   RowLayout {
     id: stats
     anchors.fill: parent

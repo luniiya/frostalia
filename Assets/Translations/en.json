@@ -2171,16 +2171,23 @@
       "app": "App",
       "command": "Command",
       "control-center": "Control center",
+      "dark-mode": "Dark mode",
+      "do-not-disturb": "Do not disturb",
       "edit-desktop": "Edit desktop",
       "folder": "Folder",
       "launcher": "Launcher",
       "lock": "Lock",
+      "night-light": "Night light",
       "session-menu": "Power",
       "settings": "Settings",
+      "ui-style": "UI style",
+      "ui-styles": "UI styles",
       "wallpaper": "Wallpaper"
     },
     "items": {
-      "apps": "Apps"
+      "apps": "Apps",
+      "open-settings": "Open settings",
+      "settings": "Settings"
     },
     "settings": {
       "add-item": "Add item",
@@ -2198,6 +2205,7 @@
       "remove": "Remove",
       "reset": "Reset items",
       "title": "Radial menu",
+      "ui-style-placeholder": "Style, e.g. material or keycap",
       "wallpaper-placeholder": "Picker command (empty opens color settings)"
     }
   },

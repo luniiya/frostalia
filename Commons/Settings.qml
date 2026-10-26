@@ -871,11 +871,48 @@ Singleton {
           ]
         },
         {
-          "action": "settings",
+          "action": "folder",
           "label": "",
-          "labelKey": "",
-          "icon": "",
-          "arg": ""
+          "labelKey": "radial-menu.items.settings",
+          "icon": "settings",
+          "arg": "",
+          "children": [
+            {
+              "action": "settings",
+              "label": "",
+              "labelKey": "radial-menu.items.open-settings",
+              "icon": "",
+              "arg": ""
+            },
+            {
+              "action": "uiStyles",
+              "label": "",
+              "labelKey": "",
+              "icon": "",
+              "arg": ""
+            },
+            {
+              "action": "darkMode",
+              "label": "",
+              "labelKey": "",
+              "icon": "",
+              "arg": ""
+            },
+            {
+              "action": "nightLight",
+              "label": "",
+              "labelKey": "",
+              "icon": "",
+              "arg": ""
+            },
+            {
+              "action": "doNotDisturb",
+              "label": "",
+              "labelKey": "",
+              "icon": "",
+              "arg": ""
+            }
+          ]
         },
         {
           "action": "sessionMenu",

@@ -48,18 +48,18 @@ var definitions = {
   },
   // Keycap: bold sticker and keycap look. Every surface is an ink outline,
   // a thin cream ring, a fill and a hard shadow straight down; things pop in
-  // with an overshoot. Panels reuse the Caelestia surface views, drawn with
-  // keycap controls; bar widgets get their own faces from `barViews`.
+  // with an overshoot. Panels use the Material layouts, drawn with keycap
+  // controls; bar widgets get their own faces from `barViews`.
   "keycap": {
     "labelKey": "options.ui-style.keycap",
     "settingsDefaults": { "ui": { "fontDefault": "Google Sans Flex", "boxBorderEnabled": true, "boxBorderWidth": 2, "panelBackgroundOpacity": 1.0, "frostedGlass": false } },
     "views": {
-      "controlCenter": "Modules/Panels/ControlCenter/CaelestiaControlCenter.qml",
-      "mediaCard": "Modules/Cards/CaelestiaMediaCard.qml",
-      "mediaPlayer": "Modules/Panels/Media/CaelestiaMediaPlayerContent.qml",
-      "osd": "Modules/OSD/CaelestiaOsdContent.qml",
-      "notificationContent": "Modules/Notification/CaelestiaNotificationContent.qml",
-      "kdeConnectHome": "Modules/Panels/KdeConnect/CaelestiaKdeConnectHome.qml"
+      "controlCenter": "Modules/Panels/ControlCenter/MaterialControlCenter.qml",
+      "mediaCard": "Modules/Cards/MaterialMediaCard.qml",
+      "mediaPlayer": "Modules/Panels/Media/MaterialMediaPlayerContent.qml",
+      "osd": "Modules/OSD/MaterialOsdContent.qml",
+      "notificationContent": "Modules/Notification/MaterialNotificationContent.qml",
+      "kdeConnectHome": "Modules/Panels/KdeConnect/MaterialKdeConnectHome.qml"
     },
     // Bar widget faces, keyed by the name a bar widget passes as `faceView`.
     // "Plate" is the plain keycap used by widgets without a face of their own.
@@ -124,6 +124,12 @@ var definitions = {
         "handleRatio": 0.36,
         "handleInset": 4
       },
+      // Shapes of the Material panel layouts Keycap draws on
+      "buttonGroup": { "gap": 4, "innerRadius": 8 },
+      "expandable": { "gap": 4, "outerRadius": 22, "innerRadius": 6 },
+      "field": { "radius": 12, "focusBorderWidth": 2 },
+      "weather": { "radius": 22, "tileRadius": 18, "cookieLobes": 9, "cookieDepth": 0.1 },
+      "menu": { "radius": 14, "padding": 8 },
       "keycap": {
         // Hard shadow depth at rest and while pressed, and the hover lift (px at scale 1).
         "depth": 3,

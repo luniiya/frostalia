@@ -1,5 +1,8 @@
 import QtQuick
 import qs.Commons
+// Faces are only loaded by URL. Quickshell indexes the directories it reaches through
+// imports, so without this the faces can't use each other as types ("KeycapFace is not a type").
+import qs.Modules.Bar.Widgets.Keycap
 
 // Loads the active style's face for a bar widget (UiStyles `barViews`), or
 // nothing when the style keeps the shared look. A face only draws: the widget

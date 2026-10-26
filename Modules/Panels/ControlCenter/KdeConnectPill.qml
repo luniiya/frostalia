@@ -18,6 +18,8 @@ Rectangle {
   radius: height / 2
   color: ShellColors.mSurfaceVariant
 
+  NKeycapCard {}
+
   NMaterialStateLayer {
     hovered: pointer.containsMouse
     pressed: pointer.pressed

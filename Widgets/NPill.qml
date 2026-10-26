@@ -15,6 +15,8 @@ Rectangle {
   radius: height / 2
   color: ShellColors.mSurfaceVariant
 
+  NKeycapCard {}
+
   RowLayout {
     id: row
     anchors.centerIn: parent

@@ -391,13 +391,16 @@ TestCase {
     verify(toggle.handle < toggle.height);
   }
 
-  function test_keycapReusesSharedSurfacesWithoutMaterialHelpers() {
+  // Keycap is a skin over the Material layouts: same panel views and panel shapes, no glass
+  function test_keycapDrawsOnTheMaterialLayouts() {
     for (const surface of ["controlCenter", "mediaCard", "mediaPlayer", "osd", "notificationContent", "kdeConnectHome"])
-      compare(UiStyles.view("keycap", surface), UiStyles.view("caelestia", surface), surface);
+      compare(UiStyles.view("keycap", surface), UiStyles.view("material", surface), surface);
     compare(UiStyles.glass("keycap", true), null);
-    compare(UiStyles.fieldShape("keycap", true), null);
-    compare(UiStyles.expandableShape("keycap", true), null);
-    compare(UiStyles.buttonGroupRadii("keycap", 30, false, true, false), null);
+    verify(UiStyles.fieldShape("keycap", true) !== null);
+    verify(UiStyles.expandableShape("keycap", true) !== null);
+    verify(UiStyles.buttonGroupRadii("keycap", 30, false, true, false) !== null);
+    for (const token of ["buttonGroup", "expandable", "field", "weather", "menu"])
+      verify(UiStyles.tokens("keycap")[token] !== undefined, token);
   }
 
   function test_barViewsOnlyForKeycap() {

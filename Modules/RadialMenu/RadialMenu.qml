@@ -5,6 +5,7 @@ import "../../Helpers/BarContextMenu.js" as BarContextMenu
 import qs.Commons
 import qs.Modules.Panels.Settings
 import qs.Services.Compositor
+import qs.Services.System
 import qs.Services.UI
 
 // Fly-Pie style radial menu on the empty desktop. A transparent background-layer
@@ -126,6 +127,25 @@ Scope {
     case "command":
       if (item.arg)
         Quickshell.execDetached(["sh", "-c", item.arg]);
+      break;
+    // Quick settings, the same switches as the bar widgets
+    case "uiStyle":
+      if (item.arg)
+        Settings.setUiStyle(item.arg);
+      break;
+    case "darkMode":
+      Settings.data.colorSchemes.darkMode = !Settings.data.colorSchemes.darkMode;
+      break;
+    case "nightLight":
+      if (!ProgramCheckerService.wlsunsetAvailable) {
+        ToastService.showWarning(I18n.tr("common.night-light"), I18n.tr("toast.night-light.not-installed"));
+        break;
+      }
+      Settings.data.nightLight.forced = false;
+      Settings.data.nightLight.enabled = !Settings.data.nightLight.enabled;
+      break;
+    case "doNotDisturb":
+      NotificationService.doNotDisturb = !NotificationService.doNotDisturb;
       break;
     }
   }

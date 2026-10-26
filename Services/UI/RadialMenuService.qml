@@ -3,6 +3,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import "../../Helpers/RadialMenu.js" as RadialMenu
+import "../../Helpers/UiStyles.js" as UiStyles
 import qs.Commons
 
 // State of the desktop radial menu (right click on the empty desktop). The geometry and
@@ -33,7 +34,7 @@ Singleton {
       screen = null;
   }
 
-  readonly property var items: RadialMenu.normalizeItems(Settings.data.radialMenu.items)
+  readonly property var items: RadialMenu.expandItems(RadialMenu.normalizeItems(Settings.data.radialMenu.items), UiStyles.choices())
   readonly property var visual: RadialMenu.visual(Style.uiStyleTokens.radialMenu)
   readonly property real scale: Style.uiScaleRatio
 

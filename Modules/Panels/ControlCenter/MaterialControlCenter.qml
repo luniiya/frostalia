@@ -94,6 +94,7 @@ Item {
       implicitHeight: tiles.implicitHeight + Style.margin2S
       radius: Style.radiusM
       color: ShellColors.mSurfaceVariant
+      NKeycapCard {}
       ColumnLayout {
         id: tiles
         anchors.left: parent.left

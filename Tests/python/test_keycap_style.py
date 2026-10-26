@@ -18,6 +18,30 @@ def bar_views():
 
 
 class KeycapStyleTests(unittest.TestCase):
+    def test_material_cards_carry_the_keycap_skin(self):
+        # Keycap draws on the Material layouts; these cards get their outline, keyline and
+        # hard shadow from NKeycapCard, and must stay opaque under it.
+        for path in ("Modules/Panels/ControlCenter/MaterialTile.qml",
+                     "Modules/Panels/ControlCenter/MaterialSliders.qml",
+                     "Modules/Panels/ControlCenter/MaterialSystemMonitor.qml",
+                     "Modules/Panels/ControlCenter/MaterialControlCenter.qml",
+                     "Modules/Panels/ControlCenter/KdeConnectPill.qml",
+                     "Modules/Cards/MaterialMediaCard.qml",
+                     "Modules/Weather/WeatherSurface.qml",
+                     "Widgets/NPill.qml",
+                     "Widgets/NMaterialQuickSlider.qml"):
+            self.assertIn("NKeycapCard {}", (ROOT / path).read_text(), path)
+        weather = (ROOT / "Modules/Weather/WeatherSurface.qml").read_text()
+        self.assertIn("Style.keycapControls ? Qt.tint(", weather)
+        field = (ROOT / "Widgets/NFieldBackground.qml").read_text()
+        self.assertIn("color: Style.keycapControls ? (", field)
+
+    def test_face_directory_is_imported(self):
+        # Faces are only loaded by URL. Quickshell indexes the directories reached through
+        # imports, so without this import every face failed with "KeycapFace is not a type".
+        loader = (ROOT / "Widgets/NStyleFace.qml").read_text()
+        self.assertIn("import qs.Modules.Bar.Widgets.Keycap\n", loader)
+
     def test_registered_faces_exist(self):
         views = bar_views()
         self.assertIn("Plate", views)

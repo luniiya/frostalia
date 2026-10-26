@@ -18,9 +18,10 @@ Rectangle {
   readonly property var fieldShape: Style.getFieldShape(active, cornerRadius)
 
   radius: fieldShape ? fieldShape.radius : cornerRadius
-  color: fieldShape ? (hovered && !active ? Qt.alpha(ShellColors.mOnSurface, 0.12) : ShellColors.mTonalContainer) : fillColor
-  border.color: active ? activeBorderColor : (Style.keycapControls ? KeycapKit.ink : ShellColors.mOutline)
-  border.width: fieldShape ? fieldShape.borderWidth : (Style.keycapControls ? Style.keycapOutline : (outlined ? Style.borderS : 0))
+  // Keycap fields are opaque so the hard shadow below only shows under the bottom edge
+  color: Style.keycapControls ? (hovered && !active ? Qt.tint(ShellColors.mSurface, Qt.alpha(ShellColors.mPrimary, 0.08)) : ShellColors.mSurface) : (fieldShape ? (hovered && !active ? Qt.alpha(ShellColors.mOnSurface, 0.12) : ShellColors.mTonalContainer) : fillColor)
+  border.color: active ? (Style.keycapControls ? ShellColors.mPrimary : activeBorderColor) : (Style.keycapControls ? KeycapKit.ink : ShellColors.mOutline)
+  border.width: Style.keycapControls ? Style.keycapOutline : (fieldShape ? fieldShape.borderWidth : (outlined ? Style.borderS : 0))
 
   // Keycap: fields sit on a short hard shadow
   Rectangle {

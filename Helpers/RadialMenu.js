@@ -20,6 +20,12 @@ var actions = {
   "controlCenter": { "labelKey": "radial-menu.actions.control-center", "icon": "adjustments-horizontal", "arg": "" },
   "app": { "labelKey": "radial-menu.actions.app", "icon": "app-window", "arg": "app" },
   "command": { "labelKey": "radial-menu.actions.command", "icon": "terminal", "arg": "command" },
+  "uiStyle": { "labelKey": "radial-menu.actions.ui-style", "icon": "palette", "arg": "style" },
+  // Folder of every UI style, filled in when the menu opens (see expandItems)
+  "uiStyles": { "labelKey": "radial-menu.actions.ui-styles", "icon": "palette", "arg": "" },
+  "darkMode": { "labelKey": "radial-menu.actions.dark-mode", "icon": "sun-moon", "arg": "" },
+  "nightLight": { "labelKey": "radial-menu.actions.night-light", "icon": "moon", "arg": "" },
+  "doNotDisturb": { "labelKey": "radial-menu.actions.do-not-disturb", "icon": "bell-off", "arg": "" },
   "folder": { "labelKey": "radial-menu.actions.folder", "icon": "folder", "arg": "" }
 };
 
@@ -63,6 +69,33 @@ function normalizeItems(items, depth) {
   return result;
 }
 
+// Replace generated folders with their contents: each "uiStyles" item becomes a folder
+// with one "uiStyle" item per entry of `styles` ([{ key, labelKey }], UiStyles.choices()),
+// so styles added later show up without editing the saved tree.
+function expandItems(items, styles) {
+  return (items || []).map(item => {
+    if (item.action === "uiStyles") {
+      return {
+        "action": "folder",
+        "label": item.label,
+        "labelKey": item.label ? "" : actions.uiStyles.labelKey,
+        "icon": item.icon || actions.uiStyles.icon,
+        "arg": "",
+        "children": (styles || []).slice(0, maxItemsPerRing).map(style => ({
+                                                                         "action": "uiStyle",
+                                                                         "label": "",
+                                                                         "labelKey": style.labelKey || "",
+                                                                         "icon": "",
+                                                                         "arg": style.key
+                                                                       }))
+      };
+    }
+    if (isFolder(item))
+      return Object.assign({}, item, { "children": expandItems(item.children, styles) });
+    return item;
+  });
+}
+
 // The ring shown at `path` (indices from the root). Invalid paths give [].
 function itemsAt(items, path) {
   let ring = items || [];
@@ -92,6 +125,9 @@ function labelKeyFor(item) {
     return "";
   if (item.labelKey)
     return item.labelKey;
+  // A style item is named after its style (options.ui-style.<id>)
+  if (item.action === "uiStyle" && item.arg)
+    return "options.ui-style." + item.arg;
   const action = actions[item.action];
   return action && item.action !== "app" ? action.labelKey : "";
 }

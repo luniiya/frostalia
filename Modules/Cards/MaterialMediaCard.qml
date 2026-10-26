@@ -22,6 +22,8 @@ Rectangle {
   color: Qt.tint(ShellColors.mSurfaceVariant, Qt.alpha(ShellColors.mPrimary, 0.08))
   clip: true
 
+  NKeycapCard {}
+
   onNeedsSpectrumChanged: {
     if (needsSpectrum)
       SpectrumService.registerComponent(spectrumId);

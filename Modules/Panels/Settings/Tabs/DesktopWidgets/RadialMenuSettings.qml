@@ -40,6 +40,8 @@ ColumnLayout {
       return I18n.tr("radial-menu.settings.app-placeholder");
     if (action === "wallpaper")
       return I18n.tr("radial-menu.settings.wallpaper-placeholder");
+    if (action === "uiStyle")
+      return I18n.tr("radial-menu.settings.ui-style-placeholder");
     return I18n.tr("radial-menu.settings.command-placeholder");
   }
 
