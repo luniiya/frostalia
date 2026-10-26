@@ -37,7 +37,6 @@ TestCase {
                                  "width": 1000,
                                  "height": 800,
                                  "deadZone": 40,
-                                 "maxRadius": 150,
                                  "descendRadius": 110,
                                  "dragThreshold": 20,
                                  "reach": 130,
@@ -459,21 +458,26 @@ TestCase {
     compare(r.state, null);
   }
 
-  function test_clickOutsideCloses() {
+  function test_clickFarBeyondTheRingPicksByDirection() {
     const s = RadialMenu.release(RadialMenu.open(500, 400, opts), 500, 400, tree, opts).state;
-    compare(RadialMenu.move(s, 500, 100, tree, opts).hovered, -1);
-    const r = RadialMenu.click(s, 500, 100, tree, opts);
+    compare(RadialMenu.move(s, 500, 20, tree, opts).hovered, 0);
+    compare(RadialMenu.move(s, 990, 410, tree, opts).hovered, 1);
+    const r = RadialMenu.click(s, 500, 20, tree, opts);
     compare(r.state, null);
-    compare(r.activate, null);
+    compare(r.activate.action, "editDesktop");
   }
 
-  function test_clickFolderOpensAroundItemAndCenterGoesBack() {
+  function test_clickFolderOpensAtTheClickAndCenterGoesBack() {
     const s = RadialMenu.release(RadialMenu.open(500, 400, opts), 500, 400, tree, opts).state;
-    const opened = RadialMenu.click(s, 500, 480, tree, opts);
+    // Far below the ring, slightly off-axis: still the folder, opened where the click was
+    const opened = RadialMenu.click(s, 520, 600, tree, opts);
     compare(opened.state.path, [2]);
-    compare(opened.state.centers[1].x, 500);
-    compare(opened.state.centers[1].y, 490);
-    const back = RadialMenu.click(opened.state, 500, 490, tree, opts);
+    compare(opened.state.centers[1].x, 520);
+    compare(opened.state.centers[1].y, 600);
+    verify(!opened.state.held);
+    // The next click is measured from the new center: the second app is below it
+    compare(RadialMenu.click(opened.state, 520, 700, tree, opts).activate.arg, "firefox");
+    const back = RadialMenu.click(opened.state, 525, 605, tree, opts);
     compare(back.state.path.length, 0);
     compare(back.state.centers.length, 1);
     const closed = RadialMenu.click(back.state, 500, 400, tree, opts);
@@ -488,6 +492,33 @@ TestCase {
     const s = RadialMenu.open(500, 400, opts);
     compare(RadialMenu.pick(s, 3, tree, opts).activate.action, "lock");
     compare(RadialMenu.pick(s, 7, tree, opts).state, s);
+  }
+
+  function test_keyboardPickedFolderOpensAtItsAnchor() {
+    const s = RadialMenu.open(500, 400, opts);
+    const opened = RadialMenu.pick(s, 2, tree, opts).state;
+    compare(opened.path, [2]);
+    fuzzy(opened.centers[1].x, 500);
+    fuzzy(opened.centers[1].y, 490);
+  }
+
+  function test_trailLinksEachOpenedFolder() {
+    compare(RadialMenu.trail(null, tree), []);
+    const s = RadialMenu.release(RadialMenu.open(500, 400, opts), 500, 400, tree, opts).state;
+    compare(RadialMenu.trail(s, tree), []);
+    const opened = RadialMenu.click(s, 300, 650, tree, opts).state;
+    const links = RadialMenu.trail(opened, tree);
+    compare(links.length, 1);
+    compare(links[0].from, {
+              "x": 500,
+              "y": 400
+            });
+    compare(links[0].to, {
+              "x": 300,
+              "y": 650
+            });
+    compare(links[0].item.labelKey, "radial-menu.items.apps");
+    compare(RadialMenu.trail(RadialMenu.back(opened), tree), []);
   }
 
   function test_stateIsNotMutated() {

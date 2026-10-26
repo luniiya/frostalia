@@ -1,11 +1,15 @@
 import QtQuick
+import QtQuick.Shapes
 import Quickshell
 import Quickshell.Wayland
+import "../../Helpers/RadialMenu.js" as RadialLogic
 import qs.Commons
 import qs.Services.UI
+import qs.Widgets
 
-// Full-screen overlay holding the ring. Clicking outside the ring or Esc closes it;
-// the center (or right click, Backspace) goes up a level.
+// Full-screen overlay holding the ring. The whole screen is the click area: a click
+// picks the wedge in its direction and folders open where you clicked. The center (or
+// right click, Backspace) goes up a level; Esc and middle click close.
 PanelWindow {
   id: root
 
@@ -73,6 +77,76 @@ PanelWindow {
       onReleased: mouse => {
         if (RadialMenuService.held)
           RadialMenuService.pointerReleased(mouse.x, mouse.y);
+      }
+    }
+
+    // Trail back to the parent rings and the direction line to the pointer, under the ring
+    Item {
+      id: trail
+      anchors.fill: parent
+      opacity: RadialMenuService.progress
+
+      readonly property real s: RadialMenuService.scale
+      readonly property real nodeSize: 34 * s
+
+      Repeater {
+        model: RadialMenuService.trail
+
+        delegate: Item {
+          required property var modelData
+
+          Shape {
+            anchors.fill: parent
+            preferredRendererType: Shape.CurveRenderer
+            ShapePath {
+              strokeColor: Qt.alpha(ShellColors.mPrimary, 0.85)
+              strokeWidth: 4 * trail.s
+              capStyle: ShapePath.RoundCap
+              fillColor: "transparent"
+              startX: modelData.from.x
+              startY: modelData.from.y
+              PathLine {
+                x: modelData.to.x
+                y: modelData.to.y
+              }
+            }
+          }
+
+          // The folder picked on the parent ring, at the parent's center
+          Rectangle {
+            x: modelData.from.x - width / 2
+            y: modelData.from.y - height / 2
+            width: trail.nodeSize
+            height: trail.nodeSize
+            radius: width / 2
+            color: ShellColors.mPrimary
+
+            NIcon {
+              anchors.centerIn: parent
+              icon: RadialLogic.iconFor(modelData.item)
+              pointSize: Style.fontSizeM
+              color: ShellColors.mOnPrimary
+            }
+          }
+        }
+      }
+
+      Shape {
+        anchors.fill: parent
+        visible: RadialMenuService.active && RadialMenuService.hovered >= 0
+        preferredRendererType: Shape.CurveRenderer
+        ShapePath {
+          strokeColor: Qt.alpha(ShellColors.mPrimary, 0.5)
+          strokeWidth: 2 * trail.s
+          capStyle: ShapePath.RoundCap
+          fillColor: "transparent"
+          startX: RadialMenuService.center.x
+          startY: RadialMenuService.center.y
+          PathLine {
+            x: RadialMenuService.pointer.x
+            y: RadialMenuService.pointer.y
+          }
+        }
       }
     }
 

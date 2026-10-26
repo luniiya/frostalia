@@ -121,6 +121,21 @@ Item {
     }
   }
 
+  // Right click on any widget opens the desktop radial menu, so widgets (and plugins) can't
+  // bind it and invisible ones don't swallow it. Only takes the right button: left clicks,
+  // hover and wheel still reach the widgets below. Edit mode keeps right click for selecting.
+  MouseArea {
+    anchors.fill: parent
+    z: 100000
+    enabled: !root.editing
+    acceptedButtons: Qt.RightButton
+
+    onPressed: mouse => RadialMenuService.openAt(root.screen, mouse.x, mouse.y)
+    // The press grab stays here while the menu window is shown: feed the stroke through
+    onPositionChanged: mouse => RadialMenuService.pointerMoved(mouse.x, mouse.y)
+    onReleased: mouse => RadialMenuService.pointerReleased(mouse.x, mouse.y)
+  }
+
   // Guide lines of the snap in progress
   Repeater {
     model: root.guides

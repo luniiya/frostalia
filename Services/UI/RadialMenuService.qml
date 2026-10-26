@@ -46,6 +46,10 @@ Singleton {
   property int hovered: -1
   property bool held: false
   readonly property var ring: RadialMenu.itemsAt(items, path)
+  // Links back to the parent rings' centers, see RadialMenu.trail()
+  property var trail: []
+  // Last pointer position on the menu's screen
+  property point pointer: Qt.point(0, 0)
   readonly property string levelKey: path.join("/")
 
   function options() {
@@ -56,7 +60,6 @@ Singleton {
       "width": screen ? screen.width : 0,
       "height": screen ? screen.height : 0,
       "deadZone": dead,
-      "maxRadius": outer + Style.marginXL,
       "descendRadius": outer,
       "dragThreshold": dead * 0.5,
       "reach": outer + Math.max(v.shadowY, v.hoverLift) * scale,
@@ -70,6 +73,7 @@ Singleton {
     if (!next)
       return;
     path = next.path;
+    trail = RadialMenu.trail(next, items);
     center = next.centers[next.centers.length - 1];
     hovered = next.hovered;
     held = next.held;
@@ -79,6 +83,7 @@ Singleton {
     if (!Settings.data.radialMenu.enabled || items.length === 0)
       return;
     screen = targetScreen;
+    pointer = Qt.point(x, y);
     apply(RadialMenu.open(x, y, options()));
   }
 
@@ -89,6 +94,7 @@ Singleton {
   }
 
   function pointerMoved(x, y) {
+    pointer = Qt.point(x, y);
     if (menuState)
       apply(RadialMenu.move(menuState, x, y, items, options()));
   }
@@ -112,6 +118,7 @@ Singleton {
   }
 
   function clicked(x, y) {
+    pointer = Qt.point(x, y);
     if (menuState)
       finish(RadialMenu.click(menuState, x, y, items, options()));
   }

@@ -92,6 +92,17 @@ class RadialMenuTests(unittest.TestCase):
         settings_ui = (ROOT / "Modules/Panels/Settings/Tabs/DesktopWidgets/RadialMenuSettings.qml").read_text()
         self.assertIn('defaultValue: Settings.getDefaultValue("radialMenu.enabled")', settings_ui)
 
+    def test_right_click_on_desktop_widgets_opens_the_menu(self):
+        # Widget input regions sit above the background catcher; invisible widgets used to
+        # swallow the right click. The layer forwards it for every widget outside edit mode.
+        layer = (ROOT / "Modules/DesktopWidgets/DesktopWidgetsLayer.qml").read_text()
+        start = layer.index("MouseArea {")
+        catcher = layer[start:layer.index("\n  }\n", start)]
+        self.assertIn("enabled: !root.editing", catcher)
+        self.assertIn("acceptedButtons: Qt.RightButton", catcher)
+        self.assertIn("RadialMenuService.openAt(root.screen, mouse.x, mouse.y)", catcher)
+        self.assertIn("RadialMenuService.pointerReleased(mouse.x, mouse.y)", catcher)
+
     def test_search_index_lists_the_toggle(self):
         index = json.loads((ROOT / "Assets/settings-search-index.json").read_text())
         self.assertIn("radial-menu.settings.enabled-label", json.dumps(index))

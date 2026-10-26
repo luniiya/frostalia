@@ -201,9 +201,12 @@ function clampCenter(x, y, width, height, radius, margin) {
 //   held     the opening button is still down (gesture mode)
 //   dragged  the pointer left the drag threshold while held
 //
-// opts: { width, height, deadZone, maxRadius, descendRadius, dragThreshold, reach, margin }
-//   maxRadius     hover limit in click mode (outside closes)
+// Selection is by direction only: everything outside the dead zone belongs to a wedge,
+// however far from the ring, so the whole screen is the click area.
+//
+// opts: { width, height, deadZone, descendRadius, dragThreshold, reach, margin, itemRadius }
 //   descendRadius distance at which a held drag over a folder opens it
+//   itemRadius    where keyboard-picked folders open their sub-ring
 //   reach         ring extent used to keep centers on screen
 
 function open(x, y, opts) {
@@ -245,7 +248,7 @@ function back(state) {
 function hoverAt(state, x, y, items, opts) {
   const c = currentCenter(state);
   const ring = itemsAt(items, state.path);
-  return hitTest(x - c.x, y - c.y, ring.length, opts.deadZone, state.held ? Infinity : opts.maxRadius);
+  return hitTest(x - c.x, y - c.y, ring.length, opts.deadZone, Infinity);
 }
 
 // Pointer moved. While held, crossing descendRadius over a folder opens it centered
@@ -284,23 +287,20 @@ function release(state, x, y, items, opts) {
   return { "state": null, "activate": item };
 }
 
-// Click in click mode: center goes back (or closes at the root), a wedge picks its
-// item (folders open around the item), anywhere else closes.
+// Click in click mode: the center goes back (or closes at the root); anywhere else
+// picks the wedge in that direction, and a folder opens its sub-ring at the click.
 function click(state, x, y, items, opts) {
   const c = currentCenter(state);
-  const dx = x - c.x;
-  const dy = y - c.y;
-  if (Math.sqrt(dx * dx + dy * dy) < opts.deadZone)
-    return { "state": back(state), "activate": null };
   const ring = itemsAt(items, state.path);
-  const index = hitTest(dx, dy, ring.length, opts.deadZone, opts.maxRadius);
+  const index = hitTest(x - c.x, y - c.y, ring.length, opts.deadZone, Infinity);
   if (index < 0)
-    return { "state": null, "activate": null };
-  return pick(state, index, items, opts);
+    return { "state": back(state), "activate": null };
+  return pick(state, index, items, opts, { "x": x, "y": y });
 }
 
-// Pick wedge `index` of the current ring (click or keyboard)
-function pick(state, index, items, opts) {
+// Pick wedge `index` of the current ring. A folder opens at `at` (the click), or at the
+// item's anchor when picked from the keyboard.
+function pick(state, index, items, opts, at) {
   const ring = itemsAt(items, state.path);
   const item = ring[index];
   if (!item)
@@ -308,9 +308,26 @@ function pick(state, index, items, opts) {
   if (isFolder(item)) {
     const c = currentCenter(state);
     const p = polar(itemAngle(index, ring.length), opts.itemRadius || 0);
-    return { "state": descend(copy(state, { "held": false }), index, { "x": c.x + p.x, "y": c.y + p.y }, opts), "activate": null };
+    const center = at || { "x": c.x + p.x, "y": c.y + p.y };
+    return { "state": descend(copy(state, { "held": false }), index, center, opts), "activate": null };
   }
   return { "state": null, "activate": item };
+}
+
+// The way down to the current ring: one link per opened folder, from the parent ring's
+// center to the child's, with the folder item that was picked.
+function trail(state, items) {
+  if (!state)
+    return [];
+  const links = [];
+  for (let i = 0; i < state.path.length; i++) {
+    links.push({
+      "from": state.centers[i],
+      "to": state.centers[i + 1],
+      "item": itemsAt(items, state.path.slice(0, i))[state.path[i]] || null
+    });
+  }
+  return links;
 }
 
 // ---------------------------------------------------------------------------
