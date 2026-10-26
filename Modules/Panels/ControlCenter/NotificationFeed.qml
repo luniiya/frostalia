@@ -30,7 +30,7 @@ Rectangle {
       delegate: Rectangle {
         required property var model
         width: list.width
-        height: content.implicitHeight + (Style.materialControls ? Style.margin2M : 0)
+        height: content.implicitHeight + Style.margin2M
         radius: Style.radiusS
         color: Qt.tint(ShellColors.mSurfaceVariant, Qt.alpha(ShellColors.mOnSurface, 0.035))
         Loader {
@@ -39,7 +39,7 @@ Rectangle {
           anchors.left: parent.left
           anchors.right: parent.right
           anchors.top: parent.top
-          anchors.margins: Style.materialControls ? Style.marginM : 0
+          anchors.margins: Style.marginM
           onLoaded: {
             item.notificationData = Qt.binding(() => model);
             item.compact = true;

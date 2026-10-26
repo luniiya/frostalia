@@ -1,16 +1,15 @@
 import QtQuick
 import qs.Commons
 
-// Shared background for dropdown and context menus.
-// Material: opaque, slightly raised surface without an outline.
+// Shared background for dropdown and context menus: an opaque, slightly raised
+// surface without an outline, dressed by the style's Card skin.
 Rectangle {
-  property color fallbackColor: ShellColors.mSurfaceVariant
-  property real fallbackRadius: Style.iRadiusM
-
   readonly property var menu: Style.uiStyleTokens.menu
 
-  color: menu ? Qt.tint(ShellColors.mSurface, Qt.alpha(ShellColors.mOnSurface, 0.05)) : fallbackColor
+  color: Qt.tint(ShellColors.mSurface, Qt.alpha(ShellColors.mOnSurface, 0.05))
   border.color: ShellColors.mOutline
-  border.width: menu ? 0 : Style.borderS
-  radius: menu ? menu.radius : fallbackRadius
+  border.width: 0
+  radius: menu.radius
+
+  NStyleCard {}
 }

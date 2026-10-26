@@ -11,13 +11,12 @@ ColumnLayout {
   property real contentSpacing: Style.marginM
   property bool _userInteracted: false
 
-  // Material: connected expandable card; null keeps the Caelestia look.
+  // Connected expandable card: header and content are separate tonal pieces
   readonly property var _shape: Style.getExpandableShape(expanded)
-  readonly property bool _material: _shape !== null
-  property real _headerBottomRadius: _material ? _shape.headerBottom : Style.iRadiusM
+  property real _headerBottomRadius: _shape.headerBottom
 
   Behavior on _headerBottomRadius {
-    enabled: root._material && root._userInteracted
+    enabled: root._userInteracted
     NumberAnimation {
       duration: Style.animationFast
       easing.type: Easing.OutCubic
@@ -36,14 +35,12 @@ ColumnLayout {
   Rectangle {
     id: headerContainer
     Layout.fillWidth: true
-    Layout.preferredHeight: headerContent.implicitHeight + (root._material ? Style.margin2L : Style.margin2M)
-    color: root._material ? ShellColors.mTonalContainer : (root.expanded ? ShellColors.mSecondary : ShellColors.mPrimary)
-    topLeftRadius: root._material ? root._shape.headerTop : Style.iRadiusM
+    Layout.preferredHeight: headerContent.implicitHeight + Style.margin2L
+    color: ShellColors.mTonalContainer
+    topLeftRadius: root._shape.headerTop
     topRightRadius: topLeftRadius
     bottomLeftRadius: root._headerBottomRadius
     bottomRightRadius: root._headerBottomRadius
-    border.color: root.expanded ? ShellColors.mOnSecondary : ShellColors.mOutline
-    border.width: root._material ? 0 : Style.borderS
 
     // Smooth color transitions
     Behavior on color {
@@ -54,13 +51,6 @@ ColumnLayout {
       }
     }
 
-    Behavior on border.color {
-      enabled: root._userInteracted
-      ColorAnimation {
-        duration: Style.animationNormal
-        easing.type: Easing.OutCubic
-      }
-    }
 
     MouseArea {
       id: headerArea
@@ -96,40 +86,14 @@ ColumnLayout {
       id: headerContent
       anchors.fill: parent
       anchors.margins: Style.marginM
-      anchors.leftMargin: root._material ? Style.marginL : Style.marginM
+      anchors.leftMargin: Style.marginL
       spacing: Style.marginM
 
-      // Expand/collapse icon with rotation animation
-      NIcon {
-        id: chevronIcon
-        visible: !root._material
-        icon: "chevron-right"
-        pointSize: Style.fontSizeL
-        color: root.expanded ? ShellColors.mOnSecondary : ShellColors.mOnPrimary
-        Layout.alignment: Qt.AlignVCenter
-
-        rotation: root.expanded ? 90 : 0
-        Behavior on rotation {
-          enabled: root._userInteracted
-          NumberAnimation {
-            duration: Style.animationNormal
-            easing.type: Easing.OutCubic
-          }
-        }
-
-        Behavior on color {
-          enabled: root._userInteracted
-          ColorAnimation {
-            duration: Style.animationNormal
-          }
-        }
-      }
-
-      // Header text content: side by side, or headline over supporting text on Material
+      // Header text: headline over supporting text
       GridLayout {
         Layout.fillWidth: true
         Layout.alignment: Qt.AlignVCenter
-        columns: root._material ? 1 : 2
+        columns: 1
         columnSpacing: Style.marginL
         rowSpacing: Style.marginXXS
 
@@ -137,7 +101,7 @@ ColumnLayout {
           text: root.label
           pointSize: Style.fontSizeL
           font.weight: Style.fontWeightSemiBold
-          color: root._material ? ShellColors.mOnSurface : (root.expanded ? ShellColors.mOnSecondary : ShellColors.mOnPrimary)
+          color: ShellColors.mOnSurface
           wrapMode: Text.WordWrap
 
           Behavior on color {
@@ -152,11 +116,10 @@ ColumnLayout {
           text: root.description
           pointSize: Style.fontSizeS
           font.weight: Style.fontWeightRegular
-          color: root._material ? ShellColors.mOnSurfaceVariant : (root.expanded ? ShellColors.mOnSecondary : ShellColors.mOnPrimary)
+          color: ShellColors.mOnSurfaceVariant
           Layout.fillWidth: true
           wrapMode: Text.WordWrap
           visible: root.description !== ""
-          opacity: root._material ? 1 : 0.87
 
           Behavior on color {
             enabled: root._userInteracted
@@ -167,9 +130,8 @@ ColumnLayout {
         }
       }
 
-      // Material: trailing expand chip that turns primary when open
+      // Trailing expand chip that turns primary when open
       Rectangle {
-        visible: root._material
         Layout.alignment: Qt.AlignVCenter
         implicitWidth: Style.baseWidgetSize
         implicitHeight: Style.baseWidgetSize
@@ -207,16 +169,14 @@ ColumnLayout {
   Rectangle {
     id: contentContainer
     Layout.fillWidth: true
-    Layout.topMargin: root._material ? root._shape.gap : Style.marginS
+    Layout.topMargin: root._shape.gap
 
     visible: root.expanded
-    color: root._material ? ShellColors.mTonalContainer : ShellColors.mSurface
-    topLeftRadius: root._material ? root._shape.contentTop : Style.iRadiusL
+    color: ShellColors.mTonalContainer
+    topLeftRadius: root._shape.contentTop
     topRightRadius: topLeftRadius
-    bottomLeftRadius: root._material ? root._shape.contentBottom : Style.iRadiusL
+    bottomLeftRadius: root._shape.contentBottom
     bottomRightRadius: bottomLeftRadius
-    border.color: ShellColors.mOutline
-    border.width: root._material ? 0 : Style.borderS
 
     // Dynamic height based on content
     Layout.preferredHeight: expanded ? contentLayout.implicitHeight + Style.margin2L : 0

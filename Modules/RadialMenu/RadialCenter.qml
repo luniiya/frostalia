@@ -47,8 +47,8 @@ Item {
     height: root.size
     radius: root.cornerRadius
     color: Qt.alpha(root.ring.color(root.spec.colors.center), root.spec.fillOpacity)
-    border.width: root.spec.borderWidth > 0 ? root.spec.borderWidth * root.s : (root.spec.shape === "orbit" ? Math.max(1, Style.borderS) : 0)
-    border.color: root.spec.shape === "orbit" ? Qt.alpha(root.ring.color(root.spec.colors.track), 0.5) : root.ring.color(root.spec.colors.outline)
+    border.width: root.spec.borderWidth * root.s
+    border.color: root.ring.color(root.spec.colors.outline)
 
     // Keyline inside the outline (keycap stickers)
     Rectangle {

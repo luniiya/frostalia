@@ -49,7 +49,7 @@ NIconButton {
   tooltipDirection: BarService.getTooltipDirection(screenName, section)
   baseSize: Style.getCapsuleHeightForScreen(screenName, section)
   faceView: "Launcher"
-  faceDepth: KeycapKit.barDepth(screen?.name, section)
+  faceDepth: Style.barFaceDepth(screen?.name, section)
   applyUiScale: false
   customRadius: Style.radiusL
   colorBg: Style.widgetBackground(root.section, Style.capsuleColor)

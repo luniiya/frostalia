@@ -204,7 +204,7 @@ Item {
       anchors.fill: parent
       view: "SystemMonitor"
       host: root
-      depth: KeycapKit.barDepth(root.screen?.name, root.section)
+      depth: Style.barFaceDepth(root.screen?.name, root.section)
     }
 
     // Mini gauge component for compact mode, vertical gauge that fills from bottom

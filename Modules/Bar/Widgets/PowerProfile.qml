@@ -34,7 +34,7 @@ NIconButton {
 
   baseSize: Style.getCapsuleHeightForScreen(screen?.name, section)
   faceView: "PowerProfile"
-  faceDepth: KeycapKit.barDepth(screen?.name, section)
+  faceDepth: Style.barFaceDepth(screen?.name, section)
   faceData: ({
                "profile": PowerProfileService.profile === PowerProfile.Performance ? "performance" : (PowerProfileService.profile === PowerProfile.PowerSaver ? "power-saver" : "balanced")
              })

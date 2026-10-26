@@ -14,12 +14,12 @@ class UiStyleTests(unittest.TestCase):
         default = re.search(r'var defaultStyle = "([^"]+)"', helper).group(1)
         self.assertEqual(default, "material")
         self.assertEqual(defaults["ui"]["style"], default)
-        self.assertRegex(helper, r'"' + default + r'":\s*\{')
+        self.assertTrue((ROOT / "Styles" / default / "Definition.qml").is_file())
 
     def test_style_names_have_english_translations(self):
-        helper = (ROOT / "Helpers/UiStyles.js").read_text()
         english = json.loads((ROOT / "Assets/Translations/en.json").read_text())
-        keys = re.findall(r'"labelKey": "([^"]+)"', helper)
+        keys = [key for path in (ROOT / "Styles").glob("*/Definition.qml")
+                for key in re.findall(r'labelKey: "([^"]+)"', path.read_text())]
         self.assertTrue(keys)
         for key in keys:
             value = english
@@ -52,14 +52,15 @@ class UiStyleTests(unittest.TestCase):
             for section, key in re.findall(r"Settings.data.(general|ui).(\w+)", (tabs / name).read_text()):
                 self.assertIn(key, appearance[section], f"{name}: {section}.{key}")
 
+    def test_caelestia_is_gone(self):
+        self.assertEqual([], sorted(str(p.relative_to(ROOT)) for p in ROOT.rglob("Caelestia*.qml")))
+        self.assertNotIn("caelestia", (ROOT / "Helpers/UiStyles.js").read_text().lower())
+        self.assertNotIn('"orbit"', (ROOT / "Helpers/RadialMenu.js").read_text())
+
     def test_control_centers_share_the_notification_feed(self):
-        # Regression: Caelestia's control center showed Material notifications.
         folder = ROOT / "Modules/Panels/ControlCenter"
         self.assertFalse((folder / "MaterialNotificationFeed.qml").exists())
-        for name in ("CaelestiaControlCenter.qml", "MaterialControlCenter.qml"):
-            self.assertIn("NotificationFeed {}", (folder / name).read_text())
-        caelestia = (folder / "CaelestiaControlCenter.qml").read_text()
-        self.assertNotIn("Material", caelestia)
+        self.assertIn("NotificationFeed {}", (folder / "MaterialControlCenter.qml").read_text())
         feed = (folder / "NotificationFeed.qml").read_text()
         self.assertIn('Style.surfaceUrl("notificationContent")', feed)
         self.assertNotIn("MaterialNotificationContent", feed)
@@ -82,7 +83,7 @@ class UiStyleTests(unittest.TestCase):
         self.assertIn("FontService.availableFonts", tab)
         self.assertIn("FontService.monospaceFonts", tab)
         service = (ROOT / "Services/System/FontService.qml").read_text()
-        self.assertIn("for (const family of UiStyles.fontFamilies())", service)
+        self.assertIn("for (const family of UiStyles.fontFamilies(UiStyleRegistry.definitions))", service)
 
     def test_font_families_are_in_ui_and_scales_remain_general(self):
         index = json.loads((ROOT / "Assets/settings-search-index.json").read_text())

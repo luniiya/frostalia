@@ -79,10 +79,10 @@ class RadialMenuTests(unittest.TestCase):
 
     def test_service_expands_the_style_folder_from_every_style(self):
         service = (ROOT / "Services/UI/RadialMenuService.qml").read_text()
-        self.assertIn("RadialMenu.expandItems(RadialMenu.normalizeItems(Settings.data.radialMenu.items), UiStyles.choices())", service)
-        styles = (ROOT / "Helpers/UiStyles.js").read_text()
-        for key in re.findall(r'"labelKey": "(options\.ui-style\.[a-z]+)"', styles):
-            self.lookup(key)
+        self.assertIn("RadialMenu.expandItems(RadialMenu.normalizeItems(Settings.data.radialMenu.items), UiStyleRegistry.choices)", service)
+        for definition in (ROOT / "Styles").glob("*/Definition.qml"):
+            for key in re.findall(r'labelKey: "(options\.ui-style\.[a-z]+)"', definition.read_text()):
+                self.lookup(key)
 
     def test_tree_round_trips_through_the_toml_store(self):
         target = pathlib.Path(os.environ.get("CARGO_TARGET_DIR", ROOT / "Tools/settings/target"))

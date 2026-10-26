@@ -8,8 +8,8 @@ Shape {
   id: root
 
   property color fillColor: ShellColors.mPrimary
-  property int lobes: Style.uiStyleTokens.weather ? Style.uiStyleTokens.weather.cookieLobes : 0
-  readonly property real depth: Style.uiStyleTokens.weather ? Style.uiStyleTokens.weather.cookieDepth : 0
+  property int lobes: Style.uiStyleTokens.weather.cookieLobes
+  readonly property real depth: Style.uiStyleTokens.weather.cookieDepth
 
   preferredRendererType: Shape.CurveRenderer
 

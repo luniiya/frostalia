@@ -101,7 +101,7 @@ Item {
     hovered: root.hovered
     pressed: root.pressed
     faceData: root.faceData
-    depth: KeycapKit.barDepth(root.screen?.name, root.section)
+    depth: Style.barFaceDepth(root.screen?.name, root.section)
     width: pillBackground.width
     height: pillHeight
     anchors.verticalCenter: parent.verticalCenter

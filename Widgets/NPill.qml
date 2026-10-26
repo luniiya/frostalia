@@ -15,7 +15,7 @@ Rectangle {
   radius: height / 2
   color: ShellColors.mSurfaceVariant
 
-  NKeycapCard {}
+  NStyleCard {}
 
   RowLayout {
     id: row

@@ -664,7 +664,7 @@ Item {
       anchors.fill: parent
       view: "Taskbar"
       host: root
-      depth: KeycapKit.barDepth(root.screen?.name, root.section)
+      depth: Style.barFaceDepth(root.screen?.name, root.section)
     }
 
     GridLayout {

@@ -31,6 +31,8 @@ SmartPanel {
 
   // Filtered items - computed in panelContent where isPinned is available
   property var trayValues: []
+  // First icon of the drawer, for scripts that open its menu (IPC `state trayDrawerItemRect`)
+  property Item firstItem: null
 
   readonly property int itemCount: trayValues.length
   readonly property int columns: Math.max(1, Math.min(maxColumns, itemCount))
@@ -181,6 +183,14 @@ SmartPanel {
       Repeater {
         id: repeater
         model: root.trayValues
+        onItemAdded: (index, item) => {
+          if (index === 0)
+            root.firstItem = item;
+        }
+        onItemRemoved: (index, item) => {
+          if (item === root.firstItem)
+            root.firstItem = null;
+        }
 
         delegate: Item {
           width: root.cellSize

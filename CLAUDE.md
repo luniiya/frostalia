@@ -24,6 +24,17 @@ Scripts/dev/run-tests.sh -silent  # quieter; this is what the pre-commit hook ru
 
 `./install.sh` symlinks `~/.config/quickshell/frostalia` to this checkout and restarts the shell (`--no-restart`, `--copy` available). Check the log with `qs -c frostalia log`. Never `pkill -f "qs -c frostalia"`: it matches the invoking shell too. Use `qs -c frostalia kill`.
 
+Check visual changes with screenshots of the running shell, not by reading code:
+
+```sh
+Scripts/dev/ui-screenshots.sh                         # every surface, keycap + material, light + dark
+Scripts/dev/ui-screenshots.sh -s keycap -m dark -p "controlCenter launcher"
+```
+
+It opens each panel over IPC, captures it once `qs -c frostalia ipc call state panels` reports it settled (`open:<panel>` / `closed`, logic in `Helpers/PanelSettle.js`), restores the original style and color mode, and prints the output directory, which has one PNG per shot and a contact sheet per style and mode. Don't hand-roll `sleep` + `grim` sequences; add new surfaces to `SHOTS` in the script instead. For a style change, check every style, not just the one you edited. Panels on the top layer are hidden behind fullscreen windows, so leave none focused.
+
+Surfaces that only a click opens (context menus, the tray drawer and its menus, the dock on hover) are reached with `Scripts/dev/click.py X Y [left|right|middle|none]`, a virtual uinput mouse. Get positions from IPC rather than from pixels: `state widgetRect <WidgetId> <output>` for a bar widget and `state trayDrawerItemRect <output>` for the open tray drawer (logic in `Helpers/UiProbe.js`). The tray shots need an app in the tray drawer; `kdeconnect-indicator` will do. `settingsTabs` walks every settings tab and subtab listed in `SETTINGS_TABS` (a test keeps it in sync with the tab files), and `barMenus` right-clicks every widget on the bar. The lock screen is the external lock command (hyprlock), not part of the shell.
+
 ## Working in a diverging fork
 
 - Upstream compatibility is not a goal. Refactor, rename or delete upstream code when it makes the change cleaner; don't keep shims or dead options around for upstream parity, and don't worry about merge conflicts with upstream.

@@ -232,8 +232,6 @@ PopupWindow {
   NMenuSurface {
     id: menuBackground
     anchors.fill: parent
-    fallbackColor: ShellColors.mSurface
-    fallbackRadius: Style.radiusM
     opacity: root.visible ? 1.0 : 0.0
 
     Behavior on opacity {
@@ -281,7 +279,6 @@ PopupWindow {
             id: innerRect
             anchors.fill: parent
             highlighted: mouseArea.containsMouse
-            fallbackRadius: Style.radiusS
             opacity: modelData.enabled !== false ? 1.0 : 0.5
 
             RowLayout {

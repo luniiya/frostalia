@@ -96,7 +96,10 @@ Item {
     anchors.fill: parent
     anchors.margins: shadowPadding
     radius: Style.radiusL
-    color: Qt.alpha(ShellColors.mSurface, ShellColors.adaptiveOpacity(Settings.data.notifications.backgroundOpacity) || 1.0)
+    // Keycap cards stay opaque: their ink shadow would show through a translucent face
+    color: Style.opaqueSurfaces ? ShellColors.mSurface : Qt.alpha(ShellColors.mSurface, ShellColors.adaptiveOpacity(Settings.data.notifications.backgroundOpacity) || 1.0)
+
+    NStyleCard {}
 
     // Colored border based on type
     border.width: Style.borderS
@@ -149,6 +152,7 @@ Item {
   }
 
   NDropShadow {
+    visible: !Style.opaqueSurfaces
     anchors.fill: background
     source: background
     autoPaddingEnabled: true

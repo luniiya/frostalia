@@ -106,7 +106,7 @@ Item {
       host: root
       hovered: mouseArea.containsMouse
       pressed: mouseArea.pressed
-      depth: KeycapKit.barDepth(root.screen?.name, root.section)
+      depth: Style.barFaceDepth(root.screen?.name, root.section)
     }
 
     // When visualizer type or playback changes, shouldShow updates automatically

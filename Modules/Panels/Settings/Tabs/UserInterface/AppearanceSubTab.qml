@@ -153,7 +153,7 @@ ColumnLayout {
   }
 
   NToggle {
-    visible: Style.materialControls
+    visible: !!Style.uiStyleTokens.frostedGlass
     label: I18n.tr("panels.user-interface.frosted-glass-label")
     description: I18n.tr("panels.user-interface.frosted-glass-description")
     checked: Settings.data.ui.frostedGlass
@@ -163,7 +163,7 @@ ColumnLayout {
 
   NValueSlider {
     Layout.fillWidth: true
-    visible: Style.materialControls && Settings.data.ui.frostedGlass
+    visible: !!Style.uiStyleTokens.frostedGlass && Settings.data.ui.frostedGlass
     enabled: Style.glass !== null
     label: I18n.tr("panels.user-interface.glass-panel-opacity-label")
     description: I18n.tr("panels.user-interface.glass-panel-opacity-description")
@@ -179,7 +179,7 @@ ColumnLayout {
 
   NValueSlider {
     Layout.fillWidth: true
-    visible: Style.materialControls && Settings.data.ui.frostedGlass
+    visible: !!Style.uiStyleTokens.frostedGlass && Settings.data.ui.frostedGlass
     enabled: Style.glass !== null
     label: I18n.tr("panels.user-interface.glass-surface-opacity-label")
     description: I18n.tr("panels.user-interface.glass-surface-opacity-description")

@@ -5,7 +5,7 @@ TestCase {
   name: "StyleFonts"
 
   FontLoader {
-    id: caelestia
+    id: rubik
     source: Qt.resolvedUrl("../Assets/Fonts/rubik/Rubik.ttf")
   }
 
@@ -15,9 +15,9 @@ TestCase {
   }
 
   function test_bundledFamiliesAreDistinctAndAvailable() {
-    tryCompare(caelestia, "status", FontLoader.Ready);
+    tryCompare(rubik, "status", FontLoader.Ready);
     tryCompare(material, "status", FontLoader.Ready);
-    compare(caelestia.name, "Rubik");
+    compare(rubik.name, "Rubik");
     compare(material.name, "Roboto");
     verify(Qt.fontFamilies().indexOf("Rubik") !== -1);
     verify(Qt.fontFamilies().indexOf("Roboto") !== -1);

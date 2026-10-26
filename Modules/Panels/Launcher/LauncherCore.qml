@@ -4,14 +4,19 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Widgets
 import "Helpers/LauncherNavigation.js" as LauncherNav
+import "../../../Helpers/LauncherView.js" as LauncherView
 
 import "Providers"
 import qs.Commons
+import qs.Services.Compositor
 import qs.Services.Keyboard
+import qs.Services.System
 import qs.Services.UI
 import qs.Widgets
 
-// Core launcher logic and UI - shared between SmartPanel (Launcher.qml) and overlay (LauncherOverlayWindow.qml)
+// Launcher state, providers and keyboard handling, shared between SmartPanel
+// (Launcher.qml) and the overlay (LauncherOverlayWindow.qml). The look comes
+// from the per-style view loaded at the bottom of this file.
 Rectangle {
   id: root
   color: "transparent"
@@ -27,7 +32,7 @@ Rectangle {
   }
 
   // Expose for preview panel positioning
-  readonly property var resultsView: resultsSwapView.item
+  readonly property var resultsView: view ? view.resultsView : null
 
   // State
   property string searchText: ""
@@ -131,11 +136,112 @@ Rectangle {
 
     return base;
   }
-  readonly property int listPanelWidth: Math.round(500 * Style.uiScaleRatio)
-  readonly property int gridContentWidth: listPanelWidth - Style.margin2XS
-  readonly property int gridCellSize: Math.floor((gridContentWidth - ((targetGridColumns - 1) * Style.marginS)) / targetGridColumns)
-
   readonly property int gridColumns: targetGridColumns
+
+  // App menu modes (apps, windows, clipboard, ...) and the query typed after
+  // the mode's command prefix.
+  readonly property var modes: LauncherView.availableModes(Settings.data.appLauncher.enableClipboardHistory)
+  readonly property var splitSearch: LauncherView.splitQuery(searchText)
+  readonly property string modeId: splitSearch.mode
+  readonly property string queryText: splitSearch.query
+  readonly property bool searching: searchText.trim() !== "" && (modeId === "apps" || queryText.trim() !== "")
+  // Browsing the alphabetical app list: letter headings make sense.
+  readonly property bool browsingApps: modeId === "apps" && searchText === "" && !isGridView
+  // The best match gets a large card while searching apps in the list view.
+  readonly property bool showTopHit: searchText.trim() !== "" && !activeProvider && !isGridView && results.length > 0
+
+  readonly property int selectedCategoryIndex: showProviderCategories ? providerCategories.indexOf(currentProvider.selectedCategory) : -1
+  readonly property string selectedCategoryName: selectedCategoryIndex >= 0 ? categoryName(providerCategories[selectedCategoryIndex]) : ""
+  // Big title above the results.
+  readonly property string headline: {
+    if (searching)
+      return I18n.tr("launcher.view.results");
+    if (selectedCategoryName)
+      return selectedCategoryName;
+    return I18n.tr(LauncherView.modeById(modeId).labelKey);
+  }
+
+  readonly property var footer: LauncherView.footerState(results.length, queryText.trim(), currentProvider && currentProvider.emptyBrowsingMessage ? currentProvider.emptyBrowsingMessage : "")
+  readonly property string statusText: {
+    if (footer.kind === "count")
+      return I18n.trp("common.result-count", footer.count);
+    if (footer.kind === "empty")
+      return I18n.tr("common.no-results");
+    if (footer.kind === "message")
+      return currentProvider.emptyBrowsingMessage;
+    return "";
+  }
+
+  function setMode(id) {
+    if (id === modeId)
+      return;
+    searchText = LauncherView.joinQuery(id, "");
+    focusSearchInput();
+  }
+
+  function setQuery(text) {
+    searchText = LauncherView.joinQuery(modeId, text);
+  }
+
+  function categoryIcon(category) {
+    const icons = currentProvider ? currentProvider.categoryIcons : null;
+    return icons ? (icons[category] || "star") : "star";
+  }
+
+  function categoryName(category) {
+    return currentProvider && currentProvider.getCategoryName ? currentProvider.getCategoryName(category) : category;
+  }
+
+  function itemActions(item) {
+    const provider = item ? (item.provider || currentProvider) : null;
+    return provider && provider.getItemActions ? provider.getItemActions(item) : [];
+  }
+
+  function isPinned(item) {
+    const provider = item ? item.provider : null;
+    return !!(item && item.appId && provider && provider.isAppPinned && provider.isAppPinned({
+                                                                                               "id": item.appId
+                                                                                             }));
+  }
+
+  function selectIndex(index) {
+    selectedIndex = index;
+  }
+
+  function activateIndex(index) {
+    selectedIndex = index;
+    activate();
+  }
+
+  function toggleViewMode() {
+    Settings.data.appLauncher.viewMode = Settings.data.appLauncher.viewMode === "grid" ? "list" : "grid";
+  }
+
+  // App menu footer actions
+  readonly property string userName: HostService.displayName
+  readonly property string hostName: HostService.hostName
+  readonly property string avatarPath: Settings.preprocessPath(Settings.data.general.avatarImage)
+
+  function openSettings() {
+    close();
+    SettingsPanelService.openHome();
+  }
+
+  function lockSession() {
+    closeImmediately();
+    Qt.callLater(() => CompositorService.lock());
+  }
+
+  function openSessionMenu() {
+    const s = screen;
+    close();
+    Qt.callLater(() => PanelService.getPanel("sessionMenuPanel", s)?.open());
+  }
+
+  // Top of the selected entry in `target` coordinates (for the preview card).
+  function selectedRowTop(target) {
+    return view && view.selectedRowTop ? view.selectedRowTop(target) : null;
+  }
 
   // Check if current provider allows wrap navigation (default true)
   readonly property bool allowWrapNavigation: {
@@ -189,8 +295,8 @@ Rectangle {
   function onClosed() {
     searchText = "";
     ignoreMouseHover = true;
-    if (resultsSwapView)
-      resultsSwapView.resetVisuals();
+    if (view && view.resetVisuals)
+      view.resetVisuals();
     for (let provider of providers) {
       if (provider.onClosed)
         provider.onClosed();
@@ -207,7 +313,6 @@ Rectangle {
       return false;
 
     currentProvider.selectCategory(categoryList[tabIndex]);
-    categoryTabs.currentIndex = tabIndex;
     return true;
   }
 
@@ -223,14 +328,13 @@ Rectangle {
     if (tabIndex === currentIdx)
       return;
 
-    const canAnimate = !animationsDisabled && resultsSwapView.width > 0 && resultsSwapView.height > 0;
-    if (!canAnimate) {
+    if (animationsDisabled || !view || !view.swapResults) {
       applyCategorySelection(tabIndex, cats);
       return;
     }
 
     const direction = tabIndex > currentIdx ? 1 : -1;
-    resultsSwapView.swap(direction, () => applyCategorySelection(tabIndex, providerCategories));
+    view.swapResults(direction, () => applyCategorySelection(tabIndex, providerCategories));
   }
 
   // Public API
@@ -239,9 +343,8 @@ Rectangle {
   }
 
   function focusSearchInput() {
-    if (searchInput.inputItem) {
-      searchInput.inputItem.forceActiveFocus();
-    }
+    if (view && view.focusSearch)
+      view.focusSearch();
   }
 
   // Provider registration
@@ -481,14 +584,27 @@ Rectangle {
       }
     }
 
+    // Backspace on an empty query leaves the current mode
+    if (event.key === Qt.Key_Backspace && modeId !== "apps" && queryText === "") {
+      setMode("apps");
+      event.accepted = true;
+      return;
+    }
+
+    // Ctrl+Tab walks through the app menu modes
+    if ((event.key === Qt.Key_Tab || event.key === Qt.Key_Backtab) && (event.modifiers & Qt.ControlModifier)) {
+      const ids = modes.map(m => m.id);
+      const step = event.key === Qt.Key_Backtab || (event.modifiers & Qt.ShiftModifier) ? -1 : 1;
+      setMode(ids[LauncherView.cycleIndex(ids.indexOf(modeId), step, ids.length)]);
+      event.accepted = true;
+      return;
+    }
+
     // Static bindings
     switch (event.key) {
     case Qt.Key_Tab:
       if (showProviderCategories) {
-        var cats = providerCategories;
-        var idx = cats.indexOf(currentProvider.selectedCategory);
-        var nextIdx = (idx + 1) % cats.length;
-        selectCategoryWithSlide(nextIdx);
+        selectCategoryWithSlide(LauncherView.cycleIndex(selectedCategoryIndex, 1, providerCategories.length));
       } else {
         selectNextWrapped();
       }
@@ -496,10 +612,7 @@ Rectangle {
       break;
     case Qt.Key_Backtab:
       if (showProviderCategories) {
-        var cats2 = providerCategories;
-        var idx2 = cats2.indexOf(currentProvider.selectedCategory);
-        var prevIdx = ((idx2 - 1) % cats2.length + cats2.length) % cats2.length;
-        selectCategoryWithSlide(prevIdx);
+        selectCategoryWithSlide(LauncherView.cycleIndex(selectedCategoryIndex, -1, providerCategories.length));
       } else {
         selectPreviousWrapped();
       }
@@ -603,13 +716,21 @@ Rectangle {
   }
 
   // ==================== UI Content ====================
+  // The per-style view (Helpers/UiStyles.js "launcher") draws everything;
+  // it reads state from and calls back into this core.
 
-  opacity: resultsReady ? 1.0 : 0.0
+  readonly property var view: launcherView.item
 
-  Behavior on opacity {
-    NumberAnimation {
-      duration: Style.animationFast
-      easing.type: Easing.OutCirc
+  NStyleView {
+    id: launcherView
+    anchors.fill: parent
+    surface: "launcher"
+    viewProperties: ({
+                       "launcher": root
+                     })
+    onLoaded: {
+      if (root.isOpen)
+        root.focusSearchInput();
     }
   }
 
@@ -635,274 +756,6 @@ Rectangle {
         root.ignoreMouseHover = false;
         root.globalLastMouseX = point.position.x;
         root.globalLastMouseY = point.position.y;
-      }
-    }
-  }
-
-  ColumnLayout {
-    anchors.fill: parent
-    anchors.topMargin: Style.marginL
-    anchors.bottomMargin: Style.marginL
-    spacing: Style.marginL
-
-    RowLayout {
-      Layout.fillWidth: true
-      Layout.leftMargin: Style.marginL
-      Layout.rightMargin: Style.marginL
-      spacing: Style.marginS
-
-      NTextInput {
-        id: searchInput
-        Layout.fillWidth: true
-        radius: Style.iRadiusM
-        text: root.searchText
-        placeholderText: I18n.tr("placeholders.search-launcher")
-        fontSize: Style.fontSizeM
-        onTextChanged: root.searchText = text
-
-        Component.onCompleted: {
-          if (searchInput.inputItem) {
-            searchInput.inputItem.forceActiveFocus();
-            searchInput.inputItem.Keys.onPressed.connect(function (event) {
-              root.handleKeyPress(event);
-            });
-          }
-        }
-      }
-
-      NIconButton {
-        visible: root.showLayoutToggle
-        icon: Settings.data.appLauncher.viewMode === "grid" ? "layout-list" : "layout-grid"
-        tooltipText: Settings.data.appLauncher.viewMode === "grid" ? I18n.tr("tooltips.list-view") : I18n.tr("tooltips.grid-view")
-        customRadius: Style.iRadiusM
-        Layout.preferredWidth: searchInput.height
-        Layout.preferredHeight: searchInput.height
-        onClicked: Settings.data.appLauncher.viewMode = Settings.data.appLauncher.viewMode === "grid" ? "list" : "grid"
-      }
-    }
-
-    // Unified category tabs (works with any provider that has categories)
-    NTabBar {
-      id: categoryTabs
-      visible: root.showProviderCategories
-      Layout.fillWidth: true
-      Layout.leftMargin: Style.marginL
-      Layout.rightMargin: Style.marginL
-      margins: 0
-      border.color: Style.boxBorderColor
-      border.width: Style.boxBorderWidth
-
-      property int computedCurrentIndex: visible && root.providerCategories.length > 0 ? root.providerCategories.indexOf(root.currentProvider.selectedCategory) : 0
-      currentIndex: computedCurrentIndex
-
-      Repeater {
-        model: root.providerCategories
-        NTabButton {
-          required property string modelData
-          required property int index
-          icon: root.currentProvider.categoryIcons ? (root.currentProvider.categoryIcons[modelData] || "star") : "star"
-          tooltipText: root.currentProvider.getCategoryName ? root.currentProvider.getCategoryName(modelData) : modelData
-          tabIndex: index
-          checked: categoryTabs.currentIndex === index
-          onClicked: root.selectCategoryWithSlide(index)
-        }
-      }
-    }
-
-    // Results view
-    NSlideSwapView {
-      id: resultsSwapView
-      Layout.fillWidth: true
-      Layout.leftMargin: Style.marginL
-      Layout.rightMargin: Style.marginL
-      Layout.fillHeight: true
-      animationsEnabled: !root.animationsDisabled
-      sourceComponent: root.isSingleView ? singleViewComponent : (root.isGridView ? gridViewComponent : listViewComponent)
-    }
-
-    // --------------------------
-    // LIST VIEW
-    Component {
-      id: listViewComponent
-      NListView {
-        id: resultsList
-
-        horizontalPolicy: ScrollBar.AlwaysOff
-        verticalPolicy: ScrollBar.AlwaysOff
-        reserveScrollbarSpace: false
-        gradientColor: Style.panelOpacity < 1 ? "transparent" : ShellColors.mSurface
-        wheelScrollMultiplier: 4.0
-
-        width: parent.width
-        height: parent.height
-        spacing: Style.marginS
-        model: root.results
-        currentIndex: root.selectedIndex
-        cacheBuffer: resultsList.height * 2
-        interactive: !Settings.data.appLauncher.ignoreMouseInput
-        onCurrentIndexChanged: {
-          cancelFlick();
-          if (currentIndex >= 0) {
-            positionViewAtIndex(currentIndex, ListView.Contain);
-          }
-        }
-        onModelChanged: {}
-
-        delegate: LauncherListDelegate {
-          launcher: root
-        }
-      }
-    }
-
-    // --------------------------
-    // SINGLE ITEM VIEW
-    Component {
-      id: singleViewComponent
-
-      Item {
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-
-        NBox {
-          anchors.fill: parent
-          color: ShellColors.mSurfaceVariant
-          forceOpaque: true
-          Layout.fillWidth: true
-          Layout.fillHeight: true
-
-          ColumnLayout {
-            anchors.fill: parent
-            anchors.margins: Style.marginL
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-
-            Item {
-              Layout.alignment: Qt.AlignTop | Qt.AlignLeft
-              NText {
-                text: root.results.length > 0 ? root.results[0].name : ""
-                pointSize: Style.fontSizeL
-                font.weight: Font.Bold
-                color: ShellColors.mPrimary
-              }
-            }
-
-            NScrollView {
-              id: descriptionScrollView
-              Layout.alignment: Qt.AlignTop | Qt.AlignLeft
-              Layout.topMargin: Style.fontSizeL + Style.marginXL
-              Layout.fillWidth: true
-              Layout.fillHeight: true
-              horizontalPolicy: ScrollBar.AlwaysOff
-              reserveScrollbarSpace: false
-
-              NText {
-                width: descriptionScrollView.availableWidth
-                text: root.results.length > 0 ? root.results[0].description : ""
-                pointSize: Style.fontSizeM
-                font.weight: Font.Bold
-                color: ShellColors.mOnSurface
-                horizontalAlignment: Text.AlignHLeft
-                verticalAlignment: Text.AlignTop
-                wrapMode: Text.Wrap
-                markdownTextEnabled: true
-              }
-            }
-          }
-        }
-      }
-    }
-
-    // // --------------------------
-    // GRID VIEW
-    Component {
-      id: gridViewComponent
-      NGridView {
-        id: resultsGrid
-
-        horizontalPolicy: ScrollBar.AlwaysOff
-        verticalPolicy: ScrollBar.AlwaysOff
-        reserveScrollbarSpace: false
-        gradientColor: Style.panelOpacity < 1 ? "transparent" : ShellColors.mSurface
-        wheelScrollMultiplier: 4.0
-        trackedSelectionIndex: root.selectedIndex
-
-        width: parent.width
-        height: parent.height
-        cellWidth: parent.width / root.targetGridColumns
-        cellHeight: {
-          var cellWidth = parent.width / root.targetGridColumns;
-          // Use provider's preferred ratio if available
-          if (root.currentProvider && root.currentProvider.preferredGridCellRatio) {
-            return cellWidth * root.currentProvider.preferredGridCellRatio;
-          }
-          return cellWidth;
-        }
-        leftMargin: 0
-        rightMargin: 0
-        topMargin: 0
-        bottomMargin: 0
-        model: root.results
-        cacheBuffer: resultsGrid.height * 2
-        keyNavigationEnabled: false
-        focus: false
-        interactive: !Settings.data.appLauncher.ignoreMouseInput
-
-        // Completely disable GridView key handling
-        Keys.enabled: false
-
-        // Handle scrolling to show selected item when it changes
-        Connections {
-          target: root
-          enabled: root.isGridView
-          function onSelectedIndexChanged() {
-            if (!root.isGridView || root.selectedIndex < 0 || !resultsGrid) {
-              return;
-            }
-
-            Qt.callLater(() => {
-              if (root.isGridView && resultsGrid && resultsGrid.cancelFlick) {
-                resultsGrid.cancelFlick();
-                resultsGrid.positionViewAtIndex(root.selectedIndex, GridView.Contain);
-              }
-            });
-          }
-        }
-
-        delegate: LauncherGridDelegate {
-          launcher: root
-        }
-      }
-    }
-
-    ColumnLayout {
-      Layout.leftMargin: Style.marginL
-      Layout.rightMargin: Style.marginL
-
-      NDivider {
-        Layout.fillWidth: true
-        Layout.bottomMargin: Style.marginS
-      }
-
-      NText {
-        Layout.fillWidth: true
-        text: {
-          if (root.results.length === 0) {
-            if (root.searchText) {
-              return I18n.tr("common.no-results");
-            }
-            // Use provider's empty browsing message if available
-            var provider = root.currentProvider;
-            if (provider && provider.emptyBrowsingMessage) {
-              return provider.emptyBrowsingMessage;
-            }
-            return "";
-          }
-          var prefix = root.activeProvider && root.activeProvider.name ? root.activeProvider.name + ": " : "";
-          return prefix + I18n.trp("common.result-count", root.results.length);
-        }
-        pointSize: Style.fontSizeXS
-        color: ShellColors.mOnSurfaceVariant
-        horizontalAlignment: Text.AlignCenter
       }
     }
   }

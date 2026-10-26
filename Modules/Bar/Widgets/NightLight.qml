@@ -36,7 +36,7 @@ NIconButton {
 
   baseSize: Style.getCapsuleHeightForScreen(screen?.name, section)
   faceView: "NightLight"
-  faceDepth: KeycapKit.barDepth(screen?.name, section)
+  faceDepth: Style.barFaceDepth(screen?.name, section)
   faceData: ({
                "enabled": Settings.data.nightLight.enabled
              })

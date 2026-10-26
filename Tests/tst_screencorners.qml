@@ -6,6 +6,13 @@ import "../Helpers/UiStyles.js" as UiStyles
 TestCase {
   name: "ScreenCorners"
 
+  // The real style folders (Styles/<id>/Definition.qml)
+  readonly property var styles: UiStyles.loadAll(Qt.resolvedUrl("../Styles"), ["material", "keycap"])
+
+  function tokens(id) {
+    return UiStyles.definition(styles, id).tokens;
+  }
+
   function test_radius_data() {
     return [
           {
@@ -52,6 +59,6 @@ TestCase {
 
   // Regression: Material used to supply its own 28 px base, so switching styles resized the corners.
   function test_radiusIsNotAStyleToken() {
-    UiStyles.choices().forEach(choice => compare(UiStyles.tokens(choice.key).screenRadius, undefined, choice.key));
+    UiStyles.choices(styles).forEach(choice => compare(tokens(choice.key).screenRadius, undefined, choice.key));
   }
 }

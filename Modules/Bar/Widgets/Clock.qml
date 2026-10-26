@@ -80,7 +80,7 @@ Item {
       host: root
       hovered: clockMouseArea.containsMouse
       pressed: clockMouseArea.pressed
-      depth: KeycapKit.barDepth(root.screenName, root.section)
+      depth: Style.barFaceDepth(root.screenName, root.section)
     }
 
     Item {

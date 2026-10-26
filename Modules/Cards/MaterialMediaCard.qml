@@ -22,7 +22,7 @@ Rectangle {
   color: Qt.tint(ShellColors.mSurfaceVariant, Qt.alpha(ShellColors.mPrimary, 0.08))
   clip: true
 
-  NKeycapCard {}
+  NStyleCard {}
 
   onNeedsSpectrumChanged: {
     if (needsSpectrum)

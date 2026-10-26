@@ -134,7 +134,7 @@ Item {
                    "round": true,
                    "alert": root.liquidState.low
                  })
-      depth: KeycapKit.barDepth(root.screenName, root.section)
+      depth: Style.barFaceDepth(root.screenName, root.section)
     }
 
     NLiquidBattery {

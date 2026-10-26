@@ -116,7 +116,7 @@ Item {
 
         WeatherShape {
           anchors.fill: parent
-          lobes: root.kind === "uv" ? 12 : (Style.uiStyleTokens.weather ? Style.uiStyleTokens.weather.cookieLobes : 0)
+          lobes: root.kind === "uv" ? 12 : Style.uiStyleTokens.weather.cookieLobes
           fillColor: root.kind === "uv" ? Qt.tint(ShellColors.mPrimary, Qt.alpha(ShellColors.mError, root.tile.fraction * 0.8)) : ShellColors.mPrimary
         }
 

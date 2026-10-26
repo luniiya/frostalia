@@ -6,6 +6,13 @@ import "../Helpers/UiStyles.js" as UiStyles
 TestCase {
   name: "ControlCenterLayout"
 
+  // The real style folders (Styles/<id>/Definition.qml)
+  readonly property var styles: UiStyles.loadAll(Qt.resolvedUrl("../Styles"), ["material", "keycap"])
+
+  function tokens(id) {
+    return UiStyles.definition(styles, id).tokens;
+  }
+
   function test_rowsPreserveSettingsAndPackFiveCells() {
     const custom = {
       id: "CustomButton",
@@ -150,14 +157,13 @@ TestCase {
     compare(ControlCenterLayout.progress(data.position, data.length), data.want);
   }
 
-  function test_styleViewsAreExplicitAndDifferent() {
+  function test_styleViewsAreExplicit() {
     for (const surface of ["controlCenter", "mediaCard", "mediaPlayer", "osd", "notificationContent"]) {
-      verify(UiStyles.view("caelestia", surface).length > 0);
-      verify(UiStyles.view("material", surface).length > 0);
-      verify(UiStyles.view("caelestia", surface) !== UiStyles.view("material", surface));
-      compare(UiStyles.view("unknown", surface), UiStyles.view("material", surface));
+      verify(UiStyles.view(UiStyles.definition(styles, "material"), surface).length > 0);
+      verify(UiStyles.view(UiStyles.definition(styles, "keycap"), surface).length > 0);
+      compare(UiStyles.view(UiStyles.definition(styles, "unknown"), surface), UiStyles.view(UiStyles.definition(styles, "material"), surface));
     }
-    compare(UiStyles.view("material", "unknown"), "");
+    compare(UiStyles.view(UiStyles.definition(styles, "material"), "unknown"), "");
   }
 
   function test_notificationFeedUsesSpaceForActualContent() {

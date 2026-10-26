@@ -3,20 +3,28 @@ import QtTest
 import "../Helpers/UiStyles.js" as UiStyles
 
 TestCase {
+  id: root
   name: "UiStyles"
+
+  // The real style folders (Styles/<id>/Definition.qml)
+  readonly property var styles: UiStyles.loadAll(Qt.resolvedUrl("../Styles"), ["material", "keycap"])
+
+  function tokens(id) {
+    return UiStyles.definition(styles, id).tokens;
+  }
 
   QtObject {
     id: consumer
-    property string selectedStyle: "caelestia"
-    readonly property var tokens: UiStyles.tokens(selectedStyle)
-    readonly property var slider: UiStyles.sliderGeometry(selectedStyle, tokens.baseWidgetSize, tokens.slider.heightRatio, 1)
+    property string selectedStyle: "keycap"
+    readonly property var tokens: root.tokens(selectedStyle)
+    readonly property var slider: UiStyles.sliderGeometry(tokens, tokens.baseWidgetSize, tokens.slider.heightRatio, 1)
   }
 
   function test_resolveId_data() {
     return [
           {
             tag: "current",
-            value: "caelestia"
+            value: "keycap"
           },
           {
             tag: "missing",
@@ -46,13 +54,22 @@ TestCase {
   }
 
   function test_resolveId(data) {
-    const expected = data.value === "caelestia" ? "caelestia" : "material";
-    compare(UiStyles.resolveId(data.value), expected);
-    compare(UiStyles.tokens(data.value), UiStyles.tokens(expected));
+    const expected = data.value === "keycap" ? "keycap" : "material";
+    compare(UiStyles.resolveId(styles, data.value), expected);
+    compare(tokens(data.value), tokens(expected));
+  }
+
+  // Regression: loading a definition from the .pragma library failed, so the shell had no styles
+  function test_loadAllReadsTheStyleFolders() {
+    compare(Object.keys(styles).sort(), ["keycap", "material"]);
+    compare(styles.material.labelKey, "options.ui-style.material");
+    verify(styles.keycap.barViews.Plate.length > 0);
+    ignoreWarning(/has no usable Definition\.qml/);
+    compare(Object.keys(UiStyles.loadAll(Qt.resolvedUrl("../Styles"), ["material", "missing"])), ["material"]);
   }
 
   function test_choices() {
-    compare(UiStyles.choices(), [
+    compare(UiStyles.choices(styles), [
               {
                 key: "material",
                 labelKey: "options.ui-style.material"
@@ -60,82 +77,12 @@ TestCase {
               {
                 key: "keycap",
                 labelKey: "options.ui-style.keycap"
-              },
-              {
-                key: "caelestia",
-                labelKey: "options.ui-style.caelestia"
               }
             ]);
     // A caller changing a menu model must not change the registry.
-    const choices = UiStyles.choices();
+    const choices = UiStyles.choices(styles);
     choices[0].key = "changed";
-    compare(UiStyles.choices()[0].key, "material");
-  }
-
-  function test_currentAppearanceIsPreserved() {
-    const tokens = UiStyles.tokens("caelestia");
-    compare(tokens.fontSizes, {
-              XXS: 8,
-              XS: 9,
-              S: 10,
-              M: 11,
-              L: 13,
-              XL: 16,
-              XXL: 18,
-              XXXL: 24
-            });
-    compare(tokens.fontWeights, {
-              Regular: 400,
-              Medium: 500,
-              SemiBold: 600,
-              Bold: 700
-            });
-    compare(tokens.radii, {
-              XXXS: 3,
-              XXS: 4,
-              XS: 8,
-              S: 12,
-              M: 16,
-              L: 20
-            });
-    compare(tokens.inputRadii, tokens.radii);
-    compare(tokens.margins, {
-              XXXS: 1,
-              XXS: 2,
-              XS: 4,
-              S: 6,
-              M: 9,
-              L: 13,
-              XL: 18
-            });
-    compare(tokens.borders, {
-              S: 1,
-              M: 2,
-              L: 3
-            });
-    compare(tokens.animations, {
-              Faster: 75,
-              Fast: 150,
-              Normal: 300,
-              Slow: 450,
-              Slowest: 750
-            });
-    compare(tokens.baseWidgetSize, 33);
-    compare(tokens.sliderWidth, 200);
-    compare(tokens.slider, {
-              heightRatio: 0.7,
-              trackRatio: 0.4,
-              cutoutRatio: 0.1,
-              trackOpacity: 0.5,
-              gradientDarkening: 1.2
-            });
-    compare(tokens.toggle, {
-              sizeRatio: 0.8,
-              widthRatio: 0.85,
-              heightRatio: 0.5,
-              handleRatio: 0.4,
-              handleInset: 3
-            });
+    compare(UiStyles.choices(styles)[0].key, "material");
   }
 
   function test_sliderGeometry_data() {
@@ -183,8 +130,17 @@ TestCase {
         ];
   }
 
+  // Round-knob slider geometry (the non-Material renderers), pinned with fixed tokens
   function test_sliderGeometry(data) {
-    const geometry = UiStyles.sliderGeometry("caelestia", 33, data.ratio, data.scale);
+    const fixture = {
+      "slider": {
+        "shape": "knob",
+        "heightRatio": 0.7,
+        "trackRatio": 0.4,
+        "cutoutRatio": 0.1
+      }
+    };
+    const geometry = UiStyles.sliderGeometry(fixture, 33, data.ratio, data.scale);
     compare(geometry.knobDiameter, data.knob);
     compare(geometry.trackHeight, data.track);
     compare(geometry.cutoutExtra, data.cutout);
@@ -205,10 +161,10 @@ TestCase {
             expected: "Iosevka"
           },
           {
-            tag: "Caelestia preset font",
+            tag: "Keycap preset font",
             family: "",
             fixed: false,
-            expected: "Rubik"
+            expected: "Google Sans Flex"
           },
           {
             tag: "style monospace fallback",
@@ -220,26 +176,26 @@ TestCase {
   }
 
   function test_fontFamily(data) {
-    compare(UiStyles.fontFamily("caelestia", data.family, data.fixed, "System Font"), data.expected);
+    compare(UiStyles.fontFamily(tokens("keycap"), data.family, data.fixed, "System Font"), data.expected);
   }
 
   function test_materialStyleSwitchIsReversible() {
-    const original = JSON.stringify(UiStyles.tokens("caelestia"));
+    const original = JSON.stringify(tokens("keycap"));
     try {
-      compare(UiStyles.resolveId("material"), "material");
+      compare(UiStyles.resolveId(styles, "material"), "material");
       consumer.selectedStyle = "material";
-      compare(consumer.tokens.controls.renderer, "material");
+      compare(consumer.tokens.slider.shape, "split");
       compare(consumer.tokens.radii.M, 24);
       compare(consumer.slider.trackHeight, 16);
       compare(consumer.slider.handleHeight, 44);
-      compare(UiStyles.fontFamily("material", "", false, "System"), "Roboto");
-      compare(UiStyles.fontFamily("material", "My Font", false, "System"), "My Font");
-      consumer.selectedStyle = "caelestia";
-      compare(consumer.tokens.controls.renderer, "caelestia");
+      compare(UiStyles.fontFamily(tokens("material"), "", false, "System"), "Roboto");
+      compare(UiStyles.fontFamily(tokens("material"), "My Font", false, "System"), "My Font");
+      consumer.selectedStyle = "keycap";
+      compare(consumer.tokens.slider.shape, "knob");
       compare(consumer.slider.trackHeight, 10);
       compare(JSON.stringify(consumer.tokens), original);
     } finally {
-      consumer.selectedStyle = "caelestia";
+      consumer.selectedStyle = "keycap";
     }
   }
 
@@ -265,21 +221,21 @@ TestCase {
   }
 
   function test_materialSliderScalesOnce(data) {
-    const g = UiStyles.sliderGeometry("material", 33, 0.7, data.scale);
+    const g = UiStyles.sliderGeometry(tokens("material"), 33, 0.7, data.scale);
     compare(g.knobDiameter, Math.round(40 * data.scale));
     compare(g.trackHeight, Math.round(16 * data.scale));
     compare(g.handleHeight, Math.round(44 * data.scale));
     compare(g.handleWidth, 4 * data.scale);
     compare(g.gap, 12 * data.scale);
-    const custom = UiStyles.sliderGeometry("material", 33, 0.35, data.scale);
+    const custom = UiStyles.sliderGeometry(tokens("material"), 33, 0.35, data.scale);
     compare(custom.handleHeight, Math.round(22 * data.scale));
   }
 
   function test_sliderGeometryHasCompleteShapeDuringStyleSwitches() {
     // QML bindings may observe the renderer and dimensions in either order.
     // Both styles must supply finite dimensions throughout a live switch.
-    for (const style of ["caelestia", "material", "keycap", "unknown"]) {
-      const g = UiStyles.sliderGeometry(style, 33, 0.7, 1);
+    for (const style of ["material", "keycap", "unknown"]) {
+      const g = UiStyles.sliderGeometry(tokens(style), 33, 0.7, 1);
       for (const key of ["knobDiameter", "handleHeight", "handleWidth", "pressedHandleWidth", "trackHeight", "gap", "cutoutExtra"]) {
         verify(Number.isFinite(g[key]), style + ":" + key);
       }
@@ -325,10 +281,10 @@ TestCase {
   }
 
   function test_glass() {
-    compare(UiStyles.glass("material", true).panelOpacity, 0.85);
-    compare(UiStyles.glass("material", true).surfaceOpacity, 0.7);
-    compare(UiStyles.glass("material", false), null);
-    compare(UiStyles.glass("caelestia", true), null);
+    compare(UiStyles.glass(tokens("material"), true).panelOpacity, 0.85);
+    compare(UiStyles.glass(tokens("material"), true).surfaceOpacity, 0.7);
+    compare(UiStyles.glass(tokens("material"), false), null);
+    compare(UiStyles.glass(tokens("keycap"), true), null);
   }
 
   function test_glassCustom_data() {
@@ -388,11 +344,11 @@ TestCase {
   }
 
   function test_glassCustom(data) {
-    const frosted = UiStyles.glass("material", true, data.custom);
+    const frosted = UiStyles.glass(tokens("material"), true, data.custom);
     compare(frosted.panelOpacity, data.panel);
     compare(frosted.surfaceOpacity, data.surface);
-    compare(UiStyles.glass("material", false, data.custom), null);
-    compare(UiStyles.glass("caelestia", true, data.custom), null);
+    compare(UiStyles.glass(tokens("material"), false, data.custom), null);
+    compare(UiStyles.glass(tokens("keycap"), true, data.custom), null);
   }
 
   function test_panelOpacity_data() {
@@ -410,8 +366,8 @@ TestCase {
             expected: 0.9
           },
           {
-            tag: "caelestia ignores glass",
-            style: "caelestia",
+            tag: "keycap ignores glass",
+            style: "keycap",
             glass: true,
             expected: 0.9
           },
@@ -437,7 +393,7 @@ TestCase {
   }
 
   function test_panelOpacity(data) {
-    compare(UiStyles.panelOpacity(data.style, 0.9, data.glass, data.custom), data.expected);
+    compare(UiStyles.panelOpacity(tokens(data.style), 0.9, data.glass, data.custom), data.expected);
   }
 
   function test_fieldShape_data() {
@@ -479,23 +435,23 @@ TestCase {
   }
 
   function test_fieldShape(data) {
-    const shape = UiStyles.fieldShape("material", data.focused, data.cornerRadius);
+    const shape = UiStyles.fieldShape(tokens("material"), data.focused, data.cornerRadius);
     compare(shape.radius, data.radius);
     compare(shape.borderWidth, data.borderWidth);
   }
 
-  function test_fieldShapeOnlyForMaterial() {
-    compare(UiStyles.fieldShape("caelestia", true), null);
+  function test_keycapUsesTheMaterialFieldShape() {
+    compare(UiStyles.fieldShape(tokens("keycap"), true).borderWidth, 2);
   }
 
   function test_weatherTokens() {
-    compare(UiStyles.tokens("material").weather.cookieLobes, 9);
-    compare(UiStyles.tokens("caelestia").weather, undefined);
+    compare(tokens("material").weather.cookieLobes, 9);
+    compare(tokens("keycap").weather.cookieLobes, 9);
   }
 
   function test_menuTokens() {
-    compare(UiStyles.tokens("material").menu.radius, 16);
-    compare(UiStyles.tokens("caelestia").menu, undefined);
+    compare(tokens("material").menu.radius, 16);
+    compare(tokens("keycap").menu.radius, 14);
   }
 
   function test_expandableShape_data() {
@@ -514,7 +470,7 @@ TestCase {
   }
 
   function test_expandableShape(data) {
-    const shape = UiStyles.expandableShape("material", data.expanded);
+    const shape = UiStyles.expandableShape(tokens("material"), data.expanded);
     compare(shape.gap, 2);
     compare(shape.headerTop, 24);
     compare(shape.headerBottom, data.headerBottom);
@@ -522,8 +478,8 @@ TestCase {
     compare(shape.contentBottom, 24);
   }
 
-  function test_expandableShapeOnlyForMaterial() {
-    compare(UiStyles.expandableShape("caelestia", true), null);
+  function test_keycapUsesTheMaterialExpandableShape() {
+    compare(UiStyles.expandableShape(tokens("keycap"), true).headerTop, 22);
   }
 
   function test_buttonGroupRadii_data() {
@@ -572,52 +528,52 @@ TestCase {
   }
 
   function test_buttonGroupRadii(data) {
-    const radii = UiStyles.buttonGroupRadii("material", 32, data.checked, data.isFirst, data.isLast);
+    const radii = UiStyles.buttonGroupRadii(tokens("material"), 32, data.checked, data.isFirst, data.isLast);
     compare(radii.left, data.left);
     compare(radii.right, data.right);
   }
 
   function test_buttonGroupRadiiClampsInnerRadius() {
-    const radii = UiStyles.buttonGroupRadii("material", 10, false, false, false);
+    const radii = UiStyles.buttonGroupRadii(tokens("material"), 10, false, false, false);
     compare(radii.left, 5);
     compare(radii.right, 5);
   }
 
-  function test_buttonGroupRadiiOnlyForMaterial() {
-    compare(UiStyles.buttonGroupRadii("caelestia", 32, true, true, true), null);
+  function test_keycapUsesTheMaterialButtonGroupRadii() {
+    verify(UiStyles.buttonGroupRadii(tokens("keycap"), 32, true, true, true) !== null);
   }
 
   function test_toggleGeometry_data() {
     return [
           {
-            tag: "legacy off",
-            style: "caelestia",
+            tag: "keycap off",
+            style: "keycap",
             checked: false,
             pressed: false,
-            width: 44,
+            width: 46,
             height: 26,
-            handle: 20,
-            x: 3
+            handle: 18,
+            x: 4
           },
           {
-            tag: "legacy on",
-            style: "caelestia",
+            tag: "keycap on",
+            style: "keycap",
             checked: true,
             pressed: false,
-            width: 44,
+            width: 46,
             height: 26,
-            handle: 20,
-            x: 21
+            handle: 18,
+            x: 24
           },
           {
-            tag: "legacy pressed",
-            style: "caelestia",
+            tag: "keycap pressed",
+            style: "keycap",
             checked: true,
             pressed: true,
-            width: 44,
+            width: 46,
             height: 26,
-            handle: 20,
-            x: 21
+            handle: 18,
+            x: 24
           },
           {
             tag: "material off",
@@ -663,13 +619,13 @@ TestCase {
   }
 
   function test_toggleGeometry(data) {
-    const geometry = UiStyles.toggleGeometry(data.style, 26, data.checked, data.pressed);
+    const geometry = UiStyles.toggleGeometry(tokens(data.style), 26, data.checked, data.pressed);
     compare(geometry.width, data.width);
     compare(geometry.height, data.height);
     compare(geometry.handle, data.handle);
     compare(geometry.x, data.x);
     if (data.style === "material") {
-      const scaled = UiStyles.toggleGeometry(data.style, 52, data.checked, data.pressed);
+      const scaled = UiStyles.toggleGeometry(tokens(data.style), 52, data.checked, data.pressed);
       compare(scaled.width, geometry.width * 2);
       compare(scaled.height, geometry.height * 2);
       compare(scaled.handle, geometry.handle * 2);
@@ -679,32 +635,32 @@ TestCase {
 
   function test_switchingStylesUpdatesBindings() {
     // Register a fixture to exercise a second style without shipping unfinished styles.
-    const original = JSON.stringify(UiStyles.tokens("caelestia"));
+    const original = JSON.stringify(tokens("keycap"));
     const custom = JSON.parse(original);
     custom.baseWidgetSize = 40;
     custom.slider.trackRatio = 0.25;
     custom.fontFamily = "Style Font";
     custom.radii.M = 2;
-    UiStyles.definitions.fixture = {
+    styles.fixture = {
       labelKey: "fixture",
       tokens: custom
     };
     try {
-      compare(consumer.tokens.radii.M, 16);
+      compare(consumer.tokens.radii.M, 18);
       consumer.selectedStyle = "fixture";
       compare(consumer.tokens.radii.M, 2);
       compare(consumer.slider.knobDiameter, 28);
       compare(consumer.slider.trackHeight, 8);
-      compare(UiStyles.fontFamily("fixture", "", false, "System Font"), "Style Font");
-      compare(UiStyles.fontFamily("fixture", "My Font", false, "System Font"), "My Font");
-      verify(UiStyles.choices().some(choice => choice.key === "fixture"));
-      consumer.selectedStyle = "caelestia";
-      compare(consumer.tokens.radii.M, 16);
+      compare(UiStyles.fontFamily(tokens("fixture"), "", false, "System Font"), "Style Font");
+      compare(UiStyles.fontFamily(tokens("fixture"), "My Font", false, "System Font"), "My Font");
+      verify(UiStyles.choices(styles).some(choice => choice.key === "fixture"));
+      consumer.selectedStyle = "keycap";
+      compare(consumer.tokens.radii.M, 18);
       compare(consumer.slider.knobDiameter, 24);
-      compare(JSON.stringify(UiStyles.tokens("caelestia")), original);
+      compare(JSON.stringify(tokens("keycap")), original);
     } finally {
-      consumer.selectedStyle = "caelestia";
-      delete UiStyles.definitions.fixture;
+      consumer.selectedStyle = "keycap";
+      delete styles.fixture;
     }
   }
 }

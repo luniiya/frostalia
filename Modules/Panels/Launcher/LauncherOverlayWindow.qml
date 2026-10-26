@@ -7,6 +7,7 @@ import qs.Commons
 import qs.Modules.MainScreen.Backgrounds
 import qs.Services.UI
 import qs.Widgets
+import "../../../Helpers/LauncherView.js" as LauncherView
 
 // Standalone launcher window for Overlay layer mode.
 // This window appears above fullscreen windows and does not attach to the bar.
@@ -83,7 +84,7 @@ Variants {
       }
 
       // Preview panel support
-      readonly property int listPanelWidth: Math.round(500 * Style.uiScaleRatio)
+      readonly property var panelSize: LauncherView.panelSize(Style.uiScaleRatio)
       readonly property int previewPanelWidth: Math.round(400 * Style.uiScaleRatio)
       readonly property bool previewActive: {
         if (!launcherCore)
@@ -117,8 +118,8 @@ Variants {
       // Launcher panel with position-based anchoring
       Item {
         id: launcherPanel
-        width: Math.round(Math.max(parent.width * 0.25, launcherWindow.listPanelWidth + Style.margin2L * 2))
-        height: Math.round(Math.max(parent.height * 0.5, 600 * Style.uiScaleRatio))
+        width: launcherWindow.panelSize.width
+        height: launcherWindow.panelSize.height
         clip: false
 
         // Entrance animation
@@ -360,17 +361,12 @@ Variants {
           return launcherPanel.x + launcherPanel.width + Style.marginM;
         }
         y: {
-          var view = launcherCore.resultsView;
-          if (!view)
-            return launcherPanel.y + Style.marginL;
-          var row = launcherCore.isGridView ? Math.floor(launcherCore.selectedIndex / launcherCore.gridColumns) : launcherCore.selectedIndex;
-          var gridCellSize = Math.floor((launcherWindow.listPanelWidth - Style.margin2XS - ((launcherCore.targetGridColumns - 1) * Style.marginS)) / launcherCore.targetGridColumns);
-          var itemHeight = launcherCore.isGridView ? (gridCellSize + Style.marginXXS) : (launcherCore.entryHeight + (view.spacing || 0));
-          var yPos = row * itemHeight - (view.contentY || 0);
-          var mapped = view.mapToItem(launcherWindow.contentItem, 0, yPos);
-          return Math.max(launcherPanel.y + Style.marginL, Math.min(mapped.y, launcherPanel.y + launcherPanel.height - previewBox.height - Style.marginL));
+          // Re-evaluate when the selection moves or the results scroll
+          launcherCore.selectedIndex;
+          launcherCore.resultsView?.contentY;
+          var top = launcherCore.selectedRowTop(launcherWindow.contentItem);
+          return LauncherView.previewY(top === null ? launcherPanel.y + Style.marginL : top, launcherPanel.y, launcherPanel.height, previewBox.height, Style.marginL);
         }
-
         opacity: visible ? 1.0 : 0.0
         Behavior on opacity {
           NumberAnimation {

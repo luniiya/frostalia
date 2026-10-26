@@ -35,7 +35,7 @@ NIconButton {
 
   baseSize: Style.getCapsuleHeightForScreen(screenName, section)
   faceView: "SessionMenu"
-  faceDepth: KeycapKit.barDepth(screen?.name, section)
+  faceDepth: Style.barFaceDepth(screen?.name, section)
   applyUiScale: false
   customRadius: Style.radiusL
   icon: "power"

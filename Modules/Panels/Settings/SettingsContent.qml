@@ -62,7 +62,6 @@ Item {
   property real _lastMouseY: 0
   property bool _mouseInitialized: false
 
-  readonly property bool material: Style.materialControls
   property bool homeVisible: true
   SettingsPageTransition {
     id: pageTransition
@@ -103,7 +102,6 @@ Item {
     }
   }
   readonly property var materialRail: SettingsWindowLayout.materialRail(sidebarExpansion, Style.uiScaleRatio, sidebarList.verticalScrollBarActive ? sidebarList.handleWidth + Style.marginXS : 0)
-  readonly property bool sidebarCardStyle: !material && Settings.data.ui.settingsPanelSideBarCardStyle
 
   onSearchResultsChanged: {
     searchSelectedIndex = 0;
@@ -775,7 +773,7 @@ Item {
   // Main UI
   ColumnLayout {
     anchors.fill: parent
-    anchors.margins: root.material ? Math.round(8 * Style.uiScaleRatio) : Style.marginL
+    anchors.margins: Math.round(8 * Style.uiScaleRatio)
     spacing: anchors.margins
 
     // Shared toolbar keeps navigation controls and search in a fixed place.
@@ -802,8 +800,8 @@ Item {
         width: SettingsWindowLayout.searchWidth(parent.width, Math.max(sidebarToggle.width, toolbarClose.width), Style.uiScaleRatio)
         placeholderText: I18n.tr("common.search")
         inputIconName: "search"
-        outlined: !root.material
-        radius: root.material ? Math.round(20 * Style.uiScaleRatio) : Style.iRadiusM
+        outlined: false
+        radius: Math.round(20 * Style.uiScaleRatio)
         onTextChanged: root.searchText = text
         onEditingFinished: {
           if (root.searchText.trim() !== "")
@@ -824,7 +822,7 @@ Item {
     RowLayout {
       Layout.fillWidth: true
       Layout.fillHeight: true
-      spacing: root.material ? Math.round(8 * Style.uiScaleRatio) : Style.marginL
+      spacing: Math.round(8 * Style.uiScaleRatio)
 
       // Sidebar
       NBox {
@@ -836,43 +834,35 @@ Item {
         clip: true
         Layout.minimumWidth: 0
         Layout.maximumWidth: Layout.preferredWidth
-        property real expandedWidth: root.material ? root.materialRail.width : Math.round(root.sidebarExpanded ? 200 * Style.uiScaleRatio : sidebarToggle.width + (root.sidebarCardStyle ? Style.margin2M : 0) + (sidebarList.verticalScrollBarActive ? Style.marginM : 0))
+        property real expandedWidth: root.materialRail.width
         Layout.preferredWidth: pageTransition.progress * expandedWidth
         Layout.fillHeight: true
         Layout.alignment: Qt.AlignTop
 
-        radius: root.sidebarCardStyle ? Style.radiusM : 0
-        color: root.sidebarCardStyle ? ShellColors.mSurfaceVariant : "transparent"
-        border.color: root.sidebarCardStyle ? Style.boxBorderColor : "transparent"
+        radius: 0
+        color: "transparent"
+        border.color: "transparent"
 
-        Behavior on expandedWidth {
-          enabled: !root.material
-          NumberAnimation {
-            duration: Style.animationFast
-            easing.type: Easing.InOutQuad
-          }
-        }
 
         // Keep the list viewport stable while the outer sidebar reveals it.
         SettingsSidebarLayout {
           viewportWidth: sidebar.expandedWidth
-          inset: root.sidebarCardStyle ? Style.marginM : 0
-          spacing: root.material ? Style.marginL : Style.marginS
+          inset: 0
+          spacing: Style.marginL
 
           NButton {
             id: homeButton
             Layout.fillWidth: true
-            Layout.rightMargin: root.material && sidebarList.verticalScrollBarActive ? sidebarList.handleWidth + Style.marginXS : 0
-            Layout.preferredHeight: root.material ? root.materialRail.rowHeight : implicitHeight
-            buttonRadius: root.material ? height / 2 : Style.iRadiusS
-            iconSize: root.material ? Style.fontSizeXL : Style.fontSizeL
-            text: !root.material && root.sidebarExpanded ? I18n.tr("panels.settings.home") : ""
-            icon: root.material ? "" : "home"
+            Layout.rightMargin: sidebarList.verticalScrollBarActive ? sidebarList.handleWidth + Style.marginXS : 0
+            Layout.preferredHeight: root.materialRail.rowHeight
+            buttonRadius: height / 2
+            iconSize: Style.fontSizeXL
+            text: ""
+            icon: ""
             clip: true
 
             NIcon {
               id: homeIcon
-              visible: root.material
               icon: "home"
               pointSize: Style.fontSizeXL
               color: homeButton.contentColor
@@ -881,7 +871,7 @@ Item {
             }
 
             NText {
-              visible: root.material && opacity > 0
+              visible: opacity > 0
               opacity: root.sidebarExpansion
               anchors.left: homeIcon.right
               anchors.leftMargin: Style.marginM
@@ -1007,26 +997,25 @@ Item {
               visible: root.searchText.trim() === ""
               anchors.fill: parent
               model: root.tabsModel
-              spacing: root.material ? root.materialRail.rowSpacing : Style.marginXS
+              spacing: root.materialRail.rowSpacing
               currentIndex: root.currentTabIndex
               horizontalPolicy: ScrollBar.AlwaysOff
-              verticalPolicy: root.material ? ScrollBar.AsNeeded : ScrollBar.AlwaysOff
+              verticalPolicy: ScrollBar.AsNeeded
               gradientColor: "transparent"
-              reserveScrollbarSpace: root.material && verticalScrollBarActive
+              reserveScrollbarSpace: verticalScrollBarActive
 
               delegate: Rectangle {
                 id: tabItem
                 width: sidebarList.availableWidth
-                height: root.material ? root.materialRail.rowHeight : tabEntryRow.implicitHeight + Style.margin2XS
-                radius: root.material ? height / 2 : Style.iRadiusS
-                color: root.material ? "transparent" : selected ? ShellColors.mPrimary : (tabItem.hovering ? ShellColors.mHover : "transparent")
+                height: root.materialRail.rowHeight
+                radius: height / 2
+                color: "transparent"
                 readonly property bool selected: !root.homeVisible && index === root.currentTabIndex
                 property bool hovering: false
-                property color tabTextColor: root.material ? ShellColors.mOnSurface : selected ? ShellColors.mOnPrimary : (tabItem.hovering ? ShellColors.mOnHover : ShellColors.mOnSurface)
+                property color tabTextColor: ShellColors.mOnSurface
 
                 Rectangle {
                   id: railIndicator
-                  visible: root.material
                   x: 0
                   y: 0
                   width: parent.width
@@ -1068,7 +1057,7 @@ Item {
                     icon: modelData.icon
                     color: tabTextColor
                     pointSize: Style.fontSizeXL
-                    x: root.material ? SettingsWindowLayout.railIconInset(root.sidebarExpansion, root.materialRail.rowHeight, width, Style.marginL) : Style.marginS
+                    x: SettingsWindowLayout.railIconInset(root.sidebarExpansion, root.materialRail.rowHeight, width, Style.marginL)
                     anchors.verticalCenter: parent.verticalCenter
                   }
 
@@ -1081,18 +1070,11 @@ Item {
                     anchors.left: tabIcon.right
                     anchors.leftMargin: Style.marginM
                     anchors.right: parent.right
-                    anchors.rightMargin: root.material ? Style.marginL : Style.marginS
+                    anchors.rightMargin: Style.marginL
                     anchors.verticalCenter: parent.verticalCenter
                     visible: opacity > 0
-                    opacity: root.material ? root.sidebarExpansion : (root.sidebarExpanded ? 1 : 0)
+                    opacity: root.sidebarExpansion
 
-                    Behavior on opacity {
-                      enabled: !root.material
-                      NumberAnimation {
-                        duration: Style.animationFast
-                        easing.type: Easing.InOutQuad
-                      }
-                    }
                   }
                 }
 
@@ -1159,7 +1141,8 @@ Item {
         Layout.alignment: Qt.AlignTop
         radius: Style.radiusM
         color: ShellColors.mSurfaceVariant
-        border.width: root.material ? 0 : Style.boxBorderWidth
+        // Outlined only when box borders are on
+        border.width: Settings.data.ui.boxBorderEnabled ? Style.boxBorderWidth : 0
 
         SettingsHome {
           id: homePane
@@ -1180,7 +1163,7 @@ Item {
           anchors.bottom: parent.bottom
           anchors.horizontalCenter: parent.horizontalCenter
           anchors.margins: Style.marginL
-          width: Math.min(parent.width - Style.marginL * 2, (root.material ? 640 : 780) * Style.uiScaleRatio)
+          width: Math.min(parent.width - Style.marginL * 2, 640 * Style.uiScaleRatio)
           spacing: Style.marginS
 
           // Header row
@@ -1195,18 +1178,12 @@ Item {
               onClicked: root.showHome()
             }
 
-            NIcon {
-              icon: root.tabsModel[currentTabIndex]?.icon ?? ""
-              visible: !root.material
-              color: ShellColors.mPrimary
-              pointSize: Style.fontSizeXXL
-            }
 
             NText {
               text: root.tabsModel[root.currentTabIndex]?.label ? I18n.tr(root.tabsModel[root.currentTabIndex].label) : ""
-              pointSize: root.material ? Style.fontSizeXXXL : Style.fontSizeXL
-              font.weight: root.material ? Style.fontWeightRegular : Style.fontWeightBold
-              color: root.material ? ShellColors.mOnSurface : ShellColors.mPrimary
+              pointSize: Style.fontSizeXXXL
+              font.weight: Style.fontWeightRegular
+              color: ShellColors.mOnSurface
               Layout.fillWidth: true
               Layout.alignment: Qt.AlignVCenter
             }

@@ -33,7 +33,7 @@ NIconButton {
   tooltipDirection: BarService.getTooltipDirection(screen?.name, section)
   baseSize: Style.getCapsuleHeightForScreen(screen?.name, section)
   faceView: "DarkMode"
-  faceDepth: KeycapKit.barDepth(screen?.name, section)
+  faceDepth: Style.barFaceDepth(screen?.name, section)
   faceData: ({
                "dark": Settings.data.colorSchemes.darkMode
              })

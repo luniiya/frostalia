@@ -243,6 +243,8 @@ PopupWindow {
     border.width: Math.max(1, Style.borderS)
     radius: Style.radiusM
 
+    NStyleCard {}
+
     // Fade-in animation
     opacity: root.visible ? 1.0 : 0.0
 

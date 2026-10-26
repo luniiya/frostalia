@@ -115,10 +115,10 @@ class WeatherWidgetTests(unittest.TestCase):
                 self.assertIn(key, EN["weather"][group])
 
     def test_weather_surfaces_cover_both_ui_styles(self):
-        # Material and Caelestia get the same weather views; only the surface differs.
+        # Material and Keycap get the same weather views; only the surface differs.
         surface = (ROOT / "Modules/Weather/WeatherSurface.qml").read_text()
         self.assertIn("Style.uiStyleTokens.weather", surface)
-        self.assertIn("Style.radiusM", surface)
+        self.assertIn("NStyleCard", surface)
         for view in ("WeatherView.qml",):
             self.assertIn("WeatherSurface", (ROOT / "Modules/Weather" / view).read_text())
 

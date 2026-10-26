@@ -84,7 +84,7 @@ Item {
     y: Style.pixelAlignCenter(parent.height, height)
     hovered: pillMouseArea.containsMouse
     pressed: pillMouseArea.pressed
-    depth: Math.max(1, Math.round(Style.keycapDepth * 0.67))
+    depth: Math.max(1, Math.round(Style.faceDepth * 0.67))
     faceData: ({
                  "focused": workspace.isFocused,
                  "urgent": workspace.isUrgent,

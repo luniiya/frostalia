@@ -6,6 +6,13 @@ import "../Helpers/UiStyles.js" as UiStyles
 TestCase {
   name: "RadialMenu"
 
+  // The real style folders (Styles/<id>/Definition.qml)
+  readonly property var styles: UiStyles.loadAll(Qt.resolvedUrl("../Styles"), ["material", "keycap"])
+
+  function tokens(id) {
+    return UiStyles.definition(styles, id).tokens;
+  }
+
   readonly property var tree: [
     {
       "action": "editDesktop"
@@ -372,7 +379,7 @@ TestCase {
   }
 
   function test_expandItemsBuildsTheStyleFolderFromEveryStyle() {
-    const styles = UiStyles.choices();
+    const choices = UiStyles.choices(styles);
     const tree = RadialMenu.expandItems(RadialMenu.normalizeItems([
                                                                     {
                                                                       "action": "folder",
@@ -382,16 +389,16 @@ TestCase {
                                                                         }
                                                                       ]
                                                                     }
-                                                                  ]), styles);
+                                                                  ]), choices);
     const folder = tree[0].children[0];
     verify(RadialMenu.isFolder(folder));
     compare(folder.labelKey, "radial-menu.actions.ui-styles");
     compare(folder.icon, "palette");
-    compare(folder.children.length, styles.length);
-    for (let i = 0; i < styles.length; i++) {
+    compare(folder.children.length, choices.length);
+    for (let i = 0; i < choices.length; i++) {
       compare(folder.children[i].action, "uiStyle");
-      compare(folder.children[i].arg, styles[i].key);
-      compare(RadialMenu.labelKeyFor(folder.children[i]), styles[i].labelKey);
+      compare(folder.children[i].arg, choices[i].key);
+      compare(RadialMenu.labelKeyFor(folder.children[i]), choices[i].labelKey);
     }
     // A new style shows up without touching the saved tree
     const more = RadialMenu.expandItems([
@@ -400,14 +407,14 @@ TestCase {
                                             "label": "Looks",
                                             "icon": "brush"
                                           }
-                                        ], styles.concat([
+                                        ], choices.concat([
                                                            {
                                                              "key": "future",
                                                              "labelKey": "options.ui-style.future"
                                                            }
                                                          ]))[0];
-    compare(more.children.length, styles.length + 1);
-    compare(more.children[styles.length].arg, "future");
+    compare(more.children.length, choices.length + 1);
+    compare(more.children[choices.length].arg, "future");
     compare(more.label, "Looks");
     compare(more.labelKey, "");
     compare(more.icon, "brush");
@@ -649,14 +656,14 @@ TestCase {
   }
 
   function test_visualShapePresetsDiffer() {
-    const orbit = RadialMenu.visual({
-                                      "shape": "orbit"
-                                    });
+    const segment = RadialMenu.visual({
+                                        "shape": "segment"
+                                      });
     const chunky = RadialMenu.visual({
                                        "shape": "chunky"
                                      });
-    verify(orbit.trackWidth > 0);
-    compare(orbit.easing, "OutBack");
+    compare(segment.borderWidth, 0);
+    compare(chunky.easing, "OutBack");
     verify(chunky.borderWidth > 0);
     verify(chunky.shadowY > 0);
     compare(chunky.colors.outline, "ink");
@@ -682,8 +689,8 @@ TestCase {
 
   function test_everyUiStyleHasItsOwnLook() {
     const shapes = {};
-    for (const choice of UiStyles.choices()) {
-      const spec = UiStyles.tokens(choice.key).radialMenu;
+    for (const choice of UiStyles.choices(styles)) {
+      const spec = tokens(choice.key).radialMenu;
       const v = RadialMenu.visual(spec);
       verify(Object.prototype.hasOwnProperty.call(RadialMenu.shapePresets, v.shape), choice.key);
       verify(v.outerRadius > v.innerRadius, choice.key);
@@ -691,7 +698,7 @@ TestCase {
         shapes[choice.key] = v.shape;
     }
     compare(shapes["material"], "segment");
-    compare(shapes["caelestia"], "orbit");
+    compare(shapes["keycap"], "chunky");
   }
 
   function test_colorSource_data() {
@@ -712,7 +719,7 @@ TestCase {
             tag: "ink",
             role: "ink",
             kind: "ink",
-            value: 0.28
+            value: undefined
           },
           {
             tag: "missing falls back to primary",
@@ -745,39 +752,6 @@ TestCase {
     compare(RadialMenu.visual({
                                 "shape": "segment"
                               }).keylineWidth, 0);
-  }
-
-  function test_nearestAngle_data() {
-    return [
-          {
-            tag: "plain",
-            current: 0,
-            target: 90,
-            result: 90
-          },
-          {
-            tag: "across zero backwards",
-            current: 10,
-            target: 300,
-            result: -60
-          },
-          {
-            tag: "across zero forwards",
-            current: 350,
-            target: 20,
-            result: 380
-          },
-          {
-            tag: "after several turns",
-            current: 720,
-            target: 90,
-            result: 810
-          }
-        ];
-  }
-
-  function test_nearestAngle(data) {
-    compare(RadialMenu.nearestAngle(data.current, data.target), data.result);
   }
 
   function test_staggerDelay() {

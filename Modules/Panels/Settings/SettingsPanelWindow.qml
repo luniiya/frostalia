@@ -12,7 +12,7 @@ FloatingWindow {
   id: root
 
   title: "Frostalia"
-  readonly property var windowMetrics: SettingsWindowLayout.windowMetrics(Style.materialControls, Style.uiScaleRatio)
+  readonly property var windowMetrics: SettingsWindowLayout.windowMetrics(Style.uiScaleRatio)
   minimumSize: Qt.size(windowMetrics.minimumWidth, windowMetrics.minimumHeight)
   implicitWidth: windowMetrics.width
   implicitHeight: windowMetrics.height

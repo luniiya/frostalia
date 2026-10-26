@@ -640,6 +640,14 @@
       "system": "System",
       "webbrowser": "Web Browser"
     },
+    "modes": {
+      "apps": "Apps",
+      "clipboard": "Clipboard",
+      "commands": "Commands",
+      "emoji": "Emoji",
+      "settings": "Settings",
+      "windows": "Windows"
+    },
     "providers": {
       "applications": "Applications",
       "calculator": "Calculator",
@@ -664,6 +672,18 @@
       "emoji-search-description": "Search and copy emojis",
       "settings-search-description": "Search and navigate to settings",
       "windows-search-description": "Search and focus open windows"
+    },
+    "view": {
+      "clear": "Clear search",
+      "open": "Open",
+      "results": "Results",
+      "search-in": "Search {mode}…",
+      "top-hit": "Top hit",
+      "clipboard-off": "Clipboard history is off",
+      "clipboard-off-hint": "Turn it on in Settings → Launcher.",
+      "hint-mode": "mode",
+      "hint-open": "open",
+      "hint-category": "category"
     }
   },
   "kdeconnect": {
@@ -864,7 +884,6 @@
   },
   "options": {
     "ui-style": {
-      "caelestia": "Caelestia",
       "keycap": "Keycap",
       "material": "Material"
     },

@@ -17,7 +17,7 @@ Rectangle {
   radius: Style.radiusM
   color: ShellColors.mSurfaceVariant
 
-  NKeycapCard {}
+  NStyleCard {}
 
   ColumnLayout {
     id: sliders

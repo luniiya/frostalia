@@ -6,6 +6,13 @@ import "../Helpers/UiStyles.js" as UiStyles
 TestCase {
   name: "DesktopMetrics"
 
+  // The real style folders (Styles/<id>/Definition.qml)
+  readonly property var styles: UiStyles.loadAll(Qt.resolvedUrl("../Styles"), ["material", "keycap"])
+
+  function tokens(id) {
+    return UiStyles.definition(styles, id).tokens;
+  }
+
   function test_clockFootprint_isAGridMultiple() {
     // 6 cells of the 25px grid, so a clock and the 25px gap beside it fill the grid exactly
     compare(DesktopMetrics.clockFootprint(1), 150);
@@ -27,9 +34,8 @@ TestCase {
 
   function test_metricsDoNotFollowTheUiStyle() {
     // The styles disagree on these numbers (that was the bug), the desktop metrics must not
-    var material = UiStyles.tokens("material");
-    var caelestia = UiStyles.tokens("caelestia");
-    verify(material.fontSizes.XXXL !== caelestia.fontSizes.XXXL || material.margins.XL !== caelestia.margins.XL);
+    var material = tokens("material");
+    verify(material.fontSizes.XXXL !== DesktopMetrics.fontSizes.XXXL || material.margins.XL !== DesktopMetrics.margins.XL);
     compare(DesktopMetrics.fontSizes.XXXL, 24);
     compare(DesktopMetrics.margins.XL, 18);
   }

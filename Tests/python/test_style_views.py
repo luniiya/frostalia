@@ -26,11 +26,11 @@ class StyleViewTests(unittest.TestCase):
     def test_sidebar_transition_shares_one_animation(self):
         source = (ROOT / "Modules/Panels/Settings/SettingsContent.qml").read_text()
         self.assertIn("Behavior on sidebarExpansion", source)
-        self.assertIn("spacing: root.material ? root.materialRail.rowSpacing : Style.marginXS", source)
+        self.assertIn("spacing: root.materialRail.rowSpacing", source)
         self.assertIn("SettingsWindowLayout.materialRail(sidebarExpansion,", source)
         self.assertEqual(source.count("SettingsWindowLayout.railIconInset(root.sidebarExpansion,"), 2)
-        self.assertIn("opacity: root.material ? root.sidebarExpansion", source)
-        self.assertIn("enabled: !root.material", source)
+        self.assertIn("opacity: root.sidebarExpansion", source)
+        self.assertNotIn("root.material ?", source)
 
     def test_home_profile_places_host_in_center_and_distribution_on_right(self):
         source = (ROOT / "Modules/Panels/Settings/SettingsHome.qml").read_text()
@@ -96,9 +96,10 @@ class StyleViewTests(unittest.TestCase):
         self.assertNotIn("SettingsSidebarDebug", source)
 
     def test_registered_views_exist(self):
-        source = (ROOT / "Helpers/UiStyles.js").read_text()
-        paths = re.findall(r'"(?:controlCenter|mediaCard|mediaPlayer|osd|notificationContent|kdeConnectHome)": "([^"]+\.qml)"', source)
-        self.assertEqual(len(paths), 18)
+        source = "".join(path.read_text() for path in sorted((ROOT / "Styles").glob("*/Definition.qml")))
+        paths = re.findall(r'"(?:controlCenter|mediaCard|mediaPlayer|osd|notificationContent|kdeConnectHome|launcher)": "([^"]+\.qml)"', source)
+        # Seven surfaces in each of the two styles
+        self.assertEqual(len(paths), 14)
         for path in paths:
             with self.subTest(path=path):
                 self.assertTrue((ROOT / path).is_file())
@@ -117,8 +118,6 @@ class StyleViewTests(unittest.TestCase):
         source = (ROOT / "Modules/Panels/ControlCenter/MaterialControlCenter.qml").read_text()
         self.assertIn("sourceComponent: MediaCard", source)
         self.assertIn("sourceComponent: MaterialSystemMonitor", source)
-        legacy = (ROOT / "Modules/Panels/ControlCenter/CaelestiaControlCenter.qml").read_text()
-        self.assertIn("SystemMonitorCard", legacy)
 
     def test_material_header_buttons_are_spaced(self):
         # Material icon buttons have a filled background, so they need a gap.

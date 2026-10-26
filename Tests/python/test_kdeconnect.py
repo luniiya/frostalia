@@ -66,7 +66,7 @@ class KdeConnectTests(unittest.TestCase):
 
     def test_home_feature_tiles_have_no_count_badges(self):
         # Counts are already in the subtitles ("34 unread"); badges were noise.
-        for path in ("Modules/Panels/KdeConnect/MaterialKdeConnectHome.qml", "Modules/Panels/KdeConnect/CaelestiaKdeConnectHome.qml", "Modules/Panels/ControlCenter/MaterialTile.qml"):
+        for path in ("Modules/Panels/KdeConnect/MaterialKdeConnectHome.qml", "Modules/Panels/ControlCenter/MaterialTile.qml"):
             self.assertNotIn("badge", (ROOT / path).read_text(encoding="utf-8").lower(), path)
 
     def test_control_center_card_is_registered_and_off_by_default(self):
@@ -77,8 +77,7 @@ class KdeConnectTests(unittest.TestCase):
         self.assertEqual(order[order.index("brightness-card") + 1:order.index("weather-card")], ["kdeconnect-card"], "card sits between brightness and weather")
         tab = (ROOT / "Modules/Panels/Settings/Tabs/ControlCenter/ControlCenterTab.qml").read_text(encoding="utf-8")
         self.assertEqual(re.findall(r'"id": "([a-z-]+-card)"', tab), order, "settings list order matches the defaults")
-        for path, component in (("Modules/Panels/ControlCenter/MaterialControlCenter.qml", "KdeConnectPill"),
-                                ("Modules/Panels/ControlCenter/CaelestiaControlCenter.qml", "CaelestiaKdeConnectCard")):
+        for path, component in (("Modules/Panels/ControlCenter/MaterialControlCenter.qml", "KdeConnectPill"),):
             source = (ROOT / path).read_text(encoding="utf-8")
             self.assertIn('case "kdeconnect-card"', source, path)
             self.assertIn(component, source, path)

@@ -238,11 +238,10 @@ RowLayout {
       y: combo.topPadding + (combo.availableHeight - height) / 2
       icon: "caret-down"
       pointSize: Style.fontSizeL
-      color: Style.materialControls ? (combo.popup.visible ? ShellColors.mPrimary : ShellColors.mOnSurfaceVariant) : ShellColors.mOnSurface
-      rotation: Style.materialControls && combo.popup.visible ? 180 : 0
+      color: combo.popup.visible ? ShellColors.mPrimary : ShellColors.mOnSurfaceVariant
+      rotation: combo.popup.visible ? 180 : 0
 
       Behavior on rotation {
-        enabled: Style.materialControls
         NumberAnimation {
           duration: Style.animationFast
           easing.type: Easing.OutCubic
@@ -277,7 +276,7 @@ RowLayout {
           width: listView.availableWidth
           highlighted: listView.currentIndex === index
           selected: combo.currentIndex === index
-          height: delegateText.implicitHeight + (Style.materialControls ? Style.margin2M : Style.margin2S)
+          height: delegateText.implicitHeight + Style.margin2M
 
           NText {
             id: delegateText

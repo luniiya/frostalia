@@ -71,6 +71,15 @@ Singleton {
     Logger.d("PanelService", "Unregistered popup menu window for screen:", key);
   }
 
+  // Whether a context or tray menu is open on any screen
+  function anyPopupMenuOpen() {
+    for (const key in popupMenuWindows) {
+      if (popupMenuWindows[key] && popupMenuWindows[key].visible)
+        return true;
+    }
+    return false;
+  }
+
   // Get popup menu window for a screen
   function getPopupMenuWindow(screen) {
     if (!screen)

@@ -50,7 +50,7 @@ Singleton {
     // Parse all fonts - split comma-separated family names
     var allLines = allFontsText.split('\n');
     var fontSet = {}; // Deduplicate font families
-    for (const family of UiStyles.fontFamilies())
+    for (const family of UiStyles.fontFamilies(UiStyleRegistry.definitions))
       fontSet[family] = true;
 
     for (var j = 0; j < allLines.length; j++) {

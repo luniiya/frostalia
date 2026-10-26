@@ -1,13 +1,20 @@
 import QtQuick
 import QtTest
 import "../Helpers/UiStyles.js" as UiStyles
-import "../Widgets" as Widgets
+import "../Styles/keycap" as Keycap
 
 // Loads every Keycap bar face with a stand-in kit and host, in both bar
 // orientations and every interaction state, and fails on any QML warning.
 TestCase {
   id: testCase
   name: "KeycapFaces"
+
+  // The real style folders (Styles/<id>/Definition.qml)
+  readonly property var styles: UiStyles.loadAll(Qt.resolvedUrl("../Styles"), ["material", "keycap"])
+
+  function tokens(id) {
+    return UiStyles.definition(styles, id).tokens;
+  }
   visible: true
   when: windowShown
   width: 400
@@ -16,6 +23,7 @@ TestCase {
   QtObject {
     id: kit
     property color cream: "#fff3dc"
+    property color shade: "#141218"
     property color ink: "#141218"
     property color fill: "#3a3546"
     property color fillText: "#fff3dc"
@@ -127,11 +135,11 @@ TestCase {
   }
 
   function faceNames() {
-    return Object.keys(UiStyles.definitions.keycap.barViews);
+    return Object.keys(styles.keycap.barViews);
   }
 
   function create(name, extra) {
-    const component = Qt.createComponent(Qt.resolvedUrl("../" + UiStyles.barView("keycap", name)));
+    const component = Qt.createComponent(Qt.resolvedUrl("../" + UiStyles.barView(UiStyles.definition(styles, "keycap"), name)));
     compare(component.status, Component.Ready, name + ": " + component.errorString());
     const props = Object.assign({
                                   "kit": kit,
@@ -300,7 +308,7 @@ TestCase {
 
     Component {
     id: keycapComponent
-    Widgets.NKeycap {
+    Keycap.Key {
     width: 40
     height: 20
     depth: 3

@@ -1,12 +1,12 @@
 .pragma library
 
-// Material uses a landscape window with a collapsible category sidebar.
-function windowMetrics(material, scale) {
+// A landscape window with a collapsible category sidebar.
+function windowMetrics(scale) {
   return {
-    width: Math.round((material ? 1100 : 840) * scale),
-    height: Math.round((material ? 750 : 910) * scale),
-    minimumWidth: Math.round((material ? 560 : 500) * scale),
-    minimumHeight: Math.round((material ? 520 : 910) * scale)
+    width: Math.round(1100 * scale),
+    height: Math.round(750 * scale),
+    minimumWidth: Math.round(560 * scale),
+    minimumHeight: Math.round(520 * scale)
   };
 }
 
@@ -44,16 +44,16 @@ function adjacentTab(index, count, fromHome, direction) {
   return (index + direction + count) % count;
 }
 
-function homeMetrics(availableWidth, scale, material) {
+function homeMetrics(availableWidth, scale) {
   return {
-    contentWidth: Math.max(0, Math.min(availableWidth, Math.round((material ? 960 : 900) * scale))),
+    contentWidth: Math.max(0, Math.min(availableWidth, Math.round(960 * scale))),
     avatarSize: Math.round(56 * scale)
   };
 }
 
-function homeGrid(width, scale, material) {
-  var spacing = Math.round((material ? 16 : 13) * scale);
-  var minimumWidth = Math.round((material ? 210 : 160) * scale);
+function homeGrid(width, scale) {
+  var spacing = Math.round(16 * scale);
+  var minimumWidth = Math.round(210 * scale);
   var columns = Math.max(1, Math.min(3, Math.floor((width + spacing) / (minimumWidth + spacing))));
   var cardWidth = Math.max(0, (width - spacing * (columns - 1)) / columns);
   var profileColumns = Math.min(2, columns);

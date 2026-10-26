@@ -76,13 +76,16 @@ class SettingsStoreTests(unittest.TestCase):
             shutil.copy2(ROOT / "Commons/TomlSettingsStore.qml", temp / "Commons/TomlSettingsStore.qml")
             for name in ("QtObj2JS.js", "SettingsObject.js", "UiStyleSettings.js", "UiStyles.js"):
                 shutil.copy2(ROOT / "Helpers" / name, temp / "Helpers" / name)
-            harness = (ROOT / "Tests/integration/ui-style-store.qml").read_text().replace('"../../Commons"', '"Commons"').replace('"../../Helpers/', '"Helpers/')
+            for definition in (ROOT / "Styles").glob("*/Definition.qml"):
+                (temp / "Styles" / definition.parent.name).mkdir(parents=True)
+                shutil.copy2(definition, temp / "Styles" / definition.parent.name / "Definition.qml")
+            harness = (ROOT / "Tests/integration/ui-style-store.qml").read_text().replace('"../../Commons"', '"Commons"').replace('"../../Helpers/', '"Helpers/').replace('"../../Styles"', '"Styles"')
             # Exercise the production IPC methods against the real store in this
             # isolated shell, without starting unrelated system services.
             ipc_source = (ROOT / "Services/Control/IPCService.qml").read_text()
             handler = ipc_source.split('  IpcHandler {\n    target: "uiStyle"', 1)[1].split('\n  IpcHandler {', 1)[0]
             handler = '  IpcHandler {\n    target: "uiStyle"' + handler
-            handler = handler.replace("Settings.setUiStyle(style)", "store.switchStyle(style)").replace("Settings.data.ui.style", "model.ui.style").replace("Style.uiStyleChoices", "[{key: 'caelestia'}, {key: 'material'}]")
+            handler = handler.replace("Settings.setUiStyle(style)", "store.switchStyle(style)").replace("Settings.data.ui.style", "model.ui.style").replace("Style.uiStyleChoices", "[{key: 'keycap'}, {key: 'material'}]")
             harness = harness.replace("  JsonAdapter {", handler + "\n  JsonAdapter {", 1)
             (temp / "shell.qml").write_text(harness)
             config = temp / "settings/moon.toml"
@@ -110,7 +113,8 @@ class SettingsStoreTests(unittest.TestCase):
          p=pathlib.Path(d)
          for folder in ['Commons','Helpers','Services/Frostalia','Services/UI','Modules/OSD','run']: (p/folder).mkdir(parents=True,exist_ok=True)
          (p/'run').chmod(0o700)
-         for name in ['Settings.qml','TomlSettingsStore.qml']: shutil.copy2(root/'Commons'/name,p/'Commons'/name)
+         for name in ['Settings.qml','TomlSettingsStore.qml','UiStyleRegistry.qml']: shutil.copy2(root/'Commons'/name,p/'Commons'/name)
+         shutil.copytree(root/'Styles',p/'Styles')
          shutil.copytree(root/'Commons/Migrations',p/'Commons/Migrations')
          shutil.copytree(root/'Helpers',p/'Helpers',dirs_exist_ok=True)
          (p/'Assets').mkdir(); shutil.copy2(root/'Assets/settings-default.json',p/'Assets/settings-default.json')

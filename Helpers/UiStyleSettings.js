@@ -37,19 +37,21 @@ var defaults = {
   }
 };
 
-function forStyle(style) {
-  return SettingsObject.resolve(defaults, UiStyles.definitions[UiStyles.resolveId(style)].settingsDefaults || {});
+// `definitions` is the style map of Commons/UiStyleRegistry.qml (id -> definition).
+function forStyle(definitions, style) {
+  const definition = UiStyles.definition(definitions, style);
+  return SettingsObject.resolve(defaults, definition ? definition.settingsDefaults || {} : {});
 }
 
-function defaultValue(style, path) {
+function defaultValue(definitions, style, path) {
   const parts = path.split(".");
-  const values = forStyle(style);
+  const values = forStyle(definitions, style);
   return parts.length === 2 && values[parts[0]] ? values[parts[0]][parts[1]] : undefined;
 }
 
-function configuration(directory) {
+function configuration(directory, definitions) {
   const styles = {};
-  for (const choice of UiStyles.choices())
-    styles[choice.key] = forStyle(choice.key);
+  for (const choice of UiStyles.choices(definitions))
+    styles[choice.key] = forStyle(definitions, choice.key);
   return { directory: directory, default_style: UiStyles.defaultStyle, defaults: styles };
 }

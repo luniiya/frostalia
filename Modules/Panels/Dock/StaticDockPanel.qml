@@ -20,6 +20,13 @@ SmartPanel {
   readonly property int maxWidth: screen ? screen.width * 0.8 : 1000
   readonly property int maxHeight: screen ? screen.height * 0.8 : 1000
   readonly property bool autoHide: false
+
+  // Turning the dock off must not leave its attached panel open with nothing in it
+  readonly property bool dockEnabled: Settings.data.dock.enabled
+  onDockEnabledChanged: {
+    if (!dockEnabled && isPanelOpen)
+      close();
+  }
   readonly property int hideDelay: 1000
   readonly property int showDelay: 100
 

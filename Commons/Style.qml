@@ -13,63 +13,87 @@ Singleton {
   id: root
 
   // Register the preset fonts before shared widgets resolve their families.
-  property FontLoader caelestiaFont: FontLoader {
+  property FontLoader rubikFont: FontLoader {
     source: Qt.resolvedUrl("../Assets/Fonts/rubik/Rubik.ttf")
   }
   property FontLoader materialFont: FontLoader {
     source: Qt.resolvedUrl("../Assets/Fonts/roboto/Roboto.ttf")
   }
 
-  readonly property string uiStyleId: UiStyles.resolveId(Settings.data.ui.style)
-  readonly property var uiStyleChoices: UiStyles.choices()
-  readonly property var uiStyleTokens: UiStyles.tokens(uiStyleId)
-  readonly property bool materialControls: uiStyleTokens.controls.renderer === "material"
-  readonly property bool keycapControls: uiStyleTokens.controls.renderer === "keycap"
+  // The active style (Styles/<id>/, see Commons/UiStyleRegistry.qml)
+  readonly property string uiStyleId: UiStyles.resolveId(UiStyleRegistry.definitions, Settings.data.ui.style)
+  readonly property var uiStyleDefinition: UiStyleRegistry.definitions[uiStyleId]
+  readonly property var uiStyleChoices: UiStyleRegistry.choices
+  readonly property var uiStyleTokens: uiStyleDefinition.tokens
   readonly property var sliderStyle: uiStyleTokens.slider
   readonly property var toggleStyle: uiStyleTokens.toggle
+  // Popups and cards are drawn solid (the style's skins put a shadow under them)
+  readonly property bool opaqueSurfaces: uiStyleTokens.surfaces.opaque
   // Installed families, only looked up for styles whose preset font may be missing.
   // Waits for the bundled fallback font so it is part of the list.
-  readonly property var _installedFonts: uiStyleTokens.fontFallbacks && caelestiaFont.status === FontLoader.Ready ? Qt.fontFamilies() : null
-  readonly property string fontDefault: UiStyles.fontFamily(uiStyleId, Settings.data.ui.fontDefault, false, Qt.application.font.family, _installedFonts)
-  readonly property string fontFixed: UiStyles.fontFamily(uiStyleId, Settings.data.ui.fontFixed, true, Qt.application.font.family)
+  readonly property var _installedFonts: uiStyleTokens.fontFallbacks && rubikFont.status === FontLoader.Ready ? Qt.fontFamilies() : null
+  readonly property string fontDefault: UiStyles.fontFamily(uiStyleTokens, Settings.data.ui.fontDefault, false, Qt.application.font.family, _installedFonts)
+  readonly property string fontFixed: UiStyles.fontFamily(uiStyleTokens, Settings.data.ui.fontFixed, true, Qt.application.font.family)
 
-  // Keycap renderer: hard shadow depth, press depth and hover lift, scaled.
-  readonly property var keycapTokens: uiStyleTokens.keycap || null
-  readonly property int keycapDepth: keycapTokens ? Math.max(1, Math.round(keycapTokens.depth * uiScaleRatio)) : 0
-  readonly property int keycapPressedDepth: keycapTokens ? Math.round(keycapTokens.pressedDepth * uiScaleRatio) : 0
-  readonly property int keycapHoverLift: keycapTokens ? Math.round(keycapTokens.hoverLift * uiScaleRatio) : 0
-  readonly property int keycapOutline: keycapTokens ? Math.max(1, Math.round(keycapTokens.outline * uiScaleRatio)) : 0
-  readonly property int keycapRing: keycapTokens ? Math.max(1, Math.round(keycapTokens.ring * uiScaleRatio)) : 0
+  // Helpers shared by the style's own files (the definition's `kit`), or null
+  readonly property var kit: kitFor(uiStyleDefinition.kit)
+  property var _kits: ({})
+  // One shared instance per kit file (a path relative to the shell directory), kept
+  // while a style switch unloads the skins that use it
+  function kitFor(path) {
+    if (!path)
+      return null;
+    if (!(path in _kits)) {
+      const component = Qt.createComponent(Quickshell.shellDir + "/" + path);
+      if (component.status !== Component.Ready)
+        console.warn("Style: cannot load kit", path, component.errorString());
+      _kits[path] = component.status === Component.Ready ? component.createObject(root) : null;
+    }
+    return _kits[path];
+  }
+
+  // Shadow depth of the style's bar faces at rest (0: the style has no faces)
+  readonly property int faceDepth: uiStyleTokens.faces ? Math.max(1, Math.round(uiStyleTokens.faces.depth * uiScaleRatio)) : 0
+
+  // Face depth for a bar section, limited by the room around the capsule
+  function barFaceDepth(screenName, section) {
+    return UiStyles.barFaceDepth(uiStyleTokens, getBarHeightForScreen(screenName, section), getCapsuleHeightForScreen(screenName, section), uiScaleRatio);
+  }
+
+  // The active style's skin for a shared control (Styles/<id>/<name>.qml, see NStyleSkin)
+  function skinUrl(name) {
+    return UiStyleRegistry.directory + "/" + uiStyleId + "/" + name + ".qml";
+  }
 
   function surfaceUrl(surface) {
-    const path = UiStyles.view(uiStyleId, surface);
+    const path = UiStyles.view(uiStyleDefinition, surface);
     return path ? Quickshell.shellDir + "/" + path : "";
   }
 
   // Style-specific bar widget face, or "" when the style keeps the shared look.
   function barViewUrl(name) {
-    const path = UiStyles.barView(uiStyleId, name);
+    const path = UiStyles.barView(uiStyleDefinition, name);
     return path ? Quickshell.shellDir + "/" + path : "";
   }
 
   function getSliderGeometry(heightRatio) {
-    return UiStyles.sliderGeometry(uiStyleId, baseWidgetSize, heightRatio, uiScaleRatio);
+    return UiStyles.sliderGeometry(uiStyleTokens, baseWidgetSize, heightRatio, uiScaleRatio);
   }
 
   function getFieldShape(focused, cornerRadius) {
-    return UiStyles.fieldShape(uiStyleId, focused, cornerRadius);
+    return UiStyles.fieldShape(uiStyleTokens, focused, cornerRadius);
   }
 
   function getExpandableShape(expanded) {
-    return UiStyles.expandableShape(uiStyleId, expanded);
+    return UiStyles.expandableShape(uiStyleTokens, expanded);
   }
 
   function getButtonGroupRadii(height, checked, isFirst, isLast) {
-    return UiStyles.buttonGroupRadii(uiStyleId, height, checked, isFirst, isLast);
+    return UiStyles.buttonGroupRadii(uiStyleTokens, height, checked, isFirst, isLast);
   }
 
   function getToggleGeometry(baseSize, checked, pressed) {
-    return UiStyles.toggleGeometry(uiStyleId, baseSize, checked, pressed);
+    return UiStyles.toggleGeometry(uiStyleTokens, baseSize, checked, pressed);
   }
 
   function splitSliderTrack(width, hitWidth, position, gap, mirrored) {
@@ -142,11 +166,11 @@ Singleton {
   readonly property real opacityFull: 1.0
 
   // Material frosted glass replaces the configured panel opacity with its own
-  readonly property var glass: UiStyles.glass(uiStyleId, Settings.data.ui.frostedGlass && !PowerProfileService.frostaliaPerformanceMode, {
+  readonly property var glass: UiStyles.glass(uiStyleTokens, Settings.data.ui.frostedGlass && !PowerProfileService.frostaliaPerformanceMode, {
                                                 "panelOpacity": Settings.data.ui.glassPanelOpacity,
                                                 "surfaceOpacity": Settings.data.ui.glassSurfaceOpacity
                                               })
-  readonly property real panelOpacity: UiStyles.panelOpacity(uiStyleId, Settings.data.ui.panelBackgroundOpacity, glass !== null, glass)
+  readonly property real panelOpacity: UiStyles.panelOpacity(uiStyleTokens, Settings.data.ui.panelBackgroundOpacity, glass !== null, glass)
   readonly property real effectivePanelOpacity: PowerProfileService.frostaliaPerformanceMode ? 1.0 : ShellColors.adaptiveOpacity(panelOpacity)
   readonly property real effectiveBarOpacity: PowerProfileService.frostaliaPerformanceMode ? 1.0 : Settings.data.bar.backgroundOpacity
 

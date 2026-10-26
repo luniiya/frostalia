@@ -6,6 +6,7 @@ import qs.Commons
 import qs.Modules.MainScreen
 import qs.Services.UI
 import qs.Widgets
+import "../../../Helpers/LauncherView.js" as LauncherView
 
 SmartPanel {
   id: root
@@ -45,13 +46,10 @@ SmartPanel {
   readonly property int previewPanelWidth: Math.round(400 * Style.uiScaleRatio)
 
   // Panel sizing
-  readonly property int listPanelWidth: Math.round(500 * Style.uiScaleRatio)
-  readonly property int totalBaseWidth: listPanelWidth + Style.margin2L
+  readonly property var panelSize: LauncherView.panelSize(Style.uiScaleRatio)
 
-  preferredWidth: totalBaseWidth
-  preferredHeight: Math.round(600 * Style.uiScaleRatio)
-  preferredWidthRatio: 0.25
-  preferredHeightRatio: 0.5
+  preferredWidth: panelSize.width
+  preferredHeight: panelSize.height
 
   // Positioning
   readonly property string screenBarPosition: Settings.getBarPositionForScreen(screen?.name)
@@ -104,15 +102,11 @@ SmartPanel {
       forceOpaque: true // no blur for now
       x: root.panelAnchorRight ? -(root.previewPanelWidth + Style.marginM) : ui.width + Style.marginM
       y: {
-        var view = launcherCore.resultsView;
-        if (!view)
-          return Style.marginL;
-        var row = launcherCore.isGridView ? Math.floor(launcherCore.selectedIndex / launcherCore.gridColumns) : launcherCore.selectedIndex;
-        var gridCellSize = Math.floor((root.listPanelWidth - Style.margin2XS - ((launcherCore.targetGridColumns - 1) * Style.marginS)) / launcherCore.targetGridColumns);
-        var itemHeight = launcherCore.isGridView ? (gridCellSize + Style.marginXXS) : (launcherCore.entryHeight + (view.spacing || 0));
-        var yPos = row * itemHeight - (view.contentY || 0);
-        var mapped = view.mapToItem(ui, 0, yPos);
-        return Math.max(Style.marginL, Math.min(mapped.y, ui.height - previewBox.height - Style.marginL));
+        // Re-evaluate when the selection moves or the results scroll
+        launcherCore.selectedIndex;
+        launcherCore.resultsView?.contentY;
+        var top = launcherCore.selectedRowTop(ui);
+        return LauncherView.previewY(top === null ? Style.marginL : top, 0, ui.height, previewBox.height, Style.marginL);
       }
       z: -1
 

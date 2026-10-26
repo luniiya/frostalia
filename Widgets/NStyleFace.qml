@@ -1,13 +1,11 @@
 import QtQuick
 import qs.Commons
-// Faces are only loaded by URL. Quickshell indexes the directories it reaches through
-// imports, so without this the faces can't use each other as types ("KeycapFace is not a type").
-import qs.Modules.Bar.Widgets.Keycap
 
-// Loads the active style's face for a bar widget (UiStyles `barViews`), or
+// Loads the active style's face for a bar widget (its definition's `barViews`), or
 // nothing when the style keeps the shared look. A face only draws: the widget
-// keeps its own mouse areas, tooltips and menus and feeds the face its state.
-// Faces derive from Modules/Bar/Widgets/Keycap/KeycapFace.qml.
+// keeps its own mouse areas, tooltips and menus and feeds the face its state and
+// the style's kit (Style.kit). Faces are loaded by URL, so a style folder of faces
+// needs a qmldir for the faces to use each other as types.
 Loader {
   id: root
 
@@ -18,7 +16,7 @@ Loader {
   property bool hovered: false
   property bool pressed: false
   property var faceData: ({})
-  property real depth: Style.keycapDepth
+  property real depth: Style.faceDepth
 
   readonly property string url: Style.barViewUrl(view) || (fallbackView ? Style.barViewUrl(fallbackView) : "")
   readonly property bool loaded: status === Loader.Ready && item !== null
@@ -41,7 +39,7 @@ Loader {
     _loadedUrl = url;
     if (url)
       setSource(url, {
-                  "kit": KeycapKit,
+                  "kit": Style.kit,
                   "host": root.host
                 });
     else

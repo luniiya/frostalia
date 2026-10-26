@@ -29,6 +29,8 @@ Rectangle {
   border.width: Style.borderS
   border.color: Qt.alpha(ShellColors.mOutline, 0.4)
 
+  NStyleCard {}
+
   RowLayout {
     anchors.fill: parent
     anchors.margins: Style.marginL
@@ -106,6 +108,11 @@ Rectangle {
           color: tile.lit ? ShellColors.mHover : ShellColors.mSurfaceVariant
           border.width: tile.lit ? 2 : 0
           border.color: ShellColors.mPrimary
+
+          NStyleCard {
+            hovered: area.containsMouse
+            pressed: area.pressed
+          }
 
           Behavior on color {
             ColorAnimation {
@@ -280,6 +287,11 @@ Rectangle {
       Layout.alignment: Qt.AlignVCenter
       radius: height / 2
       color: doneArea.containsMouse ? Qt.lighter(ShellColors.mPrimary, 1.1) : ShellColors.mPrimary
+
+      NStyleCard {
+        hovered: doneArea.containsMouse
+        pressed: doneArea.pressed
+      }
 
       RowLayout {
         anchors.centerIn: parent

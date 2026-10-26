@@ -13,16 +13,15 @@ Item {
   property var tooltipText
   property color backgroundColor: ShellColors.mPrimary
   property color textColor: ShellColors.mOnPrimary
-  // Material: outlined buttons become tonal buttons (tinted pill, no border)
-  readonly property bool _tonal: Style.materialControls && outlined
-  property color hoverColor: Style.materialControls ? (outlined ? Qt.alpha(backgroundColor, 0.16) : backgroundColor) : ShellColors.mHover
-  property color textHoverColor: Style.materialControls ? (outlined ? ShellColors.mOnSurface : textColor) : ShellColors.mOnHover
+  // Hover colors, for styles that tint on hover
+  property color hoverColor: outlined ? Qt.alpha(backgroundColor, 0.16) : backgroundColor
+  property color textHoverColor: outlined ? ShellColors.mOnSurface : textColor
   property real fontSize: Style.fontSizeM
   property int fontWeight: Style.fontWeightSemiBold
   property real iconSize: Style.fontSizeL
   property bool outlined: false
   property int horizontalAlignment: Qt.AlignHCenter
-  property real buttonRadius: Style.materialControls ? Style.iRadiusL : Style.iRadiusS
+  property real buttonRadius: Style.iRadiusL
 
   // Signals
   signal clicked
@@ -33,37 +32,24 @@ Item {
 
   // Internal properties
   property bool hovered: false
-  readonly property color contentColor: {
-    if (!root.enabled) {
-      return ShellColors.mOnSurfaceVariant;
-    }
-    if (root.hovered && !Style.keycapControls) {
-      return root.textHoverColor;
-    }
-    if (root._tonal) {
-      return ShellColors.mOnSurface;
-    }
-    if (root.outlined) {
-      return root.backgroundColor;
-    }
-    return root.textColor;
-  }
+  readonly property bool pressed: mouseArea.pressed
+  // The style's skin (Styles/<style>/Button.qml) picks the content color
+  readonly property color contentColor: skin.loaded ? skin.item.contentColor : textColor
 
   // Dimensions - include margin so border renders cleanly at fractional scales
   implicitWidth: bg.implicitWidth + 2 * Style.borderS
   implicitHeight: bg.implicitHeight + 2 * Style.borderS
 
   opacity: enabled ? 1.0 : 0.6
-  scale: Style.materialControls && mouseArea.pressed ? 0.97 : 1
+  scale: skin.loaded ? skin.item.controlScale : 1
   Behavior on scale {
-    enabled: Style.materialControls
     NumberAnimation {
       duration: Style.animationFast
       easing.type: Easing.OutCubic
     }
   }
 
-  Rectangle {
+  Item {
     id: bg
     anchors.fill: parent
     anchors.margins: Style.borderS
@@ -71,81 +57,18 @@ Item {
     implicitWidth: contentRow.implicitWidth + (root.fontSize * 2)
     implicitHeight: contentRow.implicitHeight + (root.fontSize)
 
-    radius: root.buttonRadius
-    color: {
-      if (Style.keycapControls)
-        return "transparent";
-      if (!root.enabled)
-        return root.outlined ? "transparent" : Qt.lighter(ShellColors.mSurfaceVariant, 1.2);
-      if (root.hovered)
-        return root.hoverColor;
-      if (root._tonal)
-        return Qt.alpha(root.backgroundColor, 0.16);
-      return root.outlined ? "transparent" : root.backgroundColor;
-    }
-
-    border.width: root.outlined && !root._tonal && !Style.keycapControls ? Style.borderS : 0
-    border.color: {
-      if (!root.enabled)
-        return ShellColors.mOutline;
-      if (root.hovered)
-        return root.hoverColor;
-      return root.outlined ? root.backgroundColor : "transparent";
-    }
-
-    Behavior on color {
-      enabled: !ShellColors.isTransitioning
-      ColorAnimation {
-        duration: Style.animationFast
-        easing.type: Easing.OutCubic
-      }
-    }
-
-    Behavior on border.color {
-      enabled: !ShellColors.isTransitioning
-      ColorAnimation {
-        duration: Style.animationFast
-        easing.type: Easing.OutCubic
-      }
-    }
-
-    NMaterialStateLayer {
-      hovered: root.hovered
-      pressed: mouseArea.pressed
-      tint: root._tonal ? ShellColors.mOnSurface : (root.outlined ? root.backgroundColor : root.textColor)
-    }
-
-    // Keycap renderer: filled key with a hard shadow that sinks while pressed.
-    // Outlined buttons become surface keys with the accent as content color.
-    Loader {
-      id: keycap
-      active: Style.keycapControls
-      anchors.fill: parent
+    NStyleSkin {
+      id: skin
+      name: "Button"
+      control: root
       z: -1
-      readonly property real sink: item ? item.sink : 0
-      sourceComponent: NKeycap {
-        readonly property color baseFill: !root.enabled ? ShellColors.mSurfaceVariant : (root.outlined ? ShellColors.mSurface : root.backgroundColor)
-        fillColor: root.hovered && root.enabled && !root.outlined ? Qt.lighter(baseFill, 1.08) : baseFill
-        inkColor: KeycapKit.ink
-        ringColor: KeycapKit.ringFor(baseFill)
-        radius: root.buttonRadius
-        outlineWidth: Style.keycapOutline
-        ringWidth: Style.keycapRing
-        depth: Style.keycapDepth
-        pressedDepth: Style.keycapPressedDepth
-        hoverLift: Style.keycapHoverLift
-        pressed: mouseArea.pressed
-        hovered: root.hovered && root.enabled
-        duration: Style.animationFast
-        overshoot: KeycapKit.overshoot
-      }
     }
 
     // Content
     RowLayout {
       id: contentRow
       anchors.verticalCenter: parent.verticalCenter
-      anchors.verticalCenterOffset: keycap.sink
+      anchors.verticalCenterOffset: skin.loaded ? skin.item.sink : 0
       anchors.left: root.horizontalAlignment === Qt.AlignLeft ? parent.left : undefined
       anchors.horizontalCenter: root.horizontalAlignment === Qt.AlignHCenter ? parent.horizontalCenter : undefined
       anchors.leftMargin: root.horizontalAlignment === Qt.AlignLeft ? Style.marginL : 0

@@ -57,7 +57,7 @@ NIconButton {
 
   baseSize: Style.getCapsuleHeightForScreen(screen?.name, section)
   faceView: "NotificationHistory"
-  faceDepth: KeycapKit.barDepth(screen?.name, section)
+  faceDepth: Style.barFaceDepth(screen?.name, section)
   faceData: ({
                "count": root.count,
                "showBadge": root.showUnreadBadge,

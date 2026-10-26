@@ -5,7 +5,7 @@ import qs.Commons
 import qs.Services.UI
 import qs.Widgets
 
-Rectangle {
+Item {
   id: root
 
   // Public properties
@@ -31,46 +31,14 @@ Rectangle {
   property real groupLeftRadius: groupRadii ? groupRadii.left : (isFirst ? Style.iRadiusM : Style.iRadiusXXXS)
   property real groupRightRadius: groupRadii ? groupRadii.right : (isLast ? Style.iRadiusM : Style.iRadiusXXXS)
 
-  topLeftRadius: groupLeftRadius
-  bottomLeftRadius: groupLeftRadius
-  topRightRadius: groupRightRadius
-  bottomRightRadius: groupRightRadius
+  readonly property bool pressed: tabMouse.pressed
+  // The style's skin (Styles/<style>/TabButton.qml) draws the background and picks the content color
+  readonly property color contentColor: skin.loaded ? skin.item.contentColor : (checked ? ShellColors.mOnPrimary : ShellColors.mOnSurface)
 
-  color: root.isHovered && !Style.materialControls ? ShellColors.mHover : (root.checked ? ShellColors.mPrimary : (Style.materialControls ? ShellColors.mTonalContainer : ShellColors.smartAlpha(ShellColors.mSurface)))
-  border.color: root.checked ? ShellColors.mPrimary : ShellColors.mOutline
-  border.width: Style.materialControls ? 0 : Style.borderS
-
-  Behavior on groupLeftRadius {
-    enabled: Style.materialControls
-    NumberAnimation {
-      duration: Style.animationFast
-      easing.type: Easing.OutCubic
-    }
-  }
-  Behavior on groupRightRadius {
-    enabled: Style.materialControls
-    NumberAnimation {
-      duration: Style.animationFast
-      easing.type: Easing.OutCubic
-    }
-  }
-
-  Behavior on color {
-    enabled: !ShellColors.isTransitioning
-    ColorAnimation {
-      duration: Style.animationFast
-      easing.type: Easing.OutCubic
-    }
-  }
-
-  NMaterialStateLayer {
-    topLeftRadius: root.groupLeftRadius
-    bottomLeftRadius: root.groupLeftRadius
-    topRightRadius: root.groupRightRadius
-    bottomRightRadius: root.groupRightRadius
-    hovered: root.isHovered
-    pressed: tabMouse.pressed
-    tint: root.checked ? ShellColors.mOnPrimary : ShellColors.mPrimary
+  NStyleSkin {
+    id: skin
+    name: "TabButton"
+    control: root
   }
 
   // Content
@@ -85,7 +53,7 @@ Rectangle {
       Layout.alignment: Qt.AlignVCenter
       icon: root.icon
       pointSize: root.pointSize * 1.2
-      color: root.isHovered && !Style.materialControls ? ShellColors.mOnHover : (root.checked ? ShellColors.mOnPrimary : ShellColors.mOnSurface)
+      color: root.contentColor
 
       Behavior on color {
         enabled: !ShellColors.isTransitioning
@@ -103,7 +71,7 @@ Rectangle {
       text: root.text
       pointSize: root.pointSize
       font.weight: Style.fontWeightSemiBold
-      color: root.isHovered && !Style.materialControls ? ShellColors.mOnHover : (root.checked ? ShellColors.mOnPrimary : ShellColors.mOnSurface)
+      color: root.contentColor
       horizontalAlignment: Text.AlignHCenter
       verticalAlignment: Text.AlignVCenter
 

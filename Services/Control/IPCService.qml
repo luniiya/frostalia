@@ -18,12 +18,24 @@ import qs.Services.Power
 import qs.Services.System
 import qs.Services.Theming
 import qs.Services.UI
+import "../../Helpers/LauncherView.js" as LauncherView
+import "../../Helpers/PanelSettle.js" as PanelSettle
+import "../../Helpers/UiProbe.js" as UiProbe
 
 Singleton {
   id: root
 
   // Screen detector, set via init()
   property var screenDetector: null
+
+  // Where an item is on screen, as "x y width height" in global coordinates; "" if not shown
+  function globalRect(item) {
+    const window = item ? item.QsWindow.window : null;
+    if (!window || !window.screen || !item.visible)
+      return "";
+    const origin = UiProbe.windowOrigin(window.anchors, window.margins, window.width, window.height, window.screen.width, window.screen.height);
+    return UiProbe.globalRect(window.screen, origin, item.mapToItem(null, 0, 0), item.width, item.height);
+  }
 
   function init(detector) {
     root.screenDetector = detector;
@@ -86,6 +98,7 @@ Singleton {
                                             "about": SettingsPanel.Tab.About,
                                             "audio": SettingsPanel.Tab.Audio,
                                             "bar": SettingsPanel.Tab.Bar,
+                                            "bubbles": SettingsPanel.Tab.Bubbles,
                                             "colorscheme": SettingsPanel.Tab.ColorScheme,
                                             "controlcenter": SettingsPanel.Tab.ControlCenter,
                                             "desktopwidgets": SettingsPanel.Tab.DesktopWidgets,
@@ -330,6 +343,10 @@ Singleton {
       }, Settings.data.appLauncher.overviewLayer);
     }
     function clipboard() {
+      if (!LauncherView.modeAvailable("clipboard", Settings.data.appLauncher.enableClipboardHistory)) {
+        ToastService.showNotice(I18n.tr("launcher.view.clipboard-off"), I18n.tr("launcher.view.clipboard-off-hint"), "clipboard");
+        return;
+      }
       root.screenDetector.withCurrentScreen(screen => {
         var searchText = PanelService.getLauncherSearchText(screen);
         var isInClipMode = searchText.startsWith(">clip");
@@ -790,6 +807,44 @@ Singleton {
                                 "error": "Failed to serialize state: " + error
                               }, null, 2);
       }
+    }
+
+    // "open:<panel>" once a panel finished opening, "closed" once none is open, else "busy"
+    function panels(): string {
+      return PanelSettle.state({
+                                 "opened": PanelService.openedPanel,
+                                 "closing": PanelService.closingPanel,
+                                 "settingsWindowOpen": SettingsPanelService.isWindowOpen,
+                                 "overlayLauncherOpen": PanelService.overlayLauncherOpen,
+                                 "popupMenuOpen": PanelService.anyPopupMenuOpen(),
+                                 "radialMenuOpen": RadialMenuService.active,
+                                 "editDesktopProgress": EditDesktopService.progress
+                               });
+    }
+
+    // "x y width height" of a bar widget on a screen, in global coordinates; "" if not shown
+    function widgetRect(widgetId: string, screen: string): string {
+      return root.globalRect(BarService.lookupWidget(widgetId, screen || null));
+    }
+
+    // Same for the first icon in the open tray drawer
+    function trayDrawerItemRect(screen: string): string {
+      const drawer = PanelService.getPanel("trayDrawerPanel", Quickshell.screens.find(s => s.name === screen), false);
+      return root.globalRect(drawer ? drawer.firstItem : null);
+    }
+  }
+
+  IpcHandler {
+    target: "radialMenu"
+    // Opens the desktop radial menu in the middle of the focused screen, or closes it
+    function toggle() {
+      if (RadialMenuService.active) {
+        RadialMenuService.close();
+        return;
+      }
+      root.screenDetector.withCurrentScreen(screen => {
+        RadialMenuService.openAt(screen, screen.width / 2, screen.height / 2);
+      });
     }
   }
 

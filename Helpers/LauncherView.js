@@ -75,16 +75,6 @@ function groupRadii(index, count, size, outer, inner, selected, vertical) {
   };
 }
 
-// Width of each key in a row that splits `available` px between `count` keys
-// with `gap` px between them, no wider than `maxWidth` and no narrower than
-// `minWidth`.
-function keyWidth(available, count, gap, minWidth, maxWidth) {
-  if (!(count > 0))
-    return 0;
-  const share = (available - gap * (count - 1)) / count;
-  return Math.floor(clamp(share, minWidth, Math.max(minWidth, maxWidth)));
-}
-
 // Grid cell for `columns` columns across `width`; `ratio` makes cells taller.
 function gridCell(width, columns, ratio) {
   const cols = Math.max(1, Math.round(columns) || 1);
@@ -94,13 +84,6 @@ function gridCell(width, columns, ratio) {
     "width": w,
     "height": w * r
   };
-}
-
-// Row holding `index` in a list (one entry per row) or a grid.
-function rowOf(index, isGrid, columns) {
-  if (index < 0)
-    return 0;
-  return isGrid ? Math.floor(index / Math.max(1, columns)) : index;
 }
 
 // Top of the preview card next to the selected row, kept inside the panel.
@@ -160,4 +143,117 @@ function tiltFor(text, max) {
 // Leading glyph of the search field: a terminal prompt in command mode.
 function searchGlyph(searchText) {
   return String(searchText || "").startsWith(">") ? "terminal-2" : "search";
+}
+
+// App menu modes: each one is a launcher provider reached through its
+// command prefix. "apps" is the default search with no prefix.
+var modes = [
+  {
+    "id": "apps",
+    "prefix": "",
+    "icon": "apps",
+    "labelKey": "launcher.modes.apps"
+  },
+  {
+    "id": "windows",
+    "prefix": ">win",
+    "icon": "app-window",
+    "labelKey": "launcher.modes.windows"
+  },
+  {
+    "id": "clipboard",
+    "prefix": ">clip",
+    "icon": "clipboard",
+    "labelKey": "launcher.modes.clipboard"
+  },
+  {
+    "id": "emoji",
+    "prefix": ">emoji",
+    "icon": "mood-smile",
+    "labelKey": "launcher.modes.emoji"
+  },
+  {
+    "id": "settings",
+    "prefix": ">settings",
+    "icon": "settings",
+    "labelKey": "launcher.modes.settings"
+  },
+  {
+    "id": "commands",
+    "prefix": ">cmd",
+    "icon": "terminal-2",
+    "labelKey": "launcher.modes.commands"
+  }
+];
+
+// Modes offered in the menu; clipboard needs clipboard history enabled.
+function availableModes(clipboardEnabled) {
+  return modes.filter(m => m.id !== "clipboard" || clipboardEnabled);
+}
+
+// Clipboard mode only exists while clipboard history is on (its provider is not
+// registered otherwise, and ">clip" would fall through to app search)
+function modeAvailable(id, clipboardEnabled) {
+  return availableModes(clipboardEnabled).some(m => m.id === id);
+}
+
+function modeById(id) {
+  for (let i = 0; i < modes.length; i++) {
+    if (modes[i].id === id)
+      return modes[i];
+  }
+  return modes[0];
+}
+
+// Split the launcher search text into the active mode and the query the
+// user typed after the mode's prefix (">clip foo" -> clipboard, "foo").
+// Text that matches no prefix searches apps and is shown as typed.
+function splitQuery(searchText) {
+  const text = String(searchText || "");
+  for (let i = 1; i < modes.length; i++) {
+    const p = modes[i].prefix;
+    if (text === p || text.startsWith(p + " "))
+      return {
+        "mode": modes[i].id,
+        "query": text.slice(p.length + 1)
+      };
+  }
+  return {
+    "mode": "apps",
+    "query": text
+  };
+}
+
+// Search text for `query` typed in `modeId`; the inverse of splitQuery.
+function joinQuery(modeId, query) {
+  const mode = modeById(modeId);
+  const q = String(query || "");
+  if (!mode.prefix)
+    return q;
+  return mode.prefix + " " + q;
+}
+
+// Letter heading shown beside the first entry of each initial in an
+// alphabetical list; "" for the other entries. Non-letters group under "#".
+function initialOf(name) {
+  const c = letterFor(name);
+  return c.toLowerCase() !== c.toUpperCase() ? c : "#";
+}
+
+function sectionLetter(names, index) {
+  if (!names || index < 0 || index >= names.length)
+    return "";
+  const here = initialOf(names[index]);
+  if (index === 0)
+    return here;
+  return initialOf(names[index - 1]) === here ? "" : here;
+}
+
+// Launcher panel size at a UI scale.
+function panelSize(scale) {
+  const s = scale > 0 ? scale : 1;
+  return {
+    "width": Math.round(740 * s),
+    "height": Math.round(640 * s)
+  };
 }

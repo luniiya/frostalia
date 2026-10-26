@@ -1,11 +1,9 @@
 import QtQuick
 import qs.Commons
 
-// Shared background for text fields, dropdowns, spin boxes and other input fields.
-// Material: rounded filled field with an outline on focus.
-// Keycap: ink outline on a short hard shadow.
-// Other styles: outlined rounded field.
-Rectangle {
+// Shared background for text fields, dropdowns, spin boxes and other input fields,
+// drawn by the style's Field skin (Styles/<style>/Field.qml).
+Item {
   id: root
 
   property bool active: false
@@ -16,27 +14,10 @@ Rectangle {
   property color activeBorderColor: ShellColors.mSecondary
 
   readonly property var fieldShape: Style.getFieldShape(active, cornerRadius)
+  readonly property real radius: fieldShape ? fieldShape.radius : cornerRadius
 
-  radius: fieldShape ? fieldShape.radius : cornerRadius
-  // Keycap fields are opaque so the hard shadow below only shows under the bottom edge
-  color: Style.keycapControls ? (hovered && !active ? Qt.tint(ShellColors.mSurface, Qt.alpha(ShellColors.mPrimary, 0.08)) : ShellColors.mSurface) : (fieldShape ? (hovered && !active ? Qt.alpha(ShellColors.mOnSurface, 0.12) : ShellColors.mTonalContainer) : fillColor)
-  border.color: active ? (Style.keycapControls ? ShellColors.mPrimary : activeBorderColor) : (Style.keycapControls ? KeycapKit.ink : ShellColors.mOutline)
-  border.width: Style.keycapControls ? Style.keycapOutline : (fieldShape ? fieldShape.borderWidth : (outlined ? Style.borderS : 0))
-
-  // Keycap: fields sit on a short hard shadow
-  Rectangle {
-    visible: Style.keycapControls
-    z: -1
-    width: parent.width
-    height: parent.height
-    y: Math.max(1, Style.keycapDepth - 1)
-    radius: parent.radius
-    color: KeycapKit.ink
-  }
-
-  Behavior on border.color {
-    ColorAnimation {
-      duration: Style.animationFast
-    }
+  NStyleSkin {
+    name: "Field"
+    control: root
   }
 }

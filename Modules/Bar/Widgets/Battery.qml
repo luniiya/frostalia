@@ -160,7 +160,7 @@ Item {
     faceData: ({
                  "alert": root.isLowBattery || root.isCriticalBattery
                })
-    depth: KeycapKit.barDepth(root.screenName, root.section)
+    depth: Style.barFaceDepth(root.screenName, root.section)
     anchors.centerIn: root.useLiquidMode ? liquidBox : capsule
     width: root.useLiquidMode ? liquidBox.width : capsule.width
     height: root.useLiquidMode ? liquidBox.height : capsule.height

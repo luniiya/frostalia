@@ -17,25 +17,25 @@ Item {
   property bool handleWheel: false
   property bool hovering: false
 
-  // Material: filled tonal icon button that stays visible on surface-variant pages
-  property color colorBg: Style.materialControls ? ShellColors.mTonalContainer : ShellColors.smartAlpha(ShellColors.mSurfaceVariant)
+  // The style's skin (Styles/<style>/IconButton.qml) picks the default background
+  property color colorBg: skin.loaded ? skin.item.defaultBackground : ShellColors.mTonalContainer
   property color colorFg: ShellColors.mPrimary
-  property color colorBgHover: Style.materialControls ? colorBg : ShellColors.mHover
-  property color colorFgHover: Style.materialControls ? colorFg : ShellColors.mOnHover
+  property color colorBgHover: colorBg
+  property color colorFgHover: colorFg
   property color colorBorder: ShellColors.mOutline
   property color colorBorderHover: ShellColors.mOutline
   property real customRadius: -1 // -1 means use default (iRadiusL), otherwise use this value
   // Style-specific face (UiStyles `barViews`) for bar buttons, the state it shows and its depth
   property string faceView: ""
   property var faceData: ({})
-  property real faceDepth: Style.keycapDepth
+  property real faceDepth: Style.faceDepth
   readonly property bool pressed: iconMouse.pressed && enabled
   readonly property bool faceActive: styleFace.active
 
-  // Expose border properties for backwards compatibility (aliases to visualButton)
-  property alias border: visualButton.border
-  property alias radius: visualButton.radius
-  property alias color: visualButton.color
+  // Background, shape and border the skin draws (styles may ignore some of them)
+  property alias border: borderSpec.border
+  property real radius: Math.min((customRadius >= 0 ? customRadius : Style.iRadiusL), buttonSize / 2)
+  property color color: enabled && hovering ? colorBgHover : colorBg
 
   signal entered
   signal exited
@@ -68,84 +68,23 @@ Item {
     anchors.centerIn: parent
   }
 
-  // Keycap renderer: the button is a key that sinks while pressed
-  Loader {
-    active: Style.keycapControls && !styleFace.active
-    width: root.buttonSize
-    height: root.buttonSize
-    anchors.centerIn: parent
-    sourceComponent: NKeycap {
-      readonly property color baseFill: root.colorBg.a > 0.05 ? Qt.rgba(root.colorBg.r, root.colorBg.g, root.colorBg.b, 1) : KeycapKit.fill
-      y: -Math.round(depth / 2)
-      fillColor: baseFill
-      inkColor: KeycapKit.ink
-      ringColor: KeycapKit.ringFor(baseFill)
-      radius: Math.min((root.customRadius >= 0 ? root.customRadius : Style.iRadiusL), width / 2)
-      outlineWidth: Style.keycapOutline
-      ringWidth: Style.keycapRing
-      depth: Math.min(root.faceDepth, Style.keycapDepth)
-      pressedDepth: Style.keycapPressedDepth
-      hoverLift: Style.keycapHoverLift
-      pressed: root.pressed
-      hovered: root.hovering
-      duration: Style.animationFast
-      overshoot: KeycapKit.overshoot
-
-      NIcon {
-        icon: root.icon
-        pointSize: Style.toOdd(root.buttonSize * 0.48)
-        applyUiScale: root.applyUiScale
-        color: root.colorFg
-        x: Style.pixelAlignCenter(parent.width, width)
-        y: Style.pixelAlignCenter(parent.height, contentHeight)
-      }
-    }
+  // Only holds the border settings for the skin
+  Rectangle {
+    id: borderSpec
+    visible: false
+    border.color: root.enabled && root.hovering ? root.colorBorderHover : root.colorBorder
+    border.width: 0
   }
 
-  // Visual button - stays at buttonSize, centered in parent
-  Rectangle {
-    id: visualButton
-    visible: !Style.keycapControls && !styleFace.active
+  NStyleSkin {
+    id: skin
+    name: "IconButton"
+    control: root
+    active: !styleFace.active
+    anchors.fill: undefined
     width: root.buttonSize
     height: root.buttonSize
     anchors.centerIn: parent
-
-    color: root.enabled && root.hovering ? colorBgHover : colorBg
-    radius: Math.min((customRadius >= 0 ? customRadius : Style.iRadiusL), width / 2)
-    border.color: root.enabled && root.hovering ? colorBorderHover : colorBorder
-    border.width: Style.materialControls ? 0 : Style.borderS
-
-    Behavior on color {
-      enabled: !ShellColors.isTransitioning
-      ColorAnimation {
-        duration: Style.animationFast
-        easing.type: Easing.InOutQuad
-      }
-    }
-
-    NMaterialStateLayer {
-      hovered: root.hovering
-      pressed: iconMouse.pressed && root.enabled
-      tint: root.colorFg
-    }
-
-    NIcon {
-      icon: root.icon
-      pointSize: Style.toOdd(visualButton.width * 0.48)
-      applyUiScale: root.applyUiScale
-      color: root.enabled && root.hovering ? colorFgHover : colorFg
-      // Pixel-perfect centering
-      x: Style.pixelAlignCenter(visualButton.width, width)
-      y: Style.pixelAlignCenter(visualButton.height, contentHeight)
-
-      Behavior on color {
-        enabled: !ShellColors.isTransitioning
-        ColorAnimation {
-          duration: Style.animationFast
-          easing.type: Easing.InOutQuad
-        }
-      }
-    }
   }
 
   // MouseArea fills root (extends beyond visual button for bar click area)

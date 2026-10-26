@@ -141,9 +141,10 @@ Singleton {
   TomlSettingsStore {
     id: settingsStore
     adapter: root.data
-    uiProfiles: UiStyleSettings.configuration(root.settingsDir + "UI")
+    // Every style folder's defaults, once the registry has listed them
+    uiProfiles: UiStyleRegistry.ready ? UiStyleSettings.configuration(root.settingsDir + "UI", UiStyleRegistry.definitions) : null
     configFile: root.settingsFile
-    active: root.settingsPathReady
+    active: root.settingsPathReady && UiStyleRegistry.ready
     seedFiles: root.settingsEnvOverride ? [] : SettingsPaths.seedFiles(root.configDir)
     onChanged: saveTimer.start()
     onSaved: root.settingsSaved()
@@ -966,7 +967,7 @@ Singleton {
   // Get default value for a setting path (e.g., "general.scaleRatio" or "bar.position")
   // Returns undefined if not found
   function getDefaultValue(path) {
-    const styleDefault = UiStyleSettings.defaultValue(data.ui.style, path);
+    const styleDefault = UiStyleSettings.defaultValue(UiStyleRegistry.definitions, data.ui.style, path);
     if (styleDefault !== undefined)
       return styleDefault;
     if (!root._defaultSettings) {

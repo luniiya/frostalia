@@ -9,8 +9,7 @@ import qs.Widgets
 NScrollView {
   id: root
   required property var tabs
-  readonly property bool material: Style.materialControls
-  readonly property var homeMetrics: SettingsWindowLayout.homeMetrics(availableWidth, Style.uiScaleRatio, material)
+  readonly property var homeMetrics: SettingsWindowLayout.homeMetrics(availableWidth, Style.uiScaleRatio)
   readonly property var profile: SettingsWindowLayout.profile(HostService.displayName, HostService.username, HostService.osPretty, I18n.tr("panels.settings.os"), HostService.hostName)
   readonly property var homeTabs: SettingsWindowLayout.homeCategories(tabs, SettingsPanel.Tab.General, SettingsPanel.Tab.About, categories.geometry.columns >= 3)
   signal tabRequested(int index)
@@ -18,7 +17,7 @@ NScrollView {
   horizontalPolicy: ScrollBar.AlwaysOff
   verticalPolicy: ScrollBar.AsNeeded
   reserveScrollbarSpace: false
-  leftPadding: material ? Math.round(24 * Style.uiScaleRatio) : Style.marginL
+  leftPadding: Math.round(24 * Style.uiScaleRatio)
   userRightPadding: leftPadding
   topPadding: leftPadding
   bottomPadding: leftPadding
@@ -28,11 +27,16 @@ NScrollView {
     required property var entry
     property bool compact: false
     signal chosen(int tabIndex)
-    implicitHeight: compact ? root.homeMetrics.avatarSize + Style.margin2L : Math.round((root.material ? 112 : 100) * Style.uiScaleRatio)
+    implicitHeight: compact ? root.homeMetrics.avatarSize + Style.margin2L : Math.round(112 * Style.uiScaleRatio)
     radius: Style.radiusM
-    color: root.material ? Qt.tint(ShellColors.mSurfaceVariant, Qt.alpha(ShellColors.mOnSurface, 0.035)) : categoryMouse.containsMouse ? ShellColors.mHover : ShellColors.mSurface
-    border.width: root.material ? 0 : Style.boxBorderWidth
+    color: Qt.tint(ShellColors.mSurfaceVariant, Qt.alpha(ShellColors.mOnSurface, 0.035))
+    border.width: 0
     border.color: Style.boxBorderColor
+
+    NStyleCard {
+      hovered: categoryMouse.containsMouse
+      pressed: categoryMouse.pressed
+    }
 
     NMaterialStateLayer {
       hovered: categoryMouse.containsMouse
@@ -51,7 +55,7 @@ NScrollView {
       NIcon {
         Layout.alignment: category.compact ? Qt.AlignHCenter : Qt.AlignLeft
         icon: category.entry ? category.entry.tab.icon : ""
-        color: root.material ? ShellColors.mOnSurface : categoryMouse.containsMouse ? ShellColors.mOnHover : ShellColors.mPrimary
+        color: ShellColors.mOnSurface
         pointSize: Style.fontSizeXXL
       }
       NText {
@@ -59,8 +63,8 @@ NScrollView {
         horizontalAlignment: category.compact ? Text.AlignHCenter : Text.AlignLeft
         text: category.entry ? I18n.tr(category.entry.tab.label) : ""
         pointSize: Style.fontSizeM
-        font.weight: root.material ? Style.fontWeightRegular : Style.fontWeightSemiBold
-        color: root.material ? ShellColors.mOnSurface : categoryMouse.containsMouse ? ShellColors.mOnHover : ShellColors.mOnSurface
+        font.weight: Style.fontWeightRegular
+        color: ShellColors.mOnSurface
         elide: Text.ElideRight
       }
     }
@@ -81,16 +85,16 @@ NScrollView {
     id: homeColumn
     width: root.homeMetrics.contentWidth
     x: Math.max(0, (root.availableWidth - width) / 2)
-    spacing: root.material ? Math.round(24 * Style.uiScaleRatio) : Style.marginL
+    spacing: Math.round(24 * Style.uiScaleRatio)
 
     RowLayout {
       Layout.fillWidth: true
       NText {
         Layout.fillWidth: true
         text: I18n.tr("common.settings")
-        pointSize: root.material ? Style.fontSizeXXXL : Style.fontSizeXL
-        font.weight: root.material ? Style.fontWeightRegular : Style.fontWeightBold
-        color: root.material ? ShellColors.mOnSurface : ShellColors.mPrimary
+        pointSize: Style.fontSizeXXXL
+        font.weight: Style.fontWeightRegular
+        color: ShellColors.mOnSurface
       }
     }
 
@@ -114,9 +118,11 @@ NScrollView {
         Layout.fillHeight: true
         implicitHeight: profileRow.implicitHeight + Style.margin2L
         radius: Style.radiusM
-        color: root.material ? Qt.tint(ShellColors.mSurfaceVariant, Qt.alpha(ShellColors.mOnSurface, 0.035)) : ShellColors.mSurface
-        border.width: root.material ? 0 : Style.boxBorderWidth
+        color: Qt.tint(ShellColors.mSurfaceVariant, Qt.alpha(ShellColors.mOnSurface, 0.035))
+        border.width: 0
         border.color: Style.boxBorderColor
+
+        NStyleCard {}
 
         Item {
           id: profileRow
@@ -133,8 +139,8 @@ NScrollView {
             radius: width / 2
             imagePath: Settings.preprocessPath(Settings.data.general.avatarImage || Settings.defaultAvatar)
             fallbackIcon: "person"
-            borderColor: root.material ? "transparent" : ShellColors.mPrimary
-            borderWidth: root.material ? 0 : Style.borderS
+            borderColor: "transparent"
+            borderWidth: 0
           }
 
           NText {
@@ -145,7 +151,7 @@ NScrollView {
             width: Math.max(0, parent.width / 3 - profileAvatar.width - Style.marginL)
             text: root.profile.name
             pointSize: Style.fontSizeXL
-            font.weight: root.material ? Style.fontWeightRegular : Style.fontWeightSemiBold
+            font.weight: Style.fontWeightRegular
             color: ShellColors.mOnSurface
             elide: Text.ElideRight
           }
@@ -204,7 +210,7 @@ NScrollView {
 
     GridLayout {
       id: categories
-      readonly property var geometry: SettingsWindowLayout.homeGrid(width, Style.uiScaleRatio, root.material)
+      readonly property var geometry: SettingsWindowLayout.homeGrid(width, Style.uiScaleRatio)
       Layout.fillWidth: true
       columns: geometry.columns
       rowSpacing: geometry.spacing

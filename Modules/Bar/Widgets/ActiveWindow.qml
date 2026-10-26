@@ -215,7 +215,7 @@ Item {
       host: root
       hovered: mainMouseArea.containsMouse
       pressed: mainMouseArea.pressed
-      depth: KeycapKit.barDepth(root.screen?.name, root.section)
+      depth: Style.barFaceDepth(root.screen?.name, root.section)
     }
 
     // Smooth width transition

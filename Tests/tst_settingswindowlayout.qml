@@ -8,26 +8,7 @@ TestCase {
   function test_window_data() {
     return [
           {
-            tag: "Caelestia two-column minimum",
-            material: false,
-            scale: 1,
-            width: 840,
-            height: 910,
-            minimumWidth: 500,
-            minimumHeight: 910
-          },
-          {
-            tag: "Caelestia scaled",
-            material: false,
-            scale: 1.25,
-            width: 1050,
-            height: 1138,
-            minimumWidth: 625,
-            minimumHeight: 1138
-          },
-          {
             tag: "Material landscape",
-            material: true,
             scale: 1,
             width: 1100,
             height: 750,
@@ -36,7 +17,6 @@ TestCase {
           },
           {
             tag: "Material accessibility scale",
-            material: true,
             scale: 1.5,
             width: 1650,
             height: 1125,
@@ -47,7 +27,7 @@ TestCase {
   }
 
   function test_window(data) {
-    const metrics = SettingsWindowLayout.windowMetrics(data.material, data.scale);
+    const metrics = SettingsWindowLayout.windowMetrics(data.scale);
     compare(metrics.width, data.width);
     compare(metrics.height, data.height);
     compare(metrics.minimumWidth, data.minimumWidth);
@@ -59,36 +39,24 @@ TestCase {
   function test_minimumWindowFitsTwoCards_data() {
     return [
           {
-            tag: "Caelestia",
-            material: false,
-            scale: 1
-          },
-          {
-            tag: "Caelestia scaled",
-            material: false,
-            scale: 1.25
-          },
-          {
             tag: "Material",
-            material: true,
             scale: 1
           },
           {
             tag: "Material scaled",
-            material: true,
             scale: 1.5
           }
         ];
   }
 
   function test_minimumWindowFitsTwoCards(data) {
-    const window = SettingsWindowLayout.windowMetrics(data.material, data.scale);
-    const outerMargin = Math.round((data.material ? 8 : 13) * data.scale);
-    const homePadding = Math.round((data.material ? 24 : 13) * data.scale);
+    const window = SettingsWindowLayout.windowMetrics(data.scale);
+    const outerMargin = Math.round(8 * data.scale);
+    const homePadding = Math.round(24 * data.scale);
     const width = window.minimumWidth - 2 * (outerMargin + homePadding);
-    const grid = SettingsWindowLayout.homeGrid(width, data.scale, data.material);
+    const grid = SettingsWindowLayout.homeGrid(width, data.scale);
     compare(grid.columns, 2);
-    verify(grid.cardWidth >= Math.round((data.material ? 210 : 160) * data.scale));
+    verify(grid.cardWidth >= Math.round(210 * data.scale));
   }
 
   function test_rail_data() {
@@ -323,7 +291,6 @@ TestCase {
             tag: "Material normal window",
             width: 850,
             scale: 1,
-            material: true,
             contentWidth: 850,
             avatar: 56
           },
@@ -331,7 +298,6 @@ TestCase {
             tag: "Material ultrawide",
             width: 2400,
             scale: 1,
-            material: true,
             contentWidth: 960,
             avatar: 56
           },
@@ -339,7 +305,6 @@ TestCase {
             tag: "Material narrow",
             width: 480,
             scale: 1,
-            material: true,
             contentWidth: 480,
             avatar: 56
           },
@@ -347,47 +312,13 @@ TestCase {
             tag: "Material scaled ultrawide",
             width: 3000,
             scale: 1.5,
-            material: true,
             contentWidth: 1440,
-            avatar: 84
-          },
-          {
-            tag: "Caelestia ultrawide",
-            width: 1200,
-            scale: 1,
-            material: false,
-            contentWidth: 900,
-            avatar: 56
-          },
-          {
-            tag: "Caelestia normal window",
-            width: 540,
-            scale: 1,
-            material: false,
-            contentWidth: 540,
-            avatar: 56
-          },
-          {
-            tag: "Caelestia narrow",
-            width: 300,
-            scale: 1,
-            material: false,
-            contentWidth: 300,
-            avatar: 56
-          },
-          {
-            tag: "Caelestia scaled ultrawide",
-            width: 3000,
-            scale: 1.5,
-            material: false,
-            contentWidth: 1350,
             avatar: 84
           },
           {
             tag: "initial layout",
             width: 0,
             scale: 1,
-            material: true,
             contentWidth: 0,
             avatar: 56
           }
@@ -395,20 +326,16 @@ TestCase {
   }
 
   function test_homeMetrics(data) {
-    const metrics = SettingsWindowLayout.homeMetrics(data.width, data.scale, data.material);
+    const metrics = SettingsWindowLayout.homeMetrics(data.width, data.scale);
     compare(metrics.contentWidth, data.contentWidth);
     compare(metrics.avatarSize, data.avatar);
     verify(metrics.contentWidth <= data.width);
-    const grid = SettingsWindowLayout.homeGrid(metrics.contentWidth, data.scale, data.material);
-    if (data.material && data.width >= 960 * data.scale) {
+    const grid = SettingsWindowLayout.homeGrid(metrics.contentWidth, data.scale);
+    if (data.width >= 960 * data.scale) {
       compare(grid.columns, 3);
       verify(grid.cardWidth <= 320 * data.scale);
     }
-    if (!data.material && data.width >= 900 * data.scale) {
-      compare(grid.columns, 3);
-      verify(grid.cardWidth <= 300 * data.scale);
-    }
-    verify(metrics.avatarSize + 32 * data.scale < (data.material ? 112 : 100) * data.scale, "profile with padding is shorter than category cards");
+    verify(metrics.avatarSize + 32 * data.scale < 112 * data.scale, "profile with padding is shorter than category cards");
   }
 
   function test_homeGrid_data() {
@@ -417,63 +344,31 @@ TestCase {
             tag: "Material desktop",
             width: 780,
             scale: 1,
-            material: true,
             columns: 3
           },
           {
             tag: "Material narrow window",
             width: 500,
             scale: 1,
-            material: true,
             columns: 2
-          },
-          {
-            tag: "Caelestia home",
-            width: 540,
-            scale: 1,
-            material: false,
-            columns: 3
-          },
-          {
-            tag: "Caelestia narrow",
-            width: 300,
-            scale: 1,
-            material: false,
-            columns: 1
-          },
-          {
-            tag: "Caelestia two-column fallback",
-            width: 500,
-            scale: 1,
-            material: false,
-            columns: 2
-          },
-          {
-            tag: "Caelestia scaled home",
-            width: 810,
-            scale: 1.5,
-            material: false,
-            columns: 3
           },
           {
             tag: "scaled accessibility",
             width: 780,
             scale: 1.5,
-            material: true,
             columns: 2
           },
           {
             tag: "before initial layout",
             width: 0,
             scale: 1,
-            material: true,
             columns: 1
           }
         ];
   }
 
   function test_homeGrid(data) {
-    const grid = SettingsWindowLayout.homeGrid(data.width, data.scale, data.material);
+    const grid = SettingsWindowLayout.homeGrid(data.width, data.scale);
     compare(grid.columns, data.columns);
     verify(grid.cardWidth >= 0);
     compare(grid.cardWidth * grid.columns + grid.spacing * (grid.columns - 1), data.width);

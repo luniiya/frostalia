@@ -9,10 +9,10 @@ fn request(directory: &Path, settings: Value, baseline: Option<Value>) -> Reques
         baseline,
         ui_profiles: Some(UiProfiles {
             directory: directory.join("UI"),
-            default_style: "caelestia".into(),
+            default_style: "keycap".into(),
             defaults: BTreeMap::from([
                 (
-                    "caelestia".into(),
+                    "keycap".into(),
                     json!({"general":{"radiusRatio":1.0},"ui":{"fontDefault":"", "panelBackgroundOpacity":0.93}}),
                 ),
                 (
@@ -29,7 +29,7 @@ fn request(directory: &Path, settings: Value, baseline: Option<Value>) -> Reques
 }
 
 fn defaults() -> Value {
-    json!({"settingsVersion":65,"general":{"scaleRatio":1.1,"radiusRatio":1.0},"ui":{"style":"caelestia","fontDefault":"","fontDefaultScale":1.2,"panelBackgroundOpacity":0.93}})
+    json!({"settingsVersion":65,"general":{"scaleRatio":1.1,"radiusRatio":1.0},"ui":{"style":"keycap","fontDefault":"","fontDefaultScale":1.2,"panelBackgroundOpacity":0.93}})
 }
 
 fn read(path: &Path) -> Value {
@@ -47,7 +47,7 @@ fn migrates_only_active_style_and_preserves_host_accessibility_and_comments() {
     let profile = read(&dir.path().join("UI/material.toml"));
     assert_eq!(profile["ui"]["fontDefault"], "Personal Font");
     assert_eq!(profile["general"]["radiusRatio"], 0.4);
-    assert!(!dir.path().join("UI/caelestia.toml").exists());
+    assert!(!dir.path().join("UI/keycap.toml").exists());
     let stored = read(&host);
     assert!(stored["general"].get("radiusRatio").is_none());
     assert!(stored["ui"].get("fontDefault").is_none());
@@ -83,7 +83,7 @@ fn switching_saves_pending_edits_to_previous_style_and_restores_each_profile() {
     assert_eq!(square["general"]["scaleRatio"], 1.1);
     let mut changed = square.clone();
     changed["general"]["radiusRatio"] = json!(0.1);
-    changed["ui"]["style"] = json!("caelestia");
+    changed["ui"]["style"] = json!("keycap");
     let restored = save(&host, request(dir.path(), changed, Some(square)))
         .unwrap()
         .settings;
@@ -154,7 +154,7 @@ fn manual_profile_edits_and_removed_keys_resolve_against_style_defaults() {
         .unwrap()
         .settings;
     fs::write(
-        dir.path().join("UI/caelestia.toml"),
+        dir.path().join("UI/keycap.toml"),
         "# edited\n[general]\nradiusRatio=0.75\n[ui]\nfontDefault='External'\n",
     )
     .unwrap();
@@ -164,7 +164,7 @@ fn manual_profile_edits_and_removed_keys_resolve_against_style_defaults() {
     assert_eq!(response.settings["ui"]["fontDefault"], "External");
     assert_eq!(response.settings["general"]["radiusRatio"], 0.75);
     fs::write(
-        dir.path().join("UI/caelestia.toml"),
+        dir.path().join("UI/keycap.toml"),
         "[ui]\nfontDefault='External'\n",
     )
     .unwrap();
@@ -188,7 +188,7 @@ fn toml_seed_is_preserved_and_unknown_style_uses_safe_fallback() {
     .unwrap();
     assert_eq!(response.settings["ui"]["style"], "../../escape");
     assert_eq!(response.settings["ui"]["fontDefault"], "Seed Font");
-    assert!(dir.path().join("UI/caelestia.toml").exists());
+    assert!(dir.path().join("UI/keycap.toml").exists());
     assert_eq!(fs::read_to_string(seed).unwrap(), data.to_string());
 }
 
@@ -200,7 +200,7 @@ fn profile_cannot_override_host_fields_and_pending_edits_survive_external_style_
         .unwrap()
         .settings;
     fs::write(
-        dir.path().join("UI/caelestia.toml"),
+        dir.path().join("UI/keycap.toml"),
         "[general]\nradiusRatio=0.6\nscaleRatio=99\n[ui]\nstyle='square'\nfontDefaultScale=99\n",
     )
     .unwrap();
@@ -209,7 +209,7 @@ fn profile_cannot_override_host_fields_and_pending_edits_survive_external_style_
         request(dir.path(), baseline.clone(), Some(baseline.clone())),
     )
     .unwrap();
-    assert_eq!(response.settings["ui"]["style"], "caelestia");
+    assert_eq!(response.settings["ui"]["style"], "keycap");
     assert_eq!(response.settings["general"]["scaleRatio"], 1.1);
     assert_eq!(response.settings["ui"]["fontDefaultScale"], 1.2);
     fs::write(&host, "[ui]\nstyle='material'\n").unwrap();
@@ -220,7 +220,7 @@ fn profile_cannot_override_host_fields_and_pending_edits_survive_external_style_
     assert_eq!(response.settings["general"]["radiusRatio"], 1.0);
     assert_eq!(response.settings["ui"]["panelBackgroundOpacity"], 1.0);
     assert_eq!(
-        read(&dir.path().join("UI/caelestia.toml"))["general"]["radiusRatio"],
+        read(&dir.path().join("UI/keycap.toml"))["general"]["radiusRatio"],
         0.3
     );
 }

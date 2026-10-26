@@ -22,7 +22,6 @@ Item {
   readonly property real labelHeight: Math.round(Style.fontSizeS * 1.6 * Style.uiScaleRatio * scaleFactor)
   readonly property var temperatures: hours.map(hour => WeatherData.temperature(hour.temperature, fahrenheit))
   readonly property var points: WeatherData.chartPoints(temperatures, flick.contentWidth, labelHeight + Style.marginXS, curveHeight - Style.marginXS)
-  readonly property bool material: Style.uiStyleTokens.weather !== undefined
 
   function hourLabel(hour, index) {
     if (index === 0)
@@ -92,7 +91,7 @@ Item {
                 ctx.bezierCurveTo(midX, points[i - 1].y, midX, points[i].y, points[i].x, points[i].y);
               }
               ctx.lineTo(width, points[points.length - 1].y);
-              ctx.lineWidth = (root.material ? 3 : 2) * Style.uiScaleRatio;
+              ctx.lineWidth = 3 * Style.uiScaleRatio;
               ctx.strokeStyle = ShellColors.mPrimary;
               ctx.lineCap = "round";
               ctx.stroke();

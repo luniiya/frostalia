@@ -1,0 +1,15 @@
+Box 1.0 Box.qml
+Button 1.0 Button.qml
+Card 1.0 Card.qml
+Definition 1.0 Definition.qml
+Field 1.0 Field.qml
+IconButton 1.0 IconButton.qml
+Key 1.0 Key.qml
+Kit 1.0 Kit.qml
+LauncherView 1.0 LauncherView.qml
+QuickSliderHandle 1.0 QuickSliderHandle.qml
+QuickSliderTrack 1.0 QuickSliderTrack.qml
+SliderHandle 1.0 SliderHandle.qml
+SliderTrack 1.0 SliderTrack.qml
+TabButton 1.0 TabButton.qml
+Toggle 1.0 Toggle.qml

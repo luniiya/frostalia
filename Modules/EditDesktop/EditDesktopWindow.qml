@@ -146,9 +146,11 @@ Variants {
           width: toolbarRow.implicitWidth + Style.marginM * 2
           height: toolbarRow.implicitHeight + Style.marginS * 2
           radius: height / 2
-          color: Qt.alpha(ShellColors.mSurface, 0.94)
+          color: Style.opaqueSurfaces ? ShellColors.mSurface : Qt.alpha(ShellColors.mSurface, 0.94)
           border.width: Style.borderS
           border.color: Qt.alpha(ShellColors.mOutline, 0.5)
+
+          NStyleCard {}
 
           RowLayout {
             id: toolbarRow
@@ -200,9 +202,11 @@ Variants {
           x: Math.max(Style.marginS, Math.min(targetX + (targetW - width) / 2, window.width - width - Style.marginS))
           y: targetY - height - Style.marginS >= Style.marginS ? targetY - height - Style.marginS : Math.min(targetY + targetH + Style.marginS, window.height - height - Style.marginS)
           radius: height / 2
-          color: Qt.alpha(ShellColors.mSurface, 0.96)
+          color: Style.opaqueSurfaces ? ShellColors.mSurface : Qt.alpha(ShellColors.mSurface, 0.96)
           border.width: Style.borderS
           border.color: ShellColors.mPrimary
+
+          NStyleCard {}
           z: 20
 
           RowLayout {

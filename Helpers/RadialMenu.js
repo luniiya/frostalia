@@ -171,12 +171,6 @@ function hitTest(dx, dy, count, deadZone, maxRadius) {
   return wedgeIndex(angleOf(dx, dy), count);
 }
 
-// `target` shifted by whole turns to lie within 180 degrees of `current`, so an
-// animated indicator takes the short way round
-function nearestAngle(current, target) {
-  return current + ((target - current) % 360 + 540) % 360 - 180;
-}
-
 function polar(angle, radius) {
   const rad = angle * Math.PI / 180;
   return { "x": radius * Math.sin(rad), "y": -radius * Math.cos(rad) };
@@ -464,8 +458,6 @@ var baseVisual = {
   "openRotation": 0,
   "stagger": 18,
   "easing": "OutQuint",
-  "bubbleRadius": 26,
-  "trackWidth": 0,
   "fillOpacity": 1,
   "keylineWidth": 0,
   "colors": {
@@ -477,7 +469,6 @@ var baseVisual = {
     "onCenter": "onSurface",
     "outline": "outline",
     "shadow": "shadow",
-    "track": "outline",
     "keyline": "surface"
   }
 };
@@ -485,35 +476,6 @@ var baseVisual = {
 var shapePresets = {
   // Material 3: tonal rounded segments, filled primary on hover
   "segment": {},
-  // Caelestia: round bubbles orbiting a thin track, an arc sweeps to the hovered one
-  "orbit": {
-    "innerRadius": 46,
-    "outerRadius": 132,
-    "itemRadius": 100,
-    "bubbleRadius": 25,
-    "trackWidth": 2,
-    "gap": 0,
-    "cornerRadius": 0,
-    "centerRadius": 40,
-    "hoverScale": 1.18,
-    "hoverLift": 0,
-    "openScale": 0.2,
-    "openRotation": -60,
-    "stagger": 28,
-    "easing": "OutBack",
-    "fillOpacity": 0.92,
-    "colors": {
-      "fill": "surface",
-      "onFill": "onSurface",
-      "hover": "primary",
-      "onHover": "onPrimary",
-      "center": "surface",
-      "onCenter": "onSurface",
-      "outline": "outline",
-      "shadow": "shadow",
-      "track": "primary"
-    }
-  },
   // Chunky keycaps: thick ink outline and a hard drop shadow; hovering lifts the
   // wedge off its shadow, pressing pushes it down
   "chunky": {
@@ -543,8 +505,7 @@ var shapePresets = {
       "center": "secondary",
       "onCenter": "onSecondary",
       "outline": "ink",
-      "shadow": "ink",
-      "track": "outline"
+      "shadow": "ink"
     }
   }
 };
@@ -556,8 +517,9 @@ function colorSource(role) {
   const name = typeof role === "string" && role ? role : "primary";
   if (name.charAt(0) === "#")
     return { "kind": "literal", "value": name };
+  // Outline ink of the style's kit (Style.kit.ink), light in dark schemes
   if (name === "ink")
-    return { "kind": "ink", "value": 0.28 };
+    return { "kind": "ink" };
   return { "kind": "theme", "value": "m" + name.charAt(0).toUpperCase() + name.slice(1) };
 }
 

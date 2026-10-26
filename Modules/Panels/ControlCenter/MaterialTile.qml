@@ -27,7 +27,10 @@ Rectangle {
   Accessible.role: Accessible.Button
   Accessible.onPressAction: root.clicked("left")
 
-  NKeycapCard {}
+  NStyleCard {
+    hovered: pointer.containsMouse
+    pressed: pointer.pressed
+  }
 
   NMaterialStateLayer {
     hovered: pointer.containsMouse

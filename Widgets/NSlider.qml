@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Controls
-import QtQuick.Shapes
 import qs.Commons
 import qs.Services.UI
 
@@ -27,7 +26,7 @@ Slider {
   padding: cutoutExtra / 2
 
   snapMode: snapAlways ? Slider.SnapAlways : Slider.SnapOnRelease
-  implicitHeight: Math.max(trackHeight, Style.materialControls ? sliderGeometry.handleHeight : knobDiameter)
+  implicitHeight: Math.max(trackHeight, sliderGeometry.handleHeight)
 
   background: Item {
     id: bgContainer
@@ -40,254 +39,25 @@ Slider {
 
     readonly property real fillWidth: root.visualPosition * width
 
-    // Background track
-    Shape {
-      anchors.fill: parent
-      visible: !Style.materialControls && bgContainer.width > 0 && bgContainer.height > 0
-      preferredRendererType: Shape.CurveRenderer
-      asynchronous: true
-
-      ShapePath {
-        id: bgPath
-        strokeColor: Style.keycapControls ? KeycapKit.ink : Qt.alpha(ShellColors.mOutline, Style.sliderStyle.trackOpacity)
-        strokeWidth: Style.keycapControls ? Style.keycapOutline : Style.borderS
-        fillColor: Qt.alpha(ShellColors.mSurface, Style.sliderStyle.trackOpacity)
-
-        readonly property real w: bgContainer.width
-        readonly property real h: bgContainer.height
-        readonly property real r: root.trackRadius
-
-        startX: r
-        startY: 0
-
-        PathLine {
-          x: bgPath.w - bgPath.r
-          y: 0
-        }
-        PathArc {
-          x: bgPath.w
-          y: bgPath.r
-          radiusX: bgPath.r
-          radiusY: bgPath.r
-        }
-        PathLine {
-          x: bgPath.w
-          y: bgPath.h - bgPath.r
-        }
-        PathArc {
-          x: bgPath.w - bgPath.r
-          y: bgPath.h
-          radiusX: bgPath.r
-          radiusY: bgPath.r
-        }
-        PathLine {
-          x: bgPath.r
-          y: bgPath.h
-        }
-        PathArc {
-          x: 0
-          y: bgPath.h - bgPath.r
-          radiusX: bgPath.r
-          radiusY: bgPath.r
-        }
-        PathLine {
-          x: 0
-          y: bgPath.r
-        }
-        PathArc {
-          x: bgPath.r
-          y: 0
-          radiusX: bgPath.r
-          radiusY: bgPath.r
-        }
-      }
-    }
-
-    LinearGradient {
-      id: fillGradient
-      x1: 0
-      y1: 0
-      x2: root.availableWidth
-      y2: 0
-      GradientStop {
-        position: 0.0
-        color: Qt.darker(effectiveFillColor, Style.sliderStyle.gradientDarkening)
-      }
-      GradientStop {
-        position: 1.0
-        color: effectiveFillColor
-      }
-    }
-
-    // Active/filled track
-    Shape {
-      width: bgContainer.fillWidth
-      height: bgContainer.height
-      visible: !Style.materialControls && bgContainer.fillWidth > 0 && bgContainer.height > 0
-      preferredRendererType: Shape.CurveRenderer
-      asynchronous: true
-      clip: true
-
-      ShapePath {
-        id: fillPath
-        strokeColor: "transparent"
-        fillGradient: fillGradient
-
-        readonly property real fullWidth: root.availableWidth
-        readonly property real h: root.trackHeight
-        readonly property real r: root.trackRadius
-
-        startX: r
-        startY: 0
-
-        PathLine {
-          x: fillPath.fullWidth - fillPath.r
-          y: 0
-        }
-        PathArc {
-          x: fillPath.fullWidth
-          y: fillPath.r
-          radiusX: fillPath.r
-          radiusY: fillPath.r
-        }
-        PathLine {
-          x: fillPath.fullWidth
-          y: fillPath.h - fillPath.r
-        }
-        PathArc {
-          x: fillPath.fullWidth - fillPath.r
-          y: fillPath.h
-          radiusX: fillPath.r
-          radiusY: fillPath.r
-        }
-        PathLine {
-          x: fillPath.r
-          y: fillPath.h
-        }
-        PathArc {
-          x: 0
-          y: fillPath.h - fillPath.r
-          radiusX: fillPath.r
-          radiusY: fillPath.r
-        }
-        PathLine {
-          x: 0
-          y: fillPath.r
-        }
-        PathArc {
-          x: fillPath.r
-          y: 0
-          radiusX: fillPath.r
-          radiusY: fillPath.r
-        }
-      }
-    }
-
-    // Material tracks leave actual empty space around the vertical handle.
-    Item {
-      anchors.fill: parent
-      visible: Style.materialControls
-      readonly property var segments: Style.splitSliderTrack(width, root.knobDiameter, root.visualPosition, root.sliderGeometry.gap || 0, root.mirrored)
-
-      Rectangle {
-        x: parent.segments.activeX
-        width: parent.segments.activeWidth
-        height: parent.height
-        radius: Math.min(root.trackRadius, width / 2)
-        color: root.effectiveFillColor
-      }
-      Rectangle {
-        x: parent.segments.inactiveX
-        width: parent.segments.inactiveWidth
-        height: parent.height
-        radius: Math.min(root.trackRadius, width / 2)
-        color: root.enabled ? Qt.tint(ShellColors.mSurfaceVariant, Qt.alpha(root.fillColor, 0.18)) : Qt.alpha(ShellColors.mOutline, 0.25)
-      }
-      Rectangle {
-        width: 4 * Style.uiScaleRatio
-        height: width
-        radius: width / 2
-        x: (root.mirrored ? parent.segments.start : parent.segments.end) - width / 2
-        anchors.verticalCenter: parent.verticalCenter
-        visible: parent.segments.inactiveWidth > width * 2
-        color: root.enabled ? ShellColors.mOnSurfaceVariant : ShellColors.mOutline
-      }
-    }
-
-    // Circular cutout
-    Rectangle {
-      id: knobCutout
-      visible: !Style.materialControls
-      implicitWidth: root.knobDiameter + root.cutoutExtra
-      implicitHeight: root.knobDiameter + root.cutoutExtra
-      radius: Math.min(Style.iRadiusL, width / 2)
-      color: root.cutoutColor !== undefined ? root.cutoutColor : ShellColors.mSurface
-      x: root.visualPosition * (root.availableWidth - root.knobDiameter) - root.cutoutExtra / 2
-      anchors.verticalCenter: parent.verticalCenter
+    // Track (Styles/<style>/SliderTrack.qml)
+    NStyleSkin {
+      name: "SliderTrack"
+      control: root
     }
   }
 
   handle: Item {
+    id: handleItem
     implicitWidth: knobDiameter
-    implicitHeight: Style.materialControls ? root.sliderGeometry.handleHeight : knobDiameter
-    x: root.leftPadding + (Style.materialControls ? Style.splitSliderTrack(root.availableWidth, width, root.visualPosition, root.sliderGeometry.gap, root.mirrored).center - width / 2 : root.visualPosition * (root.availableWidth - width))
+    implicitHeight: root.sliderGeometry.handleHeight
+    // The handle's center moves between half a handle in from either end
+    x: root.leftPadding + Style.splitSliderTrack(root.availableWidth, width, root.visualPosition, root.sliderGeometry.gap, root.mirrored).center - width / 2
     anchors.verticalCenter: parent.verticalCenter
 
-    // Keycap renderer: hard shadow under the knob; the knob sinks into it while pressed
-    Rectangle {
-      visible: Style.keycapControls
-      width: knob.width
-      height: knob.height
-      radius: knob.radius
-      x: (parent.width - width) / 2
-      y: (parent.height - height) / 2 + Style.keycapDepth
-      color: KeycapKit.ink
-    }
-
-    Rectangle {
-      id: knob
-      anchors.verticalCenterOffset: Style.keycapControls && root.pressed ? Style.keycapDepth - Style.keycapPressedDepth : 0
-      implicitWidth: Style.materialControls ? (root.pressed ? root.sliderGeometry.pressedHandleWidth : root.sliderGeometry.handleWidth) : knobDiameter
-      implicitHeight: Style.materialControls ? root.sliderGeometry.handleHeight : knobDiameter
-      radius: Math.min(Style.iRadiusL, width / 2)
-      color: Style.materialControls || Style.keycapControls ? root.effectiveFillColor : (root.pressed ? ShellColors.mHover : ShellColors.mSurface)
-      border.color: Style.keycapControls ? KeycapKit.ink : effectiveFillColor
-      border.width: Style.materialControls ? 0 : (Style.keycapControls ? Style.keycapOutline : Style.borderL)
-
-      // Cream ring just inside the outline
-      Rectangle {
-        visible: Style.keycapControls
-        anchors.fill: parent
-        anchors.margins: Style.keycapOutline
-        radius: Math.max(0, parent.radius - Style.keycapOutline)
-        color: "transparent"
-        border.color: KeycapKit.ringFor(root.effectiveFillColor)
-        border.width: Style.keycapRing
-      }
-
-      Behavior on anchors.verticalCenterOffset {
-        enabled: Style.keycapControls
-        NumberAnimation {
-          duration: root.pressed ? Style.animationFaster : Style.animationFast
-          easing.type: root.pressed ? Easing.OutQuad : Easing.OutBack
-          easing.overshoot: KeycapKit.overshoot
-        }
-      }
-
-      Behavior on implicitWidth {
-        enabled: Style.materialControls
-        NumberAnimation {
-          duration: Style.animationFast
-          easing.type: Easing.OutCubic
-        }
-      }
-      anchors.centerIn: parent
-
-      Behavior on color {
-        ColorAnimation {
-          duration: Style.animationFast
-        }
-      }
+    // Handle (Styles/<style>/SliderHandle.qml)
+    NStyleSkin {
+      name: "SliderHandle"
+      control: root
     }
 
     MouseArea {
@@ -301,7 +71,7 @@ Slider {
       onEntered: {
         root.hovering = true;
         if (root.tooltipText && (!Array.isArray(root.tooltipText) || root.tooltipText.length > 0)) {
-          TooltipService.show(knob, root.tooltipText, root.tooltipDirection);
+          TooltipService.show(handleItem, root.tooltipText, root.tooltipDirection);
         }
       }
 

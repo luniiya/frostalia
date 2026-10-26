@@ -401,7 +401,6 @@ Variants {
       readonly property bool isLeft: location.includes("_left") || location === "left"
       readonly property bool isRight: location.includes("_right") || location === "right"
       readonly property bool verticalMode: location === "left" || location === "right"
-      readonly property bool material: Style.materialControls
       readonly property var materialDimensions: OsdGeometry.dimensions(verticalMode, isShortMode, Style.uiScaleRatio)
 
       // Hidden text element for measuring lock key text width
@@ -523,8 +522,8 @@ Variants {
       margins.left: calculateMargin(anchors.left, "left")
       margins.right: calculateMargin(anchors.right, "right")
 
-      implicitWidth: material ? materialDimensions.width : verticalMode ? longVWidth : (isShortMode ? lockKeyHWidth : longHWidth)
-      implicitHeight: material ? materialDimensions.height : verticalMode ? (isShortMode ? lockKeyVHeight : longVHeight) : longHHeight
+      implicitWidth: materialDimensions.width
+      implicitHeight: materialDimensions.height
       color: "transparent"
 
       WlrLayershell.namespace: "frostalia-osd-" + (screen?.name || "unknown")
@@ -552,7 +551,7 @@ Variants {
         Behavior on scale {
           NumberAnimation {
             duration: Style.animationNormal
-            easing.type: panel.material ? Easing.OutCubic : Easing.InOutQuad
+            easing.type: Easing.OutCubic
           }
         }
 
@@ -576,19 +575,18 @@ Variants {
         Rectangle {
           id: background
           anchors.fill: parent
-          anchors.margins: panel.material ? 6 * Style.uiScaleRatio : Style.marginM * 1.5
-          radius: panel.material ? 32 * Style.uiScaleRatio : Style.radiusL
-          color: Qt.alpha(ShellColors.mSurface, ShellColors.adaptiveOpacity(Settings.data.osd.backgroundOpacity) || 1.0)
+          anchors.margins: 6 * Style.uiScaleRatio
+          radius: 32 * Style.uiScaleRatio
+          // Keycap cards stay opaque: their ink shadow would show through a translucent face
+          color: Style.opaqueSurfaces ? ShellColors.mSurface : Qt.alpha(ShellColors.mSurface, ShellColors.adaptiveOpacity(Settings.data.osd.backgroundOpacity) || 1.0)
           border.color: Qt.alpha(ShellColors.mOutline, ShellColors.adaptiveOpacity(Settings.data.osd.backgroundOpacity) || 1.0)
-          border.width: {
-            if (panel.material)
-              return 0;
-            const bw = Math.max(2, Style.borderM);
-            return bw % 2 === 0 ? bw : bw + 1;
-          }
+          border.width: 0
+
+          NStyleCard {}
         }
 
         NDropShadow {
+          visible: !Style.opaqueSurfaces
           anchors.fill: background
           source: background
           autoPaddingEnabled: true
@@ -597,7 +595,7 @@ Variants {
         Loader {
           id: contentLoader
           anchors.fill: background
-          anchors.margins: panel.material ? 0 : Style.marginM
+          anchors.margins: 0
           source: Style.surfaceUrl("osd")
         }
 

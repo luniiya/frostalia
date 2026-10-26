@@ -1,10 +1,17 @@
 import QtQuick
 import QtTest
-import "../Helpers/KeycapStyle.js" as KeycapStyle
+import "../Styles/keycap/KeycapStyle.js" as KeycapStyle
 import "../Helpers/UiStyles.js" as UiStyles
 
 TestCase {
   name: "KeycapStyle"
+
+  // The real style folders (Styles/<id>/Definition.qml)
+  readonly property var styles: UiStyles.loadAll(Qt.resolvedUrl("../Styles"), ["material", "keycap"])
+
+  function tokens(id) {
+    return UiStyles.definition(styles, id).tokens;
+  }
 
   function test_sink_data() {
     return [
@@ -85,10 +92,14 @@ TestCase {
   }
 
   function test_barDepth(data) {
-    compare(KeycapStyle.barDepth(data.bar, data.capsule, data.preferred), data.expected);
+    compare(UiStyles.barFaceDepth({
+                                    "faces": {
+                                      "barDepth": data.preferred
+                                    }
+                                  }, data.bar, data.capsule, 1), data.expected);
   }
 
-  function test_inkIsDarkerThanEveryFill() {
+  function test_inkStandsOutFromTheSurface() {
     const surfaces = [
             {
               r: 0.13,
@@ -104,10 +115,22 @@ TestCase {
             }
           ];
     for (const surface of surfaces) {
+      const shade = KeycapStyle.shade(surface);
+      verify(KeycapStyle.luminance(shade) < KeycapStyle.luminance(surface));
+      compare(shade.a, 1);
+      // Outlines and hard shadows must stand out from the surface in dark schemes too
       const ink = KeycapStyle.ink(surface);
-      verify(KeycapStyle.luminance(ink) < KeycapStyle.luminance(surface));
+      verify(KeycapStyle.contrast(ink, surface) >= 3, JSON.stringify(surface));
       compare(ink.a, 1);
     }
+    const dark = {
+      r: 0.1,
+      g: 0.07,
+      b: 0.16,
+      a: 1
+    };
+    verify(KeycapStyle.luminance(KeycapStyle.ink(dark)) > KeycapStyle.luminance(dark));
+    verify(KeycapStyle.luminance(KeycapStyle.shade(dark)) < KeycapStyle.luminance(dark));
     const translucent = KeycapStyle.ink({
                                           r: 1,
                                           g: 1,
@@ -360,15 +383,15 @@ TestCase {
   // ---- registry ----
 
   function test_keycapIsAChoice() {
-    const keys = UiStyles.choices().map(c => c.key);
+    const keys = UiStyles.choices(styles).map(c => c.key);
     verify(keys.indexOf("keycap") !== -1);
-    compare(UiStyles.resolveId("keycap"), "keycap");
-    compare(UiStyles.tokens("keycap").controls.renderer, "keycap");
+    compare(UiStyles.resolveId(styles, "keycap"), "keycap");
+    compare(tokens("keycap").slider.shape, "knob");
   }
 
   function test_keycapTokensAreComplete() {
-    const keycap = UiStyles.tokens("keycap");
-    const material = UiStyles.tokens("material");
+    const keycap = tokens("keycap");
+    const material = tokens("material");
     for (const group of ["fontSizes", "fontWeights", "radii", "inputRadii", "borders", "margins", "animations"]) {
       compare(Object.keys(keycap[group]).sort(), Object.keys(material[group]).sort(), group);
     }
@@ -383,10 +406,10 @@ TestCase {
   }
 
   function test_keycapGeometryIsFinite() {
-    const slider = UiStyles.sliderGeometry("keycap", 33, 0.7, 1);
+    const slider = UiStyles.sliderGeometry(tokens("keycap"), 33, 0.7, 1);
     for (const key of ["knobDiameter", "handleHeight", "handleWidth", "trackHeight", "gap", "cutoutExtra"])
       verify(Number.isFinite(slider[key]), key);
-    const toggle = UiStyles.toggleGeometry("keycap", 26, true, false);
+    const toggle = UiStyles.toggleGeometry(tokens("keycap"), 26, true, false);
     verify(toggle.x + toggle.handle <= toggle.width);
     verify(toggle.handle < toggle.height);
   }
@@ -394,24 +417,23 @@ TestCase {
   // Keycap is a skin over the Material layouts: same panel views and panel shapes, no glass
   function test_keycapDrawsOnTheMaterialLayouts() {
     for (const surface of ["controlCenter", "mediaCard", "mediaPlayer", "osd", "notificationContent", "kdeConnectHome"])
-      compare(UiStyles.view("keycap", surface), UiStyles.view("material", surface), surface);
-    compare(UiStyles.glass("keycap", true), null);
-    verify(UiStyles.fieldShape("keycap", true) !== null);
-    verify(UiStyles.expandableShape("keycap", true) !== null);
-    verify(UiStyles.buttonGroupRadii("keycap", 30, false, true, false) !== null);
+      compare(UiStyles.view(UiStyles.definition(styles, "keycap"), surface), UiStyles.view(UiStyles.definition(styles, "material"), surface), surface);
+    compare(UiStyles.glass(tokens("keycap"), true), null);
+    verify(UiStyles.fieldShape(tokens("keycap"), true) !== null);
+    verify(UiStyles.expandableShape(tokens("keycap"), true) !== null);
+    verify(UiStyles.buttonGroupRadii(tokens("keycap"), 30, false, true, false) !== null);
     for (const token of ["buttonGroup", "expandable", "field", "weather", "menu"])
-      verify(UiStyles.tokens("keycap")[token] !== undefined, token);
+      verify(tokens("keycap")[token] !== undefined, token);
   }
 
   function test_barViewsOnlyForKeycap() {
-    compare(UiStyles.barView("keycap", "Clock"), "Modules/Bar/Widgets/Keycap/ClockFace.qml");
-    compare(UiStyles.barView("keycap", "Plate"), "Modules/Bar/Widgets/Keycap/PlateFace.qml");
-    compare(UiStyles.barView("keycap", "NoSuchWidget"), "");
-    compare(UiStyles.barView("keycap", ""), "");
-    compare(UiStyles.barView("keycap", "toString"), "");
-    compare(UiStyles.barView("material", "Clock"), "");
-    compare(UiStyles.barView("caelestia", "Clock"), "");
-    compare(UiStyles.barView("unknown", "Clock"), "");
+    compare(UiStyles.barView(UiStyles.definition(styles, "keycap"), "Clock"), "Styles/keycap/Bar/ClockFace.qml");
+    compare(UiStyles.barView(UiStyles.definition(styles, "keycap"), "Plate"), "Styles/keycap/Bar/PlateFace.qml");
+    compare(UiStyles.barView(UiStyles.definition(styles, "keycap"), "NoSuchWidget"), "");
+    compare(UiStyles.barView(UiStyles.definition(styles, "keycap"), ""), "");
+    compare(UiStyles.barView(UiStyles.definition(styles, "keycap"), "toString"), "");
+    compare(UiStyles.barView(UiStyles.definition(styles, "material"), "Clock"), "");
+    compare(UiStyles.barView(UiStyles.definition(styles, "unknown"), "Clock"), "");
   }
 
   function test_fontFallbacks_data() {
@@ -462,12 +484,12 @@ TestCase {
   }
 
   function test_fontFallbacks(data) {
-    compare(UiStyles.fontFamily("keycap", data.configured, false, "System", data.available), data.expected);
+    compare(UiStyles.fontFamily(tokens("keycap"), data.configured, false, "System", data.available), data.expected);
   }
 
   function test_fontFallbacksLeaveOtherStylesAlone() {
-    compare(UiStyles.fontFamily("material", "", false, "System", []), "Roboto");
-    compare(UiStyles.fontFamily("caelestia", "Missing", false, "System", []), "Missing");
-    compare(UiStyles.fontFamily("keycap", "", true, "System", []), "monospace");
+    compare(UiStyles.fontFamily(tokens("material"), "", false, "System", []), "Roboto");
+    compare(UiStyles.fontFamily(tokens("material"), "Missing", false, "System", []), "Missing");
+    compare(UiStyles.fontFamily(tokens("keycap"), "", true, "System", []), "monospace");
   }
 }

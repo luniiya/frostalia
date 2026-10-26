@@ -4,23 +4,24 @@ import re
 import unittest
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
-FACES = ROOT / "Modules/Bar/Widgets/Keycap"
+STYLE = ROOT / "Styles/keycap"
+FACES = STYLE / "Bar"
 
 # Widgets that deliberately keep the plain keycap or draw nothing.
 PLAIN = {"Spacer", "CustomButton"}
 
 
-def bar_views():
-    source = (ROOT / "Helpers/UiStyles.js").read_text()
-    block = source[source.index('"barViews": {'):]
-    block = block[:block.index("}")]
+def bar_views(style="keycap"):
+    source = (ROOT / "Styles" / style / "Definition.qml").read_text()
+    block = source[source.index("barViews: ({"):]
+    block = block[:block.index("})")]
     return dict(re.findall(r'"(\w+)": "([^"]+\.qml)"', block))
 
 
 class KeycapStyleTests(unittest.TestCase):
     def test_material_cards_carry_the_keycap_skin(self):
         # Keycap draws on the Material layouts; these cards get their outline, keyline and
-        # hard shadow from NKeycapCard, and must stay opaque under it.
+        # hard shadow from the style's Card skin (NStyleCard), and must stay opaque under it.
         for path in ("Modules/Panels/ControlCenter/MaterialTile.qml",
                      "Modules/Panels/ControlCenter/MaterialSliders.qml",
                      "Modules/Panels/ControlCenter/MaterialSystemMonitor.qml",
@@ -29,18 +30,19 @@ class KeycapStyleTests(unittest.TestCase):
                      "Modules/Cards/MaterialMediaCard.qml",
                      "Modules/Weather/WeatherSurface.qml",
                      "Widgets/NPill.qml",
-                     "Widgets/NMaterialQuickSlider.qml"):
-            self.assertIn("NKeycapCard {}", (ROOT / path).read_text(), path)
+                     "Modules/OSD/OSD.qml",
+                     "Modules/Notification/Notification.qml",
+                     "Modules/Toast/Toast.qml",
+                     "Modules/EditDesktop/EditShelf.qml",
+                     "Modules/EditDesktop/EditDesktopWindow.qml",
+                     "Widgets/NMenuSurface.qml",
+                     "Modules/Bar/Extras/TrayMenu.qml"):
+            self.assertRegex((ROOT / path).read_text(), r"NStyleCard \{", path)
         weather = (ROOT / "Modules/Weather/WeatherSurface.qml").read_text()
-        self.assertIn("Style.keycapControls ? Qt.tint(", weather)
-        field = (ROOT / "Widgets/NFieldBackground.qml").read_text()
-        self.assertIn("color: Style.keycapControls ? (", field)
-
-    def test_face_directory_is_imported(self):
-        # Faces are only loaded by URL. Quickshell indexes the directories reached through
-        # imports, so without this import every face failed with "KeycapFace is not a type".
-        loader = (ROOT / "Widgets/NStyleFace.qml").read_text()
-        self.assertIn("import qs.Modules.Bar.Widgets.Keycap\n", loader)
+        self.assertIn("Style.opaqueSurfaces ? Qt.tint(", weather)
+        self.assertIn("kit.outline", (STYLE / "Card.qml").read_text())
+        field = (STYLE / "Field.qml").read_text()
+        self.assertNotIn("Qt.alpha(ShellColors.mSurface", field)
 
     def test_registered_faces_exist(self):
         views = bar_views()
@@ -48,7 +50,7 @@ class KeycapStyleTests(unittest.TestCase):
         for name, path in views.items():
             with self.subTest(face=name):
                 self.assertTrue((ROOT / path).is_file(), path)
-                self.assertTrue(path.startswith("Modules/Bar/Widgets/Keycap/"), path)
+                self.assertTrue(path.startswith("Styles/keycap/Bar/"), path)
 
     def test_every_face_file_is_registered_or_shared(self):
         registered = {pathlib.Path(path).name for path in bar_views().values()}
@@ -99,7 +101,7 @@ class KeycapStyleTests(unittest.TestCase):
                 self.assertIn("NStyleFace {", (ROOT / path).read_text())
         loader = (ROOT / "Widgets/NStyleFace.qml").read_text()
         self.assertIn("Style.barViewUrl(view)", loader)
-        self.assertIn('"kit": KeycapKit', loader)
+        self.assertIn('"kit": Style.kit', loader)
 
     def test_desktop_widgets_do_not_depend_on_the_style(self):
         for path in (ROOT / "Modules/DesktopWidgets").glob("*.qml"):
@@ -108,13 +110,9 @@ class KeycapStyleTests(unittest.TestCase):
                 self.assertNotIn("keycap", source.lower())
                 self.assertNotIn("NStyleFace", source)
 
-    def test_material_and_caelestia_have_no_bar_faces(self):
-        source = (ROOT / "Helpers/UiStyles.js").read_text()
-        self.assertEqual(source.count('"barViews": {'), 1)
-        keycap = source.index('"keycap": {')
-        self.assertGreater(source.index('"barViews": {'), keycap)
-        self.assertLess(source.index('"barViews": {'), source.index('"material": {'))
-
+    def test_only_keycap_has_bar_faces(self):
+        self.assertIn("Plate", bar_views("keycap"))
+        self.assertEqual(bar_views("material"), {})
 
 if __name__ == "__main__":
     unittest.main()

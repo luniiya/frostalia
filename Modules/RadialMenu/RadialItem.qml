@@ -7,8 +7,8 @@ import qs.Services.UI
 import qs.Widgets
 
 // One item of the ring, drawn the way the UI style's radial spec says: a rounded tonal
-// segment ("segment"), an outlined keycap wedge on a hard shadow ("chunky") or a bubble
-// on the orbit track ("orbit"). Its origin is the ring center.
+// segment ("segment") or an outlined keycap wedge on a hard shadow ("chunky"). Its
+// origin is the ring center.
 Item {
   id: root
 
@@ -24,7 +24,6 @@ Item {
   readonly property real angle: RadialLogic.itemAngle(index, count)
   readonly property var anchorPoint: RadialLogic.polar(angle, spec.itemRadius * s)
   readonly property var direction: RadialLogic.polar(angle, 1)
-  readonly property bool wedge: spec.shape !== "orbit"
   readonly property bool chunky: spec.shape === "chunky"
 
   readonly property color fillColor: hovered ? ring.color(spec.colors.hover) : Qt.alpha(ring.color(spec.colors.fill), spec.fillOpacity)
@@ -71,11 +70,11 @@ Item {
   readonly property real keyline: border > 0 ? spec.keylineWidth * s : 0
   readonly property real edge: corner + border + keyline
   readonly property real extent: (spec.outerRadius + spec.hoverLift + spec.shadowY + 8) * s
-  readonly property var geometry: wedge ? RadialLogic.wedgeShape(index, count, spec.innerRadius * s, spec.outerRadius * s, spec.gap * s, edge) : null
+  readonly property var geometry: RadialLogic.wedgeShape(index, count, spec.innerRadius * s, spec.outerRadius * s, spec.gap * s, edge)
 
   // Hard shadow under keycap wedges (no blur)
   Shape {
-    visible: root.wedge && root.geometry !== null && root.spec.shadowOpacity > 0
+    visible: root.geometry !== null && root.spec.shadowOpacity > 0
     x: -root.extent + root.spec.shadowX * root.s
     y: -root.extent + root.spec.shadowY * root.s
     width: root.extent * 2
@@ -99,7 +98,7 @@ Item {
     scale: root.grow
 
     Shape {
-      visible: root.wedge && root.geometry !== null
+      visible: root.geometry !== null
       x: -root.extent
       y: -root.extent
       width: root.extent * 2
@@ -130,64 +129,29 @@ Item {
       }
     }
 
-    // Orbit bubble
-    Rectangle {
-      visible: !root.wedge
-      // Grown by size rather than scale so the edge stays crisp
-      property real size: root.spec.bubbleRadius * 2 * root.s * (root.hovered ? root.spec.hoverScale : 1)
-      x: root.anchorPoint.x - size / 2
-      y: root.anchorPoint.y - size / 2
-      width: size
-      height: size
-      radius: size / 2
-      antialiasing: true
-      color: root.fillColor
-      border.width: Math.max(1, Style.borderS)
-      border.color: root.hovered ? root.fillColor : Qt.alpha(root.ring.color(root.spec.colors.outline), 0.6)
-
-      Behavior on size {
-        NumberAnimation {
-          duration: Style.animationFast
-          easing.type: Easing.OutBack
-        }
-      }
-      Behavior on color {
-        ColorAnimation {
-          duration: Style.animationFast
-        }
-      }
-    }
-
     // Folders get a dot on their outer edge
     Rectangle {
       visible: root.modelData.action === "folder"
       readonly property real d: 5 * root.s
-      readonly property var p: RadialLogic.polar(root.angle, root.wedge ? root.spec.outerRadius * root.s - root.border - 9 * root.s : (root.spec.itemRadius - root.spec.bubbleRadius - 8) * root.s)
+      readonly property var p: RadialLogic.polar(root.angle, root.spec.outerRadius * root.s - root.border - 9 * root.s)
       x: p.x - d / 2
       y: p.y - d / 2
       width: d
       height: d
       radius: d / 2
       antialiasing: true
-      color: root.wedge ? Qt.alpha(root.contentColor, 0.75) : root.ring.color(root.spec.colors.track)
+      color: Qt.alpha(root.contentColor, 0.75)
     }
 
     Item {
       id: content
       x: root.anchorPoint.x
       y: root.anchorPoint.y
-      scale: !root.wedge && root.hovered ? root.spec.hoverScale : 1
       rotation: root.chunky && root.hovered ? -root.spec.tilt : 0
       readonly property real iconSize: root.spec.iconSize * root.s
       readonly property string appIcon: RadialMenuService.appIconSource(root.modelData)
 
       Behavior on rotation {
-        NumberAnimation {
-          duration: Style.animationFast
-          easing.type: Easing.OutBack
-        }
-      }
-      Behavior on scale {
         NumberAnimation {
           duration: Style.animationFast
           easing.type: Easing.OutBack

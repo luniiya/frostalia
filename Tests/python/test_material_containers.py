@@ -7,8 +7,8 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 
 class MaterialContainerTests(unittest.TestCase):
     def test_filled_controls_use_tonal_container(self):
-        for widget in ("Widgets/NTabButton.qml", "Widgets/NCollapsible.qml", "Widgets/NIconButton.qml",
-                       "Widgets/NFieldBackground.qml", "Widgets/NMenuItemBackground.qml"):
+        for widget in ("Styles/material/TabButton.qml", "Widgets/NCollapsible.qml", "Styles/material/IconButton.qml",
+                       "Styles/material/Field.qml", "Widgets/NMenuItemBackground.qml"):
             source = (ROOT / widget).read_text()
             self.assertIn("ShellColors.mTonalContainer", source, widget)
             self.assertNotIn("? ShellColors.mSurfaceVariant", source, widget)
@@ -32,15 +32,18 @@ class MaterialContainerTests(unittest.TestCase):
         source = (ROOT / "Widgets/NFieldBackground.qml").read_text()
         self.assertIn("Style.getFieldShape(active, cornerRadius)", source)
         self.assertIn("radius: fieldShape ? fieldShape.radius : cornerRadius", source)
-        self.assertIn("fieldShape ? fieldShape.borderWidth", source)
-        self.assertNotIn("bottomLeftRadius", source)
-        self.assertNotIn("anchors.bottom", source)
+        self.assertIn('name: "Field"', source)
+        skin = (ROOT / "Styles/material/Field.qml").read_text()
+        self.assertIn("control.fieldShape ? control.fieldShape.borderWidth", skin)
+        for text in (source, skin):
+            self.assertNotIn("bottomLeftRadius", text)
+            self.assertNotIn("anchors.bottom", text)
 
     def test_settings_sidebar_reserves_scrollbar_space(self):
         source = (ROOT / "Modules/Panels/Settings/SettingsContent.qml").read_text()
         sidebar = source[source.index("id: sidebarList"):]
         sidebar = sidebar[:sidebar.index("id: tabItem") + 100]
-        self.assertIn("reserveScrollbarSpace: root.material && verticalScrollBarActive", sidebar)
+        self.assertIn("reserveScrollbarSpace: verticalScrollBarActive", sidebar)
         self.assertIn("width: sidebarList.availableWidth", sidebar)
         self.assertIn("sidebarList.verticalScrollBarActive ? sidebarList.handleWidth + Style.marginXS : 0", source)
         self.assertIn("width: searchResultsList.availableWidth", source)

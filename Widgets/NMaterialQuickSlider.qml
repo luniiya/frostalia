@@ -2,8 +2,8 @@ import QtQuick
 import QtQuick.Controls
 import qs.Commons
 
-// Wide, filled Android track with an end icon and a slim separated handle.
-// Keycap: one outlined keycap track filled up to an ink edge, no separate handle.
+// Wide filled track with an end icon. The style draws track and handle
+// (Styles/<style>/QuickSliderTrack.qml, QuickSliderHandle.qml).
 Slider {
   id: root
   property string icon: "volume-high"
@@ -29,54 +29,10 @@ Slider {
     width: root.availableWidth
     height: root.availableHeight
     readonly property real split: root.visualPosition * width
-    Rectangle {
-      id: keycapTrack
-      visible: Style.keycapControls
-      anchors.fill: parent
-      radius: Math.min(Style.iRadiusS, height / 2)
-      color: ShellColors.mSurface
 
-      NKeycapCard {}
-
-      // Fill, clipped to the inside of the outline
-      Item {
-        anchors.fill: parent
-        anchors.margins: Style.keycapOutline
-        clip: true
-        Rectangle {
-          readonly property real fillWidth: Math.max(0, Math.min(parent.width, root.visualPosition * parent.width))
-          x: root.mirrored ? parent.width - fillWidth : 0
-          width: fillWidth
-          height: parent.height
-          radius: Math.max(0, keycapTrack.radius - Style.keycapOutline)
-          color: root.enabled ? root.fillColor : ShellColors.mOutline
-          visible: fillWidth > 0
-          // Ink edge where the fill ends
-          Rectangle {
-            x: root.mirrored ? 0 : parent.width - width
-            width: Style.keycapOutline
-            height: parent.height
-            color: KeycapKit.ink
-            visible: parent.width < keycapTrack.width - 2 * Style.keycapOutline
-          }
-        }
-      }
-    }
-    Rectangle {
-      visible: !Style.keycapControls
-      x: root.mirrored ? parent.split + 6 * Style.uiScaleRatio : 0
-      width: Math.max(0, root.mirrored ? parent.width - x : parent.split - 6 * Style.uiScaleRatio)
-      height: parent.height
-      radius: Math.min(Style.iRadiusS, height / 2)
-      color: root.enabled ? root.fillColor : ShellColors.mOutline
-    }
-    Rectangle {
-      visible: !Style.keycapControls
-      x: root.mirrored ? 0 : parent.split + 6 * Style.uiScaleRatio
-      width: Math.max(0, root.mirrored ? parent.split - 6 * Style.uiScaleRatio : parent.width - x)
-      height: parent.height
-      radius: Math.min(Style.iRadiusS, height / 2)
-      color: Qt.tint(ShellColors.mSurfaceVariant, Qt.alpha(root.fillColor, 0.18))
+    NStyleSkin {
+      name: "QuickSliderTrack"
+      control: root
     }
     NIcon {
       anchors.right: parent.right
@@ -88,14 +44,16 @@ Slider {
     }
   }
 
-  handle: Rectangle {
-    visible: !Style.keycapControls
+  handle: Item {
     x: root.leftPadding + root.visualPosition * (root.availableWidth - width)
     y: (root.height - height) / 2
-    width: Math.round((root.pressed ? 3 : 4) * Style.uiScaleRatio)
-    height: root.height - Math.round(2 * Style.uiScaleRatio)
-    radius: width / 2
-    color: root.enabled ? root.fillColor : ShellColors.mOutline
+    implicitWidth: Math.round(4 * Style.uiScaleRatio)
+    implicitHeight: root.height - Math.round(2 * Style.uiScaleRatio)
+
+    NStyleSkin {
+      name: "QuickSliderHandle"
+      control: root
+    }
   }
 
   // Wheel changes use the same moved signal as drag and keyboard edits.
