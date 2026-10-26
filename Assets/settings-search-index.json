@@ -1063,6 +1063,22 @@
     "subTabLabel": "common.appearance"
   },
   {
+    "labelKey": "radial-menu.settings.enabled-label",
+    "descriptionKey": "radial-menu.settings.enabled-description",
+    "widget": "NToggle",
+    "tab": 6,
+    "tabLabel": "panels.desktop-widgets.title",
+    "subTab": null
+  },
+  {
+    "labelKey": "radial-menu.settings.items-label",
+    "descriptionKey": "radial-menu.settings.items-description",
+    "widget": "NLabel",
+    "tab": 6,
+    "tabLabel": "panels.desktop-widgets.title",
+    "subTab": null
+  },
+  {
     "labelKey": "panels.desktop-widgets.enabled-label",
     "descriptionKey": "panels.desktop-widgets.enabled-description",
     "widget": "NToggle",

@@ -341,12 +341,18 @@ TestCase {
     compare(r.end, 0);
   }
 
-  // ----- snapToBarEnds (gap 50, radius 30, edge 1504: snap zones 50..110 at the start, 1394..1454 at the end) -----
+  // ----- snapToBarEnds (gap 50, radius 30, edge 1504: snap zones 0..110 at the start, 1394..1504 at the end) -----
 
   function test_snapToBarEnds_middleUnchanged() {
     compare(NotchGeometry.snapToBarEnds(600, 200, 50, 1504, 30), 600);
     compare(NotchGeometry.snapToBarEnds(110, 200, 50, 1504, 30), 110); // right at the zone edge
     compare(NotchGeometry.snapToBarEnds(1194, 200, 50, 1504, 30), 1194); // ends exactly at 1394
+  }
+
+  function test_snapToBarEnds_gapBetweenTheEdgeAndTheInsetAlsoSnaps() {
+    compare(NotchGeometry.snapToBarEnds(45, 200, 50, 1504, 30), 0); // the floating-below-the-top case
+    compare(NotchGeometry.snapToBarEnds(10, 200, 50, 1504, 30), 0);
+    compare(NotchGeometry.snapToBarEnds(1259, 200, 50, 1504, 30), 1304); // ends at 1459, inside the end gap
   }
 
   function test_snapToBarEnds_startZoneSnapsToTheScreenEdge() {
@@ -374,9 +380,9 @@ TestCase {
     }
   }
 
-  function test_snapToBarEnds_panelsPastTheBarKeepTheirPosition() {
+  function test_snapToBarEnds_panelsAtTheScreenEdgeKeepTheirPosition() {
     compare(NotchGeometry.snapToBarEnds(0, 400, 50, 1504, 30), 0); // calendar at the top edge
-    compare(NotchGeometry.snapToBarEnds(20, 400, 50, 1504, 30), 20);
+    compare(NotchGeometry.snapToBarEnds(20, 400, 50, 1504, 30), 0); // a gap above the bar end is closed
     compare(NotchGeometry.snapToBarEnds(1104, 400, 50, 1504, 30), 1104); // reaches the bottom edge
   }
 

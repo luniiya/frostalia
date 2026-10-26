@@ -73,9 +73,9 @@ function snapToBarEnds(start, size, notchInset, edgeLength, radius) {
     return start;
   var reach = 2 * r;
   var end = start + size;
-  if (start >= notchInset && start < notchInset + reach)
+  if (start >= 0 && start < notchInset + reach)
     return 0;
-  if (end <= edgeLength - notchInset && end > edgeLength - notchInset - reach)
+  if (end <= edgeLength && end > edgeLength - notchInset - reach)
     return edgeLength - size;
   return start;
 }

@@ -139,7 +139,8 @@ var definitions = {
         "popOvershoot": 1.6,
         // Maximum sticker tilt in degrees.
         "tilt": 4
-      }
+      },
+      "radialMenu": { "shape": "chunky", "borderWidth": 2, "shadowY": 3, "keylineWidth": 1, "hoverLift": 3, "pressDepth": 2, "tilt": 4, "colors": { "keyline": "#fff3dc" } }
     }
   },
   "material": {
