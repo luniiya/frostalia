@@ -48,6 +48,19 @@ function batteryText(device) {
   return device.battery.charge + "%";
 }
 
+// What the liquid battery shows for a device. Stale batteries of offline phones are ignored.
+function liquidState(device, warningThreshold) {
+  const known = isOnline(device) && !!device.battery && device.battery.charge >= 0;
+  const charging = known && !!device.battery.charging;
+  const percent = known ? device.battery.charge : 0;
+  return {
+    "ready": known,
+    "percent": percent,
+    "charging": charging,
+    "low": known && !charging && percent <= warningThreshold
+  };
+}
+
 // KDE Connect reports 0-4 bars, or -1 when unknown.
 function signalIcon(network) {
   if (!network || network.strength < 0)

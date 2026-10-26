@@ -19,6 +19,7 @@ ColumnLayout {
   property string valueIconColor: widgetData.iconColor !== undefined ? widgetData.iconColor : widgetMetadata.iconColor
   property string valueTextColor: widgetData.textColor !== undefined ? widgetData.textColor : widgetMetadata.textColor
   property bool valueHideWhenOffline: widgetData.hideWhenOffline !== undefined ? widgetData.hideWhenOffline : widgetMetadata.hideWhenOffline
+  property bool valueLiquid: widgetData.liquid !== undefined ? widgetData.liquid : widgetMetadata.liquid
   property bool valueShowUnread: widgetData.showUnread !== undefined ? widgetData.showUnread : widgetMetadata.showUnread
 
   function saveSettings() {
@@ -27,6 +28,7 @@ ColumnLayout {
     settings.iconColor = valueIconColor;
     settings.textColor = valueTextColor;
     settings.hideWhenOffline = valueHideWhenOffline;
+    settings.liquid = valueLiquid;
     settings.showUnread = valueShowUnread;
     settingsChanged(settings);
   }
@@ -55,6 +57,17 @@ ColumnLayout {
       saveSettings();
     }
     defaultValue: widgetMetadata.displayMode
+  }
+
+  NToggle {
+    label: I18n.tr("bar.kdeconnect.liquid-label")
+    description: I18n.tr("bar.kdeconnect.liquid-description")
+    checked: root.valueLiquid
+    onToggled: checked => {
+      root.valueLiquid = checked;
+      saveSettings();
+    }
+    defaultValue: widgetMetadata.liquid
   }
 
   NToggle {

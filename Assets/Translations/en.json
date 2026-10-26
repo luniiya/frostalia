@@ -360,6 +360,8 @@
       "display-mode-description": "Show the phone battery next to the icon.",
       "hide-when-offline-label": "Hide when the phone is offline",
       "hide-when-offline-description": "Only show the widget while a paired phone is connected.",
+      "liquid-label": "Liquid battery",
+      "liquid-description": "Show the phone battery as liquid in a small container instead of an icon and a percentage.",
       "show-unread-label": "Show unread messages",
       "show-unread-description": "Add the number of unread SMS threads next to the battery."
     }

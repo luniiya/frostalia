@@ -138,6 +138,7 @@ TestCase {
 
   function test_containerLength() {
     compare(BatteryLiquid.containerLength(28), 90);
+    compare(BatteryLiquid.containerLength(28, 1), 28);
   }
 
   function test_migrateDisplayMode_convertsIconAlways() {

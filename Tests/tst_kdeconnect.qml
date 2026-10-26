@@ -107,6 +107,39 @@ TestCase {
                                          })), "device-tablet");
   }
 
+  function test_liquid_state() {
+    const phone = device("p", true, true, {
+                           battery: {
+                             charge: 15,
+                             charging: false
+                           }
+                         });
+    let state = KdeConnect.liquidState(phone, 20);
+    compare(state.ready, true);
+    compare(state.percent, 15);
+    compare(state.low, true);
+    compare(state.charging, false);
+    phone.battery.charging = true;
+    state = KdeConnect.liquidState(phone, 20);
+    compare(state.low, false, "a charging phone is not low");
+    compare(state.charging, true);
+    phone.battery.charge = 80;
+    phone.battery.charging = false;
+    compare(KdeConnect.liquidState(phone, 20).low, false);
+    const offline = device("o", false, true, {
+                             battery: {
+                               charge: 50,
+                               charging: false
+                             }
+                           });
+    compare(KdeConnect.liquidState(offline, 20).ready, false, "stale battery of an offline phone");
+    compare(KdeConnect.liquidState(offline, 20).percent, 0);
+    compare(KdeConnect.liquidState(device("n", true, true), 20).ready, false);
+    compare(KdeConnect.liquidState(null, 20).ready, false);
+    phone.battery.charge = -1;
+    compare(KdeConnect.liquidState(phone, 20).ready, false, "unknown charge");
+  }
+
   function test_signal_icon() {
     compare(KdeConnect.signalIcon(null), "antenna-bars-off");
     compare(KdeConnect.signalIcon({

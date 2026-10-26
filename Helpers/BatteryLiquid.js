@@ -97,9 +97,9 @@ function bubbleOpacity(progress, maxOpacity) {
   return Math.max(0, Math.min(1, progress * 6, (1 - progress) * 4)) * maxOpacity;
 }
 
-// Container size along the bar axis, relative to the capsule thickness
-function containerLength(capsuleThickness) {
-  return Math.round(capsuleThickness * 3.2);
+// Container size along the bar axis. The battery uses a tall container, other widgets pass 1 for a round one.
+function containerLength(capsuleThickness, lengthFactor) {
+  return Math.round(capsuleThickness * (lengthFactor || 3.2));
 }
 
 // Lists parsed from the settings file are array-likes, not always real arrays.

@@ -292,6 +292,7 @@ Singleton {
                                   "KdeConnect": {
                                     "displayMode": "alwaysShow",
                                     "hideWhenOffline": true,
+                                    "liquid": false,
                                     "showUnread": false,
                                     "iconColor": "none",
                                     "textColor": "none"

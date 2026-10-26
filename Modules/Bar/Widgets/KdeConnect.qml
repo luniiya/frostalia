@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import "../../../Helpers/BatteryLiquid.js" as BatteryLiquid
 import "../../../Helpers/KdeConnect.js" as KdeConnect
 import qs.Commons
 import qs.Modules.Bar.Extras
@@ -36,6 +37,8 @@ Item {
   readonly property bool isBarVertical: barPosition === "left" || barPosition === "right"
   readonly property string displayMode: widgetSettings.displayMode !== undefined ? widgetSettings.displayMode : widgetMetadata.displayMode
   readonly property bool hideWhenOffline: widgetSettings.hideWhenOffline !== undefined ? widgetSettings.hideWhenOffline : widgetMetadata.hideWhenOffline
+  readonly property bool liquid: widgetSettings.liquid !== undefined ? widgetSettings.liquid : widgetMetadata.liquid
+  readonly property real capsuleHeight: Style.getCapsuleHeightForScreen(screenName, section)
   readonly property bool showUnread: widgetSettings.showUnread !== undefined ? widgetSettings.showUnread : widgetMetadata.showUnread
   readonly property string iconColorKey: widgetSettings.iconColor !== undefined ? widgetSettings.iconColor : widgetMetadata.iconColor
   readonly property string textColorKey: widgetSettings.textColor !== undefined ? widgetSettings.textColor : widgetMetadata.textColor
@@ -44,17 +47,19 @@ Item {
   readonly property bool lowBattery: KdeConnectService.online && !!device?.battery && device.battery.charge >= 0 && device.battery.charge <= Settings.data.systemMonitor.batteryWarningThreshold && !device.battery.charging
 
   visible: KdeConnect.widgetVisible(KdeConnectService.enabled, device, hideWhenOffline)
-  implicitWidth: visible ? pill.width : 0
-  implicitHeight: visible ? pill.height : 0
+  readonly property var liquidState: KdeConnect.liquidState(device, Settings.data.systemMonitor.batteryWarningThreshold)
+  readonly property Item anchorItem: liquid ? liquidBox : pill
+  implicitWidth: visible ? (liquid ? liquidBox.width : pill.width) : 0
+  implicitHeight: visible ? (liquid ? liquidBox.height : pill.height) : 0
 
   function openPanel(page) {
     const panel = PanelService.getPanel("kdeConnectPanel", screen);
     if (!panel)
       return;
     if (page)
-      panel.openPage(page, pill);
+      panel.openPage(page, anchorItem);
     else
-      panel.toggle(pill);
+      panel.toggle(anchorItem);
   }
 
   NPopupContextMenu {
@@ -108,8 +113,54 @@ Item {
     }
   }
 
+  // Liquid mode: round container, the phone battery as liquid
+  Item {
+    id: liquidBox
+    visible: root.liquid
+    anchors.centerIn: parent
+    width: BatteryLiquid.containerLength(root.capsuleHeight, 1)
+    height: width
+
+    NLiquidBattery {
+      anchors.fill: parent
+      percentage: root.liquidState.percent
+      ready: root.liquidState.ready
+      charging: root.liquidState.charging
+      backgroundColor: Style.widgetBackground(root.section, liquidMouseArea.containsMouse ? ShellColors.mHover : Style.capsuleColor)
+      liquidColor: root.liquidState.low ? ShellColors.mError : ShellColors.mPrimary
+    }
+
+    Rectangle {
+      anchors.fill: parent
+      radius: width / 2
+      color: "transparent"
+      border.color: Style.widgetBorder(root.section, Style.capsuleBorderColor)
+      border.width: Style.capsuleBorderWidth
+    }
+
+    MouseArea {
+      id: liquidMouseArea
+      anchors.fill: parent
+      hoverEnabled: true
+      acceptedButtons: Qt.LeftButton | Qt.MiddleButton | Qt.RightButton
+      cursorShape: Qt.PointingHandCursor
+      onEntered: TooltipService.show(liquidBox, KdeConnectService.statusText, BarService.getTooltipDirection(root.screenName, root.section))
+      onExited: TooltipService.hide()
+      onClicked: mouse => {
+        TooltipService.hide();
+        if (mouse.button === Qt.RightButton)
+          PanelService.showContextMenu(contextMenu, liquidBox, root.screen);
+        else if (mouse.button === Qt.MiddleButton)
+          KdeConnectService.ring();
+        else
+          root.openPanel("");
+      }
+    }
+  }
+
   BarPill {
     id: pill
+    visible: !root.liquid
 
     screen: root.screen
     section: root.section
@@ -120,8 +171,8 @@ Item {
     text: KdeConnect.batteryText(root.device)
     suffix: KdeConnect.unreadSuffix(KdeConnectService.unreadCount, root.showUnread)
     autoHide: false
-    forceOpen: !isBarVertical && root.displayMode === "alwaysShow" && text !== ""
-    forceClose: isBarVertical || root.displayMode === "alwaysHide" || text === ""
+    forceOpen: root.displayMode === "alwaysShow" && text !== ""
+    forceClose: root.displayMode === "alwaysHide" || text === ""
     onClicked: root.openPanel("")
     onMiddleClicked: KdeConnectService.ring()
     onRightClicked: PanelService.showContextMenu(contextMenu, pill, screen)
