@@ -214,34 +214,34 @@ DraggableDesktopWidget {
   // Side layout: icon + legend on left, graph on right
   RowLayout {
     anchors.fill: parent
-    anchors.margins: Math.round(Style.marginM * widgetScale)
-    spacing: Math.round(Style.marginL * widgetScale)
+    anchors.margins: Math.round(DesktopMetrics.marginM * widgetScale)
+    spacing: Math.round(DesktopMetrics.marginL * widgetScale)
     visible: root.layout === "side"
 
     ColumnLayout {
       Layout.alignment: Qt.AlignVCenter
       Layout.fillHeight: true
       Layout.preferredWidth: Math.round(64 * widgetScale)
-      spacing: Style.marginXS * root.widgetScale
+      spacing: DesktopMetrics.marginXS * root.widgetScale
 
       Repeater {
         model: root.legendItems
         delegate: RowLayout {
           Layout.alignment: Qt.AlignHCenter
-          spacing: Math.round(Style.marginXXS * root.widgetScale)
+          spacing: Math.round(DesktopMetrics.marginXXS * root.widgetScale)
 
           NIcon {
             visible: !!modelData.icon
             icon: modelData.icon || ""
             color: modelData.color
-            pointSize: Style.fontSizeS * root.widgetScale
+            pointSize: DesktopMetrics.fontSizeS * root.widgetScale
             opacity: modelData.opacity !== undefined ? modelData.opacity : 1.0
           }
 
           NText {
             text: modelData.text
             color: modelData.color
-            pointSize: Style.fontSizeS * root.widgetScale
+            pointSize: DesktopMetrics.fontSizeS * root.widgetScale
             font.family: Style.fontFixed
             font.weight: modelData.bold ? Style.fontWeightBold : Style.fontWeightRegular
             opacity: modelData.opacity !== undefined ? modelData.opacity : 1.0
@@ -264,8 +264,8 @@ DraggableDesktopWidget {
   // Bottom layout: full-width graph, horizontal legend at bottom
   ColumnLayout {
     anchors.fill: parent
-    anchors.margins: Math.round(Style.marginM * widgetScale)
-    spacing: Math.round(Style.marginS * widgetScale)
+    anchors.margins: Math.round(DesktopMetrics.marginM * widgetScale)
+    spacing: Math.round(DesktopMetrics.marginS * widgetScale)
     visible: root.layout === "bottom"
 
     Loader {
@@ -278,20 +278,20 @@ DraggableDesktopWidget {
     RowLayout {
       Layout.fillWidth: true
       Layout.alignment: Qt.AlignHCenter
-      spacing: Math.round(Style.marginM * widgetScale)
+      spacing: Math.round(DesktopMetrics.marginM * widgetScale)
 
       Repeater {
         model: root.legendItems
         delegate: RowLayout {
           Layout.alignment: Qt.AlignVCenter
-          spacing: Math.round(Style.marginXXS * root.widgetScale)
+          spacing: Math.round(DesktopMetrics.marginXXS * root.widgetScale)
 
           NIcon {
             Layout.alignment: Qt.AlignVCenter
             visible: !!modelData.icon
             icon: modelData.icon || ""
             color: modelData.color
-            pointSize: Style.fontSizeS * root.widgetScale
+            pointSize: DesktopMetrics.fontSizeS * root.widgetScale
             opacity: modelData.opacity !== undefined ? modelData.opacity : 1.0
           }
 
@@ -299,7 +299,7 @@ DraggableDesktopWidget {
             Layout.alignment: Qt.AlignVCenter
             text: modelData.text
             color: modelData.color
-            pointSize: Style.fontSizeS * root.widgetScale
+            pointSize: DesktopMetrics.fontSizeS * root.widgetScale
             font.family: Style.fontFixed
             font.weight: modelData.bold ? Style.fontWeightBold : Style.fontWeightRegular
             opacity: modelData.opacity !== undefined ? modelData.opacity : 1.0

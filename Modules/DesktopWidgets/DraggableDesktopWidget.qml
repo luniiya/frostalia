@@ -35,8 +35,10 @@ Item {
   property real widgetHeightScale: 1.0
   property real minimumWidgetWidth: Math.min(implicitWidth, 96 * widgetScale)
   property real minimumWidgetHeight: Math.min(implicitHeight, 48 * widgetScale)
-  width: Math.round(implicitWidth * (horizontalResizable ? widgetWidthScale : 1))
-  height: Math.round(implicitHeight * (verticalResizable ? widgetHeightScale : 1))
+  // With grid snap on a widget covers whole grid cells, so edges of widgets on the same grid lines line up
+  readonly property bool gridSized: Settings.data.desktopWidgets.gridSnap
+  width: gridSized ? WidgetEdit.gridLength(Math.round(implicitWidth * (horizontalResizable ? widgetWidthScale : 1)), gridSize) : Math.round(implicitWidth * (horizontalResizable ? widgetWidthScale : 1))
+  height: gridSized ? WidgetEdit.gridLength(Math.round(implicitHeight * (verticalResizable ? widgetHeightScale : 1)), gridSize) : Math.round(implicitHeight * (verticalResizable ? widgetHeightScale : 1))
   readonly property real backgroundRadius: container.radius
 
   // A per-widget setting, falling back to the registry default
@@ -52,62 +54,8 @@ Item {
   readonly property real scaleUpdateThreshold: 0.015
   readonly property real cornerScaleSensitivity: 0.0003  // Much lower sensitivity for corner handles
 
-  // Grid size ensures lines pass through screen center on both axes
-  readonly property int gridSize: {
-    if (!screen)
-      return 30;
-    var baseSize = Math.round(screen.width * 0.015);
-    baseSize = Math.max(20, Math.min(60, baseSize));
-
-    var centerX = screen.width / 2;
-    var centerY = screen.height / 2;
-    var bestSize = baseSize;
-    var bestDistance = Infinity;
-
-    for (var offset = -10; offset <= 10; offset++) {
-      var candidate = baseSize + offset;
-      if (candidate < 20 || candidate > 60)
-        continue;
-
-      var remainderX = centerX % candidate;
-      var remainderY = centerY % candidate;
-
-      if (remainderX === 0 && remainderY === 0) {
-        return candidate;
-      }
-
-      var distance = Math.abs(remainderX) + Math.abs(remainderY);
-      if (distance < bestDistance) {
-        bestDistance = distance;
-        bestSize = candidate;
-      }
-    }
-
-    var gcd = function (a, b) {
-      while (b !== 0) {
-        var temp = b;
-        b = a % b;
-        a = temp;
-      }
-      return a;
-    };
-
-    var centerGcd = gcd(Math.round(centerX), Math.round(centerY));
-    if (centerGcd > 0) {
-      for (var divisor = Math.floor(centerGcd / 60); divisor <= Math.ceil(centerGcd / 20); divisor++) {
-        if (centerGcd % divisor !== 0)
-          continue;
-        var candidate = centerGcd / divisor;
-        if (candidate >= 20 && candidate <= 60) {
-          if (Math.abs(candidate - baseSize) < Math.abs(bestSize - baseSize)) {
-            bestSize = candidate;
-          }
-        }
-      }
-    }
-
-    return bestSize;
-  }
+  // One grid for the overlay and for snapping, see DesktopWidgetEdit.js
+  readonly property int gridSize: WidgetEdit.gridSize(screen ? screen.width : 0, screen ? screen.height : 0)
 
   QtObject {
     id: internal
@@ -521,7 +469,7 @@ Item {
 
   // Corner handles for scaling - using Repeater to avoid code duplication
   readonly property real cornerHandleSize: 8 * widgetScale
-  readonly property real outlineMargin: Style.marginS * widgetScale
+  readonly property real outlineMargin: DesktopMetrics.marginS
   readonly property color colorHandle: ShellColors.mSecondary
 
   // Corner handle model: defines position, direction, cursor, and triangle points for each corner

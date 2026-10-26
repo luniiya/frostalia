@@ -14,7 +14,7 @@ DraggableDesktopWidget {
 
   readonly property string view: WeatherWidget.view(widgetSetting("view"))
   readonly property int forecastDays: widgetSetting("forecastDays") ?? 0
-  readonly property real padding: Math.round(Style.marginM * widgetScale)
+  readonly property real padding: Math.round(DesktopMetrics.marginM * widgetScale)
   readonly property var baseSize: WeatherWidget.desktopSize(view, widgetSetting("compact") ?? false)
 
   implicitWidth: view === "hourly" && viewLoader.item ? viewLoader.item.implicitWidth : Math.round(baseSize.width * widgetScale)
@@ -47,7 +47,7 @@ DraggableDesktopWidget {
         scaleFactor: root.widgetScale
         padding: root.padding
         badgeSize: Math.round(64 * root.widgetScale)
-        temperatureSize: Style.fontSizeXXXL * 1.5 * root.widgetScale
+        temperatureSize: DesktopMetrics.fontSizeXXXL * 1.5 * root.widgetScale
         radius: root.backgroundRadius
         showSky: root.widgetSetting("animatedSky") ?? false
         showCondition: root.widgetSetting("showCondition") ?? true

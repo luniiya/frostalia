@@ -3,6 +3,7 @@ import QtQuick.Effects
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
+import "../../Helpers/DesktopWidgetEdit.js" as WidgetEdit
 import qs.Commons
 import qs.Modules.Panels.Settings
 import qs.Services.Compositor
@@ -166,76 +167,8 @@ Variants {
             anchors.fill: parent
             opacity: 0.3
 
-            // Grid size calculated based on screen resolution - matches DraggableDesktopWidget
-            // Ensures grid lines pass through the screen center on both axes
-            readonly property int gridSize: {
-              if (!window.screen)
-                return 30; // Fallback
-              var baseSize = Math.round(window.screen.width * 0.015);
-              baseSize = Math.max(20, Math.min(60, baseSize));
-
-              // Calculate center coordinates
-              var centerX = window.screen.width / 2;
-              var centerY = window.screen.height / 2;
-
-              // Find a grid size that divides evenly into both center coordinates
-              // This ensures a grid line crosses through the center on both axes
-              var bestSize = baseSize;
-              var bestDistance = Infinity;
-
-              // Try values around baseSize to find one that divides evenly into both centers
-              for (var offset = -10; offset <= 10; offset++) {
-                var candidate = baseSize + offset;
-                if (candidate < 20 || candidate > 60)
-                  continue;
-
-                // Check if this size divides evenly into both center coordinates
-                var remainderX = centerX % candidate;
-                var remainderY = centerY % candidate;
-
-                // If both remainders are 0, this is perfect - center is on grid lines
-                if (remainderX === 0 && remainderY === 0) {
-                  return candidate; // Perfect match, use it immediately
-                }
-
-                // Otherwise, find the closest to perfect alignment
-                var distance = Math.abs(remainderX) + Math.abs(remainderY);
-                if (distance < bestDistance) {
-                  bestDistance = distance;
-                  bestSize = candidate;
-                }
-              }
-
-              // If we found a perfect match, it would have returned already
-              // Otherwise, try to find a divisor of both centerX and centerY
-              // that's close to our best size
-              var gcd = function (a, b) {
-                while (b !== 0) {
-                  var temp = b;
-                  b = a % b;
-                  a = temp;
-                }
-                return a;
-              };
-
-              // Find common divisors of centerX and centerY
-              var centerGcd = gcd(Math.round(centerX), Math.round(centerY));
-              if (centerGcd > 0) {
-                // Find a divisor of centerGcd that's close to bestSize
-                for (var divisor = Math.floor(centerGcd / 60); divisor <= Math.ceil(centerGcd / 20); divisor++) {
-                  if (centerGcd % divisor !== 0)
-                    continue;
-                  var candidate = centerGcd / divisor;
-                  if (candidate >= 20 && candidate <= 60) {
-                    if (Math.abs(candidate - baseSize) < Math.abs(bestSize - baseSize)) {
-                      bestSize = candidate;
-                    }
-                  }
-                }
-              }
-
-              return bestSize;
-            }
+            // Same grid as the widgets snap to
+            readonly property int gridSize: WidgetEdit.gridSize(window.screen ? window.screen.width : 0, window.screen ? window.screen.height : 0)
 
             onPaint: {
               const ctx = getContext("2d");

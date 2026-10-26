@@ -34,3 +34,54 @@ function feedbackPosition(x, y, width, height, labelWidth, labelHeight, screenWi
   const top = Math.max(gap, Math.min(preferredTop, screenHeight - labelHeight - gap));
   return { x: left - x, y: top - y };
 }
+
+// Grid cell size for a screen. Lines pass through the screen center on both axes when a size allows it.
+function gridSize(screenWidth, screenHeight) {
+  if (!screenWidth || !screenHeight)
+    return 30;
+  const baseSize = Math.max(20, Math.min(60, Math.round(screenWidth * 0.015)));
+  const centerX = screenWidth / 2;
+  const centerY = screenHeight / 2;
+  let bestSize = baseSize;
+  let bestDistance = Infinity;
+  for (let offset = -10; offset <= 10; offset++) {
+    const candidate = baseSize + offset;
+    if (candidate < 20 || candidate > 60)
+      continue;
+    const remainderX = centerX % candidate;
+    const remainderY = centerY % candidate;
+    if (remainderX === 0 && remainderY === 0)
+      return candidate;
+    const distance = Math.abs(remainderX) + Math.abs(remainderY);
+    if (distance < bestDistance) {
+      bestDistance = distance;
+      bestSize = candidate;
+    }
+  }
+  const gcd = (a, b) => {
+    while (b !== 0) {
+      const temp = b;
+      b = a % b;
+      a = temp;
+    }
+    return a;
+  };
+  const centerGcd = gcd(Math.round(centerX), Math.round(centerY));
+  if (centerGcd > 0) {
+    for (let divisor = Math.floor(centerGcd / 60); divisor <= Math.ceil(centerGcd / 20); divisor++) {
+      if (divisor === 0 || centerGcd % divisor !== 0)
+        continue;
+      const candidate = centerGcd / divisor;
+      if (candidate >= 20 && candidate <= 60 && Math.abs(candidate - baseSize) < Math.abs(bestSize - baseSize))
+        bestSize = candidate;
+    }
+  }
+  return bestSize;
+}
+
+// Outer length of a widget on the grid: whole cells, never smaller than its content.
+function gridLength(length, grid) {
+  if (!(grid > 0) || !(length > 0))
+    return length;
+  return Math.max(1, Math.ceil(length / grid - 1e-9)) * grid;
+}

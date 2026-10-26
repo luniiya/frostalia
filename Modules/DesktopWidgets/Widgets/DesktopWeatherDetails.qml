@@ -10,7 +10,7 @@ DraggableDesktopWidget {
   horizontalResizable: true
   verticalResizable: false
 
-  readonly property real padding: Math.round(Style.marginM * widgetScale)
+  readonly property real padding: Math.round(DesktopMetrics.marginM * widgetScale)
   readonly property var baseSize: WeatherWidget.desktopSize("detail")
   implicitWidth: Math.round(baseSize.width * widgetScale)
   implicitHeight: Math.round(baseSize.height * widgetScale)

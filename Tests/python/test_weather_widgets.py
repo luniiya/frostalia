@@ -138,7 +138,7 @@ class DesktopWeatherConventionTests(unittest.TestCase):
             source = (ROOT / ("Modules/DesktopWidgets/Widgets/%s.qml" % name)).read_text()
             with self.subTest(widget=name):
                 self.assertIn("WeatherWidget.desktopSize(", source)
-                self.assertIn("Style.marginM * widgetScale", source)
+                self.assertIn("DesktopMetrics.marginM * widgetScale", source)
                 self.assertNotIn("uiScaleRatio", source)
                 self.assertNotIn("Style.marginL", source)
 

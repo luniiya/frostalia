@@ -65,7 +65,7 @@ DraggableDesktopWidget {
     Loader {
       id: visualizerLoader
       anchors.fill: parent
-      anchors.margins: root.showBackground ? Math.round(Style.marginXS * root.widgetScale) : 0
+      anchors.margins: root.showBackground ? Math.round(DesktopMetrics.marginXS * root.widgetScale) : 0
       active: root.shouldShow
       asynchronous: true
 

@@ -61,7 +61,7 @@ DraggableDesktopWidget {
   readonly property int visibleButtonCount: root.showButtons ? (1 + (showPrev ? 1 : 0) + (showNext ? 1 : 0)) : 0
 
   implicitWidth: Math.round(400 * widgetScale)
-  implicitHeight: Math.round(64 * widgetScale + Style.margin2M * widgetScale)
+  implicitHeight: Math.round(64 * widgetScale + DesktopMetrics.margin2M * widgetScale)
 
   // Visualizer visibility mode
   readonly property bool shouldShowVisualizer: {
@@ -76,9 +76,9 @@ DraggableDesktopWidget {
   // Completely disabled during scaling to avoid expensive canvas redraws
   Loader {
     anchors.fill: parent
-    anchors.leftMargin: Math.round(Style.marginXS * widgetScale)
-    anchors.rightMargin: Math.round(Style.marginXS * widgetScale)
-    anchors.topMargin: Math.round(Style.marginXS * widgetScale)
+    anchors.leftMargin: Math.round(DesktopMetrics.marginXS * widgetScale)
+    anchors.rightMargin: Math.round(DesktopMetrics.marginXS * widgetScale)
+    anchors.topMargin: Math.round(DesktopMetrics.marginXS * widgetScale)
     anchors.bottomMargin: 0
     z: 0
     clip: true
@@ -89,9 +89,9 @@ DraggableDesktopWidget {
       maskEnabled: root.roundedCorners
       maskSource: ShaderEffectSource {
         sourceItem: Rectangle {
-          width: root.width - Math.round(Style.marginXS * widgetScale) * 2
-          height: root.height - Math.round(Style.marginXS * widgetScale)
-          radius: root.roundedCorners ? Math.round(Math.max(0, (Style.radiusL - Style.marginXS) * widgetScale)) : 0
+          width: root.width - Math.round(DesktopMetrics.marginXS * widgetScale) * 2
+          height: root.height - Math.round(DesktopMetrics.marginXS * widgetScale)
+          radius: root.roundedCorners ? Math.round(Math.max(0, (Style.radiusL - DesktopMetrics.marginXS) * widgetScale)) : 0
           color: "white"
         }
       }
@@ -186,8 +186,8 @@ DraggableDesktopWidget {
         }
       }
     ]
-    anchors.margins: Math.round(Style.marginM * widgetScale)
-    spacing: Math.round(Style.marginS * widgetScale)
+    anchors.margins: Math.round(DesktopMetrics.marginM * widgetScale)
+    spacing: Math.round(DesktopMetrics.marginS * widgetScale)
     z: 2
 
     Item {
@@ -225,7 +225,7 @@ DraggableDesktopWidget {
       NText {
         Layout.fillWidth: true
         text: hasPlayer ? (MediaService.trackTitle || "Unknown Track") : "No media playing"
-        pointSize: Math.round(Style.fontSizeS * widgetScale)
+        pointSize: Math.round(DesktopMetrics.fontSizeS * widgetScale)
         font.weight: Style.fontWeightSemiBold
         color: ShellColors.mOnSurface
         elide: Text.ElideRight
@@ -236,7 +236,7 @@ DraggableDesktopWidget {
         visible: hasPlayer && MediaService.trackArtist
         Layout.fillWidth: true
         text: MediaService.trackArtist || ""
-        pointSize: Math.round(Style.fontSizeXS * widgetScale)
+        pointSize: Math.round(DesktopMetrics.fontSizeXS * widgetScale)
         font.weight: Style.fontWeightRegular
         color: ShellColors.mSecondary
         elide: Text.ElideRight
@@ -246,7 +246,7 @@ DraggableDesktopWidget {
 
     RowLayout {
       id: controlsRow
-      spacing: Math.round(Style.marginXS * widgetScale)
+      spacing: Math.round(DesktopMetrics.marginXS * widgetScale)
       z: 10
       visible: root.showButtons
       Layout.alignment: root.showAlbumArt ? Qt.AlignVCenter : Qt.AlignCenter

@@ -23,8 +23,8 @@ DraggableDesktopWidget {
   readonly property bool canStart: running || ringing || stopwatchMode || (mainInstance && mainInstance.timerPomodoroMode) || (mainInstance && mainInstance.cdRemainingSeconds > 0)
 
   // Same footprint as the analog/binary desktop clock (see DesktopClock.qml)
-  readonly property real fontSize: Math.round(Style.fontSizeXXXL * 2.5 * widgetScale)
-  readonly property real contentPadding: Math.round(Style.marginXL * widgetScale)
+  readonly property real fontSize: Math.round(DesktopMetrics.fontSizeXXXL * 2.5 * widgetScale)
+  readonly property real contentPadding: Math.round(DesktopMetrics.marginXL * widgetScale)
   readonly property real faceSize: Math.round(fontSize * 1.9)
   implicitWidth: Math.round(faceSize + contentPadding * 2)
   implicitHeight: implicitWidth
@@ -87,7 +87,7 @@ DraggableDesktopWidget {
 
     ColumnLayout {
       anchors.centerIn: parent
-      spacing: Math.round(Style.marginXXS * root.widgetScale)
+      spacing: Math.round(DesktopMetrics.marginXXS * root.widgetScale)
 
       // Switches between countdown and stopwatch while nothing is running
       NIconButton {
@@ -117,13 +117,13 @@ DraggableDesktopWidget {
         visible: root.mainInstance?.timerPomodoroMode ?? false
         Layout.alignment: Qt.AlignHCenter
         text: root.pluginApi?.tr(root.mainInstance?.pmPhase === "break" ? "pomodoro.break" : "pomodoro.work") ?? ""
-        pointSize: Style.fontSizeS
+        pointSize: DesktopMetrics.fontSizeS
         color: ShellColors.mPrimary
       }
 
       RowLayout {
         Layout.alignment: Qt.AlignHCenter
-        spacing: Math.round(Style.marginXS * root.widgetScale)
+        spacing: Math.round(DesktopMetrics.marginXS * root.widgetScale)
 
         NIconButton {
           baseSize: Math.round(24 * root.widgetScale)
