@@ -101,6 +101,9 @@ Scope {
     case "settings":
       SettingsPanelService.openHome();
       break;
+    case "editRadialMenu":
+      SettingsPanelService.openToTab(SettingsPanel.Tab.RadialMenu, -1, screen);
+      break;
     case "wallpaper":
       // Wallpapers belong to the system daemon (awww/hyprpaper). Without a picker
       // command, open the wallpaper color settings.
@@ -128,7 +131,7 @@ Scope {
       if (item.arg)
         Quickshell.execDetached(["sh", "-c", item.arg]);
       break;
-    // Quick settings, the same switches as the bar widgets
+      // Quick settings, the same switches as the bar widgets
     case "uiStyle":
       if (item.arg)
         Settings.setUiStyle(item.arg);

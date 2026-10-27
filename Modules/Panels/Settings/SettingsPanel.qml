@@ -32,7 +32,8 @@ SmartPanel {
     SessionMenu,
     System,
     UserInterface,
-    Bubbles
+    Bubbles,
+    RadialMenu
   }
 
   // -1 opens the settings home; callers set a tab before open() or toggle().

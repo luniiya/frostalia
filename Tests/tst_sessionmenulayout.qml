@@ -190,4 +190,125 @@ TestCase {
       }
     }
   }
+
+  function test_tileState_data() {
+    return [
+          {
+            "tag": "idle",
+            "args": [1, -1, "lock", "", false, false],
+            "expected": {
+              "active": false,
+              "pending": false,
+              "danger": false
+            }
+          },
+          {
+            "tag": "selected",
+            "args": [2, 2, "reboot", "", false, false],
+            "expected": {
+              "active": true,
+              "pending": false,
+              "danger": false
+            }
+          },
+          {
+            "tag": "pending but not selected",
+            "args": [0, 3, "shutdown", "shutdown", true, true],
+            "expected": {
+              "active": true,
+              "pending": true,
+              "danger": true
+            }
+          },
+          {
+            "tag": "stale pending action without a timer",
+            "args": [0, -1, "lock", "lock", false, false],
+            "expected": {
+              "active": false,
+              "pending": false,
+              "danger": false
+            }
+          },
+          {
+            "tag": "nothing selected never matches index -1",
+            "args": [-1, -1, "", "", true, false],
+            "expected": {
+              "active": false,
+              "pending": false,
+              "danger": false
+            }
+          }
+        ];
+  }
+
+  function test_tileState(data) {
+    compare(SessionMenuLayout.tileState.apply(null, data.args), data.expected);
+  }
+
+  function test_countdownProgress_data() {
+    return [
+          {
+            "tag": "start",
+            "remaining": 3000,
+            "duration": 3000,
+            "expected": 0
+          },
+          {
+            "tag": "half",
+            "remaining": 1500,
+            "duration": 3000,
+            "expected": 0.5
+          },
+          {
+            "tag": "overrun",
+            "remaining": -100,
+            "duration": 3000,
+            "expected": 1
+          },
+          {
+            "tag": "no duration",
+            "remaining": 0,
+            "duration": 0,
+            "expected": 0
+          }
+        ];
+  }
+
+  function test_countdownProgress(data) {
+    compare(SessionMenuLayout.countdownProgress(data.remaining, data.duration), data.expected);
+  }
+
+  function test_revealY_data() {
+    // 3 columns, 100 px tiles, 10 px gap, 150 px viewport
+    return [
+          {
+            "tag": "nothing selected keeps the offset",
+            "selected": -1,
+            "contentY": 40,
+            "expected": 40
+          },
+          {
+            "tag": "first row scrolls to top",
+            "selected": 1,
+            "contentY": 80,
+            "expected": 0
+          },
+          {
+            "tag": "visible row keeps the offset",
+            "selected": 4,
+            "contentY": 100,
+            "expected": 100
+          },
+          {
+            "tag": "row below scrolls down to its bottom",
+            "selected": 7,
+            "contentY": 0,
+            "expected": 170
+          }
+        ];
+  }
+
+  function test_revealY(data) {
+    compare(SessionMenuLayout.revealY(data.selected, 3, 100, 10, data.contentY, 150), data.expected);
+  }
 }

@@ -1878,6 +1878,9 @@
       "update-version": "v{current} → v{new}",
       "updating": "Updating..."
     },
+    "radial-menu": {
+      "title": "Right-click menu"
+    },
     "region": {
       "title": "Region"
     },
@@ -2193,6 +2196,7 @@
       "dark-mode": "Dark mode",
       "do-not-disturb": "Do not disturb",
       "edit-desktop": "Edit desktop",
+      "edit-radial-menu": "Customize menu",
       "folder": "Folder",
       "launcher": "Launcher",
       "lock": "Lock",
@@ -2211,6 +2215,8 @@
     "settings": {
       "add-item": "Add item",
       "add-to-folder": "Add an item to this folder",
+      "animations-description": "Grow the ring out of the center when it opens. Off opens it instantly.",
+      "animations-label": "Animations",
       "app-placeholder": "Desktop entry, e.g. firefox",
       "command-placeholder": "Shell command",
       "description": "Right click the empty desktop to open a ring of shortcuts. Hold the button and flick towards an item to pick it without looking, or click. The center goes back up a level.",
@@ -2221,8 +2227,17 @@
       "items-label": "Items",
       "move-down": "Move down",
       "move-up": "Move up",
+      "opacity-description": "How see-through the item wedges are. The hovered item stays solid.",
+      "opacity-label": "Opacity",
       "remove": "Remove",
       "reset": "Reset items",
+      "shape-auto": "Follow UI style",
+      "shape-chunky": "Keycaps",
+      "shape-description": "Look of the item wedges. Follow UI style matches the rest of the shell.",
+      "shape-label": "Shape",
+      "shape-segment": "Segments",
+      "size-description": "Scale the whole ring.",
+      "size-label": "Size",
       "title": "Radial menu",
       "ui-style-placeholder": "Style, e.g. material or keycap",
       "wallpaper-placeholder": "Picker command (empty opens color settings)"

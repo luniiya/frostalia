@@ -179,7 +179,7 @@ PanelWindow {
 
         // Closing: shrink back into the center
         opacity: RadialMenuService.progress
-        scale: 0.6 + 0.4 * RadialMenuService.progress
+        scale: RadialMenuService.visual.animate ? 0.6 + 0.4 * RadialMenuService.progress : 1
       }
     }
   }

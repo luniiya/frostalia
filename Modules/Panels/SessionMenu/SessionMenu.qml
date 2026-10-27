@@ -311,6 +311,29 @@ SmartPanel {
     }
   }
 
+  // Large menu tiles (style views): hover selects once the pointer has moved,
+  // a click selects and starts the action's countdown.
+  function hoverTile(index, inside) {
+    if (ignoreMouseHover)
+      return;
+    if (inside)
+      selectedIndex = index;
+    else if (selectedIndex === index)
+      selectedIndex = -1;
+  }
+
+  function pressTile(index) {
+    if (index < 0 || index >= powerOptions.length)
+      return;
+    selectedIndex = index;
+    startTimer(powerOptions[index].action);
+  }
+
+  readonly property string countdownText: timerActive ? I18n.tr("session-menu.action-in-seconds", {
+                                                                  "action": actionMetadata[pendingAction] ? actionMetadata[pendingAction].title : "",
+                                                                  "seconds": Math.ceil(timeRemaining / 1000)
+                                                                }) : ""
+
   function checkKey(event, settingName) {
     return Keybinds.checkKey(event, settingName, Settings);
   }
@@ -520,148 +543,18 @@ SmartPanel {
       }
     }
 
-    // One surface keeps the fullscreen menu readable over busy desktops.
-    Rectangle {
-      id: largeButtonsContainer
+    // Fullscreen card, drawn by the UI style (views.sessionMenu); it reads the
+    // menu's state and calls hoverTile(), pressTile(), cancelTimer() and close().
+    NStyleView {
+      id: largeView
       visible: largeButtonsStyle
       anchors.centerIn: parent
       width: root.tileGeometry.width
-      height: Math.min(largeContent.implicitHeight + root.tileGeometry.padding * 2, panelContent.height - Style.margin2L)
-      radius: Style.radiusL
-      color: ShellColors.mSurface
-      border.color: ShellColors.mOutline
-      border.width: Style.borderS
-
-      // Absorb clicks inside the card, including gaps between actions.
-      MouseArea {
-        anchors.fill: parent
-        acceptedButtons: Qt.AllButtons
-      }
-
-      ColumnLayout {
-        id: largeContent
-        anchors.fill: parent
-        anchors.margins: root.tileGeometry.padding
-        spacing: Style.marginL
-
-        RowLayout {
-          Layout.fillWidth: true
-          spacing: Style.marginM
-
-          NIcon {
-            icon: "shutdown"
-            pointSize: Style.fontSizeXXL
-            color: ShellColors.mPrimary
-          }
-
-          ColumnLayout {
-            Layout.fillWidth: true
-            spacing: Style.marginXS
-            NText {
-              Layout.fillWidth: true
-              text: I18n.tr("session-menu.title")
-              pointSize: Style.fontSizeXL
-              font.weight: Style.fontWeightBold
-            }
-            NText {
-              Layout.fillWidth: true
-              text: I18n.tr("session-menu.choose-action")
-              color: ShellColors.mOnSurfaceVariant
-              pointSize: Style.fontSizeS
-              wrapMode: Text.WordWrap
-            }
-          }
-
-          NIconButton {
-            icon: "close"
-            tooltipText: I18n.tr("common.close")
-            baseSize: Style.baseWidgetSize * 0.8
-            onClicked: root.close()
-          }
-        }
-
-        NDivider {
-          Layout.fillWidth: true
-        }
-
-        Flickable {
-          id: actionScroll
-          Layout.fillWidth: true
-          Layout.fillHeight: true
-          Layout.preferredHeight: largeButtonsGrid.implicitHeight
-          Layout.minimumHeight: 0
-          contentHeight: largeButtonsGrid.implicitHeight
-          clip: true
-          boundsBehavior: Flickable.StopAtBounds
-          ScrollBar.vertical: NScrollBar {}
-
-          function revealSelection() {
-            if (root.selectedIndex < 0)
-              return;
-            const top = Math.floor(root.selectedIndex / root.tileGeometry.columns) * (root.tileGeometry.tileHeight + root.tileGeometry.gap);
-            contentY = Math.max(0, Math.min(top, Math.max(contentY, top + root.tileGeometry.tileHeight - height)));
-          }
-          Connections {
-            target: root
-            function onSelectedIndexChanged() {
-              actionScroll.revealSelection();
-            }
-          }
-
-          GridLayout {
-            id: largeButtonsGrid
-            width: parent.width
-            columns: root.tileGeometry.columns
-            rowSpacing: root.tileGeometry.gap
-            columnSpacing: root.tileGeometry.gap
-
-            Repeater {
-              model: powerOptions
-              delegate: LargeButton {
-                Layout.fillWidth: true
-                Layout.preferredWidth: root.tileGeometry.tileWidth
-                Layout.preferredHeight: root.tileGeometry.tileHeight
-                icon: modelData.icon
-                title: modelData.title
-                isShutdown: modelData.isShutdown || false
-                isSelected: index === selectedIndex
-                buttonIndex: index
-                onClicked: {
-                  selectedIndex = index;
-                  startTimer(modelData.action);
-                }
-                pending: timerActive && pendingAction === modelData.action
-                keybind: modelData.keybind || ""
-              }
-            }
-          }
-        }
-
-        NDivider {
-          Layout.fillWidth: true
-        }
-
-        RowLayout {
-          Layout.fillWidth: true
-          spacing: Style.marginM
-          NText {
-            Layout.fillWidth: true
-            text: timerActive ? I18n.tr("session-menu.action-in-seconds", {
-                                          "action": root.actionMetadata[pendingAction] ? root.actionMetadata[pendingAction].title : "",
-                                          "seconds": Math.ceil(timeRemaining / 1000)
-                                        }) : I18n.tr("session-menu.dismiss-hint")
-            color: timerActive ? ShellColors.mPrimary : ShellColors.mOnSurfaceVariant
-            pointSize: Style.fontSizeS
-            wrapMode: Text.WordWrap
-          }
-          NButton {
-            visible: timerActive
-            text: I18n.tr("common.cancel")
-            outlined: true
-            onClicked: cancelTimer()
-          }
-        }
-      }
+      height: item ? Math.min(item.implicitHeight, panelContent.height - Style.margin2L) : 0
+      surface: "sessionMenu"
+      viewProperties: ({
+                         "menu": root
+                       })
     }
 
     // Normal style layout
@@ -683,10 +576,7 @@ SmartPanel {
           Layout.preferredHeight: Style.baseWidgetSize * 0.6
 
           NText {
-            text: timerActive ? I18n.tr("session-menu.action-in-seconds", {
-                                          "action": root.actionMetadata[pendingAction] ? root.actionMetadata[pendingAction].title : "",
-                                          "seconds": Math.ceil(timeRemaining / 1000)
-                                        }) : I18n.tr("session-menu.title")
+            text: timerActive ? root.countdownText : I18n.tr("session-menu.title")
             font.weight: Style.fontWeightBold
             pointSize: Style.fontSizeL
             color: timerActive ? ShellColors.mPrimary : ShellColors.mOnSurface
@@ -944,164 +834,6 @@ SmartPanel {
       }
 
       onClicked: buttonRoot.clicked()
-    }
-  }
-
-  // Large buttons style button component
-  component LargeButton: Rectangle {
-    id: largeButtonRoot
-
-    property string icon: ""
-    property string title: ""
-    property bool pending: false
-    property bool isShutdown: false
-    property bool isSelected: false
-    property int number: 0
-    property string keybind: ""
-    property int buttonIndex: -1
-
-    // Effective hover state that respects ignoreMouseHover
-    readonly property bool effectiveHover: !root.ignoreMouseHover && mouseArea.containsMouse
-
-    signal clicked
-
-    radius: Style.radiusM
-    color: {
-      if (pending) {
-        return Qt.alpha(ShellColors.mPrimary, 0.18);
-      }
-      if (isSelected || effectiveHover) {
-        return Qt.alpha(ShellColors.mPrimary, 0.18);
-      }
-      return ShellColors.mSurfaceVariant;
-    }
-
-    border.width: Style.borderS
-    border.color: (pending || isSelected || effectiveHover) ? (isShutdown ? ShellColors.mError : ShellColors.mPrimary) : Qt.alpha(ShellColors.mOutline, 0.5)
-
-    Behavior on color {
-      ColorAnimation {
-        duration: Style.animationFast
-        easing.type: Easing.OutCirc
-      }
-    }
-
-    ColumnLayout {
-      anchors.fill: parent
-      anchors.margins: Style.marginM
-      anchors.topMargin: Style.marginL
-      spacing: Style.marginM
-
-      // Keep the icon steady while the surface responds to focus.
-      NIcon {
-        id: iconElement
-        Layout.alignment: Qt.AlignHCenter
-        icon: largeButtonRoot.icon
-        color: {
-          if (largeButtonRoot.pending)
-            return largeButtonRoot.isShutdown ? ShellColors.mError : ShellColors.mPrimary;
-          if (largeButtonRoot.isShutdown)
-            return ShellColors.mError;
-          if (largeButtonRoot.isSelected || largeButtonRoot.effectiveHover)
-            return ShellColors.mPrimary;
-          return ShellColors.mOnSurface;
-        }
-        pointSize: Style.fontSizeXXXL * 1.25
-        width: 48 * Style.uiScaleRatio
-        height: 48 * Style.uiScaleRatio
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
-
-        Behavior on color {
-          ColorAnimation {
-            duration: Style.animationFast
-            easing.type: Easing.OutCirc
-          }
-        }
-      }
-
-      // Title text
-      NText {
-        Layout.alignment: Qt.AlignHCenter
-        Layout.fillWidth: true
-        horizontalAlignment: Text.AlignHCenter
-        wrapMode: Text.WordWrap
-        maximumLineCount: 2
-        text: largeButtonRoot.title
-        font.weight: Style.fontWeightMedium
-        pointSize: Style.fontSizeM
-        color: {
-          if (largeButtonRoot.pending)
-            return largeButtonRoot.isShutdown ? ShellColors.mError : ShellColors.mPrimary;
-          if (largeButtonRoot.isShutdown)
-            return ShellColors.mError;
-          if (largeButtonRoot.isSelected || largeButtonRoot.effectiveHover)
-            return ShellColors.mPrimary;
-          return ShellColors.mOnSurface;
-        }
-
-        Behavior on color {
-          ColorAnimation {
-            duration: Style.animationFast
-            easing.type: Easing.OutCirc
-          }
-        }
-      }
-    }
-
-    // Keybind/Number indicator in top-right corner
-    Rectangle {
-      anchors.top: parent.top
-      anchors.right: parent.right
-      anchors.margins: Style.marginM
-      width: largeNumberText.implicitWidth + Style.margin2M
-      height: largeNumberText.implicitHeight + Style.margin2XS
-      radius: Math.min(Style.radiusM, height / 2)
-      color: (largeButtonRoot.isSelected || largeButtonRoot.effectiveHover) ? ShellColors.mPrimary : Qt.alpha(ShellColors.mSurfaceVariant, 0.7)
-      border.width: Style.borderS
-      border.color: (largeButtonRoot.isSelected || largeButtonRoot.effectiveHover) ? ShellColors.mPrimary : ShellColors.mOutline
-      visible: Settings.data.sessionMenu.showKeybinds && (largeButtonRoot.keybind !== "") && !largeButtonRoot.pending
-      z: 10
-
-      NText {
-        id: largeNumberText
-        anchors.centerIn: parent
-        text: largeButtonRoot.keybind
-        pointSize: Style.fontSizeS
-        color: {
-          if (largeButtonRoot.isSelected || largeButtonRoot.effectiveHover)
-            return ShellColors.mOnPrimary;
-          return ShellColors.mOnSurfaceVariant;
-        }
-
-        Behavior on color {
-          ColorAnimation {
-            duration: Style.animationFast
-            easing.type: Easing.OutCirc
-          }
-        }
-      }
-    }
-
-    MouseArea {
-      id: mouseArea
-      anchors.fill: parent
-      hoverEnabled: true
-      cursorShape: Qt.PointingHandCursor
-
-      onEntered: {
-        if (!root.ignoreMouseHover) {
-          selectedIndex = largeButtonRoot.buttonIndex;
-        }
-      }
-
-      onExited: {
-        if (!root.ignoreMouseHover && selectedIndex === largeButtonRoot.buttonIndex) {
-          selectedIndex = -1;
-        }
-      }
-
-      onClicked: largeButtonRoot.clicked()
     }
   }
 }

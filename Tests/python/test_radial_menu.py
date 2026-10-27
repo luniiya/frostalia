@@ -63,7 +63,7 @@ class RadialMenuTests(unittest.TestCase):
         keys = set(re.findall(r'"labelKey": "([^"]+)"', helper))
         self.assertGreater(len(keys), 8)
         keys |= {item["labelKey"] for item in walk(self.defaults["items"]) if item["labelKey"]}
-        settings_ui = (ROOT / "Modules/Panels/Settings/Tabs/DesktopWidgets/RadialMenuSettings.qml").read_text()
+        settings_ui = (ROOT / "Modules/Panels/Settings/Tabs/RadialMenu/RadialMenuTab.qml").read_text()
         keys |= set(re.findall(r'I18n\.tr\("(radial-menu\.[^"]+)"', settings_ui))
         for key in sorted(keys):
             self.lookup(key)
@@ -104,10 +104,22 @@ class RadialMenuTests(unittest.TestCase):
         # Edit mode keeps right click for selecting widgets
         self.assertIn("enabled: !DesktopWidgetRegistry.editMode", menu)
         self.assertIn("DesktopWidgetRegistry.editMode = next.editing", menu)
-        tab = (ROOT / "Modules/Panels/Settings/Tabs/DesktopWidgetsTab.qml").read_text()
-        self.assertIn("RadialMenuSettings {", tab)
-        settings_ui = (ROOT / "Modules/Panels/Settings/Tabs/DesktopWidgets/RadialMenuSettings.qml").read_text()
-        self.assertIn('defaultValue: Settings.getDefaultValue("radialMenu.enabled")', settings_ui)
+        # The editor is its own settings tab, opened from the menu by "editRadialMenu"
+        content = (ROOT / "Modules/Panels/Settings/SettingsContent.qml").read_text()
+        self.assertIn("RadialMenuTab {}", content)
+        self.assertIn('"id": SettingsPanel.Tab.RadialMenu', content)
+        self.assertIn("SettingsPanelService.openToTab(SettingsPanel.Tab.RadialMenu", menu)
+        settings_ui = (ROOT / "Modules/Panels/Settings/Tabs/RadialMenu/RadialMenuTab.qml").read_text()
+        for key in ("enabled", "shape", "size", "opacity", "animations"):
+            self.assertIn(f'defaultValue: Settings.getDefaultValue("radialMenu.{key}")', settings_ui)
+            self.assertIn(f"Settings.data.radialMenu.{key} =", settings_ui)
+        # Look preferences reach the menu
+        service = (ROOT / "Services/UI/RadialMenuService.qml").read_text()
+        self.assertIn("RadialMenu.visual(Style.uiStyleTokens.radialMenu, Settings.data.radialMenu)", service)
+
+    def test_default_settings_folder_can_edit_the_menu(self):
+        folder = next(item for item in self.defaults["items"] if item["labelKey"] == "radial-menu.items.settings")
+        self.assertIn("editRadialMenu", [child["action"] for child in folder["children"]])
 
     def test_right_click_on_desktop_widgets_opens_the_menu(self):
         # Widget input regions sit above the background catcher; invisible widgets used to

@@ -61,6 +61,22 @@ class LauncherViewTests(unittest.TestCase):
         self.assertFalse((LAUNCHER / "LauncherListDelegate.qml").exists())
         self.assertFalse((LAUNCHER / "LauncherGridDelegate.qml").exists())
 
+    def test_inline_components_are_not_shadowed_at_the_use_site(self):
+        # Redeclaring a component's property where it is used makes a second property:
+        # the component kept reading its own `index` (always 0), so every Material mode
+        # key was drawn as the first of its group and the last lost its round end.
+        for path in launcher_views().values():
+            source = (ROOT / path).read_text()
+            for name, body in re.findall(r"^  component (\w+): \w+ \{\n(.*?)^  \}$", source, re.S | re.M):
+                declared = set(re.findall(r"^    (?:required |readonly )?property \w+(?:<\w+>)? (\w+)", body, re.M))
+                for use in re.finditer(r"\b" + name + r" \{\n", source):
+                    indent = re.match(r"[ ]*", source[source.rfind("\n", 0, use.start()) + 1:]).group(0)
+                    end = source.find("\n" + indent + "}", use.end())
+                    own = set(re.findall(r"^" + indent + r"  (?:required |readonly )?property \w+(?:<\w+>)? (\w+)",
+                                         source[use.end():end], re.M))
+                    with self.subTest(path=path, component=name, line=source.count("\n", 0, use.start()) + 1):
+                        self.assertEqual(own & declared, set())
+
 
 if __name__ == "__main__":
     unittest.main()

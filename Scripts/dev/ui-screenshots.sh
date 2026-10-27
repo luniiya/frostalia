@@ -54,7 +54,7 @@ SHOTS=(
 )
 
 # Settings tabs (IPC names) and how many subtabs each has; settingsTabs shoots every one
-SETTINGS_TABS="general:4 userinterface:2 colorscheme:2 bar:4 bubbles:1 dock:2 desktopwidgets:1
+SETTINGS_TABS="general:4 userinterface:2 colorscheme:2 bar:4 bubbles:1 dock:2 desktopwidgets:1 radialmenu:1
   controlcenter:3 launcher:3 notifications:6 osd:2 sessionmenu:2 idle:2 audio:4 display:2
   connections:3 location:3 system:4 plugins:3 about:2"
 

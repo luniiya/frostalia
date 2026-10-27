@@ -25,7 +25,8 @@ QtObject {
                                   "osd": "Modules/OSD/MaterialOsdContent.qml",
                                   "notificationContent": "Modules/Notification/MaterialNotificationContent.qml",
                                   "kdeConnectHome": "Modules/Panels/KdeConnect/MaterialKdeConnectHome.qml",
-                                  "launcher": "Modules/Panels/Launcher/MaterialLauncherView.qml"
+                                  "launcher": "Modules/Panels/Launcher/MaterialLauncherView.qml",
+                                  "sessionMenu": "Modules/Panels/SessionMenu/MaterialSessionMenuView.qml"
                                 })
   // Bar widgets keep the shared look
   readonly property var barViews: ({})

@@ -19,6 +19,7 @@ import qs.Modules.Panels.Settings.Tabs.Launcher
 import qs.Modules.Panels.Settings.Tabs.Notifications
 import qs.Modules.Panels.Settings.Tabs.Osd
 import qs.Modules.Panels.Settings.Tabs.Plugins
+import qs.Modules.Panels.Settings.Tabs.RadialMenu
 import qs.Modules.Panels.Settings.Tabs.Region
 import qs.Modules.Panels.Settings.Tabs.SessionMenu
 import qs.Modules.Panels.Settings.Tabs.SystemMonitor
@@ -536,6 +537,10 @@ Item {
     id: desktopWidgetsTab
     DesktopWidgetsTab {}
   }
+  Component {
+    id: radialMenuTab
+    RadialMenuTab {}
+  }
 
   function updateTabsModel() {
     let newTabs = [
@@ -580,6 +585,12 @@ Item {
             "label": "panels.desktop-widgets.title",
             "icon": "clock",
             "source": desktopWidgetsTab
+          },
+          {
+            "id": SettingsPanel.Tab.RadialMenu,
+            "label": "panels.radial-menu.title",
+            "icon": "click",
+            "source": radialMenuTab
           },
           {
             "id": SettingsPanel.Tab.ControlCenter,
@@ -843,7 +854,6 @@ Item {
         color: "transparent"
         border.color: "transparent"
 
-
         // Keep the list viewport stable while the outer sidebar reveals it.
         SettingsSidebarLayout {
           viewportWidth: sidebar.expandedWidth
@@ -1074,7 +1084,6 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     visible: opacity > 0
                     opacity: root.sidebarExpansion
-
                   }
                 }
 
@@ -1177,7 +1186,6 @@ Item {
               tooltipText: I18n.tr("common.back")
               onClicked: root.showHome()
             }
-
 
             NText {
               text: root.tabsModel[root.currentTabIndex]?.label ? I18n.tr(root.tabsModel[root.currentTabIndex].label) : ""

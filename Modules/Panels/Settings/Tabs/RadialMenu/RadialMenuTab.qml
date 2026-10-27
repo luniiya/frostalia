@@ -5,7 +5,7 @@ import qs.Commons
 import qs.Services.UI
 import qs.Widgets
 
-// Settings for the desktop radial menu: on/off and the item tree editor. Tree edits go
+// Right-click menu tab: on/off and the item tree editor for the desktop radial menu. Tree edits go
 // through Helpers/RadialMenu.js (addItem, updateItem, ...) and save the whole tree.
 ColumnLayout {
   id: root
@@ -45,12 +45,8 @@ ColumnLayout {
     return I18n.tr("radial-menu.settings.command-placeholder");
   }
 
-  NDivider {
+  NLabel {
     Layout.fillWidth: true
-  }
-
-  NHeader {
-    label: I18n.tr("radial-menu.settings.title")
     description: I18n.tr("radial-menu.settings.description")
   }
 
@@ -61,6 +57,70 @@ ColumnLayout {
     checked: Settings.data.radialMenu.enabled
     defaultValue: Settings.getDefaultValue("radialMenu.enabled")
     onToggled: checked => Settings.data.radialMenu.enabled = checked
+  }
+
+  NComboBox {
+    Layout.fillWidth: true
+    enabled: Settings.data.radialMenu.enabled
+    label: I18n.tr("radial-menu.settings.shape-label")
+    description: I18n.tr("radial-menu.settings.shape-description")
+    model: [
+      {
+        "key": "auto",
+        "name": I18n.tr("radial-menu.settings.shape-auto")
+      },
+      {
+        "key": "segment",
+        "name": I18n.tr("radial-menu.settings.shape-segment")
+      },
+      {
+        "key": "chunky",
+        "name": I18n.tr("radial-menu.settings.shape-chunky")
+      }
+    ]
+    currentKey: Settings.data.radialMenu.shape
+    defaultValue: Settings.getDefaultValue("radialMenu.shape")
+    onSelected: key => Settings.data.radialMenu.shape = key
+  }
+
+  NValueSlider {
+    Layout.fillWidth: true
+    enabled: Settings.data.radialMenu.enabled
+    label: I18n.tr("radial-menu.settings.size-label")
+    description: I18n.tr("radial-menu.settings.size-description")
+    from: RadialLogic.sizeRange[0]
+    to: RadialLogic.sizeRange[1]
+    stepSize: 0.05
+    showReset: true
+    value: Settings.data.radialMenu.size
+    defaultValue: Settings.getDefaultValue("radialMenu.size")
+    onMoved: value => Settings.data.radialMenu.size = value
+    text: Math.round(Settings.data.radialMenu.size * 100) + "%"
+  }
+
+  NValueSlider {
+    Layout.fillWidth: true
+    enabled: Settings.data.radialMenu.enabled
+    label: I18n.tr("radial-menu.settings.opacity-label")
+    description: I18n.tr("radial-menu.settings.opacity-description")
+    from: RadialLogic.opacityRange[0]
+    to: RadialLogic.opacityRange[1]
+    stepSize: 0.01
+    showReset: true
+    value: Settings.data.radialMenu.opacity
+    defaultValue: Settings.getDefaultValue("radialMenu.opacity")
+    onMoved: value => Settings.data.radialMenu.opacity = value
+    text: Math.round(Settings.data.radialMenu.opacity * 100) + "%"
+  }
+
+  NToggle {
+    Layout.fillWidth: true
+    enabled: Settings.data.radialMenu.enabled
+    label: I18n.tr("radial-menu.settings.animations-label")
+    description: I18n.tr("radial-menu.settings.animations-description")
+    checked: Settings.data.radialMenu.animations
+    defaultValue: Settings.getDefaultValue("radialMenu.animations")
+    onToggled: checked => Settings.data.radialMenu.animations = checked
   }
 
   NLabel {

@@ -408,11 +408,11 @@ TestCase {
                                             "icon": "brush"
                                           }
                                         ], choices.concat([
-                                                           {
-                                                             "key": "future",
-                                                             "labelKey": "options.ui-style.future"
-                                                           }
-                                                         ]))[0];
+                                                            {
+                                                              "key": "future",
+                                                              "labelKey": "options.ui-style.future"
+                                                            }
+                                                          ]))[0];
     compare(more.children.length, choices.length + 1);
     compare(more.children[choices.length].arg, "future");
     compare(more.label, "Looks");
@@ -685,6 +685,119 @@ TestCase {
     compare(RadialMenu.visual({
                                 "shape": "chunky"
                               }).colors.hover, "primary");
+  }
+
+  // --- user preferences (Settings.data.radialMenu)
+
+  function test_visualPrefsDefaultToTheStyle() {
+    const plain = RadialMenu.visual({
+                                      "shape": "chunky"
+                                    });
+    const withDefaults = RadialMenu.visual({
+                                             "shape": "chunky"
+                                           }, {
+                                             "shape": "auto",
+                                             "size": 1,
+                                             "opacity": 1,
+                                             "animations": true
+                                           });
+    compare(withDefaults.shape, "chunky");
+    compare(withDefaults.outerRadius, plain.outerRadius);
+    compare(withDefaults.fillOpacity, plain.fillOpacity);
+    compare(withDefaults.stagger, plain.stagger);
+    verify(withDefaults.animate);
+  }
+
+  function test_visualShapePrefOverridesTheStyleButKeepsItsColors() {
+    const v = RadialMenu.visual({
+                                  "shape": "segment",
+                                  "cornerRadius": 10,
+                                  "colors": {
+                                    "hover": "tertiary"
+                                  }
+                                }, {
+                                  "shape": "chunky"
+                                });
+    compare(v.shape, "chunky");
+    verify(v.borderWidth > 0);
+    // The segment style's corner tweak is dropped, its colors are kept
+    compare(v.cornerRadius, RadialMenu.shapePresets.chunky.cornerRadius);
+    compare(v.colors.hover, "tertiary");
+    compare(RadialMenu.visual({
+                                "shape": "segment"
+                              }, {
+                                "shape": "bogus"
+                              }).shape, "segment");
+  }
+
+  function test_visualSizeScalesRadiiOnly_data() {
+    return [
+          {
+            "tag": "bigger",
+            "size": 1.5,
+            "factor": 1.5
+          },
+          {
+            "tag": "clamped low",
+            "size": 0.1,
+            "factor": RadialMenu.sizeRange[0]
+          },
+          {
+            "tag": "clamped high",
+            "size": 9,
+            "factor": RadialMenu.sizeRange[1]
+          },
+          {
+            "tag": "garbage",
+            "size": "abc",
+            "factor": 1
+          }
+        ];
+  }
+
+  function test_visualSizeScalesRadiiOnly(data) {
+    const base = RadialMenu.visual(undefined);
+    const v = RadialMenu.visual(undefined, {
+                                  "size": data.size
+                                });
+    for (const field of RadialMenu.sizedFields)
+      fuzzyCompare(v[field], base[field] * data.factor, 0.0001);
+    compare(v.gap, base.gap);
+    compare(v.borderWidth, base.borderWidth);
+  }
+
+  function test_visualOpacityMultipliesAndClamps() {
+    compare(RadialMenu.visual({
+                                "fillOpacity": 0.8
+                              }, {
+                                "opacity": 0.5
+                              }).fillOpacity, 0.4);
+    compare(RadialMenu.visual(undefined, {
+                                "opacity": 0
+                              }).fillOpacity, RadialMenu.opacityRange[0]);
+  }
+
+  function test_visualAnimationsOff() {
+    const v = RadialMenu.visual({
+                                  "shape": "chunky"
+                                }, {
+                                  "animations": false
+                                });
+    verify(!v.animate);
+    compare(v.stagger, 0);
+    compare(v.openScale, 1);
+    compare(v.openRotation, 0);
+  }
+
+  function test_editRadialMenuIsAPlainAction() {
+    const items = RadialMenu.normalizeItems([
+                                              {
+                                                "action": "editRadialMenu"
+                                              }
+                                            ]);
+    compare(items.length, 1);
+    compare(RadialMenu.labelKeyFor(items[0]), "radial-menu.actions.edit-radial-menu");
+    compare(RadialMenu.iconFor(items[0]), "pencil");
   }
 
   function test_everyUiStyleHasItsOwnLook() {

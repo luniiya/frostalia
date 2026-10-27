@@ -97,9 +97,9 @@ class StyleViewTests(unittest.TestCase):
 
     def test_registered_views_exist(self):
         source = "".join(path.read_text() for path in sorted((ROOT / "Styles").glob("*/Definition.qml")))
-        paths = re.findall(r'"(?:controlCenter|mediaCard|mediaPlayer|osd|notificationContent|kdeConnectHome|launcher)": "([^"]+\.qml)"', source)
-        # Seven surfaces in each of the two styles
-        self.assertEqual(len(paths), 14)
+        paths = re.findall(r'"(?:controlCenter|mediaCard|mediaPlayer|osd|notificationContent|kdeConnectHome|launcher|sessionMenu)": "([^"]+\.qml)"', source)
+        # Eight surfaces in each of the two styles
+        self.assertEqual(len(paths), 16)
         for path in paths:
             with self.subTest(path=path):
                 self.assertTrue((ROOT / path).is_file())
@@ -108,7 +108,8 @@ class StyleViewTests(unittest.TestCase):
         for path, surface in (("Modules/Panels/ControlCenter/ControlCenterPanel.qml", "controlCenter"),
                               ("Modules/Panels/Media/MediaPlayerPanel.qml", "mediaPlayer"),
                               ("Modules/Cards/MediaCard.qml", "mediaCard"),
-                              ("Modules/Panels/KdeConnect/KdeConnectContent.qml", "kdeConnectHome")):
+                              ("Modules/Panels/KdeConnect/KdeConnectContent.qml", "kdeConnectHome"),
+                              ("Modules/Panels/SessionMenu/SessionMenu.qml", "sessionMenu")):
             with self.subTest(path=path):
                 source = (ROOT / path).read_text()
                 self.assertIn(f'surface: "{surface}"', source)

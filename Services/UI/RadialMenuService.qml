@@ -23,7 +23,7 @@ Singleton {
   property real progress: active ? 1 : 0
   Behavior on progress {
     NumberAnimation {
-      duration: root.active ? Style.animationNormal : Style.animationFast
+      duration: !root.visual.animate ? 0 : root.active ? Style.animationNormal : Style.animationFast
       easing.type: Easing.OutCubic
     }
   }
@@ -34,7 +34,7 @@ Singleton {
   }
 
   readonly property var items: RadialMenu.expandItems(RadialMenu.normalizeItems(Settings.data.radialMenu.items), UiStyleRegistry.choices)
-  readonly property var visual: RadialMenu.visual(Style.uiStyleTokens.radialMenu)
+  readonly property var visual: RadialMenu.visual(Style.uiStyleTokens.radialMenu, Settings.data.radialMenu)
   readonly property real scale: Style.uiScaleRatio
 
   // Current ring and where it sits; kept while closing so the ring can animate out

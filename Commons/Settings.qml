@@ -825,6 +825,11 @@ Singleton {
     // desktop radial menu (right click on the empty desktop), see Helpers/RadialMenu.js
     property JsonObject radialMenu: JsonObject {
       property bool enabled: true
+      // Look on top of the UI style: "auto" keeps the style's shape, see RadialMenu.visual()
+      property string shape: "auto" // "auto", "segment", "chunky"
+      property real size: 1.0
+      property real opacity: 1.0
+      property bool animations: true
       // Item tree: [{ action, label, labelKey, icon, arg, children? }], first item points up
       property list<var> items: [
         {
@@ -882,6 +887,13 @@ Singleton {
               "action": "settings",
               "label": "",
               "labelKey": "radial-menu.items.open-settings",
+              "icon": "",
+              "arg": ""
+            },
+            {
+              "action": "editRadialMenu",
+              "label": "",
+              "labelKey": "",
               "icon": "",
               "arg": ""
             },

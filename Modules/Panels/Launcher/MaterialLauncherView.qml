@@ -109,7 +109,8 @@ Item {
   // One segment of a connected button group; the selected one turns into a pill
   component Segment: Rectangle {
     id: seg
-    property int index
+    // Set by the Repeater; redeclaring it at the use site would shadow this one
+    required property int index
     property int count
     property bool selected
     property string icon
@@ -291,7 +292,6 @@ Item {
         model: root.launcher.modes
         Segment {
           required property var modelData
-          required property int index
           width: (modeRow.width - modeRow.spacing * (root.launcher.modes.length - 1)) / root.launcher.modes.length
           height: modeRow.height
           count: root.launcher.modes.length
@@ -462,7 +462,6 @@ Item {
               ]
               Segment {
                 required property var modelData
-                required property int index
                 width: Math.round(44 * root.s)
                 height: Math.round(34 * root.s)
                 count: 2
@@ -580,7 +579,6 @@ Item {
           ]
           Segment {
             required property var modelData
-            required property int index
             width: Math.round(52 * root.s)
             height: Math.round(40 * root.s)
             count: 3

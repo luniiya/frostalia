@@ -37,3 +37,29 @@ function navigate(count, columns, selected, direction) {
   }
   return row * columns + col;
 }
+
+// How a tile of the large menu looks: `active` while selected (keyboard or hover)
+// or counting down, `pending` while its countdown runs, `danger` for shutdown.
+function tileState(index, selectedIndex, action, pendingAction, timerActive, isShutdown) {
+  const pending = !!timerActive && !!action && action === pendingAction;
+  return {
+    "active": pending || (index >= 0 && index === selectedIndex),
+    "pending": pending,
+    "danger": !!isShutdown
+  };
+}
+
+// Elapsed share of the countdown, 0 at the start and 1 when the action runs.
+function countdownProgress(remaining, duration) {
+  if (!(duration > 0))
+    return 0;
+  return Math.max(0, Math.min(1, 1 - remaining / duration));
+}
+
+// Scroll offset that keeps the selected row of the tile grid in view.
+function revealY(selected, columns, tileHeight, gap, contentY, viewportHeight) {
+  if (selected < 0 || columns < 1)
+    return contentY;
+  const top = Math.floor(selected / columns) * (tileHeight + gap);
+  return Math.max(0, Math.min(top, Math.max(contentY, top + tileHeight - viewportHeight)));
+}

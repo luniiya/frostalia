@@ -13,6 +13,8 @@ var maxDepth = 4;
 var actions = {
   "editDesktop": { "labelKey": "radial-menu.actions.edit-desktop", "icon": "layout-dashboard", "arg": "" },
   "settings": { "labelKey": "radial-menu.actions.settings", "icon": "settings", "arg": "" },
+  // Opens the Right-click menu settings tab, to edit this menu
+  "editRadialMenu": { "labelKey": "radial-menu.actions.edit-radial-menu", "icon": "pencil", "arg": "" },
   "wallpaper": { "labelKey": "radial-menu.actions.wallpaper", "icon": "photo", "arg": "command" },
   "lock": { "labelKey": "radial-menu.actions.lock", "icon": "lock", "arg": "" },
   "sessionMenu": { "labelKey": "radial-menu.actions.session-menu", "icon": "power", "arg": "" },
@@ -536,10 +538,38 @@ function merge(target, source) {
   return target;
 }
 
-function visual(styleSpec) {
-  const shape = styleSpec && Object.prototype.hasOwnProperty.call(shapePresets, styleSpec.shape) ? styleSpec.shape : "segment";
-  const spec = merge(merge(merge({}, baseVisual), shapePresets[shape]), styleSpec || {});
+// User preferences from Settings.data.radialMenu, applied on top of the style's spec
+var sizeRange = [0.6, 1.6];
+var opacityRange = [0.3, 1];
+// Spec fields that grow with the size preference; strokes, gaps and shadows stay put
+var sizedFields = ["innerRadius", "outerRadius", "itemRadius", "centerRadius", "iconSize", "cornerRadius"];
+
+function clamp(value, range, fallback) {
+  const n = Number(value);
+  return isFinite(n) ? Math.max(range[0], Math.min(range[1], n)) : fallback;
+}
+
+// The style's spec with the user's preferences ({ shape, size, opacity, animations }).
+// shape "auto" (or unknown) keeps the style's own shape; everything else overrides it.
+function visual(styleSpec, prefs) {
+  const p = prefs || {};
+  const own = styleSpec && Object.prototype.hasOwnProperty.call(shapePresets, styleSpec.shape) ? styleSpec.shape : "segment";
+  const forced = p.shape && p.shape !== "auto" && Object.prototype.hasOwnProperty.call(shapePresets, p.shape) ? p.shape : "";
+  const shape = forced || own;
+  // A forced shape drops the style's own shape tweaks but keeps its colors
+  const styleExtras = forced && forced !== own ? { "colors": (styleSpec || {}).colors } : (styleSpec || {});
+  const spec = merge(merge(merge({}, baseVisual), shapePresets[shape]), styleExtras);
   spec.shape = shape;
+  const size = clamp(p.size, sizeRange, 1);
+  for (const field of sizedFields)
+    spec[field] = spec[field] * size;
+  spec.fillOpacity = spec.fillOpacity * clamp(p.opacity, opacityRange, 1);
+  spec.animate = p.animations !== false;
+  if (!spec.animate) {
+    spec.stagger = 0;
+    spec.openScale = 1;
+    spec.openRotation = 0;
+  }
   return spec;
 }
 

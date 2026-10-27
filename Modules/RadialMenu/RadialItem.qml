@@ -38,7 +38,7 @@ Item {
     }
     NumberAnimation {
       to: 1
-      duration: Style.animationNormal
+      duration: root.spec.animate ? Style.animationNormal : 0
       easing.type: root.spec.easing === "OutBack" ? Easing.OutBack : root.spec.easing === "OutCubic" ? Easing.OutCubic : Easing.OutQuint
     }
   }

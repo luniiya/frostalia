@@ -5,6 +5,9 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Widgets
+import "../../Helpers/LauncherView.js" as LauncherView
+import "../../Helpers/PanelSettle.js" as PanelSettle
+import "../../Helpers/UiProbe.js" as UiProbe
 
 import qs.Commons
 import qs.Modules.Panels.Settings
@@ -18,9 +21,6 @@ import qs.Services.Power
 import qs.Services.System
 import qs.Services.Theming
 import qs.Services.UI
-import "../../Helpers/LauncherView.js" as LauncherView
-import "../../Helpers/PanelSettle.js" as PanelSettle
-import "../../Helpers/UiProbe.js" as UiProbe
 
 Singleton {
   id: root
@@ -103,6 +103,7 @@ Singleton {
                                             "controlcenter": SettingsPanel.Tab.ControlCenter,
                                             "desktopwidgets": SettingsPanel.Tab.DesktopWidgets,
                                             "osd": SettingsPanel.Tab.OSD,
+                                            "radialmenu": SettingsPanel.Tab.RadialMenu,
                                             "display": SettingsPanel.Tab.Display,
                                             "dock": SettingsPanel.Tab.Dock,
                                             "general": SettingsPanel.Tab.General,

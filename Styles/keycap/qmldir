@@ -8,6 +8,7 @@ Key 1.0 Key.qml
 Kit 1.0 Kit.qml
 LauncherView 1.0 LauncherView.qml
 QuickSliderHandle 1.0 QuickSliderHandle.qml
+SessionMenuView 1.0 SessionMenuView.qml
 QuickSliderTrack 1.0 QuickSliderTrack.qml
 SliderHandle 1.0 SliderHandle.qml
 SliderTrack 1.0 SliderTrack.qml
