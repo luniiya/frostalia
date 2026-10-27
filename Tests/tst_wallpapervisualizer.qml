@@ -215,67 +215,53 @@ TestCase {
       verify(WallpaperVisualizer.hintKey(effect).startsWith("panels.desktop-widgets.effect-hint-"), effect);
   }
 
-  function test_equalize_silence_stays_silent() {
-    const r = WallpaperVisualizer.equalize([0, 0, 0.01], [], 0, 2, 0.08);
-    verify(r.values[0] === 0 && r.values[1] === 0);
-    // Noise under the floor is not blown up to full height
-    verify(r.values[2] < 0.2, r.values[2]);
+  // Regression: mirrored on each edge with the highs at the ends, the corners always got
+  // the quietest bands and stayed empty
+  function test_lobes_never_line_up_with_the_four_edges() {
+    verify(WallpaperVisualizer.lobes % 2 === 1, "odd");
+    verify(WallpaperVisualizer.lobes % 4 !== 0);
   }
 
-  // Regression: highs carry far less energy than lows, so the corners (where the
-  // mirrored spectrum puts them) barely moved
-  function test_equalize_quiet_bands_use_their_full_range() {
-    let peaks = [];
-    let r = null;
-    for (let i = 0; i < 20; i++) {
-      r = WallpaperVisualizer.equalize([0.9, 0.2], peaks, 1 / 60, 2, 0.08);
-      peaks = r.peaks;
+  function test_frameLevel_is_full_for_any_real_song() {
+    compare(WallpaperVisualizer.frameLevel([0.1, 0.45, 0.2], 0, 1 / 60, 0.3, 0.6), 1);
+    fuzzyCompare(WallpaperVisualizer.frameLevel([0.15, 0.05], 0, 1 / 60, 0.3, 0.6), 0.5, 1e-9);
+  }
+
+  // The old floor was a fixed height, so when a song cut out a still frame stayed on screen
+  function test_frameLevel_fades_out_when_the_song_goes_quiet() {
+    fuzzyCompare(WallpaperVisualizer.frameLevel([0, 0], 1, 0.6, 0.3, 0.6), 0.5, 1e-9);
+    let level = 1;
+    for (let i = 0; i < 300; i++)
+      level = WallpaperVisualizer.frameLevel([0, 0], level, 1 / 60, 0.3, 0.6);
+    verify(level < 0.01, level);
+  }
+
+  function test_frameLevel_rises_at_once_and_ignores_bad_input() {
+    compare(WallpaperVisualizer.frameLevel([0.3], 0.1, 0, 0.3, 0.6), 1);
+    compare(WallpaperVisualizer.frameLevel([NaN, "x"], NaN, 1, 0.3, 0.6), 0);
+    compare(WallpaperVisualizer.frameLevel(null, 0, 1, 0.3, 0.6), 0);
+  }
+
+  // Regression: one bump per spectrum band made narrow, crowded spikes
+  function test_bins_average_the_spectrum_into_wide_bands() {
+    compare(WallpaperVisualizer.bins([1, 0, 0.5, 0.5, 0.2, 0.4], 3), [0.5, 0.5, 0.30000000000000004]);
+    compare(WallpaperVisualizer.bins([0.1, 0.2], 12), [0.1, 0.2]);
+    compare(WallpaperVisualizer.bins(null, 12), []);
+    compare(WallpaperVisualizer.bins([NaN, 1], 1), [0.5]);
+    compare(WallpaperVisualizer.bins(new Array(32).fill(0.3), WallpaperVisualizer.waveBands).length, WallpaperVisualizer.waveBands);
+  }
+
+  function test_drift_is_slow_and_bounded() {
+    let lo = 1, hi = -1;
+    for (let t = 0; t < 600; t += 0.5) {
+      const d = WallpaperVisualizer.drift(t);
+      lo = Math.min(lo, d);
+      hi = Math.max(hi, d);
+      // Never faster than a fifth of a lobe a second
+      verify(Math.abs(WallpaperVisualizer.drift(t + 0.5) - d) < 0.5 * 0.2 / WallpaperVisualizer.lobes, t);
     }
-    fuzzyCompare(r.values[0], 1, 1e-9);
-    // Lifted well past its share of the loudest band (0.2 / 0.9), but not to the top
-    verify(r.values[1] > 0.45 && r.values[1] < 1, r.values[1]);
-  }
-
-  // Regression: each band was boosted to full height on its own, so neighbours jumped
-  // between nothing and the top and the edge became a comb of spikes
-  function test_equalize_keeps_quiet_bands_under_the_loud_ones() {
-    let peaks = [];
-    let r = null;
-    for (let i = 0; i < 20; i++) {
-      r = WallpaperVisualizer.equalize([0.9, 0.05, 0.05, 0.05], peaks, 1 / 60, 2, 0.02, 0.4);
-      peaks = r.peaks;
-    }
-    for (let j = 1; j < 4; j++)
-      verify(r.values[j] <= 0.05 / (0.9 * 0.4) + 1e-9, r.values[j]);
-  }
-
-  function test_equalize_evens_the_gain_out_across_neighbours() {
-    // Same level everywhere, but one band's peak is far higher: its neighbours share it
-    const r = WallpaperVisualizer.equalize([0.3, 0.3, 0.3, 0.3, 0.3], [0.3, 0.3, 1, 0.3, 0.3], 0, 2, 0.08, 0.01);
-    verify(r.values[1] < r.values[0], "neighbour of the loud band is lower");
-    verify(r.values[2] < r.values[1], "the loud band itself is lowest");
-    fuzzyCompare(r.values[0], r.values[4], 1e-9);
-  }
-
-  function test_equalize_peaks_decay_by_half_life() {
-    const r = WallpaperVisualizer.equalize([0], [0.8], 2, 2, 0.08);
-    fuzzyCompare(r.peaks[0], 0.4, 1e-9);
-    const floor = WallpaperVisualizer.equalize([0], [0.1], 100, 2, 0.08);
-    fuzzyCompare(floor.peaks[0], 0.08, 1e-9);
-  }
-
-  function test_equalize_follows_a_drop_after_a_loud_peak() {
-    let peaks = [1];
-    let r = WallpaperVisualizer.equalize([0.3], peaks, 0, 2, 0.08);
-    fuzzyCompare(r.values[0], 0.3, 1e-9);
-    // Four half-lives later the same level reads as loud again
-    r = WallpaperVisualizer.equalize([0.3], r.peaks, 8, 2, 0.08);
-    fuzzyCompare(r.values[0], 1, 1e-9);
-  }
-
-  function test_equalize_bad_input() {
-    const r = WallpaperVisualizer.equalize([NaN, -1, 2, "x"], null, 0, 2, 0.08);
-    compare(r.values, [0, 0, 1, 0]);
-    compare(r.peaks.length, 4);
+    verify(hi <= 0.36 && lo >= -0.36);
+    // Wanders over more than a lobe, so every part of the border gets the lows
+    verify(hi - lo > 1 / WallpaperVisualizer.lobes, hi - lo);
   }
 }

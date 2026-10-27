@@ -110,6 +110,14 @@ class KeycapStyleTests(unittest.TestCase):
                 self.assertNotIn("keycap", source.lower())
                 self.assertNotIn("NStyleFace", source)
 
+    def test_desktop_widget_backgrounds_wear_the_style_card(self):
+        # Keycap's outline and hard shadow on desktop widgets, without naming the style;
+        # its shadow needs an opaque fill
+        source = (ROOT / "Modules/DesktopWidgets/DraggableDesktopWidget.qml").read_text()
+        container = source[source.index("id: container"):source.index("id: contentContainer")]
+        self.assertIn("NStyleCard {}", container)
+        self.assertIn("Style.opaqueSurfaces ? ShellColors.mSurface", container)
+
     def test_only_keycap_has_bar_faces(self):
         self.assertIn("Plate", bar_views("keycap"))
         self.assertEqual(bar_views("material"), {})

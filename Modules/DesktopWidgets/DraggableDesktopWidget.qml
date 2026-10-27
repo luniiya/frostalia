@@ -286,14 +286,19 @@ Item {
     anchors.fill: parent
     radius: root.roundedCorners ? Math.min(Math.round(Style.radiusL * root.widgetScale), Style.radiusL, width / 2, height / 2) : 0
     // Not frosted: desktop widgets get no compositor blur, and a translucent
-    // background would show its own drop shadow through.
-    color: Qt.alpha(ShellColors.mSurface, Settings.data.ui.panelBackgroundOpacity)
+    // background would show its own drop shadow through. Styles with a hard shadow
+    // (keycap) need it fully opaque.
+    color: Style.opaqueSurfaces ? ShellColors.mSurface : Qt.alpha(ShellColors.mSurface, Settings.data.ui.panelBackgroundOpacity)
     border {
       width: 1
       color: Qt.alpha(ShellColors.mOutline, 0.12)
     }
     clip: true
     visible: root.showBackground
+
+    // The style's card dressing (keycap: ink outline, keyline and hard shadow, which
+    // replace this soft shadow); material leaves the card alone
+    NStyleCard {}
 
     layer.enabled: Settings.data.general.enableShadows && !internal.isDragging && root.showBackground
     layer.effect: MultiEffect {

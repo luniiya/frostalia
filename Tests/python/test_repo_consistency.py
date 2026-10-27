@@ -9,13 +9,15 @@ import unittest
 
 import settings_defaults
 
+import repo_files
+
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 EN = ROOT / "Assets" / "Translations" / "en.json"
 TR_CALL = re.compile(r'I18n\.tr[pu]?\(\s*"([^"]+)"')
 
 
 def qml_files():
-    for path in ROOT.rglob("*.qml"):
+    for path in repo_files.tracked("*.qml"):
         if "Tests" not in path.relative_to(ROOT).parts:
             yield path
 

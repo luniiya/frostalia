@@ -58,7 +58,21 @@ class WaveSettingsTests(unittest.TestCase):
         fill = next(line for line in tile.splitlines() if line.strip().startswith("color: effect.lit"))
         self.assertNotRegex(fill, r"[?:]\s*Qt\.alpha\(")
 
-    def test_corner_fillet_is_capped(self):
-        # A fillet as wide as the crest filled in blobs ("cheese") far from the edges
+    def test_edges_are_combined_without_merging(self):
+        # Merging neighbouring edges' waves (a smooth union) filled in blobs and holes
+        # ("cheese") far from the edges; the loop makes corners meet at one height instead
         shader = (ROOT / "Shaders/frag/edge_wave.frag").read_text()
-        self.assertRegex(shader, r"float fillet\(.*\)\s*\{\s*return min\(.*,\s*0\.15 \* waveHeight\);")
+        self.assertNotIn("smoothUnion", shader)
+        # One shape: the nearest crest of any edge, so crossing waves don't show each other's rim
+        self.assertIn("if (wave.x < front) {", shader)
+
+    def test_loop_uniforms_are_set(self):
+        waves = (ROOT / "Modules/WallpaperVisualizer/EdgeWaves.qml").read_text()
+        for name in ("lobes", "drift", "frame"):
+            self.assertRegex(waves, r"property real %s:" % name)
+
+    def test_nothing_is_drawn_past_the_rim(self):
+        # The body's glow and the back wave stuck out past the white crest line
+        shader = (ROOT / "Shaders/frag/edge_wave.frag").read_text()
+        self.assertIn("smoothstep(-glow, 0.0, front)", shader)
+        self.assertIn("back *= inside;", shader)

@@ -4,6 +4,8 @@ import pathlib
 import re
 import unittest
 
+import repo_files
+
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 
 
@@ -16,12 +18,12 @@ class ForkIdentityTests(unittest.TestCase):
         self.assertIn('github:noctalia-dev/noctalia-qs', (ROOT / "flake.nix").read_text())
 
     def test_shell_module_imports_resolve(self):
-        for path in ROOT.rglob("*.qml"):
+        for path in repo_files.tracked("*.qml"):
             for module in re.findall(r"^import qs\.([\w.]+)", path.read_text(), re.MULTILINE):
                 self.assertTrue((ROOT / module.replace(".", "/")).is_dir(), f"{path}: {module}")
 
     def test_branded_assets_exist(self):
-        for path in ROOT.rglob("*.qml"):
+        for path in repo_files.tracked("*.qml"):
             for asset in re.findall(r"(/Assets/[\w/.-]*[Ff]rostalia[\w/.-]*)", path.read_text()):
                 self.assertTrue((ROOT / asset.lstrip("/")).exists(), f"{path}: {asset}")
 

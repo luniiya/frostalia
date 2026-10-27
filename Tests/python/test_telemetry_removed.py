@@ -5,12 +5,14 @@ import unittest
 
 import settings_defaults
 
+import repo_files
+
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 
 
 class TelemetryRemovalTests(unittest.TestCase):
     def test_no_runtime_telemetry_references(self):
-        for path in ROOT.rglob("*.qml"):
+        for path in repo_files.tracked("*.qml"):
             if "Tests" in path.relative_to(ROOT).parts or path.name == "Migration70.qml":
                 continue
             with self.subTest(path=str(path.relative_to(ROOT))):

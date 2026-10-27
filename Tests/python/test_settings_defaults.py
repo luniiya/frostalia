@@ -13,6 +13,7 @@ import subprocess
 import tempfile
 import unittest
 
+import repo_files
 import settings_defaults
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
@@ -21,7 +22,7 @@ SETTINGS_QML = ROOT / "Commons" / "Settings.qml"
 
 def default_value_paths():
     """Yield (file, path) for every literal Settings.getDefaultValue("...") call."""
-    for path in sorted(ROOT.glob("**/*.qml")):
+    for path in sorted(repo_files.tracked("*.qml")):
         if "Tests" in path.relative_to(ROOT).parts:
             continue
         for key in re.findall(r'Settings\.getDefaultValue\("([^"]+)"\)', path.read_text(encoding="utf-8")):

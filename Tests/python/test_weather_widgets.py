@@ -4,6 +4,8 @@ import pathlib
 import re
 import unittest
 
+import repo_files
+
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 REGISTRY = (ROOT / "Services/UI/DesktopWidgetRegistry.qml").read_text()
 EN = json.loads((ROOT / "Assets/Translations/en.json").read_text())
@@ -125,7 +127,7 @@ class WeatherWidgetTests(unittest.TestCase):
     def test_old_weather_shaders_removed(self):
         for name in ("cloud", "rain", "snow", "stars", "sun"):
             self.assertFalse((ROOT / ("Shaders/frag/weather_%s.frag" % name)).exists())
-        self.assertEqual([], [p for p in ROOT.rglob("*.qml") if "weather_" in p.read_text() and ".frag.qsb" in p.read_text()])
+        self.assertEqual([], [p for p in repo_files.tracked("*.qml") if "weather_" in p.read_text() and ".frag.qsb" in p.read_text()])
 
 
 class DesktopWeatherConventionTests(unittest.TestCase):

@@ -16,11 +16,26 @@ Item {
   property real devicePixelRatio: 1
 
   readonly property var look: WallpaperVisualizer.look(prefs)
+  // The spectrum averaged into a few wide bands, which the waves are drawn from
+  readonly property var bands: WallpaperVisualizer.bins(values, WallpaperVisualizer.waveBands)
+  // Seconds the waves have been shown, for the spectrum's slow slide around the border
+  property real elapsed: 0
+
+  // How much of the frame (the wave floor all round) shows, from the tallest band
+  property real frameLevel: 0
+
+  FrameAnimation {
+    running: root.visible && root.values.length >= 2
+    onTriggered: {
+      root.elapsed += frameTime;
+      root.frameLevel = WallpaperVisualizer.frameLevel(root.values, root.frameLevel, frameTime, 0.3, 0.6);
+    }
+  }
 
   // Data texture: one pixel per spectrum band, R channel = amplitude
   Item {
     id: dataRow
-    width: Math.max(root.values.length, 4)
+    width: Math.max(root.bands.length, 4)
     height: 1
 
     Repeater {
@@ -31,7 +46,7 @@ Item {
         width: 1
         height: 1
         color: {
-          const v = index < root.values.length ? root.values[index] : 0;
+          const v = index < root.bands.length ? root.bands[index] : 0;
           return Qt.rgba(isFinite(v) ? Math.max(0, Math.min(1, v)) : 0, 0, 0, 1);
         }
       }
@@ -54,7 +69,7 @@ Item {
 
     property variant dataSource: dataTexture
     property color fillColor: ShellColors.resolveColorKey(root.prefs.color)
-    property real count: root.values.length
+    property real count: root.bands.length
     property real texWidth: dataRow.width
     property vector4d edges: {
       const f = WallpaperVisualizer.edgeFlags(root.prefs.edges);
@@ -66,6 +81,9 @@ Item {
     property real rim: root.look.rim
     property real backWave: root.look.backWave
     property real softness: root.look.softness
+    property real lobes: WallpaperVisualizer.lobes
+    property real drift: WallpaperVisualizer.drift(root.elapsed)
+    property real frame: WallpaperVisualizer.frameShare * root.frameLevel
 
     fragmentShader: Qt.resolvedUrl(Quickshell.shellDir + "/Shaders/qsb/edge_wave.frag.qsb")
     blending: true

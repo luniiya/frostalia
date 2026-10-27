@@ -4,6 +4,8 @@ import pathlib
 import re
 import unittest
 
+import repo_files
+
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 SCRIPT = ROOT / "Scripts/dev/ui-screenshots.sh"
 
@@ -11,7 +13,7 @@ SCRIPT = ROOT / "Scripts/dev/ui-screenshots.sh"
 def ipc_functions():
     """{target: {function names}} for every IpcHandler in the tree."""
     handlers = {}
-    for path in ROOT.rglob("*.qml"):
+    for path in repo_files.tracked("*.qml"):
         if "Tests" in path.parts:
             continue
         source = path.read_text(errors="ignore")

@@ -6,6 +6,8 @@ import unittest
 
 import settings_defaults
 
+import repo_files
+
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 
 
@@ -55,7 +57,7 @@ class UiStyleTests(unittest.TestCase):
                 self.assertIn(key, appearance[section], f"{name}: {section}.{key}")
 
     def test_caelestia_is_gone(self):
-        self.assertEqual([], sorted(str(p.relative_to(ROOT)) for p in ROOT.rglob("Caelestia*.qml")))
+        self.assertEqual([], sorted(str(p.relative_to(ROOT)) for p in repo_files.tracked("Caelestia*.qml")))
         self.assertNotIn("caelestia", (ROOT / "Helpers/UiStyles.js").read_text().lower())
         self.assertNotIn('"orbit"', (ROOT / "Helpers/RadialMenu.js").read_text())
 

@@ -69,28 +69,11 @@ Variants {
 
       readonly property bool playing: WallpaperVisualizer.wavesActive(root.enabled, SpectrumService.isIdle, PowerProfileService.ecoMode)
       readonly property string cutout: root.prefs.depth ? WallpaperCutoutService.cutoutFor(screenLoader.wallpaper) : ""
-      // The spectrum, each band against its own recent peak, so the whole edge moves
-      property var values: []
-      property var peaks: []
-      property real lastAt: 0
-
-      Connections {
-        target: SpectrumService
-        function onValuesChanged() {
-          const now = Date.now();
-          const dt = window.lastAt > 0 ? (now - window.lastAt) / 1000 : 0;
-          const result = WallpaperVisualizer.equalize(SpectrumService.values || [], window.peaks, dt, 2, 0.08);
-          window.lastAt = now;
-          window.peaks = result.peaks;
-          window.values = result.values;
-        }
-      }
-
       EdgeWaves {
         anchors.fill: parent
         opacity: window.playing ? 1 : 0
         visible: opacity > 0
-        values: window.values
+        values: SpectrumService.values || []
         prefs: root.prefs
         cutout: window.cutout
         devicePixelRatio: window.screen?.devicePixelRatio ?? 1

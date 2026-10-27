@@ -3,6 +3,8 @@ import pathlib
 import re
 import unittest
 
+import repo_files
+
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 
 
@@ -31,7 +33,7 @@ class ChangelogTests(unittest.TestCase):
         self.assertNotIn("setChangelogState", state)
 
     def test_removed_popup_has_no_remaining_imports_or_calls(self):
-        for path in ROOT.rglob("*.qml"):
+        for path in repo_files.tracked("*.qml"):
             self.assertNotRegex(path.read_text(), r'(?:qs.Modules.Panels.Changelog|ChangelogPanel\s*\{|UpdateService\.markChangelogSeen\()', str(path))
 
 

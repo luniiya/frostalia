@@ -163,39 +163,61 @@ function hintKey(effect) {
   return hintKeys[effect] || "";
 }
 
-// Per-band auto-gain, so every part of an edge moves: highs carry far less energy than
-// lows and would barely stir next to them. Each band is divided by its own recent peak,
-// which decays by half every `halfLife` seconds, evened out with its neighbours' so the
-// gain doesn't jump from band to band (that turned the edge into a comb of spikes). A
-// band is never boosted past the loudest one by more than 1 / `spread`, and `floor`
-// keeps silence and noise from being blown up, so no sound still means no waves.
-// `peaks` is the previous call's result (or []); `dt` the seconds since it.
-// Returns { values, peaks }.
-function equalize(values, peaks, dt, halfLife, floor, spread) {
-  var decay = Math.pow(0.5, Math.max(0, dt) / Math.max(halfLife || 2, 0.001));
-  var minPeak = floor === undefined ? 0.08 : floor;
-  var share = spread === undefined ? 0.4 : Math.max(0.01, Math.min(1, spread));
-  var levels = [];
-  var next = [];
-  var loudest = 0;
-  for (var i = 0; i < values.length; i++) {
-    var v = Number(values[i]);
-    v = isFinite(v) ? Math.max(0, Math.min(1, v)) : 0;
-    var previous = peaks && isFinite(peaks[i]) ? peaks[i] : 0;
-    var peak = Math.max(v, previous * decay, minPeak);
-    levels.push(v);
-    next.push(peak);
-    loudest = Math.max(loudest, peak);
-  }
+// The spectrum runs around the screen's border as one loop, in `lobes` mirrored copies
+// (lows in the middle of each, highs where two meet). An odd count never lines up with
+// the four edges, so the corners don't always get the quiet highs; edges meeting at a
+// corner sit at the same point of the loop, so their waves meet at the same height.
+var lobes = 3;
+
+// Bands the waves are drawn from: the spectrum averaged down to this many, so each
+// bump of a wave is wide and rolling instead of one narrow spike per band
+var waveBands = 12;
+
+// `values` averaged into `count` equal groups (fewer values come back as they are)
+function bins(values, count) {
+  var n = values ? values.length : 0;
+  if (n <= count)
+    return values ? Array.prototype.slice.call(values) : [];
   var out = [];
-  for (var j = 0; j < levels.length; j++) {
-    var left = next[Math.max(0, j - 1)];
-    var right = next[Math.min(next.length - 1, j + 1)];
-    var ref = Math.max((left + 2 * next[j] + right) / 4, loudest * share);
-    out.push(Math.min(1, levels[j] / ref));
+  for (var b = 0; b < count; b++) {
+    var from = Math.floor(b * n / count);
+    var to = Math.max(from + 1, Math.floor((b + 1) * n / count));
+    var sum = 0;
+    for (var i = from; i < to; i++) {
+      var v = Number(values[i]);
+      sum += isFinite(v) ? v : 0;
+    }
+    out.push(sum / (to - from));
   }
-  return {
-    "values": out,
-    "peaks": next
-  };
+  return out;
+}
+
+// The frame: a wave floor all round the border, so quiet bands never leave gaps, that
+// goes away with the music. Its height is `frameShare` of the tallest wave times the
+// frame level from frameLevel()
+var frameShare = 0.1;
+
+// Frame level, 0..1, from the tallest band right now: 1 whenever any band reaches
+// `knee` (most of any song), less only once the whole song gets very quiet. It follows a
+// rise at once and a drop by half every `halfLife` seconds, so it doesn't flicker.
+// `previous` is the last call's result; `dt` the seconds since it.
+function frameLevel(values, previous, dt, knee, halfLife) {
+  var tallest = 0;
+  for (var i = 0; i < (values ? values.length : 0); i++) {
+    var v = Number(values[i]);
+    if (isFinite(v))
+      tallest = Math.max(tallest, v);
+  }
+  var target = Math.max(0, Math.min(1, tallest / Math.max(knee || 0.3, 0.001)));
+  var last = isFinite(previous) ? Math.max(0, Math.min(1, previous)) : 0;
+  if (target >= last)
+    return target;
+  return Math.max(target, last * Math.pow(0.5, Math.max(0, dt) / Math.max(halfLife || 0.6, 0.001)));
+}
+
+// How far the spectrum has slid around the loop after `t` seconds, in turns: a slow,
+// irregular back and forth (incommensurate sines, so it doesn't visibly repeat) that
+// gives every part of the border its share of the lows over time
+function drift(t) {
+  return 0.18 * Math.sin(t * 0.043) + 0.11 * Math.sin(t * 0.071 + 1.3) + 0.07 * Math.sin(t * 0.113 + 2.1);
 }
