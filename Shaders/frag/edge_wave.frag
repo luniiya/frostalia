@@ -2,7 +2,7 @@
 
 // Soft audio waves rising from the screen edges (wallpaper visualizer). Each edge
 // shows the spectrum mirrored around its middle: lows in the center, highs toward
-// the corners, as a milky body with a thin light rim on the crest. A fainter,
+// the corners, where neighbouring edges merge into one rounded wave. A milky body with a thin light rim on the crest. A fainter,
 // shifted wave fades out underneath for depth.
 
 layout(location = 0) in vec2 qt_TexCoord0;
@@ -19,6 +19,10 @@ layout(std140, binding = 0) uniform buf {
   vec4 edges;        // top, bottom, left, right: 1 when the edge has a wave
   vec2 size;         // item size in pixels
   float waveHeight;  // tallest wave, in pixels
+  float whiteness;   // how far the body is tinted toward white
+  float rim;         // strength of the light rim on the crest
+  float backWave;    // strength of the fainter wave underneath
+  float softness;    // glow past the crest, as a share of waveHeight
 };
 
 float fetchData(float idx) {
@@ -46,32 +50,33 @@ float amplitude(float along) {
   return clamp(cubicHermite(fetchData(i - 1.0), fetchData(i), fetchData(i + 1.0), fetchData(i + 2.0), t), 0.0, 1.0);
 }
 
-// Crest height, tapered to nothing toward both ends so neighbouring edges never
-// pile up into blobs in the corners
+// Crest height: nothing in silence. It runs all the way into the corners, where the
+// two edges' waves are joined into one rounded curve (see smoothUnion)
 float crest(float along, float scale) {
-  float taper = smoothstep(0.0, 0.12, along) * smoothstep(1.0, 0.88, along);
-  return waveHeight * scale * (0.08 + 0.92 * amplitude(along)) * taper;
+  return waveHeight * scale * amplitude(along);
 }
 
-// The front wave at `depth` pixels from its edge, `length` pixels long: x is the
-// milky body with a soft glow past the crest, y a thin light rim along the crest
-vec2 frontWave(float along, float depth, float length) {
+// Smooth minimum of two distances: where two edges meet, their waves merge into
+// one curve with a round fillet `k` pixels wide instead of a notch or a square
+float smoothUnion(float a, float b, float k) {
+  k = max(k, 0.001);
+  float h = clamp(0.5 + 0.5 * (b - a) / k, 0.0, 1.0);
+  return mix(b, a, h) - k * h * (1.0 - h);
+}
+
+// Distance from the front wave's crest at `depth` pixels from its edge, `length`
+// pixels long (negative inside the wave), measured across the slope so the rim keeps
+// its width on steep peaks
+float frontDistance(float along, float depth, float length) {
   float h = crest(along, 1.0);
-  // Distance to the crest measured across the slope, so the rim keeps its width on steep peaks
   float e = 1.5 / length;
   float slope = (crest(along + e, 1.0) - crest(along - e, 1.0)) / 3.0;
-  float distance = (depth - h) / sqrt(1.0 + slope * slope);
-  float glow = max(waveHeight * 0.08, 2.0);
-  float body = (1.0 - smoothstep(-glow, glow * 0.6, distance)) * (0.5 + 0.2 * clamp(depth / max(h, 1.0), 0.0, 1.0));
-  float rim = h > 0.5 ? exp(-pow(distance / 1.6, 2.0)) : 0.0;
-  return vec2(body, rim);
+  return (depth - h) / sqrt(1.0 + slope * slope);
 }
 
-// The back wave: shifted, lower, no rim, fading out from the edge toward its crest
-float backWave(float along, float depth) {
-  float h = crest(fract(along + 0.13), 0.75);
-  float body = 1.0 - smoothstep(-waveHeight * 0.25, 0.5, depth - h);
-  return body * 0.35 * (1.0 - clamp(depth / max(h, 1.0), 0.0, 1.0));
+// Distance from the back wave's crest: shifted along the edge and lower
+float backDistance(float along, float depth) {
+  return depth - crest(fract(along + 0.13), 0.75);
 }
 
 void main() {
@@ -79,23 +84,41 @@ void main() {
   // [along, depth, length] per edge
   vec3 lanes[4] = vec3[4](vec3(qt_TexCoord0.x, px.y, size.x), vec3(qt_TexCoord0.x, size.y - px.y, size.x),
                           vec3(qt_TexCoord0.y, px.x, size.y), vec3(qt_TexCoord0.y, size.x - px.x, size.y));
-  float body = 0.0;
-  float rim = 0.0;
-  float back = 0.0;
+  float glow = max(waveHeight * softness, 2.0);
+  float front = 1e6;
+  float back = 1e6;
+  // Tallest crest at this pixel: the fillet and the rim scale with it, so quiet waves
+  // don't round off into blobs in the corners and silence draws nothing at all
+  float crestHere = 0.0;
+  float backCrestHere = 0.0;
+  // Distance to the nearest edge with a wave, for the body's shading from the edge out
+  float depth = 1e6;
   for (int i = 0; i < 4; i++) {
-    if (edges[i] < 0.5 || lanes[i].y > waveHeight * 1.3)
+    if (edges[i] < 0.5 || lanes[i].y > waveHeight * 1.5)
       continue;
-    vec2 front = frontWave(lanes[i].x, lanes[i].y, lanes[i].z);
-    body = max(body, front.x);
-    rim = max(rim, front.y);
-    back = max(back, backWave(lanes[i].x, lanes[i].y));
+    float h = crest(lanes[i].x, 1.0);
+    float backH = crest(fract(lanes[i].x + 0.13), 0.75);
+    front = smoothUnion(front, frontDistance(lanes[i].x, lanes[i].y, lanes[i].z), 0.8 * min(crestHere > 0.0 ? crestHere : h, h));
+    back = smoothUnion(back, backDistance(lanes[i].x, lanes[i].y), 0.8 * min(backCrestHere > 0.0 ? backCrestHere : backH, backH));
+    crestHere = max(crestHere, h);
+    backCrestHere = max(backCrestHere, backH);
+    depth = min(depth, lanes[i].y);
   }
+  // The milky body with a soft glow past the crest, a bit denser toward the crest; a
+  // thin light rim along the crest; the back wave fading out from the edge
+  float height = max(depth - front, 1.0);
+  // The glow past the crest shrinks with the wave too, down to nothing in silence
+  float soft = max(min(glow, crestHere * 0.6), 0.5);
+  float body = (1.0 - smoothstep(-soft, soft * 0.6, front)) * (0.5 + 0.2 * clamp(depth / height, 0.0, 1.0)) * smoothstep(0.0, 2.0, crestHere);
+  float rimLine = exp(-pow(front / 1.6, 2.0)) * smoothstep(0.5, 3.0, crestHere);
+  float backHeight = max(depth - back, 1.0);
+  float backBody = smoothstep(0.0, 2.0, backCrestHere) * (1.0 - smoothstep(-min(waveHeight * 0.25, backCrestHere), 0.5, back)) * backWave * (1.0 - clamp(depth / backHeight, 0.0, 1.0));
   // Milky tints of the wave color; layered back, body, rim (premultiplied "over")
-  vec3 bodyColor = mix(fillColor.rgb, vec3(1.0), 0.65);
+  vec3 bodyColor = mix(fillColor.rgb, vec3(1.0), whiteness);
   vec3 rimColor = mix(bodyColor, vec3(1.0), 0.7);
-  float backA = back * fillColor.a;
+  float backA = backBody * fillColor.a;
   float bodyA = body * fillColor.a;
-  float rimA = rim * 0.85;
+  float rimA = rimLine * rim;
   vec3 rgb = bodyColor * backA;
   float a = backA;
   rgb = bodyColor * bodyA + rgb * (1.0 - bodyA);

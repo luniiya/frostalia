@@ -7,6 +7,11 @@
 var edgeChoices = ["all", "topBottom", "bottom"];
 var heightRange = [0.05, 0.5];
 var opacityRange = [0.1, 1];
+// Look of the waves, passed to the shader as is
+var whitenessRange = [0, 1];
+var rimRange = [0, 1];
+var backWaveRange = [0, 1];
+var softnessRange = [0.02, 0.3];
 
 // Which edges carry a wave, as shader flags [top, bottom, left, right]
 function edgeFlags(edges) {
@@ -112,4 +117,72 @@ function edgeLabelKey(edges) {
 
 function depthLabelKey(status) {
   return depthLabelKeys[status] || depthLabelKeys["off"];
+}
+
+// Shader uniforms for the look settings, clamped; out of range or missing values fall back to the defaults
+function look(prefs) {
+  prefs = prefs || {};
+  return {
+    "whiteness": clamp(prefs.whiteness, whitenessRange, 0.65),
+    "rim": clamp(prefs.rim, rimRange, 0.85),
+    "backWave": clamp(prefs.backWave, backWaveRange, 0.35),
+    "softness": clamp(prefs.softness, softnessRange, 0.08)
+  };
+}
+
+// A made-up spectrum for the Edit Desktop preview, `t` seconds in: a few slow beats
+// sweeping the bands, louder in the lows like music, every value within 0..1
+function demoSpectrum(count, t) {
+  var values = [];
+  var beat = Math.pow(0.5 + 0.5 * Math.sin(t * 2 * Math.PI * 1.8), 3);
+  for (var i = 0; i < count; i++) {
+    var band = count > 1 ? i / (count - 1) : 0;
+    var lows = (1 - band) * (0.35 + 0.5 * beat);
+    var sweep = 0.3 * (0.5 + 0.5 * Math.sin(band * 9 - t * 3.1));
+    var shimmer = 0.15 * (0.5 + 0.5 * Math.sin(band * 23 + t * 5.3));
+    values.push(Math.max(0, Math.min(1, lows + sweep * (0.4 + 0.6 * band) + shimmer * band)));
+  }
+  return values;
+}
+
+// The effect the Edit Desktop card previews: the hovered tile's, or the waves while their settings are open; "" for none
+function previewEffect(hovered, settingsOpen) {
+  if (hovered)
+    return hovered;
+  return settingsOpen ? "waves" : "";
+}
+
+// Hint shown on the card for a previewed effect
+var hintKeys = {
+  "waves": "panels.desktop-widgets.effect-hint-waves",
+  "depth": "panels.desktop-widgets.effect-hint-depth",
+  "edges": "panels.desktop-widgets.effect-hint-edges"
+};
+
+function hintKey(effect) {
+  return hintKeys[effect] || "";
+}
+
+// Per-band auto-gain, so every part of an edge moves: highs carry far less energy than
+// lows and would barely stir next to them. Each band is divided by its own recent peak,
+// which decays by half every `halfLife` seconds; `floor` keeps silence and noise from
+// being blown up, so no sound still means no waves. `peaks` is the previous call's
+// result (or []); `dt` the seconds since it. Returns { values, peaks }.
+function equalize(values, peaks, dt, halfLife, floor) {
+  var decay = Math.pow(0.5, Math.max(0, dt) / Math.max(halfLife || 2, 0.001));
+  var minPeak = floor === undefined ? 0.08 : floor;
+  var out = [];
+  var next = [];
+  for (var i = 0; i < values.length; i++) {
+    var v = Number(values[i]);
+    v = isFinite(v) ? Math.max(0, Math.min(1, v)) : 0;
+    var previous = peaks && isFinite(peaks[i]) ? peaks[i] : 0;
+    var peak = Math.max(v, previous * decay, minPeak);
+    next.push(peak);
+    out.push(Math.min(1, v / peak));
+  }
+  return {
+    "values": out,
+    "peaks": next
+  };
 }

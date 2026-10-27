@@ -116,30 +116,28 @@ Item {
       }
     }
 
-    // Charging: a few faint bubbles every so often, clipped to the liquid below the surface line
+    // Charging: a few bubbles every so often, rising through the whole container: faint white
+    // in the liquid, in the liquid's color above it
     Item {
-      id: bubbleClip
-      y: root.liquidTop
-      width: parent.width
-      height: root.liquidHeight
-      clip: true
+      anchors.fill: parent
 
       Repeater {
         model: 4
 
         Rectangle {
           id: bubble
-          property var spec: BatteryLiquid.bubbleSpec(Math.random, root.width, root.liquidHeight)
+          property var spec: BatteryLiquid.bubbleSpec(Math.random, root.width, root.height)
           property real progress: 0
-          readonly property var pos: BatteryLiquid.bubblePosition(spec, progress, root.liquidHeight)
+          readonly property var pos: BatteryLiquid.bubblePosition(spec, progress, root.height)
+          readonly property real above: BatteryLiquid.bubbleAbove(pos.y, root.liquidTop, root.amplitude)
 
           width: spec.size
           height: spec.size
           radius: spec.size / 2
           x: pos.x - width / 2
           y: pos.y - height / 2
-          color: "white"
-          opacity: root.bubbling ? BatteryLiquid.bubbleOpacity(progress, 0.4) : 0
+          color: Qt.rgba(1 + (root.liquidColor.r - 1) * above, 1 + (root.liquidColor.g - 1) * above, 1 + (root.liquidColor.b - 1) * above, 1)
+          opacity: root.bubbling ? BatteryLiquid.bubbleOpacity(progress, BatteryLiquid.bubblePeakOpacity(above)) : 0
 
           SequentialAnimation {
             running: root.bubbling
@@ -149,7 +147,7 @@ Item {
             ScriptAction {
               script: {
                 bubble.progress = 0;
-                bubble.spec = BatteryLiquid.bubbleSpec(Math.random, root.width, root.liquidHeight);
+                bubble.spec = BatteryLiquid.bubbleSpec(Math.random, root.width, root.height);
               }
             }
             PauseAnimation {

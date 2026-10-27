@@ -251,7 +251,7 @@ TestCase {
     verify(spec.wobble >= 0);
   }
 
-  function test_bubblePosition_risesFromBelowToAboveTheLiquid() {
+  function test_bubblePosition_risesThroughTheWholeContainer() {
     var spec = {
       "size": 4,
       "x": 10,
@@ -276,5 +276,47 @@ TestCase {
     fuzzyCompare(BatteryLiquid.bubbleOpacity(0.5, 0.3), 0.3, 1e-9);
     verify(BatteryLiquid.bubbleOpacity(0.05, 0.3) < 0.3);
     verify(BatteryLiquid.bubbleOpacity(0.95, 0.3) < 0.3);
+  }
+
+  // Regression: at a low charge the liquid is a few pixels tall, and bubbles sized and
+  // clipped by it could not be seen at all
+  function test_bubbleSpec_isSizedByTheContainerNotTheLiquid() {
+    var spec = BatteryLiquid.bubbleSpec(constant(0.5), 28, 30);
+    verify(spec.size > 3, spec.size);
+  }
+
+  function test_bubbleAbove_insideAcrossAndAboveTheSurface() {
+    // surface line at y=20, waves 2 px either side
+    compare(BatteryLiquid.bubbleAbove(25, 20, 2), 0);
+    compare(BatteryLiquid.bubbleAbove(22, 20, 2), 0);
+    fuzzyCompare(BatteryLiquid.bubbleAbove(20, 20, 2), 0.5, 1e-9);
+    compare(BatteryLiquid.bubbleAbove(18, 20, 2), 1);
+    compare(BatteryLiquid.bubbleAbove(5, 20, 2), 1);
+  }
+
+  function test_bubbleAbove_tinyAmplitudeStillBlends() {
+    fuzzyCompare(BatteryLiquid.bubbleAbove(20, 20, 0), 0.5, 1e-9);
+  }
+
+  function test_bubbleAbove_lowChargeBubbleSpendsMostOfItsRiseAbove() {
+    var spec = {
+      "size": 4,
+      "x": 10,
+      "wobble": 0,
+      "cycles": 1,
+      "duration": 3000,
+      "rest": 5000
+    };
+    // 10% charge: surface near the bottom of a 30 px container
+    var above = 0;
+    for (var i = 0; i <= 10; i++)
+      above += BatteryLiquid.bubbleAbove(BatteryLiquid.bubblePosition(spec, i / 10, 30).y, 27, 1.5);
+    verify(above / 11 > 0.7, above / 11);
+  }
+
+  function test_bubblePeakOpacity_strongerAboveTheLiquid() {
+    fuzzyCompare(BatteryLiquid.bubblePeakOpacity(0), 0.4, 1e-9);
+    fuzzyCompare(BatteryLiquid.bubblePeakOpacity(1), 0.85, 1e-9);
+    verify(BatteryLiquid.bubblePeakOpacity(0.5) > 0.4 && BatteryLiquid.bubblePeakOpacity(0.5) < 0.85);
   }
 }

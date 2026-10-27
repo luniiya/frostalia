@@ -1060,7 +1060,15 @@
       "wallpaper-visualizer-height-label": "Wave height",
       "wallpaper-visualizer-opacity-description": "How strongly the waves show over the wallpaper.",
       "wallpaper-visualizer-opacity-label": "Opacity",
-      "wallpaper-visualizer-title": "Wallpaper visualizer"
+      "wallpaper-visualizer-title": "Wallpaper visualizer",
+      "wallpaper-visualizer-whiteness-label": "Milkiness",
+      "wallpaper-visualizer-whiteness-description": "How far the waves are tinted toward white, from the pure theme color to milky.",
+      "wallpaper-visualizer-rim-label": "Crest line",
+      "wallpaper-visualizer-rim-description": "Strength of the thin light line along the top of the waves.",
+      "wallpaper-visualizer-back-wave-label": "Back wave",
+      "wallpaper-visualizer-back-wave-description": "Strength of the fainter, shifted wave underneath, which adds depth.",
+      "wallpaper-visualizer-softness-label": "Softness",
+      "wallpaper-visualizer-softness-description": "How far the waves glow past their crest. Low is a crisp edge, high a soft haze."
     },
     "bar": {
       "appearance-auto-hide-delay-description": "Time before bar hides after mouse leaves",
@@ -1375,7 +1383,11 @@
       "lyrics-color-label": "Sung color",
       "lyrics-color-description": "Color that fills each word as it is sung.",
       "lyrics-show-track-label": "Show track",
-      "lyrics-show-track-description": "Show the title and artist under the lyrics."
+      "lyrics-show-track-description": "Show the title and artist under the lyrics.",
+      "effect-hint-waves": "Audio waves rise from the screen edges while sound plays",
+      "effect-hint-depth": "The waves pass behind the wallpaper's subject, like a character or an object",
+      "effect-hint-edges": "The screen edges the waves rise from. Click to switch",
+      "effect-wave-settings": "Wave settings"
     },
     "display": {
       "monitors-backlight-device-auto-option": "Default",

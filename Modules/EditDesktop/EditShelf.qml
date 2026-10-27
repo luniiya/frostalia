@@ -10,7 +10,8 @@ import qs.Widgets
 
 // The shelf of everything that can be put on the desktop, in two pages picked on the left:
 // widgets (framed tiles with a live preview; click a tile to add it, or pull it up onto the
-// card) and effects drawn on the wallpaper. Done closes the editor.
+// card) and effects drawn on the wallpaper (hover a tile to preview it on the card; the gear on
+// the waves tile opens their settings above the shelf). Done closes the editor.
 Rectangle {
   id: root
 
@@ -30,12 +31,19 @@ Rectangle {
   // 0: widgets, 1: effects
   property int page: 0
   readonly property var visualizer: Settings.data.wallpaperVisualizer
+  // Effect tile under the pointer, and whether the wave settings are open; the card previews them
+  property string hoveredEffect: ""
+  property bool settingsOpen: false
+  readonly property string previewEffect: WallpaperVisualizer.previewEffect(hoveredEffect, settingsOpen)
   readonly property string depthStatus: WallpaperVisualizer.depthStatus(WallpaperCutoutService.results, WallpaperService.getWallpaper(screen?.name ?? ""), visualizer.depth)
 
   color: ShellColors.mSurface
   radius: Style.radiusL
   border.width: Style.borderS
   border.color: Qt.alpha(ShellColors.mOutline, 0.4)
+
+  onPageChanged: settingsOpen = false
+  onVisibleChanged: settingsOpen = false
 
   NStyleCard {}
 
@@ -332,9 +340,13 @@ Rectangle {
 
       // Effects: the wallpaper visualizer, as tiles that toggle or cycle on click
       Row {
+        id: effectRow
         spacing: Style.marginXL
 
         EffectTile {
+          id: wavesTile
+          effectId: "waves"
+          configurable: true
           icon: "wave-sine"
           label: I18n.tr("panels.audio.wallpaper-visualizer-enabled-label")
           active: root.visualizer.enabled
@@ -343,18 +355,20 @@ Rectangle {
         }
 
         EffectTile {
+          effectId: "depth"
           icon: "layers-subtract"
           label: I18n.tr("panels.audio.wallpaper-visualizer-depth-label")
-          enabled: root.visualizer.enabled
+          available: root.visualizer.enabled
           active: root.visualizer.depth
           value: I18n.tr(WallpaperVisualizer.depthLabelKey(root.depthStatus))
           onClicked: root.visualizer.depth = !root.visualizer.depth
         }
 
         EffectTile {
+          effectId: "edges"
           icon: "border-sides"
           label: I18n.tr("panels.audio.wallpaper-visualizer-edges-label")
-          enabled: root.visualizer.enabled
+          available: root.visualizer.enabled
           active: true
           cycles: true
           value: I18n.tr(WallpaperVisualizer.edgeLabelKey(root.visualizer.edges))
@@ -423,6 +437,134 @@ Rectangle {
     }
   }
 
+  // Wave settings, above the shelf over the waves tile; every change shows on the card right away
+  Rectangle {
+    id: waveSettings
+    visible: root.settingsOpen
+    // Mapped again on each open, once the tiles are laid out
+    readonly property real anchorX: root.settingsOpen ? wavesTile.mapToItem(root, 0, 0).x : 0
+
+    width: Math.round(640 * Style.uiScaleRatio)
+    height: settingsColumn.implicitHeight + Style.marginL * 2
+    x: Math.max(0, Math.min(anchorX, root.width - width))
+    y: -height - Style.marginM
+    radius: Style.radiusL
+    // Opaque like the shelf: the sliders sit over the card, whose wallpaper would show through
+    color: ShellColors.mSurface
+    border.width: Style.borderS
+    border.color: ShellColors.mPrimary
+
+    NStyleCard {}
+
+    // Keeps clicks in the gaps from reaching the card below
+    MouseArea {
+      anchors.fill: parent
+    }
+
+    ColumnLayout {
+      id: settingsColumn
+      anchors.fill: parent
+      anchors.margins: Style.marginL
+      spacing: Style.marginM
+
+      RowLayout {
+        Layout.fillWidth: true
+        spacing: Style.marginS
+
+        NIcon {
+          icon: "wave-sine"
+          pointSize: Style.fontSizeL
+          color: ShellColors.mPrimary
+        }
+        NText {
+          Layout.fillWidth: true
+          text: I18n.tr("panels.desktop-widgets.effect-wave-settings")
+          pointSize: Style.fontSizeM
+          font.weight: Style.fontWeightBold
+          color: root.ink
+        }
+        NIconButton {
+          icon: "external-link"
+          tooltipText: I18n.tr("panels.desktop-widgets.effect-more")
+          onClicked: {
+            root.done();
+            SettingsPanelService.openToTab(SettingsPanel.Tab.Audio, 3, root.screen);
+          }
+        }
+        NIconButton {
+          icon: "x"
+          tooltipText: I18n.tr("common.close")
+          onClicked: root.settingsOpen = false
+        }
+      }
+
+      GridLayout {
+        Layout.fillWidth: true
+        columns: 2
+        columnSpacing: Style.marginXL
+        rowSpacing: Style.marginM
+
+        WaveSlider {
+          key: "height"
+          label: I18n.tr("panels.audio.wallpaper-visualizer-height-label")
+          range: WallpaperVisualizer.heightRange
+        }
+        WaveSlider {
+          key: "opacity"
+          label: I18n.tr("panels.audio.wallpaper-visualizer-opacity-label")
+          range: WallpaperVisualizer.opacityRange
+        }
+        WaveSlider {
+          key: "whiteness"
+          label: I18n.tr("panels.audio.wallpaper-visualizer-whiteness-label")
+          range: WallpaperVisualizer.whitenessRange
+        }
+        WaveSlider {
+          key: "rim"
+          label: I18n.tr("panels.audio.wallpaper-visualizer-rim-label")
+          range: WallpaperVisualizer.rimRange
+        }
+        WaveSlider {
+          key: "backWave"
+          label: I18n.tr("panels.audio.wallpaper-visualizer-back-wave-label")
+          range: WallpaperVisualizer.backWaveRange
+        }
+        WaveSlider {
+          key: "softness"
+          label: I18n.tr("panels.audio.wallpaper-visualizer-softness-label")
+          range: WallpaperVisualizer.softnessRange
+        }
+
+        NColorChoice {
+          Layout.fillWidth: true
+          Layout.columnSpan: 2
+          label: I18n.tr("panels.audio.wallpaper-visualizer-color-label")
+          description: ""
+          currentKey: root.visualizer.color
+          defaultValue: Settings.getDefaultValue("wallpaperVisualizer.color")
+          onSelected: key => root.visualizer.color = key
+        }
+      }
+    }
+  }
+
+  // A slider for one wave setting, shown as a percentage
+  component WaveSlider: NValueSlider {
+    property string key
+    property var range: [0, 1]
+
+    Layout.fillWidth: true
+    Layout.preferredWidth: 1
+    from: range[0]
+    to: range[1]
+    stepSize: 0.01
+    showReset: true
+    value: root.visualizer[key]
+    defaultValue: Settings.getDefaultValue("wallpaperVisualizer." + key)
+    onMoved: value => root.visualizer[key] = value
+    text: Math.round(root.visualizer[key] * 100) + "%"
+  }
+
   // An effect tile, framed like the widget tiles: icon and current value inside, name below,
   // and an on/off badge (or a cycle mark) in the corner
   component EffectTile: Item {
@@ -433,13 +575,29 @@ Rectangle {
     property bool active
     property bool cycles: false
     property bool badge: true
+    // Previewed on the card while hovered, when set
+    property string effectId: ""
+    // Has a gear that opens the wave settings
+    property bool configurable: false
+    // Clickable; an unavailable tile is dimmed but still previews
+    property bool available: true
     signal clicked
 
-    readonly property bool lit: effectArea.containsMouse && enabled
+    readonly property bool hovered: effectArea.containsMouse || gearArea.containsMouse
+    readonly property bool lit: hovered && available
 
     width: Math.round(210 * Style.uiScaleRatio)
     height: parent ? parent.height : 0
-    opacity: enabled ? 1 : 0.45
+    opacity: available ? 1 : 0.45
+
+    onHoveredChanged: {
+      if (!effectId)
+        return;
+      if (hovered)
+        root.hoveredEffect = effectId;
+      else if (root.hoveredEffect === effectId)
+        root.hoveredEffect = "";
+    }
 
     Rectangle {
       id: effectFrame
@@ -522,9 +680,41 @@ Rectangle {
       id: effectArea
       anchors.fill: parent
       hoverEnabled: true
-      enabled: effect.enabled
-      cursorShape: Qt.PointingHandCursor
-      onClicked: effect.clicked()
+      cursorShape: effect.available ? Qt.PointingHandCursor : Qt.ArrowCursor
+      onClicked: {
+        if (effect.available)
+          effect.clicked();
+      }
+    }
+
+    // Gear in the top-left corner: opens or closes the wave settings
+    Rectangle {
+      visible: effect.configurable
+      anchors.left: effectFrame.left
+      anchors.top: effectFrame.top
+      anchors.margins: Style.marginS
+      width: Math.round(28 * Style.uiScaleRatio)
+      height: width
+      radius: width / 2
+      color: root.settingsOpen ? ShellColors.mPrimary : gearArea.containsMouse ? ShellColors.mHover : ShellColors.mSurface
+      border.width: root.settingsOpen ? 0 : Style.borderS
+      border.color: ShellColors.mOutline
+
+      NIcon {
+        anchors.centerIn: parent
+        icon: "adjustments-horizontal"
+        pointSize: Style.fontSizeS
+        color: root.settingsOpen ? ShellColors.mOnPrimary : root.ink
+      }
+
+      MouseArea {
+        id: gearArea
+        anchors.fill: parent
+        enabled: effect.configurable
+        hoverEnabled: true
+        cursorShape: Qt.PointingHandCursor
+        onClicked: root.settingsOpen = !root.settingsOpen
+      }
     }
   }
 }

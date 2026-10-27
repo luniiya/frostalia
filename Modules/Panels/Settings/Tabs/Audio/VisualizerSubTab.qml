@@ -166,6 +166,66 @@ ColumnLayout {
     text: Math.round(Settings.data.wallpaperVisualizer.opacity * 100) + "%"
   }
 
+  NValueSlider {
+    Layout.fillWidth: true
+    enabled: Settings.data.wallpaperVisualizer.enabled
+    label: I18n.tr("panels.audio.wallpaper-visualizer-whiteness-label")
+    description: I18n.tr("panels.audio.wallpaper-visualizer-whiteness-description")
+    from: WallpaperVisualizer.whitenessRange[0]
+    to: WallpaperVisualizer.whitenessRange[1]
+    stepSize: 0.01
+    showReset: true
+    value: Settings.data.wallpaperVisualizer.whiteness
+    defaultValue: Settings.getDefaultValue("wallpaperVisualizer.whiteness")
+    onMoved: value => Settings.data.wallpaperVisualizer.whiteness = value
+    text: Math.round(Settings.data.wallpaperVisualizer.whiteness * 100) + "%"
+  }
+
+  NValueSlider {
+    Layout.fillWidth: true
+    enabled: Settings.data.wallpaperVisualizer.enabled
+    label: I18n.tr("panels.audio.wallpaper-visualizer-rim-label")
+    description: I18n.tr("panels.audio.wallpaper-visualizer-rim-description")
+    from: WallpaperVisualizer.rimRange[0]
+    to: WallpaperVisualizer.rimRange[1]
+    stepSize: 0.01
+    showReset: true
+    value: Settings.data.wallpaperVisualizer.rim
+    defaultValue: Settings.getDefaultValue("wallpaperVisualizer.rim")
+    onMoved: value => Settings.data.wallpaperVisualizer.rim = value
+    text: Math.round(Settings.data.wallpaperVisualizer.rim * 100) + "%"
+  }
+
+  NValueSlider {
+    Layout.fillWidth: true
+    enabled: Settings.data.wallpaperVisualizer.enabled
+    label: I18n.tr("panels.audio.wallpaper-visualizer-back-wave-label")
+    description: I18n.tr("panels.audio.wallpaper-visualizer-back-wave-description")
+    from: WallpaperVisualizer.backWaveRange[0]
+    to: WallpaperVisualizer.backWaveRange[1]
+    stepSize: 0.01
+    showReset: true
+    value: Settings.data.wallpaperVisualizer.backWave
+    defaultValue: Settings.getDefaultValue("wallpaperVisualizer.backWave")
+    onMoved: value => Settings.data.wallpaperVisualizer.backWave = value
+    text: Math.round(Settings.data.wallpaperVisualizer.backWave * 100) + "%"
+  }
+
+  NValueSlider {
+    Layout.fillWidth: true
+    enabled: Settings.data.wallpaperVisualizer.enabled
+    label: I18n.tr("panels.audio.wallpaper-visualizer-softness-label")
+    description: I18n.tr("panels.audio.wallpaper-visualizer-softness-description")
+    from: WallpaperVisualizer.softnessRange[0]
+    to: WallpaperVisualizer.softnessRange[1]
+    stepSize: 0.01
+    showReset: true
+    value: Settings.data.wallpaperVisualizer.softness
+    defaultValue: Settings.getDefaultValue("wallpaperVisualizer.softness")
+    onMoved: value => Settings.data.wallpaperVisualizer.softness = value
+    text: Math.round(Settings.data.wallpaperVisualizer.softness * 100) + "%"
+  }
+
   NColorChoice {
     Layout.fillWidth: true
     enabled: Settings.data.wallpaperVisualizer.enabled

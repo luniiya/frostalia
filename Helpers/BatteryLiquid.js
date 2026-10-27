@@ -66,11 +66,12 @@ function wavePolygon(wavelength, periods, amplitude, itemHeight, phase, stepsPer
   return points;
 }
 
-// Charging bubbles, a subtle detail: each one rises from the bottom of the liquid to its
-// surface with its own size, speed and sideways wobble, then rests for a random while.
+// Charging bubbles: each one rises from the bottom of the container all the way to its top,
+// with its own size, speed and sideways wobble, then rests for a random while. They are
+// sized by the container, not the liquid, so they still show when the charge is low.
 // `rand` is Math.random, injectable for tests.
-function bubbleSpec(rand, width, liquidHeight) {
-  var size = Math.max(1.5, liquidHeight * (0.09 + rand() * 0.08));
+function bubbleSpec(rand, width, containerHeight) {
+  var size = Math.max(1.5, containerHeight * (0.09 + rand() * 0.08));
   var margin = size / 2 + 2;
   return {
     "size": size,
@@ -82,9 +83,9 @@ function bubbleSpec(rand, width, liquidHeight) {
   };
 }
 
-// Center of a bubble at progress 0..1 of its rise: from just below the liquid to just above it.
-function bubblePosition(spec, progress, liquidHeight) {
-  var start = liquidHeight + spec.size / 2;
+// Center of a bubble at progress 0..1 of its rise: from just below the container to just above it.
+function bubblePosition(spec, progress, containerHeight) {
+  var start = containerHeight + spec.size / 2;
   var end = -spec.size / 2;
   return {
     "x": spec.x + spec.wobble * Math.sin(progress * 2 * Math.PI * spec.cycles),
@@ -95,6 +96,21 @@ function bubblePosition(spec, progress, liquidHeight) {
 // Fades in after the start of the rise and out before the surface, peaking at maxOpacity.
 function bubbleOpacity(progress, maxOpacity) {
   return Math.max(0, Math.min(1, progress * 6, (1 - progress) * 4)) * maxOpacity;
+}
+
+// How far a bubble centered at `y` has left the liquid whose surface line is at `surfaceY`:
+// 0 inside it, 1 above it, blended across the wave's `amplitude` either side of the line.
+// Above the liquid a bubble takes the liquid's color, so it shows on the empty part.
+function bubbleAbove(y, surfaceY, amplitude) {
+  var band = Math.max(1, amplitude);
+  return Math.max(0, Math.min(1, (surfaceY + band - y) / (2 * band)));
+}
+
+// Peak opacity of a bubble: faint white inside the liquid, stronger above it
+function bubblePeakOpacity(above) {
+  var inside = 0.4;
+  var outside = 0.85;
+  return inside + (outside - inside) * above;
 }
 
 // Container size along the bar axis. The battery uses a tall container, other widgets pass 1 for a round one.

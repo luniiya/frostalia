@@ -4,6 +4,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import "../../Helpers/Lyrics.js" as Lyrics
+import "../../Helpers/UserCount.js" as UserCount
 import qs.Commons
 
 // Synced lyrics for the track that is playing. While Rufin plays and its Web
@@ -23,14 +24,13 @@ Singleton {
   property var _users: ({})
   readonly property bool active: Object.keys(_users).length > 0
 
+  // Counted, so an id shared by two instances stays until both are gone (UserCount.js)
   function registerUser(id) {
-    _users[id] = true;
-    _users = Object.assign({}, _users);
+    _users = UserCount.add(_users, id);
   }
 
   function unregisterUser(id) {
-    delete _users[id];
-    _users = Object.assign({}, _users);
+    _users = UserCount.remove(_users, id);
   }
 
   // ===== The track =====

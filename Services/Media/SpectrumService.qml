@@ -3,6 +3,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Services.Pipewire
+import "../../Helpers/UserCount.js" as UserCount
 import qs.Commons
 import qs.Services.UI
 
@@ -17,21 +18,20 @@ Singleton {
   // Register a component that needs audio data, call this when a visualizer becomes active.
   // Pass a unique identifier (e.g., "controlcenter:screen1", "plugin:fancy-audiovisualizer")
   function registerComponent(componentId) {
-    root._registeredComponents[componentId] = true;
-    root._registeredComponents = Object.assign({}, root._registeredComponents);
+    // Counted, so an id shared by two instances stays until both are gone (UserCount.js)
+    root._registeredComponents = UserCount.add(root._registeredComponents, componentId);
     Logger.d("Spectrum", "Component registered:", componentId, "- total:", root._registeredCount);
   }
 
   // Unregister a component when it no longer needs audio data.
   function unregisterComponent(componentId) {
-    delete root._registeredComponents[componentId];
-    root._registeredComponents = Object.assign({}, root._registeredComponents);
+    root._registeredComponents = UserCount.remove(root._registeredComponents, componentId);
     Logger.d("Spectrum", "Component unregistered:", componentId, "- total:", root._registeredCount);
   }
 
   // Check if a component is registered
   function isRegistered(componentId) {
-    return root._registeredComponents[componentId] === true;
+    return (root._registeredComponents[componentId] || 0) > 0;
   }
 
   // Component registration - any component needing audio data registers here

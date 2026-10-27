@@ -731,6 +731,10 @@ Singleton {
       property real opacity: 0.7
       property string color: "primary"
       property bool depth: true
+      property real whiteness: 0.65
+      property real rim: 0.85
+      property real backWave: 0.35
+      property real softness: 0.08
     }
 
     // brightness

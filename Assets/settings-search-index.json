@@ -99,6 +99,42 @@
     "subTabLabel": "common.visualizer"
   },
   {
+    "labelKey": "panels.audio.wallpaper-visualizer-whiteness-label",
+    "descriptionKey": "panels.audio.wallpaper-visualizer-whiteness-description",
+    "widget": "NValueSlider",
+    "tab": 14,
+    "tabLabel": "panels.audio.title",
+    "subTab": 3,
+    "subTabLabel": "common.visualizer"
+  },
+  {
+    "labelKey": "panels.audio.wallpaper-visualizer-rim-label",
+    "descriptionKey": "panels.audio.wallpaper-visualizer-rim-description",
+    "widget": "NValueSlider",
+    "tab": 14,
+    "tabLabel": "panels.audio.title",
+    "subTab": 3,
+    "subTabLabel": "common.visualizer"
+  },
+  {
+    "labelKey": "panels.audio.wallpaper-visualizer-back-wave-label",
+    "descriptionKey": "panels.audio.wallpaper-visualizer-back-wave-description",
+    "widget": "NValueSlider",
+    "tab": 14,
+    "tabLabel": "panels.audio.title",
+    "subTab": 3,
+    "subTabLabel": "common.visualizer"
+  },
+  {
+    "labelKey": "panels.audio.wallpaper-visualizer-softness-label",
+    "descriptionKey": "panels.audio.wallpaper-visualizer-softness-description",
+    "widget": "NValueSlider",
+    "tab": 14,
+    "tabLabel": "panels.audio.title",
+    "subTab": 3,
+    "subTabLabel": "common.visualizer"
+  },
+  {
     "labelKey": "panels.audio.wallpaper-visualizer-color-label",
     "descriptionKey": "panels.audio.wallpaper-visualizer-color-description",
     "widget": "NColorChoice",

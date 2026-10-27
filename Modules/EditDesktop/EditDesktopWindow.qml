@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
 import "../../Helpers/EditDesktopGeometry.js" as Geometry
+import "../../Helpers/WallpaperVisualizer.js" as WallpaperVisualizer
 import qs.Commons
 import qs.Modules.DesktopWidgets
 import qs.Services.UI
@@ -99,6 +100,14 @@ Variants {
             cache: true
           }
 
+          // The hovered effect, drawn where it would be: over the wallpaper, under the bar and widgets
+          EditEffectPreview {
+            anchors.fill: parent
+            effect: window.isMain ? shelf.previewEffect : ""
+            wallpaper: window.wallpaper
+            devicePixelRatio: screenLoader.modelData.devicePixelRatio
+          }
+
           EditBarStandIn {
             anchors.fill: parent
             screenName: screenLoader.modelData.name
@@ -134,6 +143,38 @@ Variants {
           cardY: window.stage.y
           cardWidth: window.width * window.stage.scale
           cardHeight: window.height * window.stage.scale
+        }
+
+        // What the previewed effect does, at the top of the card
+        Rectangle {
+          readonly property string hint: WallpaperVisualizer.hintKey(shelf.previewEffect)
+          visible: opacity > 0
+          opacity: window.isMain && hint !== "" ? 1 : 0
+          anchors.horizontalCenter: parent.horizontalCenter
+          y: window.stage.y + Style.marginL
+          width: Math.min(hintText.implicitWidth + Style.marginL * 2, window.width * window.stage.scale - Style.marginL * 2)
+          height: hintText.implicitHeight + Style.marginS * 2
+          radius: height / 2
+          color: Style.opaqueSurfaces ? ShellColors.mSurface : Qt.alpha(ShellColors.mSurface, 0.9)
+          border.width: Style.borderS
+          border.color: Qt.alpha(ShellColors.mOutline, 0.5)
+
+          Behavior on opacity {
+            NumberAnimation {
+              duration: Style.animationFast
+            }
+          }
+
+          NText {
+            id: hintText
+            anchors.centerIn: parent
+            width: Math.min(implicitWidth, parent.width - Style.marginL * 2)
+            // Keeps the last hint while fading out
+            text: parent.hint ? I18n.tr(parent.hint) : text
+            pointSize: Style.fontSizeS
+            color: ShellColors.mOnSurface
+            elide: Text.ElideRight
+          }
         }
 
         // Toolbar above the card
