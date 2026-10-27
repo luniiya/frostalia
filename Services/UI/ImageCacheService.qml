@@ -20,6 +20,9 @@ Singleton {
   readonly property string baseDir: Settings.cacheDir + "images/"
   readonly property string wpThumbDir: baseDir + "wallpapers/thumbnails/"
   readonly property string wpLargeDir: baseDir + "wallpapers/large/"
+  // Wallpapers cropped to a screen's exact size for the shell's renderer. Not aged out like
+  // the rest: the renderer pre-scales whole folders, which would just redo them every 15 days.
+  readonly property string wpScreenDir: baseDir + "wallpapers/screen/"
   readonly property string notificationsDir: baseDir + "notifications/"
   readonly property string contributorsDir: baseDir + "contributors/"
 
@@ -72,6 +75,7 @@ Singleton {
   function createDirectories() {
     Quickshell.execDetached(["mkdir", "-p", wpThumbDir]);
     Quickshell.execDetached(["mkdir", "-p", wpLargeDir]);
+    Quickshell.execDetached(["mkdir", "-p", wpScreenDir]);
     Quickshell.execDetached(["mkdir", "-p", notificationsDir]);
     Quickshell.execDetached(["mkdir", "-p", contributorsDir]);
   }
@@ -147,6 +151,34 @@ Singleton {
         processRequest(cacheKey, cachedPath, sourcePath, callback, function () {
           startLargeProcessing(sourcePath, cachedPath, targetWidth, targetHeight, cacheKey);
         });
+      });
+    });
+  }
+
+  // -------------------------------------------------
+  // Public API: Get Screen Wallpaper (cropped to fill width x height exactly)
+  // -------------------------------------------------
+  // For the shell's wallpaper renderer: scaled to cover the screen and centered like awww's
+  // default crop, so a switch decodes a screen-sized JPEG instead of the original. Without
+  // ImageMagick the original is returned. `background` runs ImageMagick at the lowest CPU
+  // priority, for pre-scaling a folder ahead of time.
+  function getScreenWallpaper(sourcePath, width, height, callback, background) {
+    if (!sourcePath || sourcePath === "") {
+      callback("", false);
+      return;
+    }
+
+    if (!imageMagickAvailable) {
+      callback(sourcePath, false);
+      return;
+    }
+
+    getMtime(sourcePath, function (mtime) {
+      const cacheKey = Checksum.sha256("screen:" + sourcePath + "@" + width + "x" + height + "@" + (mtime || "unknown"));
+      const cachedPath = wpScreenDir + cacheKey + ".jpg";
+
+      processRequest(cacheKey, cachedPath, sourcePath, callback, function () {
+        startScreenWallpaperProcessing(sourcePath, cachedPath, width, height, cacheKey, !!background);
       });
     });
   }
@@ -344,6 +376,22 @@ Singleton {
 
     // Use Lanczos filter for high-quality downscaling and PNG for lossless output
     const command = `magick '${srcEsc}' -auto-orient -filter Lanczos -resize '${width}x${height}^' '${dstEsc}'`;
+
+    runProcess(command, cacheKey, outputPath, sourcePath);
+  }
+
+  // -------------------------------------------------
+  // ImageMagick Processing: Screen Wallpaper
+  // -------------------------------------------------
+  function startScreenWallpaperProcessing(sourcePath, outputPath, width, height, cacheKey, background) {
+    const srcEsc = sourcePath.replace(/'/g, "'\\''");
+    const dstEsc = outputPath.replace(/'/g, "'\\''");
+    const tmpEsc = dstEsc.replace(/\.jpg$/, ".tmp.jpg");
+    const size = `${width}x${height}`;
+
+    // First frame only (animated GIFs), transparency on black, written next to the cache
+    // file and moved into place so a half-written file is never a cache hit
+    const command = `${background ? "nice -n 19 " : ""}magick '${srcEsc}[0]' -auto-orient -filter Lanczos -resize '${size}^' -gravity center -extent ${size} -background black -flatten -quality 95 '${tmpEsc}' && mv -f '${tmpEsc}' '${dstEsc}'`;
 
     runProcess(command, cacheKey, outputPath, sourcePath);
   }
@@ -741,6 +789,12 @@ Singleton {
     Logger.i("ImageCache", "Clearing large cache");
     Quickshell.execDetached(["rm", "-rf", wpLargeDir]);
     Quickshell.execDetached(["mkdir", "-p", wpLargeDir]);
+  }
+
+  function clearScreenWallpapers() {
+    Logger.i("ImageCache", "Clearing screen wallpaper cache");
+    Quickshell.execDetached(["rm", "-rf", wpScreenDir]);
+    Quickshell.execDetached(["mkdir", "-p", wpScreenDir]);
   }
 
   function clearNotifications() {

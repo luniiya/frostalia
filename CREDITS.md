@@ -10,6 +10,7 @@ Frostalia is an independent fork of [Noctalia Shell](https://github.com/noctalia
 ## Shells
 
 - **[Clavis Shell](https://github.com/StatIndet/quickshell)** by StatIndet - Weather views and animated weather backdrop (GPL-3.0), and the visual reference for the Material style
+- **[SekaiPop](https://github.com/Blapples/SekaiPop)** by Blapples - Lyrics widget, and the wallpaper renderer and its transitions (GPL-3.0)
 - **[Animated Weather Cards](https://codepen.io/ste-vg/pen/GqaZbo)** by Steve Gardner - The original web animation behind the weather backdrop ([MIT](licenses/AnimatedWeatherCards-MIT.txt))
 - **[Open-Meteo](https://open-meteo.com/)** - Weather and air quality data
 

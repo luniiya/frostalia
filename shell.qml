@@ -21,8 +21,8 @@ import qs.Modules.Background
 import qs.Modules.Bar
 import qs.Modules.Bubbles
 import qs.Modules.DesktopWidgets
-import qs.Modules.EditDesktop
 import qs.Modules.Dock
+import qs.Modules.EditDesktop
 import qs.Modules.MainScreen
 import qs.Modules.Notification
 import qs.Modules.OSD
@@ -131,6 +131,8 @@ ShellRoot {
         delayedInitTimer.restart();
       }
 
+      // Before the visualizer: both are on the background layer, and the later one is on top
+      ShellWallpaper {}
       WallpaperVisualizer {}
       DesktopWidgets {}
       EditDesktopWindow {}

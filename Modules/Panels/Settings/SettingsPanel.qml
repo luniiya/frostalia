@@ -33,7 +33,8 @@ SmartPanel {
     System,
     UserInterface,
     Bubbles,
-    RadialMenu
+    RadialMenu,
+    Wallpaper
   }
 
   // -1 opens the settings home; callers set a tab before open() or toggle().

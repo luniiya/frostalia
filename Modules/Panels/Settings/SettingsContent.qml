@@ -24,6 +24,7 @@ import qs.Modules.Panels.Settings.Tabs.Region
 import qs.Modules.Panels.Settings.Tabs.SessionMenu
 import qs.Modules.Panels.Settings.Tabs.SystemMonitor
 import qs.Modules.Panels.Settings.Tabs.UserInterface
+import qs.Modules.Panels.Settings.Tabs.Wallpaper
 import qs.Services.Compositor
 import qs.Services.Power
 import qs.Services.System
@@ -541,6 +542,10 @@ Item {
     id: radialMenuTab
     RadialMenuTab {}
   }
+  Component {
+    id: wallpaperTab
+    WallpaperTab {}
+  }
 
   function updateTabsModel() {
     let newTabs = [
@@ -561,6 +566,12 @@ Item {
             "label": "panels.color-scheme.title",
             "icon": "settings-color-scheme",
             "source": colorSchemeTab
+          },
+          {
+            "id": SettingsPanel.Tab.Wallpaper,
+            "label": "panels.wallpaper.title",
+            "icon": "wallpaper",
+            "source": wallpaperTab
           },
           {
             "id": SettingsPanel.Tab.Bar,

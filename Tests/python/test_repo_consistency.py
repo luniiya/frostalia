@@ -269,7 +269,8 @@ class SettingsWindowTests(unittest.TestCase):
 
 
 class WallpaperTests(unittest.TestCase):
-    """The system wallpaper daemon draws wallpapers; the shell only reads them for theming."""
+    """The system wallpaper daemon draws wallpapers unless the shell's own renderer is on
+    (Settings > Wallpaper); everything else only reads them."""
 
     def test_no_wallpaper_management_left(self):
         pattern = re.compile(r"Settings\.data\.wallpaper\b|WallhavenService|wallpaperPanel|WallpaperSelector")
@@ -285,10 +286,14 @@ class WallpaperTests(unittest.TestCase):
         users = {str(p.relative_to(ROOT)) for p in qml_files()
                  if "WallpaperService." in p.read_text(encoding="utf-8")}
         # The Edit Desktop card shows a copy of the wallpaper (the daemon draws the real one);
-        # the wallpaper visualizer draws only a cut-out of its subject, and the shelf says
-        # whether the wallpaper has one
+        # the wallpaper visualizer's waves draw only a cut-out of its subject, and the shelf says
+        # whether the wallpaper has one. The renderer's windows, its IPC and the radial menu's
+        # random-wallpaper action drive the shell's own renderer.
         self.assertEqual(users, {"shell.qml", "Services/Theming/AppThemeService.qml", "Modules/EditDesktop/EditDesktopWindow.qml",
-                                 "Modules/WallpaperVisualizer/WallpaperVisualizer.qml", "Modules/EditDesktop/EditShelf.qml"})
+                                 "Modules/WallpaperVisualizer/WallpaperVisualizer.qml", "Modules/WallpaperVisualizer/ScreenWaves.qml",
+                                 "Modules/EditDesktop/EditShelf.qml",
+                                 "Modules/Background/ShellWallpaper.qml", "Modules/Background/WallpaperLayer.qml",
+                                 "Services/Control/IPCService.qml", "Modules/RadialMenu/RadialMenu.qml"})
 
 
 class PowerProfileLabelTests(unittest.TestCase):

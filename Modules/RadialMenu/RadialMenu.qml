@@ -105,10 +105,12 @@ Scope {
       SettingsPanelService.openToTab(SettingsPanel.Tab.RadialMenu, -1, screen);
       break;
     case "wallpaper":
-      // Wallpapers belong to the system daemon (awww/hyprpaper). Without a picker
-      // command, open the wallpaper color settings.
+      // A picker command when one is set. Without one, the shell's renderer rolls a random
+      // wallpaper; with awww drawing it, the wallpaper color settings open.
       if (item.arg)
         Quickshell.execDetached(["sh", "-c", item.arg]);
+      else if (WallpaperService.rendererEnabled)
+        WallpaperService.random();
       else
         SettingsPanelService.openToTab(SettingsPanel.Tab.ColorScheme, -1, screen);
       break;

@@ -63,6 +63,12 @@ Singleton {
 
       // Launcher app usage counts
       property var launcherUsage: ({})
+
+      // WallpaperService (shell renderer): the picture each color mode showed last
+      property var wallpaperRenderer: ({
+                                         light: "",
+                                         dark: ""
+                                       })
     }
 
     onLoaded: {
@@ -184,6 +190,19 @@ Singleton {
     return adapter.colorSchemesList || {
       schemes: [],
       timestamp: 0
+    };
+  }
+
+  // Wallpaper renderer state (WallpaperService)
+  function setWallpaperRendererState(stateData) {
+    adapter.wallpaperRenderer = stateData;
+    save();
+  }
+
+  function getWallpaperRendererState() {
+    return adapter.wallpaperRenderer || {
+      light: "",
+      dark: ""
     };
   }
 

@@ -737,6 +737,29 @@ Singleton {
       property real softness: 0.08
     }
 
+    // wallpaper renderer: the shell draws the wallpaper itself instead of awww (Modules/Background/WallpaperLayer.qml)
+    property JsonObject wallpaperRenderer: JsonObject {
+      property bool enabled: false
+      property string lightFolder: "~/Wall/Light"
+      property string darkFolder: "~/Wall/Dark"
+      // a style from Helpers/WallpaperRenderer.js, "random" or "none"
+      property string transition: "ring"
+      property int duration: 1300
+      property string ringVariant: "ring"
+      // "theme" (color scheme) or "sekai" (SekaiPop's white, pink and cyan)
+      property string colors: "theme"
+      // change to a random wallpaper every N minutes, 0 = never
+      property int randomMinutes: 0
+      // pre-scale the whole folder to the screen size in the background
+      property bool precache: true
+      // slide the wallpaper as the workspace changes: zoomed in by parallaxAmount percent,
+      // from the left edge on workspace 1 to the right edge on workspace parallaxWorkspaces
+      property bool parallax: false
+      property int parallaxAmount: 10
+      property int parallaxWorkspaces: 10
+      property int parallaxDuration: 450
+    }
+
     // brightness
     property JsonObject brightness: JsonObject {
       property int brightnessStep: 5

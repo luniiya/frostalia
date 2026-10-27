@@ -8,6 +8,7 @@ import Quickshell.Widgets
 import "../../Helpers/LauncherView.js" as LauncherView
 import "../../Helpers/PanelSettle.js" as PanelSettle
 import "../../Helpers/UiProbe.js" as UiProbe
+import "../../Helpers/WallpaperRenderer.js" as WallpaperRenderer
 
 import qs.Commons
 import qs.Modules.Panels.Settings
@@ -116,7 +117,8 @@ Singleton {
                                             "system": SettingsPanel.Tab.System,
                                             "systemmonitor": SettingsPanel.Tab.System,
                                             "userinterface": SettingsPanel.Tab.UserInterface,
-                                            "idle": SettingsPanel.Tab.Idle
+                                            "idle": SettingsPanel.Tab.Idle,
+                                            "wallpaper": SettingsPanel.Tab.Wallpaper
                                           })
 
   function _parseSettingsTabArg(tabArg) {
@@ -845,6 +847,73 @@ Singleton {
     function trayDrawerItemRect(screen: string): string {
       const drawer = PanelService.getPanel("trayDrawerPanel", Quickshell.screens.find(s => s.name === screen), false);
       return root.globalRect(drawer ? drawer.firstItem : null);
+    }
+  }
+
+  // The shell's wallpaper renderer (Settings > Wallpaper). Changing the picture needs it
+  // on; `get` answers for awww too.
+  IpcHandler {
+    target: "wallpaper"
+
+    // Show a picture (any path; one in the light or dark folder is remembered for that mode)
+    function set(path: string): string {
+      if (!WallpaperService.rendererEnabled)
+        return "the wallpaper renderer is off (Settings > Wallpaper)";
+      WallpaperService.setWallpaper(path);
+      return "";
+    }
+    // Show a picture and remember it for a mode (light or dark), for a switch to that
+    // mode that follows (what a wallpaper picker that also sets the theme wants)
+    function setFor(path: string, mode: string): string {
+      if (!WallpaperService.rendererEnabled)
+        return "the wallpaper renderer is off (Settings > Wallpaper)";
+      const m = WallpaperRenderer.normalizeMode(mode);
+      if (m !== "light" && m !== "dark")
+        return "unknown mode '" + mode + "' (light or dark)";
+      WallpaperService.setWallpaper(path, m);
+      return "";
+    }
+    function next(): string {
+      if (!WallpaperService.rendererEnabled)
+        return "the wallpaper renderer is off (Settings > Wallpaper)";
+      WallpaperService.next();
+      return "";
+    }
+    function previous(): string {
+      if (!WallpaperService.rendererEnabled)
+        return "the wallpaper renderer is off (Settings > Wallpaper)";
+      WallpaperService.previous();
+      return "";
+    }
+    function random(): string {
+      if (!WallpaperService.rendererEnabled)
+        return "the wallpaper renderer is off (Settings > Wallpaper)";
+      WallpaperService.random();
+      return "";
+    }
+    // Which folder to pick from: "light", "dark", or "auto" to follow the color mode again
+    function mode(name: string): string {
+      return WallpaperService.setMode(name) ? "" : "unknown mode '" + name + "' (light, dark or auto)";
+    }
+    function light() {
+      WallpaperService.setMode("light");
+    }
+    function dark() {
+      WallpaperService.setMode("dark");
+    }
+    function auto() {
+      WallpaperService.setMode("auto");
+    }
+    // The picture on a screen (any screen's when empty)
+    function get(screen: string): string {
+      return WallpaperService.getWallpaper(screen);
+    }
+    function getMode(): string {
+      return WallpaperService.mode + (WallpaperService.modeOverride ? "" : " (auto)");
+    }
+    // Throw away the pre-scaled copies; they are made again as pictures show
+    function clearCache() {
+      ImageCacheService.clearScreenWallpapers();
     }
   }
 
