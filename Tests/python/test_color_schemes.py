@@ -4,12 +4,14 @@ import pathlib
 import re
 import unittest
 
+import settings_defaults
+
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 
 
 class ColorSchemeTests(unittest.TestCase):
     def default_scheme(self):
-        return json.loads((ROOT / "Assets/settings-default.json").read_text())["colorSchemes"]["predefinedScheme"]
+        return settings_defaults.defaults()["colorSchemes"]["predefinedScheme"]
 
     def test_default_scheme_is_bundled(self):
         name = self.default_scheme()

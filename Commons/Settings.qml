@@ -5,6 +5,7 @@ import Quickshell
 import Quickshell.Io
 import "../Helpers/BubbleLogic.js" as BubbleLogic
 import "../Helpers/QtObj2JS.js" as QtObj2JS
+import "../Helpers/SettingsObject.js" as SettingsObject
 import "../Helpers/SettingsPaths.js" as SettingsPaths
 import "../Helpers/UiStyleSettings.js" as UiStyleSettings
 import qs.Commons
@@ -106,7 +107,6 @@ Singleton {
     // Then it should be commented out again, regular users don't need to generate
     // default settings on every start
     if (isDebug) {
-      generateDefaultSettings();
       generateWidgetDefaultSettings();
     }
 
@@ -162,30 +162,6 @@ Singleton {
         saveTimer.start();
       } else {
         root.settingsReloaded();
-      }
-    }
-  }
-
-  // FileView to load default settings for comparison
-  FileView {
-    id: defaultSettingsFileView
-    path: Quickshell.shellDir + "/Assets/settings-default.json"
-    printErrors: false
-    watchChanges: false
-  }
-
-  // Cached default settings object
-  property var _defaultSettings: null
-
-  // Load default settings when file is loaded
-  Connections {
-    target: defaultSettingsFileView
-    function onLoaded() {
-      try {
-        root._defaultSettings = JSON.parse(defaultSettingsFileView.text());
-      } catch (e) {
-        Logger.w("Settings", "Failed to parse default settings file: " + e);
-        root._defaultSettings = null;
       }
     }
   }
@@ -982,21 +958,8 @@ Singleton {
     const styleDefault = UiStyleSettings.defaultValue(UiStyleRegistry.definitions, data.ui.style, path);
     if (styleDefault !== undefined)
       return styleDefault;
-    if (!root._defaultSettings) {
-      return undefined;
-    }
-
-    var parts = path.split(".");
-    var current = root._defaultSettings;
-
-    for (var i = 0; i < parts.length; i++) {
-      if (current === undefined || current === null) {
-        return undefined;
-      }
-      current = current[parts[i]];
-    }
-
-    return current;
+    // Built-in defaults: the store snapshots this file's values before loading the host's TOML
+    return SettingsObject.valueAt(settingsStore.defaults, path);
   }
 
   // -----------------------------------------------------
@@ -1256,24 +1219,6 @@ Singleton {
   // Public function to trigger immediate settings saving
   function saveImmediate() {
     settingsStore.save();
-  }
-
-  // -----------------------------------------------------
-  // Generate default settings: for reference only, not used by the shell
-  function generateDefaultSettings() {
-    try {
-      Logger.d("Settings", "Generating settings-default.json");
-
-      // Prepare a clean JSON
-      var plainAdapter = QtObj2JS.qtObjectToPlainObject(adapter);
-      var jsonData = JSON.stringify(plainAdapter, null, 2);
-
-      var defaultPath = Quickshell.shellDir + "/Assets/settings-default.json";
-
-      Quickshell.execDetached(["sh", "-c", `cat > "${defaultPath}" << 'FROSTALIA_EOF'\n${jsonData}\nFROSTALIA_EOF`]);
-    } catch (error) {
-      Logger.e("Settings", "Failed to generate default settings file: " + error);
-    }
   }
 
   // -----------------------------------------------------

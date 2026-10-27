@@ -1,6 +1,6 @@
 // -----------------------------------------------------
 // Helper function to convert Qt objects to plain JavaScript objects
-// Only used when generating settings-default.json
+// (settings snapshots, exports and the debug widget-defaults dump)
 function qtObjectToPlainObject(obj) {
   if (obj === null || obj === undefined) {
     return obj;

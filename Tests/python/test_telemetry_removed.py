@@ -1,8 +1,9 @@
 """Telemetry has no runtime service, setting, state or user interface."""
-import json
 import pathlib
 import re
 import unittest
+
+import settings_defaults
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 
@@ -14,7 +15,7 @@ class TelemetryRemovalTests(unittest.TestCase):
                 continue
             with self.subTest(path=str(path.relative_to(ROOT))):
                 self.assertNotRegex(path.read_text(), r"(?i)telemetry")
-        defaults = json.loads((ROOT / "Assets/settings-default.json").read_text())
+        defaults = settings_defaults.defaults()
         self.assertNotIn("telemetryEnabled", defaults["general"])
         self.assertFalse((ROOT / "Services/Frostalia/TelemetryService.qml").exists())
 

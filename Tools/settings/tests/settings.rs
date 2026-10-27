@@ -36,19 +36,6 @@ fn first_install_creates_private_config_and_loads_it_again() {
 }
 
 #[test]
-fn complete_shell_defaults_round_trip() {
-    let directory = tempdir().unwrap();
-    let path = directory.path().join("host.toml");
-    let defaults: Value =
-        serde_json::from_str(include_str!("../../../Assets/settings-default.json")).unwrap();
-    load(&path, &[], request(defaults.clone(), None)).unwrap();
-    assert_eq!(
-        load(&path, &[], request(json!({}), None)).unwrap().settings,
-        defaults
-    );
-}
-
-#[test]
 fn seeds_precede_defaults_and_hosts_stay_independent() {
     let directory = tempdir().unwrap();
     let first_seed = directory.path().join("first-seed.toml");

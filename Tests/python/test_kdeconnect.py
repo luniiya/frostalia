@@ -5,6 +5,8 @@ import pathlib
 import re
 import unittest
 
+import settings_defaults
+
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 PANEL = ROOT / "Modules" / "Panels" / "KdeConnect"
 
@@ -18,7 +20,7 @@ def kdeconnect_sources():
 
 class KdeConnectTests(unittest.TestCase):
     def test_disabled_by_default(self):
-        defaults = json.loads((ROOT / "Assets" / "settings-default.json").read_text(encoding="utf-8"))
+        defaults = settings_defaults.defaults()
         self.assertIs(defaults["kdeConnect"]["enabled"], False)
 
     def test_every_page_has_a_file(self):
@@ -70,7 +72,7 @@ class KdeConnectTests(unittest.TestCase):
             self.assertNotIn("badge", (ROOT / path).read_text(encoding="utf-8").lower(), path)
 
     def test_control_center_card_is_registered_and_off_by_default(self):
-        settings = json.loads((ROOT / "Assets" / "settings-default.json").read_text(encoding="utf-8"))
+        settings = settings_defaults.defaults()
         cards = {c["id"]: c["enabled"] for c in settings["controlCenter"]["cards"]}
         self.assertIs(cards.get("kdeconnect-card"), False)
         order = [c["id"] for c in settings["controlCenter"]["cards"]]

@@ -67,7 +67,6 @@ let
 
   settingsHelper = rustPlatform.buildRustPackage {
     pname = "frostalia-settings";
-    # Integration tests read Assets/settings-default.json from the repository.
     inherit version src;
     cargoRoot = "Tools/settings";
     buildAndTestSubdir = "Tools/settings";

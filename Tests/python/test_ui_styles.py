@@ -4,12 +4,14 @@ import pathlib
 import re
 import unittest
 
+import settings_defaults
+
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 
 
 class UiStyleTests(unittest.TestCase):
     def test_default_style_is_registered(self):
-        defaults = json.loads((ROOT / "Assets/settings-default.json").read_text())
+        defaults = settings_defaults.defaults()
         helper = (ROOT / "Helpers/UiStyles.js").read_text()
         default = re.search(r'var defaultStyle = "([^"]+)"', helper).group(1)
         self.assertEqual(default, "material")
@@ -38,7 +40,7 @@ class UiStyleTests(unittest.TestCase):
     def test_style_defaults_match_the_reference_defaults(self):
         source = (ROOT / "Helpers/UiStyleSettings.js").read_text()
         appearance = json.loads(re.search(r"var defaults = (\{.*?\n\});", source, re.S).group(1))
-        reference = json.loads((ROOT / "Assets/settings-default.json").read_text())
+        reference = settings_defaults.defaults()
         for section, fields in appearance.items():
             for key, value in fields.items():
                 with self.subTest(path=f"{section}.{key}"):

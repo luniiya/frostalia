@@ -3,12 +3,14 @@ import json
 import pathlib
 import unittest
 
+import settings_defaults
+
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 
 
 class BarContextMenuTests(unittest.TestCase):
     def test_menu_is_default_and_reset_option(self):
-        defaults = json.loads((ROOT / "Assets/settings-default.json").read_text())
+        defaults = settings_defaults.defaults()
         self.assertEqual(defaults["bar"]["rightClickAction"], "contextMenu")
         ui = (ROOT / "Modules/Panels/Settings/Tabs/Bar/BehaviorSubTab.qml").read_text()
         self.assertIn('"key": "contextMenu"', ui)

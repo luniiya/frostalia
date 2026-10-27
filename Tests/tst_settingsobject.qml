@@ -172,4 +172,75 @@ TestCase {
     };
     compare(SettingsObject.changes(value, value), {});
   }
+
+  function test_valueAt_data() {
+    const tree = {
+      "bar": {
+        "position": "top",
+        "widgets": {
+          "left": []
+        },
+        "enabled": false,
+        "opacity": 0
+      },
+      "nothing": null
+    };
+    return [
+          {
+            "tag": "nested string",
+            "tree": tree,
+            "path": "bar.position",
+            "expected": "top"
+          },
+          {
+            "tag": "falsy values are kept",
+            "tree": tree,
+            "path": "bar.enabled",
+            "expected": false
+          },
+          {
+            "tag": "zero",
+            "tree": tree,
+            "path": "bar.opacity",
+            "expected": 0
+          },
+          {
+            "tag": "missing leaf",
+            "tree": tree,
+            "path": "bar.missing",
+            "expected": undefined
+          },
+          {
+            "tag": "through a null",
+            "tree": tree,
+            "path": "nothing.deeper",
+            "expected": undefined
+          },
+          {
+            "tag": "through a string",
+            "tree": tree,
+            "path": "bar.position.length",
+            "expected": undefined
+          },
+          {
+            "tag": "no tree yet",
+            "tree": null,
+            "path": "bar.position",
+            "expected": undefined
+          }
+        ];
+  }
+
+  function test_valueAt(data) {
+    compare(SettingsObject.valueAt(data.tree, data.path), data.expected);
+  }
+
+  function test_valueAtReturnsTheStoredObject() {
+    const left = [1, 2];
+    compare(SettingsObject.valueAt({
+                                     "bar": {
+                                       "left": left
+                                     }
+                                   }, "bar.left"), left);
+  }
 }

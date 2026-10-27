@@ -9,6 +9,8 @@ import tempfile
 import tomllib
 import unittest
 
+import settings_defaults
+
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 
 
@@ -33,7 +35,7 @@ def walk(items):
 class RadialMenuTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.defaults = json.loads((ROOT / "Assets/settings-default.json").read_text())["radialMenu"]
+        cls.defaults = settings_defaults.defaults()["radialMenu"]
         cls.english = json.loads((ROOT / "Assets/Translations/en.json").read_text())
 
     def lookup(self, key):

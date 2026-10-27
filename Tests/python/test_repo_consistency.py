@@ -7,6 +7,8 @@ import subprocess
 import sys
 import unittest
 
+import settings_defaults
+
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 EN = ROOT / "Assets" / "Translations" / "en.json"
 TR_CALL = re.compile(r'I18n\.tr[pu]?\(\s*"([^"]+)"')
@@ -126,7 +128,7 @@ class SettingsSchemaTests(unittest.TestCase):
         self.assertNotIn("LockScreen", settings)
         self.assertIn("lockScreen", ipc_handlers())
 
-        defaults = json.loads((ROOT / "Assets" / "settings-default.json").read_text(encoding="utf-8"))
+        defaults = settings_defaults.defaults()
         self.assertNotIn("lockTimeout", defaults["idle"])
         self.assertNotIn("lockOnSuspend", defaults["general"])
         self.assertNotIn("screenLock", defaults["hooks"])
@@ -254,7 +256,7 @@ class SettingsWindowTests(unittest.TestCase):
                 continue
             with self.subTest(path=str(path.relative_to(ROOT))):
                 self.assertNotIn("settingsPanelMode", path.read_text(encoding="utf-8"))
-        defaults = json.loads((ROOT / "Assets" / "settings-default.json").read_text(encoding="utf-8"))
+        defaults = settings_defaults.defaults()
         self.assertNotIn("settingsPanelMode", defaults["ui"])
 
     def test_settings_panel_has_no_in_bar_content(self):
@@ -274,7 +276,7 @@ class WallpaperTests(unittest.TestCase):
                 continue
             with self.subTest(path=str(path.relative_to(ROOT))):
                 self.assertIsNone(pattern.search(path.read_text(encoding="utf-8")))
-        defaults = json.loads((ROOT / "Assets" / "settings-default.json").read_text(encoding="utf-8"))
+        defaults = settings_defaults.defaults()
         self.assertNotIn("wallpaper", defaults)
 
     def test_only_theming_reads_the_wallpaper(self):
@@ -294,8 +296,7 @@ class PerformanceModeTests(unittest.TestCase):
                 continue
             with self.subTest(path=str(path.relative_to(ROOT))):
                 self.assertIsNone(pattern.search(path.read_text(encoding="utf-8")))
-        for name in ("settings-default.json", "settings-widgets-default.json"):
-            self.assertNotIn("FrostaliaPerformance", (ROOT / "Assets" / name).read_text(encoding="utf-8"))
+        self.assertNotIn("FrostaliaPerformance", (ROOT / "Assets" / "settings-widgets-default.json").read_text(encoding="utf-8"))
 
 
 class TooltipTests(unittest.TestCase):

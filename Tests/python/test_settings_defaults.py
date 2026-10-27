@@ -1,116 +1,107 @@
-"""Defaults in Commons/Settings.qml must match Assets/settings-default.json.
+"""Commons/Settings.qml is the single source of built-in setting defaults.
 
-The JSON file backs Settings.getDefaultValue(), which every settings "reset"
-button uses, so a missing or stale entry breaks resetting that setting.
+The settings store snapshots the JsonAdapter before loading the host's TOML and
+Settings.getDefaultValue() reads that snapshot, which every settings "reset"
+button uses. These tests read the same tree through settings_defaults.
 """
 
 import json
+import os
 import pathlib
 import re
+import subprocess
+import tempfile
 import unittest
+
+import settings_defaults
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 SETTINGS_QML = ROOT / "Commons" / "Settings.qml"
-DEFAULTS_JSON = ROOT / "Assets" / "settings-default.json"
-
-OPEN_OBJECT = re.compile(r"^\s*(?:property JsonObject )?(\w+): JsonObject \{")
-SIMPLE_PROP = re.compile(r'^\s*property (bool|int|real|string) (\w+): (true|false|-?\d+(?:\.\d+)?|"[^"]*")\s*(?://.*)?$')
-
-# Patched at runtime with machine-specific values, see Settings.qml Component.onCompleted
-RUNTIME_PATCHED = {"general.avatarImage", "wallpaper.directory", "ui.fontDefault", "ui.fontFixed"}
 
 
-def qml_defaults():
-    """Yield (dotted.path, python value) for literal defaults inside the JsonAdapter."""
-    text = SETTINGS_QML.read_text(encoding="utf-8")
-    body = text[text.index("JsonAdapter {"):]
-    stack = []  # (name, brace depth at which the object was opened)
-    depth = 0
-    for line in body.splitlines():
-        match = OPEN_OBJECT.match(line)
-        if match:
-            stack.append((match.group(1), depth))
-        prop = SIMPLE_PROP.match(line)
-        if prop and depth >= 1:
-            kind, name, raw = prop.groups()
-            if raw in ("true", "false"):
-                value = raw == "true"
-            elif raw.startswith('"'):
-                value = json.loads(raw)  # QML string escapes match JSON's
-            else:
-                value = float(raw)
-            yield ".".join([s[0] for s in stack] + [name]), kind, value
-        depth += line.count("{") - line.count("}")
-        while stack and depth <= stack[-1][1]:
-            stack.pop()
-        if depth <= 0:
-            break
+def default_value_paths():
+    """Yield (file, path) for every literal Settings.getDefaultValue("...") call."""
+    for path in sorted(ROOT.glob("**/*.qml")):
+        if "Tests" in path.relative_to(ROOT).parts:
+            continue
+        for key in re.findall(r'Settings\.getDefaultValue\("([^"]+)"\)', path.read_text(encoding="utf-8")):
+            yield str(path.relative_to(ROOT)), key
 
 
-def lookup(tree, path):
-    node = tree
-    for part in path.split("."):
-        if not isinstance(node, dict) or part not in node:
-            raise KeyError(path)
-        node = node[part]
-    return node
+def style_default_paths():
+    # Style folders supply their own defaults for these, see Helpers/UiStyleSettings.js
+    source = (ROOT / "Helpers/UiStyleSettings.js").read_text(encoding="utf-8")
+    appearance = json.loads(re.search(r"var defaults = (\{.*?\n\});", source, re.S).group(1))
+    return {f"{section}.{key}" for section, fields in appearance.items() for key in fields}
 
 
 class SettingsDefaultsTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.defaults = json.loads(DEFAULTS_JSON.read_text(encoding="utf-8"))
-        cls.qml = [d for d in qml_defaults() if d[0] not in RUNTIME_PATCHED]
+        cls.defaults = settings_defaults.defaults()
 
-    def test_parser_found_settings(self):
-        paths = {p for p, _, _ in self.qml}
-        self.assertGreater(len(paths), 100)
-        self.assertIn("bar.barType", paths)
-        self.assertIn("bar.notchGap", paths)
+    def test_parser_reads_the_whole_adapter(self):
+        self.assertEqual(settings_defaults.lookup("bar.barType"), "simple")
+        self.assertIsInstance(settings_defaults.lookup("bar.notchGap"), (int, float))
+        self.assertIsInstance(settings_defaults.lookup("radialMenu.items"), list)
+        self.assertIsInstance(settings_defaults.lookup("controlCenter.cards"), list)
+        self.assertIsInstance(settings_defaults.lookup("settingsVersion"), int)
+        # Enum members resolve to their index, as QML stores them
+        self.assertTrue(all(isinstance(t, int) for t in settings_defaults.lookup("osd.enabledTypes")))
+        self.assertGreater(len(self.defaults), 20)
 
-    def test_every_default_exists_in_json(self):
+    def test_lookup_reports_missing_paths(self):
+        with self.assertRaises(KeyError):
+            settings_defaults.lookup("bar.noSuchSetting")
+        with self.assertRaises(KeyError):
+            settings_defaults.lookup("bar.barType.deeper")
+
+    def test_no_json_defaults_file(self):
+        self.assertFalse((ROOT / "Assets/settings-default.json").exists())
+        source = SETTINGS_QML.read_text(encoding="utf-8")
+        self.assertNotIn("settings-default.json", source)
+        self.assertIn("SettingsObject.valueAt(settingsStore.defaults, path)", source)
+
+    def test_every_reset_button_has_a_default(self):
+        # A path missing from Settings.qml makes the reset button reset to undefined
+        styled = style_default_paths()
         missing = []
-        for path, _, _ in self.qml:
-            try:
-                lookup(self.defaults, path)
-            except KeyError:
-                missing.append(path)
-        self.assertEqual(missing, [], "add these to Assets/settings-default.json")
-
-    def test_defaults_match(self):
-        mismatched = []
-        for path, kind, value in self.qml:
-            try:
-                actual = lookup(self.defaults, path)
-            except KeyError:
+        for file, path in default_value_paths():
+            if path in styled:
                 continue
-            if kind in ("int", "real"):
-                ok = isinstance(actual, (int, float)) and not isinstance(actual, bool) and abs(actual - value) < 1e-9
-            else:
-                ok = actual == value
-            if not ok:
-                mismatched.append(f"{path}: qml={value!r} json={actual!r}")
-        self.assertEqual(mismatched, [])
+            try:
+                settings_defaults.lookup(path)
+            except KeyError:
+                missing.append(f"{file}: {path}")
+        self.assertEqual(missing, [])
+
+    def test_defaults_round_trip_through_the_toml_store(self):
+        target = pathlib.Path(os.environ.get("CARGO_TARGET_DIR", ROOT / "Tools/settings/target"))
+        helper = target / "debug/frostalia-settings"
+        if not helper.exists():
+            self.skipTest("run cargo test for Tools/settings first")
+        with tempfile.TemporaryDirectory(prefix="frostalia-defaults-") as directory:
+            config = pathlib.Path(directory) / "host.toml"
+            for settings in (self.defaults, {}):
+                request = json.dumps({"settings": settings, "baseline": None})
+                result = subprocess.run([str(helper), "load", str(config)], input=request + "\n",
+                                        text=True, check=True, capture_output=True)
+            self.assertEqual(json.loads(result.stdout)["settings"], self.defaults)
 
     def test_session_menu_default_actions(self):
-        options = lookup(self.defaults, "sessionMenu.powerOptions")
+        options = settings_defaults.lookup("sessionMenu.powerOptions")
         enabled = [option for option in options if option["enabled"]]
         self.assertEqual([option["action"] for option in enabled],
                          ["lock", "shutdown", "reboot", "rebootToUefi"])
         self.assertEqual([option["keybind"] for option in enabled], ["1", "2", "3", "4"])
         self.assertTrue(all(option["keybind"] == "" for option in options if not option["enabled"]))
         self.assertEqual(len({option["action"] for option in options}), 8)
-        text = SETTINGS_QML.read_text(encoding="utf-8")
-        literal = re.search(r"property list<var> powerOptions: (\[[\s\S]*?\n      \])", text)
-        self.assertIsNotNone(literal)
-        self.assertEqual(json.loads(literal.group(1)), options)
         ui = (ROOT / "Modules/Panels/Settings/Tabs/SessionMenu/SessionMenuTab.qml").read_text(encoding="utf-8")
         ui_defaults = dict(re.findall(r'"id": "([^"\n]+)",\s*"text": [^\n]+\n\s*"enabled": (true|false)', ui))
         self.assertEqual(ui_defaults, {option["action"]: str(option["enabled"]).lower() for option in options})
 
     def test_screen_corners_black_by_default(self):
-        self.assertIs(lookup(self.defaults, "general.forceBlackScreenCorners"), True)
-        self.assertIn(("general.forceBlackScreenCorners", "bool", True), self.qml)
+        self.assertIs(settings_defaults.lookup("general.forceBlackScreenCorners"), True)
 
 
 if __name__ == "__main__":

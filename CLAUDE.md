@@ -51,14 +51,13 @@ Surfaces that only a click opens (context menus, the tray drawer and its menus, 
 
 Do **all** of these, every time. Missing one breaks the setting's reset button or search entry without any visible error.
 
-1. Add or change the default in `Commons/Settings.qml`.
-2. Add or change **the same value** in `Assets/settings-default.json`. It backs `Settings.getDefaultValue()`, which every reset button uses.
-3. Add the UI control in `Modules/Panels/Settings/Tabs/...` with `defaultValue: Settings.getDefaultValue("section.key")`.
-4. Add the label and description keys to `Assets/Translations/en.json`.
-5. Run `python3 Scripts/dev/build-settings-search-index.py`.
-6. If the saved value must be changed or renamed, add a migration. Changing a default only affects hosts that never saved that key.
-7. Put any logic behind the setting in a `Helpers/*.js` module and add unit tests for it.
-8. Run `Scripts/dev/run-tests.sh`. `Tests/python/test_settings_defaults.py` fails if steps 1 and 2 disagree, and `test_repo_consistency.py` catches missing translations and a stale search index.
+1. Add or change the default in `Commons/Settings.qml`. It is the only copy: the store snapshots it before loading the host's TOML, and `Settings.getDefaultValue()`, which every reset button uses, reads that snapshot.
+2. Add the UI control in `Modules/Panels/Settings/Tabs/...` with `defaultValue: Settings.getDefaultValue("section.key")`.
+3. Add the label and description keys to `Assets/Translations/en.json`.
+4. Run `python3 Scripts/dev/build-settings-search-index.py`.
+5. If the saved value must be changed or renamed, add a migration. Changing a default only affects hosts that never saved that key.
+6. Put any logic behind the setting in a `Helpers/*.js` module and add unit tests for it.
+7. Run `Scripts/dev/run-tests.sh`. `Tests/python/test_settings_defaults.py` fails if a `getDefaultValue()` path has no default in `Settings.qml`, and `test_repo_consistency.py` catches missing translations and a stale search index.
 - User-facing strings go through `I18n.tr("…")` with keys added to `Assets/Translations/en.json` only. Other language files are leftovers from upstream and are no longer synced; missing keys fall back to English (`Commons/I18n.qml`), so don't edit them. Removing a string may leave stale keys in them, which is fine.
 - After changing settings UI, run `python3 Scripts/dev/build-settings-search-index.py`.
 - `Scripts/dev/qmlfmt.sh` formats every QML file, and the pre-commit hook runs it on the whole tree. Formatter churn in files you touched is fine; don't mass-reformat unrelated files as part of a feature change.

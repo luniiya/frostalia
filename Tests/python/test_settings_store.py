@@ -117,7 +117,7 @@ class SettingsStoreTests(unittest.TestCase):
          shutil.copytree(root/'Styles',p/'Styles')
          shutil.copytree(root/'Commons/Migrations',p/'Commons/Migrations')
          shutil.copytree(root/'Helpers',p/'Helpers',dirs_exist_ok=True)
-         (p/'Assets').mkdir(); shutil.copy2(root/'Assets/settings-default.json',p/'Assets/settings-default.json')
+         (p/'Assets').mkdir()
          (p/'Commons/Logger.qml').write_text('pragma Singleton\nimport Quickshell\nSingleton { function i() {} function d() {} function w() {} function e(message) { console.error(message); } }')
          (p/'Services/Frostalia/PluginService.qml').write_text('pragma Singleton\nimport Quickshell\nSingleton { property bool initialized: false; property bool pluginsFullyLoaded: false }')
          (p/'Services/UI/Stub.qml').write_text('import QtQuick\nQtObject {}')

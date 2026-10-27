@@ -39,3 +39,14 @@ function changes(before, after) {
   }
   return result;
 }
+
+// Value at a dotted path ("bar.position") in a plain settings tree, undefined when missing.
+function valueAt(tree, path) {
+  let node = tree;
+  for (const part of String(path).split(".")) {
+    if (node === null || typeof node !== "object" || !Object.prototype.hasOwnProperty.call(node, part))
+      return undefined;
+    node = node[part];
+  }
+  return node;
+}
