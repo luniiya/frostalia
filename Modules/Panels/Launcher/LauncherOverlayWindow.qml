@@ -2,12 +2,12 @@ import QtQuick
 import QtQuick.Shapes
 import Quickshell
 import Quickshell.Wayland
+import "../../../Helpers/LauncherView.js" as LauncherView
 
 import qs.Commons
 import qs.Modules.MainScreen.Backgrounds
 import qs.Services.UI
 import qs.Widgets
-import "../../../Helpers/LauncherView.js" as LauncherView
 
 // Standalone launcher window for Overlay layer mode.
 // This window appears above fullscreen windows and does not attach to the bar.

@@ -1,7 +1,7 @@
 import QtQuick
 import QtTest
-import "../Styles/keycap/KeycapStyle.js" as KeycapStyle
 import "../Helpers/UiStyles.js" as UiStyles
+import "../Styles/keycap/KeycapStyle.js" as KeycapStyle
 
 TestCase {
   name: "KeycapStyle"

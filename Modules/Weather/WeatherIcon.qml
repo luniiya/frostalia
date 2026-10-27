@@ -1,8 +1,8 @@
 import QtQuick
+import "../../Helpers/WeatherData.js" as WeatherData
 import qs.Commons
 import qs.Services.Location
 import qs.Widgets
-import "../../Helpers/WeatherData.js" as WeatherData
 
 // Condition icon for a WMO code; Talia stands in for it on her day.
 Item {

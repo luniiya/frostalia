@@ -2117,8 +2117,8 @@
       "parallax-workspaces-label": "Workspaces to slide across",
       "precache-description": "Scale every wallpaper in both folders to the screen size in the background, so switching is instant. Pauses in eco mode.",
       "precache-label": "Pre-scale wallpapers",
-      "random-minutes-description": "Change to a random wallpaper from the folder every few minutes. 0 turns it off.",
-      "random-minutes-label": "Random wallpaper every",
+      "random-minutes-description": "How long each random wallpaper stays up.",
+      "random-minutes-label": "Every",
       "renderer-enabled-description": "Frostalia draws the wallpaper itself, with transitions, from the folder that matches the color mode. Off, the wallpaper daemon (awww, swww or hyprpaper) draws it.",
       "renderer-enabled-label": "Draw the wallpaper in the shell",
       "ring-variant-description": "The edge of the ring transition.",
@@ -2168,7 +2168,13 @@
       "view-mode-browse": "Browse directories",
       "view-mode-cycle-tooltip": "View mode: {mode} (click to change)",
       "view-mode-recursive": "Flattened subdirectories",
-      "view-mode-single": "Root directory"
+      "view-mode-single": "Root directory",
+      "random-enabled-label": "Change randomly",
+      "random-enabled-description": "Switch to a random wallpaper from the folder on a timer.",
+      "cache-all-button": "Cache all wallpapers now",
+      "cache-all-progress": "Caching {done} of {total}…",
+      "cache-all-done": "Every light and dark wallpaper is cached",
+      "cache-all-no-magick": "ImageMagick is needed to cache wallpapers"
     },
     "bubbles": {
       "reserve-space-description": "Push windows away from this screen edge. Leave disabled to overlay windows.",

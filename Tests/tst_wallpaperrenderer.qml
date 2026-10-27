@@ -482,9 +482,32 @@ TestCase {
   }
 
   function test_intervalMs() {
-    compare(WallpaperRenderer.intervalMs(0), 0);
-    compare(WallpaperRenderer.intervalMs(-3), 0);
-    compare(WallpaperRenderer.intervalMs("x"), 0);
-    compare(WallpaperRenderer.intervalMs(15), 900000);
+    // Off whatever the minutes say
+    compare(WallpaperRenderer.intervalMs(false, 15), 0);
+    compare(WallpaperRenderer.intervalMs(true, 15), 900000);
+    // On is never "never": a broken or zero value is a minute
+    compare(WallpaperRenderer.intervalMs(true, 0), 60000);
+    compare(WallpaperRenderer.intervalMs(true, -3), 60000);
+    compare(WallpaperRenderer.intervalMs(true, "x"), 60000);
+  }
+
+  function test_cacheAllOrder() {
+    compare(WallpaperRenderer.cacheAllOrder(["/l/a", "/l/b"], ["/d/c", "/l/a", ""]), ["/l/a", "/l/b", "/d/c"]);
+    compare(WallpaperRenderer.cacheAllOrder(null, ["/d/c"]), ["/d/c"]);
+    compare(WallpaperRenderer.cacheAllOrder([], []), []);
+  }
+
+  function test_publishCommand_empty() {
+    compare(WallpaperRenderer.publishCommand("", "/c/wallpaper"), "");
+    compare(WallpaperRenderer.publishCommand("/w/a.png", ""), "");
+  }
+
+  function test_publishCommand() {
+    const cmd = WallpaperRenderer.publishCommand("/w/it's a.gif", "/c/wallpaper/");
+    verify(cmd.startsWith("mkdir -p '/c/wallpaper' && "));
+    // The link keeps the original, quoted, and is swapped in whole
+    verify(cmd.indexOf("ln -sfn '/w/it'\\''s a.gif' '/c/wallpaper/current.tmp' && mv -Tf '/c/wallpaper/current.tmp' '/c/wallpaper/current'") >= 0);
+    // The PNG is the first frame, written beside the published file and moved over it
+    verify(cmd.indexOf("magick '/w/it'\\''s a.gif[0]' -auto-orient '/c/wallpaper/current.tmp.png' && mv -f '/c/wallpaper/current.tmp.png' '/c/wallpaper/current.png'") >= 0);
   }
 }

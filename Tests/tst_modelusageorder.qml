@@ -7,14 +7,31 @@ TestCase {
 
   function test_orderedIds_data() {
     return [
-          { tag: "empty keeps default", order: [], expected: ModelUsageOrder.defaultOrder },
-          { tag: "missing setting keeps default", order: undefined, expected: ModelUsageOrder.defaultOrder },
-          { tag: "full custom order", order: ["zen", "gemini", "claude", "codex", "openrouter", "copilot"],
-            expected: ["zen", "gemini", "claude", "codex", "openrouter", "copilot"] },
-          { tag: "partial order appends the rest", order: ["gemini"],
-            expected: ["gemini", "claude", "codex", "copilot", "openrouter", "zen"] },
-          { tag: "unknown ids are ignored", order: ["nope", "codex"],
-            expected: ["codex", "claude", "copilot", "gemini", "openrouter", "zen"] }
+          {
+            tag: "empty keeps default",
+            order: [],
+            expected: ModelUsageOrder.defaultOrder
+          },
+          {
+            tag: "missing setting keeps default",
+            order: undefined,
+            expected: ModelUsageOrder.defaultOrder
+          },
+          {
+            tag: "full custom order",
+            order: ["zen", "gemini", "claude", "codex", "openrouter", "copilot"],
+            expected: ["zen", "gemini", "claude", "codex", "openrouter", "copilot"]
+          },
+          {
+            tag: "partial order appends the rest",
+            order: ["gemini"],
+            expected: ["gemini", "claude", "codex", "copilot", "openrouter", "zen"]
+          },
+          {
+            tag: "unknown ids are ignored",
+            order: ["nope", "codex"],
+            expected: ["codex", "claude", "copilot", "gemini", "openrouter", "zen"]
+          }
         ];
   }
 
@@ -23,7 +40,17 @@ TestCase {
   }
 
   function test_sortByOrderSortsObjects() {
-    const items = [{ providerId: "claude" }, { providerId: "codex" }, { providerId: "gemini" }];
+    const items = [
+            {
+              providerId: "claude"
+            },
+            {
+              providerId: "codex"
+            },
+            {
+              providerId: "gemini"
+            }
+          ];
     const sorted = ModelUsageOrder.sortByOrder(items, ["gemini", "claude"], item => item.providerId);
     compare(sorted.map(item => item.providerId), ["gemini", "claude", "codex"]);
     compare(items[0].providerId, "claude");

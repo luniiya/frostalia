@@ -125,9 +125,27 @@ TestCase {
 
   function test_temperatureText_data() {
     return [
-          { tag: "celsius", c: 11.4, f: false, unit: false, expected: "11°" },
-          { tag: "fahrenheit unit", c: 0, f: true, unit: true, expected: "32°F" },
-          { tag: "missing", c: null, f: false, unit: true, expected: "--" }
+          {
+            tag: "celsius",
+            c: 11.4,
+            f: false,
+            unit: false,
+            expected: "11°"
+          },
+          {
+            tag: "fahrenheit unit",
+            c: 0,
+            f: true,
+            unit: true,
+            expected: "32°F"
+          },
+          {
+            tag: "missing",
+            c: null,
+            f: false,
+            unit: true,
+            expected: "--"
+          }
         ];
   }
 
@@ -137,11 +155,31 @@ TestCase {
 
   function test_windSpeed_data() {
     return [
-          { tag: "kmh", unit: "kmh", expected: 36 },
-          { tag: "ms", unit: "ms", expected: 10 },
-          { tag: "mph", unit: "mph", expected: 22 },
-          { tag: "kn", unit: "kn", expected: 19 },
-          { tag: "unknown falls back to kmh", unit: "x", expected: 36 }
+          {
+            tag: "kmh",
+            unit: "kmh",
+            expected: 36
+          },
+          {
+            tag: "ms",
+            unit: "ms",
+            expected: 10
+          },
+          {
+            tag: "mph",
+            unit: "mph",
+            expected: 22
+          },
+          {
+            tag: "kn",
+            unit: "kn",
+            expected: 19
+          },
+          {
+            tag: "unknown falls back to kmh",
+            unit: "x",
+            expected: 36
+          }
         ];
   }
 
@@ -162,11 +200,31 @@ TestCase {
 
   function test_compass_data() {
     return [
-          { tag: "north", deg: 0, expected: "N" },
-          { tag: "wraps", deg: 359, expected: "N" },
-          { tag: "southwest", deg: 225, expected: "SW" },
-          { tag: "east-northeast", deg: 70, expected: "ENE" },
-          { tag: "negative", deg: -90, expected: "W" }
+          {
+            tag: "north",
+            deg: 0,
+            expected: "N"
+          },
+          {
+            tag: "wraps",
+            deg: 359,
+            expected: "N"
+          },
+          {
+            tag: "southwest",
+            deg: 225,
+            expected: "SW"
+          },
+          {
+            tag: "east-northeast",
+            deg: 70,
+            expected: "ENE"
+          },
+          {
+            tag: "negative",
+            deg: -90,
+            expected: "W"
+          }
         ];
   }
 
@@ -321,9 +379,24 @@ TestCase {
 
   function test_detailSun_data() {
     return [
-          { tag: "before sunrise", now: "2026-10-19T06:00", label: "weather.details.sunrise", value: "08:10" },
-          { tag: "daytime", now: "2026-10-19T14:15", label: "weather.details.sunset", value: "18:50" },
-          { tag: "after sunset shows tomorrow", now: "2026-10-19T21:00", label: "weather.details.sunrise", value: "08:12" }
+          {
+            tag: "before sunrise",
+            now: "2026-10-19T06:00",
+            label: "weather.details.sunrise",
+            value: "08:10"
+          },
+          {
+            tag: "daytime",
+            now: "2026-10-19T14:15",
+            label: "weather.details.sunset",
+            value: "18:50"
+          },
+          {
+            tag: "after sunset shows tomorrow",
+            now: "2026-10-19T21:00",
+            label: "weather.details.sunrise",
+            value: "08:12"
+          }
         ];
   }
 

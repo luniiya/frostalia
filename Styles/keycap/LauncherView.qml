@@ -5,8 +5,8 @@ import "../../Helpers/LauncherView.js" as LauncherView
 import "." as Keycap
 
 import qs.Commons
-import qs.Services.UI
 import qs.Modules.Panels.Launcher
+import qs.Services.UI
 import qs.Widgets
 
 // Keycap app menu, laid out like a keyboard: a long search key on top, the

@@ -1,10 +1,10 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import "../../../../../Helpers/WeatherData.js" as WeatherData
 import qs.Commons
 import qs.Services.Location
 import qs.Widgets
-import "../../../../../Helpers/WeatherData.js" as WeatherData
 
 ColumnLayout {
   id: root
@@ -153,9 +153,9 @@ ColumnLayout {
       enabled: Settings.data.location.weatherEnabled
       minimumWidth: 160 * Style.uiScaleRatio
       model: WeatherData.windUnits.map(unit => ({
-                                                  "key": unit,
-                                                  "name": WeatherData.windUnitLabel(unit)
-                                                }))
+        "key": unit,
+        "name": WeatherData.windUnitLabel(unit)
+      }))
       currentKey: Settings.data.location.windSpeedUnit
       onSelected: key => Settings.data.location.windSpeedUnit = key
       defaultValue: Settings.getDefaultValue("location.windSpeedUnit")
@@ -230,10 +230,10 @@ ColumnLayout {
       Layout.fillWidth: true
       visible: Settings.data.location.weatherShowDetails
       model: WeatherData.detailEntries(Settings.data.location.weatherDetails).map(entry => ({
-                                                                                            "id": entry.id,
-                                                                                            "text": I18n.tr("weather.details." + entry.id),
-                                                                                            "enabled": entry.enabled
-                                                                                          }))
+        "id": entry.id,
+        "text": I18n.tr("weather.details." + entry.id),
+        "enabled": entry.enabled
+      }))
       onItemToggled: (index, enabled) => Settings.data.location.weatherDetails = WeatherData.toggledDetail(Settings.data.location.weatherDetails, index, enabled)
       onItemsReordered: (fromIndex, toIndex) => Settings.data.location.weatherDetails = WeatherData.movedDetail(Settings.data.location.weatherDetails, fromIndex, toIndex)
     }

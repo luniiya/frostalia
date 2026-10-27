@@ -2941,6 +2941,15 @@
     "subTabLabel": "common.general"
   },
   {
+    "labelKey": "panels.wallpaper.random-enabled-label",
+    "descriptionKey": "panels.wallpaper.random-enabled-description",
+    "widget": "NToggle",
+    "tab": 3,
+    "tabLabel": "panels.wallpaper.title",
+    "subTab": 0,
+    "subTabLabel": "common.general"
+  },
+  {
     "labelKey": "panels.wallpaper.random-minutes-label",
     "descriptionKey": "panels.wallpaper.random-minutes-description",
     "widget": "NSpinBox",

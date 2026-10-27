@@ -743,13 +743,14 @@ Singleton {
       property string lightFolder: "~/Wall/Light"
       property string darkFolder: "~/Wall/Dark"
       // a style from Helpers/WallpaperRenderer.js, "random" or "none"
-      property string transition: "ring"
+      property string transition: "random"
       property int duration: 1300
       property string ringVariant: "ring"
       // "theme" (color scheme) or "sekai" (SekaiPop's white, pink and cyan)
       property string colors: "theme"
-      // change to a random wallpaper every N minutes, 0 = never
-      property int randomMinutes: 0
+      // change to a random wallpaper every randomMinutes minutes
+      property bool randomEnabled: false
+      property int randomMinutes: 30
       // pre-scale the whole folder to the screen size in the background
       property bool precache: true
       // slide the wallpaper as the workspace changes: zoomed in by parallaxAmount percent,

@@ -91,10 +91,10 @@ Singleton {
   readonly property var shelfIds: {
     const ids = Object.keys(DesktopWidgetRegistry.widgets || {});
     ids.sort((a, b) => {
-               const pa = a.indexOf("plugin:") === 0;
-               const pb = b.indexOf("plugin:") === 0;
-               return pa === pb ? a.localeCompare(b) : (pa ? 1 : -1);
-             });
+      const pa = a.indexOf("plugin:") === 0;
+      const pb = b.indexOf("plugin:") === 0;
+      return pa === pb ? a.localeCompare(b) : (pa ? 1 : -1);
+    });
     return ids;
   }
 

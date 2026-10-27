@@ -333,5 +333,4 @@ TestCase {
     compare(Geometry.tileIcon("Unknown"), "layout-grid-add");
     compare(Geometry.tileIcon("Lyrics"), "microphone-2");
   }
-
 }

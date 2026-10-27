@@ -3,8 +3,8 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
-import qs.Commons
 import "../../Helpers/WeatherData.js" as WeatherData
+import qs.Commons
 
 // Location and weather service with decoupled geocoding and weather fetching.
 Singleton {

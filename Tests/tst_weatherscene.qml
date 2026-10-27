@@ -7,15 +7,51 @@ TestCase {
 
   function test_type_data() {
     return [
-          { tag: "clear", code: 0, expected: "clear" },
-          { tag: "mainly clear", code: 1, expected: "partly" },
-          { tag: "overcast", code: 3, expected: "overcast" },
-          { tag: "fog", code: 45, expected: "overcast" },
-          { tag: "drizzle", code: 53, expected: "rain" },
-          { tag: "showers", code: 81, expected: "rain" },
-          { tag: "snow", code: 73, expected: "snow" },
-          { tag: "snow showers", code: 86, expected: "snow" },
-          { tag: "thunderstorm", code: 95, expected: "storm" }
+          {
+            tag: "clear",
+            code: 0,
+            expected: "clear"
+          },
+          {
+            tag: "mainly clear",
+            code: 1,
+            expected: "partly"
+          },
+          {
+            tag: "overcast",
+            code: 3,
+            expected: "overcast"
+          },
+          {
+            tag: "fog",
+            code: 45,
+            expected: "overcast"
+          },
+          {
+            tag: "drizzle",
+            code: 53,
+            expected: "rain"
+          },
+          {
+            tag: "showers",
+            code: 81,
+            expected: "rain"
+          },
+          {
+            tag: "snow",
+            code: 73,
+            expected: "snow"
+          },
+          {
+            tag: "snow showers",
+            code: 86,
+            expected: "snow"
+          },
+          {
+            tag: "thunderstorm",
+            code: 95,
+            expected: "storm"
+          }
         ];
   }
 

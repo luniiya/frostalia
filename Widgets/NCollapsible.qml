@@ -51,7 +51,6 @@ ColumnLayout {
       }
     }
 
-
     MouseArea {
       id: headerArea
       anchors.fill: parent

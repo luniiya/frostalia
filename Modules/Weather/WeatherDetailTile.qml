@@ -1,9 +1,9 @@
 import QtQuick
 import QtQuick.Layouts
+import "../../Helpers/WeatherData.js" as WeatherData
 import qs.Commons
 import qs.Services.Location
 import qs.Widgets
-import "../../Helpers/WeatherData.js" as WeatherData
 
 // One weather detail (wind, UV, humidity, ...): label, big value, caption and a
 // visual on the right. The content comes from WeatherData.detail().

@@ -288,12 +288,13 @@ class WallpaperTests(unittest.TestCase):
         # The Edit Desktop card shows a copy of the wallpaper (the daemon draws the real one);
         # the wallpaper visualizer's waves draw only a cut-out of its subject, and the shelf says
         # whether the wallpaper has one. The renderer's windows, its IPC and the radial menu's
-        # random-wallpaper action drive the shell's own renderer.
+        # random-wallpaper action drive the shell's own renderer; its settings tab caches both folders.
         self.assertEqual(users, {"shell.qml", "Services/Theming/AppThemeService.qml", "Modules/EditDesktop/EditDesktopWindow.qml",
                                  "Modules/WallpaperVisualizer/WallpaperVisualizer.qml", "Modules/WallpaperVisualizer/ScreenWaves.qml",
                                  "Modules/EditDesktop/EditShelf.qml",
                                  "Modules/Background/ShellWallpaper.qml", "Modules/Background/WallpaperLayer.qml",
-                                 "Services/Control/IPCService.qml", "Modules/RadialMenu/RadialMenu.qml"})
+                                 "Services/Control/IPCService.qml", "Modules/RadialMenu/RadialMenu.qml",
+                                 "Modules/Panels/Settings/Tabs/Wallpaper/GeneralSubTab.qml"})
 
 
 class PowerProfileLabelTests(unittest.TestCase):

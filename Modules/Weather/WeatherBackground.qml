@@ -141,12 +141,12 @@ Item {
   function quadraticSamples(controlX, controlY, endX, endY) {
     const steps = 20;
     const points = [
-      {
-        "x": 0,
-        "y": 0,
-        "len": 0
-      }
-    ];
+            {
+              "x": 0,
+              "y": 0,
+              "len": 0
+            }
+          ];
     let previous = {
       "x": 0,
       "y": 0
@@ -295,11 +295,11 @@ Item {
     const jitter = Math.max(20, width * 0.07);
     const pathX = margin + Math.random() * Math.max(1, width - margin * 2);
     const points = [
-      {
-        "x": pathX,
-        "y": 0
-      }
-    ];
+            {
+              "x": pathX,
+              "y": 0
+            }
+          ];
     for (let i = 0; i < steps; ++i)
       points.push({
                     "x": pathX + (Math.random() * jitter - jitter * 0.5),

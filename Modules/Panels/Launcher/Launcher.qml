@@ -1,12 +1,12 @@
 import QtQuick
 import QtQuick.Controls
 import Quickshell
+import "../../../Helpers/LauncherView.js" as LauncherView
 
 import qs.Commons
 import qs.Modules.MainScreen
 import qs.Services.UI
 import qs.Widgets
-import "../../../Helpers/LauncherView.js" as LauncherView
 
 SmartPanel {
   id: root

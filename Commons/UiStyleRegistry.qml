@@ -1,7 +1,7 @@
 pragma Singleton
+import Qt.labs.folderlistmodel
 
 import QtQuick
-import Qt.labs.folderlistmodel
 import Quickshell
 import "../Helpers/UiStyles.js" as UiStyles
 

@@ -1,8 +1,8 @@
 import QtQuick
 import QtQuick.Layouts
+import "../../Helpers/WeatherData.js" as WeatherData
 import qs.Commons
 import qs.Services.Location
-import "../../Helpers/WeatherData.js" as WeatherData
 
 // The full weather page: current conditions, hourly, daily and detail tiles.
 // Each section can be turned off in Settings > Region > Location.

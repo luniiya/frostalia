@@ -1,6 +1,6 @@
 import QtQuick
-import qs.Commons
 import "KeycapStyle.js" as KeycapStyle
+import qs.Commons
 
 // Colors, metrics and glyphs shared by the Keycap skins and bar faces (Bar/). The
 // definition names this file as its `kit`; Style.kit is the one live instance.
@@ -9,16 +9,16 @@ QtObject {
   id: root
 
   readonly property var tokens: Style.uiStyleTokens.keycap || ({
-                                                         "cream": "#fff3dc",
-                                                         "overshoot": 2.2,
-                                                         "popOvershoot": 1.6,
-                                                         "tilt": 4,
-                                                         "depth": 3,
-                                                         "pressedDepth": 1,
-                                                         "hoverLift": 1,
-                                                         "outline": 2,
-                                                         "ring": 1
-                                                       })
+                                                                 "cream": "#fff3dc",
+                                                                 "overshoot": 2.2,
+                                                                 "popOvershoot": 1.6,
+                                                                 "tilt": 4,
+                                                                 "depth": 3,
+                                                                 "pressedDepth": 1,
+                                                                 "hoverLift": 1,
+                                                                 "outline": 2,
+                                                                 "ring": 1
+                                                               })
 
   // Palette
   readonly property color cream: tokens.cream

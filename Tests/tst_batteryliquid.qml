@@ -212,16 +212,16 @@ TestCase {
 
   function test_bubbleSpec_staysInsideTheContainer_data() {
     return [
-      {
-        "r": 0
-      },
-      {
-        "r": 0.5
-      },
-      {
-        "r": 0.999
-      }
-    ];
+          {
+            "r": 0
+          },
+          {
+            "r": 0.5
+          },
+          {
+            "r": 0.999
+          }
+        ];
   }
 
   function test_bubbleSpec_staysInsideTheContainer(data) {

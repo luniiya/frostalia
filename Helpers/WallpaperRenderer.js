@@ -398,8 +398,39 @@ function transitionColors(mode, primary, secondary, tertiary) {
   };
 }
 
-// Random-change interval in milliseconds, 0 when off
-function intervalMs(minutes) {
+// Random-change interval in milliseconds, 0 when off; at least a minute when on
+function intervalMs(enabled, minutes) {
+  if (!enabled)
+    return 0;
   var m = Number(minutes);
-  return isFinite(m) && m > 0 ? Math.round(m * 60000) : 0;
+  return Math.round(Math.max(1, isFinite(m) ? m : 1) * 60000);
+}
+
+// Both folders, each path once, the current mode's first
+function cacheAllOrder(current, other) {
+  var out = [];
+  var all = (current || []).concat(other || []);
+  for (var i = 0; i < all.length; i++) {
+    if (all[i] && out.indexOf(all[i]) < 0)
+      out.push(all[i]);
+  }
+  return out;
+}
+
+function shellQuote(s) {
+  return "'" + String(s).replace(/'/g, "'\\''") + "'";
+}
+
+// Shell command that publishes the picture on screen for tools outside the shell, in `dir`:
+// `current` links to the original (a GIF stays a GIF) and `current.png` is a flat first frame
+// (what the lock screen draws). Both are swapped in whole, so a reader never sees half a file.
+function publishCommand(path, dir) {
+  if (!path || !dir)
+    return "";
+  var d = dir.replace(/\/+$/, "");
+  var png = shellQuote(d + "/current.png");
+  var tmpPng = shellQuote(d + "/current.tmp.png");
+  var link = shellQuote(d + "/current");
+  var tmpLink = shellQuote(d + "/current.tmp");
+  return "mkdir -p " + shellQuote(d) + " && ln -sfn " + shellQuote(path) + " " + tmpLink + " && mv -Tf " + tmpLink + " " + link + " && magick " + shellQuote(path + "[0]") + " -auto-orient " + tmpPng + " && mv -f " + tmpPng + " " + png;
 }

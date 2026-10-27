@@ -39,17 +39,17 @@ ColumnLayout {
   NReorderCheckboxes {
     Layout.fillWidth: true
     model: ModelUsageOrder.orderedIds(Settings.data.modelUsage.providerOrder).map(id => ({
-                                                                                          "id": id,
-                                                                                          "text": I18n.tr(root.labelKeys[id]),
-                                                                                          "enabled": Settings.data.modelUsage[id + "Enabled"]
-                                                                                        }))
+      "id": id,
+      "text": I18n.tr(root.labelKeys[id]),
+      "enabled": Settings.data.modelUsage[id + "Enabled"]
+    }))
     onItemToggled: (index, enabled) => {
-                     const id = ModelUsageOrder.orderedIds(Settings.data.modelUsage.providerOrder)[index];
-                     Settings.data.modelUsage[id + "Enabled"] = enabled;
-                   }
+      const id = ModelUsageOrder.orderedIds(Settings.data.modelUsage.providerOrder)[index];
+      Settings.data.modelUsage[id + "Enabled"] = enabled;
+    }
     onItemsReordered: (fromIndex, toIndex) => {
-                        Settings.data.modelUsage.providerOrder = ModelUsageOrder.moved(Settings.data.modelUsage.providerOrder, fromIndex, toIndex);
-                      }
+      Settings.data.modelUsage.providerOrder = ModelUsageOrder.moved(Settings.data.modelUsage.providerOrder, fromIndex, toIndex);
+    }
   }
 
   NTextInput {

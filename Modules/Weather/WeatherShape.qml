@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Shapes
-import qs.Commons
 import "../../Helpers/CookieShape.js" as CookieShape
+import qs.Commons
 
 // Filled badge shape: the Material 3 Expressive cookie, or a circle on other styles.
 Shape {

@@ -70,12 +70,21 @@ ColumnLayout {
     }
   }
 
+  NToggle {
+    enabled: root.prefs.enabled
+    label: I18n.tr("panels.wallpaper.random-enabled-label")
+    description: I18n.tr("panels.wallpaper.random-enabled-description")
+    checked: root.prefs.randomEnabled
+    defaultValue: Settings.getDefaultValue("wallpaperRenderer.randomEnabled")
+    onToggled: checked => root.prefs.randomEnabled = checked
+  }
+
   NSpinBox {
     Layout.fillWidth: true
-    enabled: root.prefs.enabled
+    enabled: root.prefs.enabled && root.prefs.randomEnabled
     label: I18n.tr("panels.wallpaper.random-minutes-label")
     description: I18n.tr("panels.wallpaper.random-minutes-description")
-    from: 0
+    from: 1
     to: 1440
     stepSize: 5
     suffix: " min"
@@ -95,6 +104,27 @@ ColumnLayout {
     checked: root.prefs.precache
     defaultValue: Settings.getDefaultValue("wallpaperRenderer.precache")
     onToggled: checked => root.prefs.precache = checked
+  }
+
+  NButton {
+    enabled: root.prefs.enabled && !WallpaperService.cachingAll
+    icon: "download"
+    text: WallpaperService.cachingAll ? I18n.tr("panels.wallpaper.cache-all-progress", {
+                                                  "done": WallpaperService.cacheAllDone,
+                                                  "total": WallpaperService.cacheAllTotal
+                                                }) : I18n.tr("panels.wallpaper.cache-all-button")
+    Layout.fillWidth: true
+    onClicked: {
+      if (!WallpaperService.cacheAll())
+        ToastService.showWarning(I18n.tr("panels.wallpaper.title"), I18n.tr("panels.wallpaper.cache-all-no-magick"));
+    }
+  }
+
+  Connections {
+    target: WallpaperService
+    function onCacheAllFinished() {
+      ToastService.showNotice(I18n.tr("panels.wallpaper.title"), I18n.tr("panels.wallpaper.cache-all-done"));
+    }
   }
 
   NButton {

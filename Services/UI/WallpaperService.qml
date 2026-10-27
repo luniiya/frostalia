@@ -168,8 +168,20 @@ Singleton {
     rendererPath = path;
     upcomingRandom = WallpaperRenderer.pickRandom(list || images, [path]);
     Logger.d("Wallpaper", "Renderer shows", path);
+    publish(path);
     resolveDisplays();
     precacheTimer.restart();
+  }
+
+  // The picture on screen, for tools outside the shell: the lock screen draws
+  // `<cache>/wallpaper/current.png`, and pickers read where `current` links to
+  readonly property string publishDir: Settings.cacheDir + "wallpaper"
+  property string publishWanted: ""
+
+  function publish(path) {
+    publishWanted = path;
+    if (!publishProcess.running)
+      publishProcess.start(path);
   }
 
   function remember(forMode, path) {
@@ -350,8 +362,8 @@ Singleton {
 
   // A random wallpaper every N minutes (Settings > Wallpaper)
   Timer {
-    interval: Math.max(60000, WallpaperRenderer.intervalMs(root.prefs.randomMinutes))
-    running: root.rendererEnabled && root.started && WallpaperRenderer.intervalMs(root.prefs.randomMinutes) > 0
+    interval: Math.max(60000, WallpaperRenderer.intervalMs(root.prefs.randomEnabled, root.prefs.randomMinutes))
+    running: root.rendererEnabled && root.started && root.prefs.randomEnabled
     repeat: true
     onTriggered: root.random()
   }
@@ -360,6 +372,24 @@ Singleton {
   // and at the lowest CPU priority, paused in eco mode. Cached copies are only checked.
   property var precacheQueue: []
   property bool precaching: false
+  // "Cache all wallpapers now": both folders, now, even with pre-scaling off or in eco mode
+  property bool cachingAll: false
+  property int cacheAllTotal: 0
+  readonly property int cacheAllDone: cachingAll ? cacheAllTotal - precacheQueue.length : 0
+  signal cacheAllFinished
+
+  // false when ImageMagick is missing
+  function cacheAll() {
+    if (!ImageCacheService.imageMagickAvailable)
+      return false;
+    const other = mode === "dark" ? lightImages : darkImages;
+    precacheQueue = WallpaperRenderer.cacheAllOrder(images, other);
+    cacheAllTotal = precacheQueue.length;
+    cachingAll = true;
+    if (!precaching)
+      precacheNext();
+    return true;
+  }
 
   Timer {
     id: precacheTimer
@@ -368,7 +398,7 @@ Singleton {
   }
 
   function startPrecache() {
-    if (!rendererEnabled || !prefs.precache || !ImageCacheService.imageMagickAvailable)
+    if (cachingAll || !rendererEnabled || !prefs.precache || !ImageCacheService.imageMagickAvailable)
       return;
     const other = mode === "dark" ? lightImages : darkImages;
     const otherMode = mode === "dark" ? "light" : "dark";
@@ -381,8 +411,12 @@ Singleton {
   }
 
   function precacheNext() {
-    if (precacheQueue.length === 0 || !rendererEnabled || !prefs.precache || PowerProfileService.ecoMode) {
+    if (precacheQueue.length === 0 || !rendererEnabled || (!cachingAll && (!prefs.precache || PowerProfileService.ecoMode))) {
       precaching = false;
+      if (cachingAll && precacheQueue.length === 0) {
+        cachingAll = false;
+        cacheAllFinished();
+      }
       return;
     }
     precaching = true;
@@ -421,6 +455,23 @@ Singleton {
     repeat: true
     running: root.isInitialized && !root.rendererEnabled
     onTriggered: root.refresh()
+  }
+
+  // One at a time; a picture picked while one is written is published after it
+  Process {
+    id: publishProcess
+    property string path: ""
+    function start(p) {
+      path = p;
+      command = ["sh", "-c", WallpaperRenderer.publishCommand(p, root.publishDir)];
+      running = true;
+    }
+    onExited: exitCode => {
+      if (exitCode !== 0)
+        Logger.w("Wallpaper", "Could not publish", path, "to", root.publishDir);
+      if (root.publishWanted !== path)
+        start(root.publishWanted);
+    }
   }
 
   Process {

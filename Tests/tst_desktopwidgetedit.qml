@@ -226,32 +226,32 @@ TestCase {
 
   function test_gridSize_data() {
     return [
-      {
-        "w": 2256,
-        "h": 1504,
-        "expected": 25
-      },
-      {
-        "w": 2560,
-        "h": 1440,
-        "expected": 40
-      },
-      {
-        "w": 1920,
-        "h": 1080,
-        "expected": 20
-      },
-      {
-        "w": 3840,
-        "h": 2160,
-        "expected": 60
-      },
-      {
-        "w": 0,
-        "h": 0,
-        "expected": 30
-      }
-    ];
+          {
+            "w": 2256,
+            "h": 1504,
+            "expected": 25
+          },
+          {
+            "w": 2560,
+            "h": 1440,
+            "expected": 40
+          },
+          {
+            "w": 1920,
+            "h": 1080,
+            "expected": 20
+          },
+          {
+            "w": 3840,
+            "h": 2160,
+            "expected": 60
+          },
+          {
+            "w": 0,
+            "h": 0,
+            "expected": 30
+          }
+        ];
   }
 
   function test_gridSize(data) {
@@ -260,47 +260,47 @@ TestCase {
 
   function test_gridLength_data() {
     return [
-      {
-        "length": 240,
-        "grid": 25,
-        "expected": 250
-      },
-      {
-        "length": 250,
-        "grid": 25,
-        "expected": 250
-      },
-      {
-        "length": 132,
-        "grid": 25,
-        "expected": 150
-      },
-      {
-        "length": 101,
-        "grid": 25,
-        "expected": 125
-      },
-      {
-        "length": 150,
-        "grid": 25,
-        "expected": 150
-      },
-      {
-        "length": 5,
-        "grid": 25,
-        "expected": 25
-      },
-      {
-        "length": 240,
-        "grid": 0,
-        "expected": 240
-      },
-      {
-        "length": 0,
-        "grid": 25,
-        "expected": 0
-      }
-    ];
+          {
+            "length": 240,
+            "grid": 25,
+            "expected": 250
+          },
+          {
+            "length": 250,
+            "grid": 25,
+            "expected": 250
+          },
+          {
+            "length": 132,
+            "grid": 25,
+            "expected": 150
+          },
+          {
+            "length": 101,
+            "grid": 25,
+            "expected": 125
+          },
+          {
+            "length": 150,
+            "grid": 25,
+            "expected": 150
+          },
+          {
+            "length": 5,
+            "grid": 25,
+            "expected": 25
+          },
+          {
+            "length": 240,
+            "grid": 0,
+            "expected": 240
+          },
+          {
+            "length": 0,
+            "grid": 25,
+            "expected": 0
+          }
+        ];
   }
 
   function test_gridLength(data) {
