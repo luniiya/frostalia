@@ -59,6 +59,8 @@ MaterialTile {
       return BluetoothService.connectedDevices.length ? I18n.tr("common.connected") : I18n.tr("common.disconnected");
     if (widgetId === "KdeConnect")
       return action?.statusText || "";
+    if (widgetId === "PowerProfile")
+      return PowerProfileService.getLabel();
     if (widgetId === "EcoMode" && PowerProfileService.ecoModeForced)
       return I18n.tr("control-center.eco-mode.forced");
     return I18n.tr(active ? "common.enabled" : "common.disabled");

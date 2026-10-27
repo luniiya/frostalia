@@ -289,6 +289,72 @@ class WallpaperTests(unittest.TestCase):
                                  "Modules/WallpaperVisualizer/WallpaperVisualizer.qml", "Modules/EditDesktop/EditShelf.qml"})
 
 
+class PowerProfileLabelTests(unittest.TestCase):
+    """The Material control center tile names the current profile instead of showing enabled/disabled."""
+
+    def test_helper_translation_keys_exist(self):
+        # The helper names keys the QML translation check cannot see
+        english = json.loads((ROOT / "Assets/Translations/en.json").read_text())
+        keys = set(re.findall(r'"(common\.[a-z-]+)"', (ROOT / "Helpers/PowerProfiles.js").read_text()))
+        self.assertEqual(keys, {"common.power-saver", "common.balanced", "common.performance", "common.unknown"})
+        for key in keys:
+            with self.subTest(key=key):
+                self.assertIsInstance(english["common"].get(key.split(".")[1]), str)
+
+    def test_service_import_does_not_shadow_quickshell_power_profiles(self):
+        # Importing the helper "as PowerProfiles" hides Quickshell's PowerProfiles singleton
+        service = (ROOT / "Services/Power/PowerProfileService.qml").read_text()
+        self.assertNotRegex(service, r'\bas PowerProfiles\b')
+        self.assertIn("readonly property var powerProfiles: PowerProfiles", service)
+
+    def test_material_tile_shows_the_profile_name(self):
+        tile = (ROOT / "Modules/Panels/ControlCenter/MaterialShortcut.qml").read_text()
+        self.assertRegex(tile, r'widgetId === "PowerProfile"\)\s*return PowerProfileService\.getLabel\(\);')
+
+
+class LyricsWidgetTests(unittest.TestCase):
+    """The desktop lyrics widget: registered, drawn by every style, fed by LyricsService."""
+
+    def test_widget_is_registered_with_settings(self):
+        registry = (ROOT / "Services/UI/DesktopWidgetRegistry.qml").read_text()
+        self.assertIn('widgetsObj["Lyrics"] = lyricsComponent;', registry)
+        self.assertIn('urlsObj["Lyrics"] = _widgetsDir + "DesktopLyrics.qml";', registry)
+        self.assertIn('"Lyrics": "WidgetSettings/LyricsSettings.qml"', registry)
+        self.assertTrue((ROOT / "Modules/DesktopWidgets/Widgets/DesktopLyrics.qml").exists())
+        self.assertTrue((ROOT / "Modules/Panels/Settings/DesktopWidgets/WidgetSettings/LyricsSettings.qml").exists())
+
+    def test_every_style_draws_lyrics(self):
+        # The shared widget keeps the clock and the stack; each style's "lyrics" view draws them
+        widget = (ROOT / "Modules/DesktopWidgets/Widgets/DesktopLyrics.qml").read_text()
+        self.assertIn('surface: "lyrics"', widget)
+        for definition in sorted((ROOT / "Styles").glob("*/Definition.qml")):
+            with self.subTest(style=definition.parent.name):
+                view = re.search(r'"lyrics": "([^"]+)"', definition.read_text())
+                self.assertIsNotNone(view)
+                self.assertTrue((ROOT / view.group(1)).exists())
+
+    def test_rufin_token_stays_off_the_command_line(self):
+        # Process command lines are visible to every user; the token goes in the environment
+        service = (ROOT / "Services/Media/LyricsService.qml").read_text()
+        commands = [c for c in re.findall(r"command: \[(.*)\]", service) if "curl" in c]
+        self.assertEqual(len(commands), 2)
+        for command in commands:
+            with self.subTest(command=command):
+                self.assertNotIn("rufin.token", command)
+                self.assertIn("$RUFIN_TOKEN", command)
+        self.assertEqual(service.count('"RUFIN_TOKEN": rufin.token'), 2)
+
+
+    def test_clock_follows_the_players_own_position(self):
+        # Regression: Quickshell runs a position on from the last report, so Rufin
+        # stalling while it buffers left the lyrics seconds ahead
+        service = (ROOT / "Services/Media/LyricsService.qml").read_text()
+        widget = (ROOT / "Modules/DesktopWidgets/Widgets/DesktopLyrics.qml").read_text()
+        self.assertIn('"org.mpris.MediaPlayer2.Player", "Position"', service)
+        self.assertIn("Lyrics.busctlPosition(text)", service)
+        self.assertIn("function onPositionSampled(position, at)", widget)
+
+
 class EcoModeTests(unittest.TestCase):
     """Eco mode is the lite mode: power saver forces it on, other profiles (Performance included) leave it to the user's toggle."""
 

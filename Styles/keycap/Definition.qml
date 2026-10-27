@@ -27,7 +27,8 @@ QtObject {
                                   "notificationContent": "Modules/Notification/MaterialNotificationContent.qml",
                                   "kdeConnectHome": "Modules/Panels/KdeConnect/MaterialKdeConnectHome.qml",
                                   "launcher": "Styles/keycap/LauncherView.qml",
-                                  "sessionMenu": "Styles/keycap/SessionMenuView.qml"
+                                  "sessionMenu": "Styles/keycap/SessionMenuView.qml",
+                                  "lyrics": "Styles/keycap/LyricsView.qml"
                                 })
   // Bar widget faces, keyed by the name a bar widget passes as `faceView`.
   // "Plate" is the plain keycap used by widgets without a face of their own.

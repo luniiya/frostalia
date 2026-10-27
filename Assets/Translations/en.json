@@ -583,7 +583,9 @@
     "width": "Width",
     "wifi": "Wi-Fi",
     "windows": "Windows",
-    "yes": "Yes"
+    "yes": "Yes",
+    "balanced": "Balanced",
+    "power-saver": "Power saver"
   },
   "control-center": {
     "audio-output": "Audio output",
@@ -1323,7 +1325,8 @@
         "MediaPlayer": "Media player",
         "SystemStat": "System stat",
         "Weather": "Weather",
-        "WeatherDetails": "Weather details"
+        "WeatherDetails": "Weather details",
+        "Lyrics": "Lyrics"
       },
       "overview-enabled-description": "Show desktop widgets while the compositor overview is open.",
       "overview-enabled-label": "Show in overview",
@@ -1365,7 +1368,14 @@
       "weather-show-high-low-description": "Show today's highest and lowest temperature.",
       "weather-show-high-low-label": "Show high and low",
       "weather-show-precipitation-description": "Show the chance of precipitation.",
-      "weather-show-precipitation-label": "Show rain chance"
+      "weather-show-precipitation-label": "Show rain chance",
+      "lyrics-demo": "Lyrics show up here",
+      "lyrics-instrumental": "Instrumental",
+      "lyrics-width-description": "Width of the lyrics area, before scaling.",
+      "lyrics-color-label": "Sung color",
+      "lyrics-color-description": "Color that fills each word as it is sung.",
+      "lyrics-show-track-label": "Show track",
+      "lyrics-show-track-description": "Show the title and artist under the lyrics."
     },
     "display": {
       "monitors-backlight-device-auto-option": "Default",

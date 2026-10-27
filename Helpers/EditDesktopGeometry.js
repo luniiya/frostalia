@@ -183,6 +183,8 @@ function tileIcon(id) {
     return "cpu";
   case "AudioVisualizer":
     return "chart-bar";
+  case "Lyrics":
+    return "microphone-2";
   }
   return String(id).indexOf("plugin:") === 0 ? "plug" : "layout-grid-add";
 }

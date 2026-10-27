@@ -126,49 +126,49 @@ TestCase {
 
   function test_gesture_data() {
     return [
-      {
-        "tag": "still",
-        "dx": 0,
-        "dy": 0,
-        "expected": "click"
-      },
-      {
-        "tag": "small wiggle",
-        "dx": 3,
-        "dy": -3,
-        "expected": "click"
-      },
-      {
-        "tag": "straight up",
-        "dx": 0,
-        "dy": -5,
-        "expected": "pull"
-      },
-      {
-        "tag": "steep up and across",
-        "dx": 12,
-        "dy": -9,
-        "expected": "pull"
-      },
-      {
-        "tag": "too flat is a scroll",
-        "dx": 30,
-        "dy": -10,
-        "expected": "scroll"
-      },
-      {
-        "tag": "downward is a scroll",
-        "dx": 0,
-        "dy": 20,
-        "expected": "scroll"
-      },
-      {
-        "tag": "sideways",
-        "dx": -25,
-        "dy": 2,
-        "expected": "scroll"
-      }
-    ];
+          {
+            "tag": "still",
+            "dx": 0,
+            "dy": 0,
+            "expected": "click"
+          },
+          {
+            "tag": "small wiggle",
+            "dx": 3,
+            "dy": -3,
+            "expected": "click"
+          },
+          {
+            "tag": "straight up",
+            "dx": 0,
+            "dy": -5,
+            "expected": "pull"
+          },
+          {
+            "tag": "steep up and across",
+            "dx": 12,
+            "dy": -9,
+            "expected": "pull"
+          },
+          {
+            "tag": "too flat is a scroll",
+            "dx": 30,
+            "dy": -10,
+            "expected": "scroll"
+          },
+          {
+            "tag": "downward is a scroll",
+            "dx": 0,
+            "dy": 20,
+            "expected": "scroll"
+          },
+          {
+            "tag": "sideways",
+            "dx": -25,
+            "dy": 2,
+            "expected": "scroll"
+          }
+        ];
   }
 
   function test_gesture(data) {
@@ -179,13 +179,13 @@ TestCase {
 
   function test_snap_toAnotherWidgetsEdge() {
     var others = [
-      {
-        "x": 500,
-        "y": 100,
-        "width": 200,
-        "height": 100
-      }
-    ];
+          {
+            "x": 500,
+            "y": 100,
+            "width": 200,
+            "height": 100
+          }
+        ];
     var moving = {
       "x": 296,
       "y": 400,
@@ -203,13 +203,13 @@ TestCase {
 
   function test_snap_toCentersAlignsBothAxes() {
     var others = [
-      {
-        "x": 400,
-        "y": 400,
-        "width": 200,
-        "height": 200
-      }
-    ];
+          {
+            "x": 400,
+            "y": 400,
+            "width": 200,
+            "height": 200
+          }
+        ];
     var moving = {
       "x": 905,
       "y": 100,
@@ -232,19 +232,19 @@ TestCase {
 
   function test_snap_prefersTheClosestCandidate() {
     var others = [
-      {
-        "x": 300,
-        "y": 0,
-        "width": 100,
-        "height": 100
-      },
-      {
-        "x": 305,
-        "y": 200,
-        "width": 100,
-        "height": 100
-      }
-    ];
+          {
+            "x": 300,
+            "y": 0,
+            "width": 100,
+            "height": 100
+          },
+          {
+            "x": 305,
+            "y": 200,
+            "width": 100,
+            "height": 100
+          }
+        ];
     var s = Geometry.snap({
                             "x": 304,
                             "y": 500,
@@ -331,5 +331,7 @@ TestCase {
     compare(Geometry.tileIcon("Clock"), "clock");
     compare(Geometry.tileIcon("plugin:timer"), "plug");
     compare(Geometry.tileIcon("Unknown"), "layout-grid-add");
+    compare(Geometry.tileIcon("Lyrics"), "microphone-2");
   }
+
 }

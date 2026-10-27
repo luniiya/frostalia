@@ -102,6 +102,9 @@ Singleton {
   property Component audioVisualizerComponent: Component {
     DesktopAudioVisualizer {}
   }
+  property Component lyricsComponent: Component {
+    DesktopLyrics {}
+  }
 
   // Widget registry object mapping widget names to components
   // Created in Component.onCompleted to ensure Components are ready
@@ -124,6 +127,7 @@ Singleton {
     widgetsObj["WeatherDetails"] = weatherDetailsComponent;
     widgetsObj["SystemStat"] = systemStatComponent;
     widgetsObj["AudioVisualizer"] = audioVisualizerComponent;
+    widgetsObj["Lyrics"] = lyricsComponent;
     widgets = widgetsObj;
 
     var urlsObj = {};
@@ -133,6 +137,7 @@ Singleton {
     urlsObj["WeatherDetails"] = _widgetsDir + "DesktopWeatherDetails.qml";
     urlsObj["SystemStat"] = _widgetsDir + "DesktopSystemStat.qml";
     urlsObj["AudioVisualizer"] = _widgetsDir + "DesktopAudioVisualizer.qml";
+    urlsObj["Lyrics"] = _widgetsDir + "DesktopLyrics.qml";
     widgetUrls = urlsObj;
 
     Logger.i("DesktopWidgetRegistry", "Service started");
@@ -144,7 +149,8 @@ Singleton {
                                      "Weather": "WidgetSettings/WeatherSettings.qml",
                                      "WeatherDetails": "WidgetSettings/WeatherDetailsSettings.qml",
                                      "SystemStat": "WidgetSettings/SystemStatSettings.qml",
-                                     "AudioVisualizer": "WidgetSettings/AudioVisualizerSettings.qml"
+                                     "AudioVisualizer": "WidgetSettings/AudioVisualizerSettings.qml",
+                                     "Lyrics": "WidgetSettings/LyricsSettings.qml"
                                    })
 
   property var widgetMetadata: ({
@@ -200,6 +206,13 @@ Singleton {
                                     "visualizerType": "linear",
                                     "hideWhenIdle": false,
                                     "colorName": "primary"
+                                  },
+                                  "Lyrics": {
+                                    "showBackground": false,
+                                    "roundedCorners": false,
+                                    "width": 760,
+                                    "colorName": "primary",
+                                    "showTrack": false
                                   }
                                 })
 

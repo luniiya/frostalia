@@ -4,6 +4,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Services.UPower
 import "../../Helpers/EcoMode.js" as EcoMode
+import "../../Helpers/PowerProfiles.js" as PowerProfileLabels
 import qs.Commons
 import qs.Services.UI
 
@@ -44,6 +45,12 @@ Singleton {
     default:
       return "Unknown";
     }
+  }
+
+  // Translated profile name, for display
+  function getLabel(p) {
+    const prof = (p !== undefined) ? p : profile;
+    return I18n.tr(PowerProfileLabels.labelKey(available, prof, PowerProfile.PowerSaver, PowerProfile.Balanced, PowerProfile.Performance));
   }
 
   function getIcon(p) {
