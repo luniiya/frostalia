@@ -14,7 +14,10 @@ Item {
   property Item control
   readonly property var kit: Style.kitFor("Styles/keycap/Kit.qml")
   readonly property Item card: control ? control.parent : parent
-  readonly property bool active: card !== null
+  // Off while the skin is being unloaded (style change), so the Bindings below hand
+  // the card its own border, transform and layer back; a destroyed Binding doesn't
+  property bool alive: true
+  readonly property bool active: card !== null && alive
   property real depth: kit.depth
   readonly property bool hovered: control ? control.hovered : false
   readonly property bool pressed: control ? control.pressed : false
@@ -33,6 +36,8 @@ Item {
     id: lift
     y: root.sink
   }
+
+  Component.onDestruction: alive = false
 
   anchors.fill: control ? undefined : parent
   // Under the card's other children, so content stays on top of the keyline

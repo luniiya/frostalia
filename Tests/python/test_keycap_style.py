@@ -118,6 +118,14 @@ class KeycapStyleTests(unittest.TestCase):
         self.assertIn("NStyleCard {}", container)
         self.assertIn("Style.opaqueSurfaces ? ShellColors.mSurface", container)
 
+    def test_card_skin_restores_the_card_when_unloaded(self):
+        # Regression: switching back to material left desktop widgets in keycap dress;
+        # the mechanism itself is tested in Tests/tst_skinrestore.qml
+        skin = (ROOT / "Styles/keycap/Card.qml").read_text()
+        self.assertIn("Component.onDestruction: alive = false", skin)
+        self.assertIn("readonly property bool active: card !== null && alive", skin)
+        self.assertNotRegex(skin, r"when: (?!root\.active)")
+
     def test_only_keycap_has_bar_faces(self):
         self.assertIn("Plate", bar_views("keycap"))
         self.assertEqual(bar_views("material"), {})
