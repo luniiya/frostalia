@@ -16,7 +16,7 @@ Item {
   property color shadowColor: "black"
   property real shadowBlur: Style.shadowBlur
 
-  layer.enabled: Settings.data.general.enableShadows && !PowerProfileService.frostaliaPerformanceMode
+  layer.enabled: Settings.data.general.enableShadows && !PowerProfileService.ecoMode
   layer.effect: MultiEffect {
     source: root.source
     shadowEnabled: true

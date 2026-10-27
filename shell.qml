@@ -31,6 +31,7 @@ import qs.Modules.Panels.Launcher
 import qs.Modules.Panels.Settings
 import qs.Modules.RadialMenu
 import qs.Modules.Toast
+import qs.Modules.WallpaperVisualizer
 import qs.Services.Control
 import qs.Services.Frostalia
 import qs.Services.Hardware
@@ -130,6 +131,7 @@ ShellRoot {
         delayedInitTimer.restart();
       }
 
+      WallpaperVisualizer {}
       DesktopWidgets {}
       EditDesktopWindow {}
       Bubbles {}

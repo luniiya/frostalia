@@ -25,23 +25,23 @@ Singleton {
     }
   }
 
-  // Track performance mode state for hooks
-  property bool wasPerformanceModeEnabled: false
+  // Track eco mode state for hooks
+  property bool wasEcoModeEnabled: false
 
   Connections {
     target: PowerProfileService
-    function onFrostaliaPerformanceModeChanged() {
-      const isEnabled = PowerProfileService.frostaliaPerformanceMode;
+    function onEcoModeChanged() {
+      const isEnabled = PowerProfileService.ecoMode;
 
       // Detect enabled: was disabled, now enabled
-      if (!wasPerformanceModeEnabled && isEnabled) {
-        executePerformanceModeEnabledHook();
+      if (!wasEcoModeEnabled && isEnabled) {
+        executeEcoModeEnabledHook();
       }
       // Detect disabled: was enabled, now disabled
-      if (wasPerformanceModeEnabled && !isEnabled) {
-        executePerformanceModeDisabledHook();
+      if (wasEcoModeEnabled && !isEnabled) {
+        executeEcoModeDisabledHook();
       }
-      wasPerformanceModeEnabled = isEnabled;
+      wasEcoModeEnabled = isEnabled;
     }
   }
 
@@ -65,13 +65,13 @@ Singleton {
     }
   }
 
-  // Execute performance mode enabled hook
-  function executePerformanceModeEnabledHook() {
+  // Execute eco mode enabled hook
+  function executeEcoModeEnabledHook() {
     if (!Settings.data.hooks?.enabled) {
       return;
     }
 
-    const script = Settings.data.hooks?.performanceModeEnabled;
+    const script = Settings.data.hooks?.ecoModeEnabled;
     if (!script || script === "") {
       return;
     }
@@ -79,17 +79,17 @@ Singleton {
     try {
       Quickshell.execDetached(["sh", "-lc", script]);
     } catch (e) {
-      Logger.e("HooksService", `Failed to execute performance mode enabled hook: ${e}`);
+      Logger.e("HooksService", `Failed to execute eco mode enabled hook: ${e}`);
     }
   }
 
-  // Execute performance mode disabled hook
-  function executePerformanceModeDisabledHook() {
+  // Execute eco mode disabled hook
+  function executeEcoModeDisabledHook() {
     if (!Settings.data.hooks?.enabled) {
       return;
     }
 
-    const script = Settings.data.hooks?.performanceModeDisabled;
+    const script = Settings.data.hooks?.ecoModeDisabled;
     if (!script || script === "") {
       return;
     }
@@ -97,7 +97,7 @@ Singleton {
     try {
       Quickshell.execDetached(["sh", "-lc", script]);
     } catch (e) {
-      Logger.e("HooksService", `Failed to execute performance mode disabled hook: ${e}`);
+      Logger.e("HooksService", `Failed to execute eco mode disabled hook: ${e}`);
     }
   }
 
@@ -187,8 +187,8 @@ Singleton {
   function init() {
     Logger.i("HooksService", "Service started");
     Qt.callLater(() => {
-      // Initialize performance mode state tracking
-      wasPerformanceModeEnabled = PowerProfileService.frostaliaPerformanceMode;
+      // Initialize eco mode state tracking
+      wasEcoModeEnabled = PowerProfileService.ecoMode;
       // Execute startup hook
       executeStartupHook();
     });

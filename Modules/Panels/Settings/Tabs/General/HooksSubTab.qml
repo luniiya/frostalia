@@ -111,14 +111,14 @@ ColumnLayout {
     })
   }
 
-  // Performance Mode Enabled Hook
+  // Eco Mode Enabled Hook
   HookRow {
     enabled: Settings.data.hooks.enabled
-    label: I18n.tr("panels.hooks.performance-mode-enabled-label")
-    description: I18n.tr("panels.hooks.performance-mode-enabled-description")
-    value: Settings.data.hooks.performanceModeEnabled
-    onEditClicked: openEdit(label, description, I18n.tr("panels.hooks.performance-mode-enabled-placeholder"), value, newValue => {
-      Settings.data.hooks.performanceModeEnabled = newValue;
+    label: I18n.tr("panels.hooks.eco-mode-enabled-label")
+    description: I18n.tr("panels.hooks.eco-mode-enabled-description")
+    value: Settings.data.hooks.ecoModeEnabled
+    onEditClicked: openEdit(label, description, I18n.tr("panels.hooks.eco-mode-enabled-placeholder"), value, newValue => {
+      Settings.data.hooks.ecoModeEnabled = newValue;
       Settings.saveImmediate();
     }, val => {
       if (val)
@@ -126,14 +126,14 @@ ColumnLayout {
     })
   }
 
-  // Performance Mode Disabled Hook
+  // Eco Mode Disabled Hook
   HookRow {
     enabled: Settings.data.hooks.enabled
-    label: I18n.tr("panels.hooks.performance-mode-disabled-label")
-    description: I18n.tr("panels.hooks.performance-mode-disabled-description")
-    value: Settings.data.hooks.performanceModeDisabled
-    onEditClicked: openEdit(label, description, I18n.tr("panels.hooks.performance-mode-disabled-placeholder"), value, newValue => {
-      Settings.data.hooks.performanceModeDisabled = newValue;
+    label: I18n.tr("panels.hooks.eco-mode-disabled-label")
+    description: I18n.tr("panels.hooks.eco-mode-disabled-description")
+    value: Settings.data.hooks.ecoModeDisabled
+    onEditClicked: openEdit(label, description, I18n.tr("panels.hooks.eco-mode-disabled-placeholder"), value, newValue => {
+      Settings.data.hooks.ecoModeDisabled = newValue;
       Settings.saveImmediate();
     }, val => {
       if (val)

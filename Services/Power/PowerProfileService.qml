@@ -3,7 +3,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Services.UPower
-import "../../Helpers/PerformanceMode.js" as PerformanceMode
+import "../../Helpers/EcoMode.js" as EcoMode
 import qs.Commons
 import qs.Services.UI
 
@@ -14,9 +14,19 @@ Singleton {
   readonly property bool available: powerProfiles && powerProfiles.hasPerformanceProfile
   property int profile: powerProfiles ? powerProfiles.profile : PowerProfile.Balanced
 
-  // Not a power profile: disables shadows, animations, notification popups, etc.
-  // while the Performance profile is active.
-  readonly property bool frostaliaPerformanceMode: PerformanceMode.enabled(available, profile, PowerProfile.Performance)
+  // Not a power profile: the shell's lite mode (no shadows, animations, desktop widgets,
+  // notification popups, etc.). Power saver forces it on; otherwise the user's toggle decides.
+  // The Performance profile behaves like Balanced here.
+  readonly property bool ecoModeForced: EcoMode.forced(available, profile, PowerProfile.PowerSaver)
+  readonly property bool ecoMode: EcoMode.active(available, profile, PowerProfile.PowerSaver, Settings.data.ecoMode.enabled)
+
+  function toggleEcoMode() {
+    Settings.data.ecoMode.enabled = EcoMode.toggled(available, profile, PowerProfile.PowerSaver, Settings.data.ecoMode.enabled);
+  }
+
+  function setEcoMode(value) {
+    Settings.data.ecoMode.enabled = !!value;
+  }
 
   function getName(p) {
     if (!available)

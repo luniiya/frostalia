@@ -26,7 +26,7 @@ TestCase {
           right: []
         }
       },
-      frostaliaPerformance: {
+      ecoMode: {
         disableDesktopWidgets: false
       },
       colorSchemes: {
@@ -88,14 +88,14 @@ TestCase {
     compare(target.bar.widgets.right[0].showFrostaliaPerformance, true);
     compare(target.bar.screenOverrides[0].widgets.center[0].id, "FrostaliaPerformance");
     compare(target.controlCenter.shortcuts.left[0].id, "FrostaliaPerformance");
-    compare(target.frostaliaPerformance.disableDesktopWidgets, true);
+    compare(target.ecoMode.disableDesktopWidgets, true);
     compare(target.colorSchemes.predefinedScheme, "Frostalia (legacy)");
     compare(saved.bar.widgets.left[0].id, "NoctaliaaPerformance");
   }
 
   function test_preservesCustomSchemeAndFalseSetting() {
     var target = adapter();
-    target.frostaliaPerformance.disableDesktopWidgets = true;
+    target.ecoMode.disableDesktopWidgets = true;
     target.colorSchemes.predefinedScheme = "Noctalia custom";
     verify(migration.migrate(target, {
                                i: function () {}
@@ -107,7 +107,7 @@ TestCase {
                                  predefinedScheme: "Noctalia custom"
                                }
                              }));
-    compare(target.frostaliaPerformance.disableDesktopWidgets, false);
+    compare(target.ecoMode.disableDesktopWidgets, false);
     compare(target.colorSchemes.predefinedScheme, "Noctalia custom");
   }
 

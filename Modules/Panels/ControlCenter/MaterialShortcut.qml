@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import "../../../Helpers/ControlCenterLayout.js" as ControlCenterLayout
 import qs.Commons
 import qs.Services.Networking
+import qs.Services.Power
 import qs.Widgets
 
 MaterialTile {
@@ -43,6 +44,8 @@ MaterialTile {
       return I18n.tr("common.bluetooth");
     case "PowerProfile":
       return I18n.tr("battery.power-profile");
+    case "EcoMode":
+      return I18n.tr("common.eco-mode");
     case "KdeConnect":
       return KdeConnectService.activeDevice?.name || I18n.tr("kdeconnect.title");
     default:
@@ -56,6 +59,8 @@ MaterialTile {
       return BluetoothService.connectedDevices.length ? I18n.tr("common.connected") : I18n.tr("common.disconnected");
     if (widgetId === "KdeConnect")
       return action?.statusText || "";
+    if (widgetId === "EcoMode" && PowerProfileService.ecoModeForced)
+      return I18n.tr("control-center.eco-mode.forced");
     return I18n.tr(active ? "common.enabled" : "common.disabled");
   }
   onClicked: button => ControlCenterLayout.invoke(action, button)

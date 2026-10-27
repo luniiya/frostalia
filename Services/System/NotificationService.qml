@@ -24,7 +24,7 @@ Singleton {
 
   // State
   property real lastSeenTs: 0
-  // Volatile property that doesn't persist to settings (similar to frostaliaPerformanceMode)
+  // Volatile property that doesn't persist to settings (similar to ecoMode)
   property bool doNotDisturb: false
 
   // Models
@@ -150,7 +150,7 @@ Singleton {
 
     trySaveToHistory(data, notification);
 
-    if (root.doNotDisturb || PowerProfileService.frostaliaPerformanceMode)
+    if (root.doNotDisturb || PowerProfileService.ecoMode)
       return;
 
     // Check if this is a replacement notification
@@ -1150,7 +1150,7 @@ Singleton {
     if (!Settings.data.notifications.enableMediaToast || !mediaToastInitialized)
     return;
 
-    if (doNotDisturb || PowerProfileService.frostaliaPerformanceMode)
+    if (doNotDisturb || PowerProfileService.ecoMode)
     return;
 
     // Re-evaluate player identity here to handle race conditions where

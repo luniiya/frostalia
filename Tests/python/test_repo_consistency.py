@@ -282,20 +282,48 @@ class WallpaperTests(unittest.TestCase):
     def test_only_theming_reads_the_wallpaper(self):
         users = {str(p.relative_to(ROOT)) for p in qml_files()
                  if "WallpaperService." in p.read_text(encoding="utf-8")}
-        # The Edit Desktop card shows a copy of the wallpaper (the daemon draws the real one)
-        self.assertEqual(users, {"shell.qml", "Services/Theming/AppThemeService.qml", "Modules/EditDesktop/EditDesktopWindow.qml"})
+        # The Edit Desktop card shows a copy of the wallpaper (the daemon draws the real one);
+        # the wallpaper visualizer draws only a cut-out of its subject, and the shelf says
+        # whether the wallpaper has one
+        self.assertEqual(users, {"shell.qml", "Services/Theming/AppThemeService.qml", "Modules/EditDesktop/EditDesktopWindow.qml",
+                                 "Modules/WallpaperVisualizer/WallpaperVisualizer.qml", "Modules/EditDesktop/EditShelf.qml"})
 
 
-class PerformanceModeTests(unittest.TestCase):
-    """Performance mode follows the Performance power profile and has no toggle of its own."""
+class EcoModeTests(unittest.TestCase):
+    """Eco mode is the lite mode: power saver forces it on, other profiles (Performance included) leave it to the user's toggle."""
 
-    def test_no_performance_toggle_left(self):
-        pattern = re.compile(r"FrostaliaPerformance\b|toggleFrostaliaPerformance|setFrostaliaPerformance|frostaliaPerformanceMode\s*=")
+    def test_performance_profile_does_not_drive_the_shell(self):
+        pattern = re.compile(r"frostaliaPerformance|PowerProfile\.Performance\b.*(ecoMode|EcoMode)")
         for path in qml_files():
             if path.parent.name == "Migrations":
                 continue
             with self.subTest(path=str(path.relative_to(ROOT))):
                 self.assertIsNone(pattern.search(path.read_text(encoding="utf-8")))
+
+    def test_eco_mode_is_forced_by_power_saver_only(self):
+        service = (ROOT / "Services" / "Power" / "PowerProfileService.qml").read_text(encoding="utf-8")
+        self.assertIn("EcoMode.forced(available, profile, PowerProfile.PowerSaver)", service)
+        self.assertIn("Settings.data.ecoMode.enabled", service)
+
+    def test_toggle_is_reachable(self):
+        ipc = (ROOT / "Services" / "Control" / "IPCService.qml").read_text(encoding="utf-8")
+        self.assertIn('target: "ecoMode"', ipc)
+        registry = (ROOT / "Services" / "UI" / "ControlCenterWidgetRegistry.qml").read_text(encoding="utf-8")
+        self.assertIn('"EcoMode": ecoModeComponent', registry)
+        self.assertTrue((ROOT / "Modules" / "Panels" / "ControlCenter" / "Widgets" / "EcoMode.qml").exists())
+
+    def test_bar_widget_is_registered_with_a_keycap_face(self):
+        registry = (ROOT / "Services" / "UI" / "BarWidgetRegistry.qml").read_text(encoding="utf-8")
+        self.assertIn('"EcoMode": ecoModeComponent', registry)
+        self.assertTrue((ROOT / "Modules" / "Bar" / "Widgets" / "EcoMode.qml").exists())
+        keycap = (ROOT / "Styles" / "keycap" / "Definition.qml").read_text(encoding="utf-8")
+        self.assertIn('"EcoMode": "Styles/keycap/Bar/EcoModeFace.qml"', keycap)
+
+    def test_control_center_shows_the_toggle_by_default(self):
+        right = [entry["id"] for entry in settings_defaults.lookup("controlCenter.shortcuts.right")]
+        self.assertEqual(right[right.index("PowerProfile") + 1], "EcoMode")
+
+    def test_old_toggle_widget_is_not_registered(self):
         self.assertNotIn("FrostaliaPerformance", (ROOT / "Assets" / "settings-widgets-default.json").read_text(encoding="utf-8"))
 
 

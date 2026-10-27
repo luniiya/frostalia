@@ -41,6 +41,7 @@ QtObject {
                                      "Clock": "Styles/keycap/Bar/ClockFace.qml",
                                      "ControlCenter": "Styles/keycap/Bar/ControlCenterFace.qml",
                                      "DarkMode": "Styles/keycap/Bar/DarkModeFace.qml",
+                                     "EcoMode": "Styles/keycap/Bar/EcoModeFace.qml",
                                      "KdeConnect": "Styles/keycap/Bar/KdeConnectFace.qml",
                                      "KeepAwake": "Styles/keycap/Bar/KeepAwakeFace.qml",
                                      "KeyboardLayout": "Styles/keycap/Bar/KeyboardLayoutFace.qml",

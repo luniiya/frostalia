@@ -355,13 +355,13 @@ Singleton {
 
   // Adaptive opacity calculation: automatically makes light mode more transparent
   function adaptiveOpacity(baseOpacity) {
-    if (PowerProfileService.frostaliaPerformanceMode)
+    if (PowerProfileService.ecoMode)
       return 1.0;
     return Settings.data.colorSchemes.darkMode ? baseOpacity : Math.pow(baseOpacity, 1.5);
   }
 
   function smartAlpha(baseColor, minAlpha = 0.4) {
-    if (PowerProfileService.frostaliaPerformanceMode)
+    if (PowerProfileService.ecoMode)
       return baseColor;
 
     const glass = Style.glass;

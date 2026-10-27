@@ -32,7 +32,7 @@ Singleton {
   - Appearance: ~/.config/frostalia/settings/UI/<style>.toml
   */
   readonly property alias data: adapter  // Used to access via Settings.data.xxx.yyy
-  readonly property int settingsVersion: 75
+  readonly property int settingsVersion: 76
   property bool isDebug: Quickshell.env("FROSTALIA_DEBUG") === "1"
   readonly property string shellName: "frostalia"
   readonly property string configDir: ensureTrailingSlash(Quickshell.env("FROSTALIA_CONFIG_DIR") || (Quickshell.env("XDG_CONFIG_HOME") || Quickshell.env("HOME") + "/.config") + "/" + shellName + "/")
@@ -463,6 +463,9 @@ Singleton {
             "id": "PowerProfile"
           },
           {
+            "id": "EcoMode"
+          },
+          {
             "id": "KeepAwake"
           },
           {
@@ -549,8 +552,9 @@ Singleton {
       property list<string> providerOrder: ["claude", "codex", "copilot", "gemini", "openrouter", "zen"]
     }
 
-    // performance
-    property JsonObject frostaliaPerformance: JsonObject {
+    // eco (lite) mode: enabled is the user's own toggle, power saver forces the mode on
+    property JsonObject ecoMode: JsonObject {
+      property bool enabled: false
       property bool disableDesktopWidgets: true
     }
 
@@ -719,6 +723,16 @@ Singleton {
       property string volumeFeedbackSoundFile: ""
     }
 
+    // wallpaper visualizer: audio waves along the screen edges, behind the wallpaper's subject
+    property JsonObject wallpaperVisualizer: JsonObject {
+      property bool enabled: true
+      property string edges: "all"
+      property real height: 0.25
+      property real opacity: 0.7
+      property string color: "primary"
+      property bool depth: true
+    }
+
     // brightness
     property JsonObject brightness: JsonObject {
       property int brightnessStep: 5
@@ -762,8 +776,8 @@ Singleton {
     property JsonObject hooks: JsonObject {
       property bool enabled: false
       property string darkModeChange: ""
-      property string performanceModeEnabled: ""
-      property string performanceModeDisabled: ""
+      property string ecoModeEnabled: ""
+      property string ecoModeDisabled: ""
       property string startup: ""
       property string session: ""
       property string colorGeneration: ""

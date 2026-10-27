@@ -166,13 +166,13 @@ Singleton {
   readonly property real opacityFull: 1.0
 
   // Material frosted glass replaces the configured panel opacity with its own
-  readonly property var glass: UiStyles.glass(uiStyleTokens, Settings.data.ui.frostedGlass && !PowerProfileService.frostaliaPerformanceMode, {
+  readonly property var glass: UiStyles.glass(uiStyleTokens, Settings.data.ui.frostedGlass && !PowerProfileService.ecoMode, {
                                                 "panelOpacity": Settings.data.ui.glassPanelOpacity,
                                                 "surfaceOpacity": Settings.data.ui.glassSurfaceOpacity
                                               })
   readonly property real panelOpacity: UiStyles.panelOpacity(uiStyleTokens, Settings.data.ui.panelBackgroundOpacity, glass !== null, glass)
-  readonly property real effectivePanelOpacity: PowerProfileService.frostaliaPerformanceMode ? 1.0 : ShellColors.adaptiveOpacity(panelOpacity)
-  readonly property real effectiveBarOpacity: PowerProfileService.frostaliaPerformanceMode ? 1.0 : Settings.data.bar.backgroundOpacity
+  readonly property real effectivePanelOpacity: PowerProfileService.ecoMode ? 1.0 : ShellColors.adaptiveOpacity(panelOpacity)
+  readonly property real effectiveBarOpacity: PowerProfileService.ecoMode ? 1.0 : Settings.data.bar.backgroundOpacity
 
   // Shadows
   readonly property real shadowOpacity: 0.85
@@ -182,11 +182,11 @@ Singleton {
   readonly property real shadowVerticalOffset: Settings.data.general.shadowOffsetY
 
   // Animation duration (ms)
-  readonly property int animationFaster: (Settings.data.general.animationDisabled || PowerProfileService.frostaliaPerformanceMode) ? 0 : Math.round(uiStyleTokens.animations.Faster / Settings.data.general.animationSpeed)
-  readonly property int animationFast: (Settings.data.general.animationDisabled || PowerProfileService.frostaliaPerformanceMode) ? 0 : Math.round(uiStyleTokens.animations.Fast / Settings.data.general.animationSpeed)
-  readonly property int animationNormal: (Settings.data.general.animationDisabled || PowerProfileService.frostaliaPerformanceMode) ? 0 : Math.round(uiStyleTokens.animations.Normal / Settings.data.general.animationSpeed)
-  readonly property int animationSlow: (Settings.data.general.animationDisabled || PowerProfileService.frostaliaPerformanceMode) ? 0 : Math.round(uiStyleTokens.animations.Slow / Settings.data.general.animationSpeed)
-  readonly property int animationSlowest: (Settings.data.general.animationDisabled || PowerProfileService.frostaliaPerformanceMode) ? 0 : Math.round(uiStyleTokens.animations.Slowest / Settings.data.general.animationSpeed)
+  readonly property int animationFaster: (Settings.data.general.animationDisabled || PowerProfileService.ecoMode) ? 0 : Math.round(uiStyleTokens.animations.Faster / Settings.data.general.animationSpeed)
+  readonly property int animationFast: (Settings.data.general.animationDisabled || PowerProfileService.ecoMode) ? 0 : Math.round(uiStyleTokens.animations.Fast / Settings.data.general.animationSpeed)
+  readonly property int animationNormal: (Settings.data.general.animationDisabled || PowerProfileService.ecoMode) ? 0 : Math.round(uiStyleTokens.animations.Normal / Settings.data.general.animationSpeed)
+  readonly property int animationSlow: (Settings.data.general.animationDisabled || PowerProfileService.ecoMode) ? 0 : Math.round(uiStyleTokens.animations.Slow / Settings.data.general.animationSpeed)
+  readonly property int animationSlowest: (Settings.data.general.animationDisabled || PowerProfileService.ecoMode) ? 0 : Math.round(uiStyleTokens.animations.Slowest / Settings.data.general.animationSpeed)
 
   // Delays
   readonly property int tooltipDelay: 300

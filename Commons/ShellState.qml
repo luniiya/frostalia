@@ -219,7 +219,7 @@ Singleton {
         settings: settingsData,
         state: {
           doNotDisturb: NotificationService.doNotDisturb,
-          frostaliaPerformanceMode: PowerProfileService.frostaliaPerformanceMode,
+          ecoMode: PowerProfileService.ecoMode,
           barVisible: BarService.isVisible,
           openedPanel: PanelService.openedPanel?.objectName || "",
           desktopWidgetsEditMode: DesktopWidgetRegistry.editMode || false,

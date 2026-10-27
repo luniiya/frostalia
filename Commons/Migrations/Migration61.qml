@@ -34,7 +34,7 @@ QtObject {
     if (perf) {
       for (const key of ["disableDesktopWidgets"]) {
         if (typeof perf[key] === "boolean")
-          adapter.frostaliaPerformance[key] = perf[key];
+          adapter.ecoMode[key] = perf[key];
       }
     }
 

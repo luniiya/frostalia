@@ -15,6 +15,7 @@ Singleton {
                            "CustomButton": customButtonComponent,
                            "DarkMode": darkModeComponent,
                            "KdeConnect": kdeConnectComponent,
+                           "EcoMode": ecoModeComponent,
                            "KeepAwake": keepAwakeComponent,
                            "NightLight": nightLightComponent,
                            "Notifications": notificationsComponent,
@@ -62,6 +63,9 @@ Singleton {
   }
   property Component notificationsComponent: Component {
     Notifications {}
+  }
+  property Component ecoModeComponent: Component {
+    EcoMode {}
   }
   property Component powerProfileComponent: Component {
     PowerProfile {}

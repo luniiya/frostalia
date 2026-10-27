@@ -21,6 +21,7 @@ Singleton {
                            "ControlCenter": controlCenterComponent,
                            "CustomButton": customButtonComponent,
                            "DarkMode": darkModeComponent,
+                           "EcoMode": ecoModeComponent,
                            "KdeConnect": kdeConnectComponent,
                            "KeepAwake": keepAwakeComponent,
                            "KeyboardLayout": keyboardLayoutComponent,
@@ -56,6 +57,7 @@ Singleton {
                                      "CustomButton": "WidgetSettings/CustomButtonSettings.qml",
                                      "DarkMode": "WidgetSettings/DarkModeSettings.qml",
                                      "KdeConnect": "WidgetSettings/KdeConnectSettings.qml",
+                                     "EcoMode": "WidgetSettings/PowerProfileSettings.qml",
                                      "KeepAwake": "WidgetSettings/KeepAwakeSettings.qml",
                                      "KeyboardLayout": "WidgetSettings/KeyboardLayoutSettings.qml",
                                      "Launcher": "WidgetSettings/LauncherSettings.qml",
@@ -303,6 +305,9 @@ Singleton {
                                   "PowerProfile": {
                                     "iconColor": "none"
                                   },
+                                  "EcoMode": {
+                                    "iconColor": "none"
+                                  },
                                   "Workspace": {
                                     "labelMode": "index",
                                     "followFocusedScreen": false,
@@ -360,6 +365,9 @@ Singleton {
   }
   property Component darkModeComponent: Component {
     DarkMode {}
+  }
+  property Component ecoModeComponent: Component {
+    EcoMode {}
   }
   property Component kdeConnectComponent: Component {
     KdeConnect {}

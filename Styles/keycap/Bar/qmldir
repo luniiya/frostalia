@@ -6,6 +6,7 @@ BrightnessFace 1.0 BrightnessFace.qml
 ClockFace 1.0 ClockFace.qml
 ControlCenterFace 1.0 ControlCenterFace.qml
 DarkModeFace 1.0 DarkModeFace.qml
+EcoModeFace 1.0 EcoModeFace.qml
 FaceGlyph 1.0 FaceGlyph.qml
 FaceKey 1.0 FaceKey.qml
 FaceShape 1.0 FaceShape.qml

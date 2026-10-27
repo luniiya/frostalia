@@ -63,6 +63,60 @@
     "subTabLabel": "common.visualizer"
   },
   {
+    "labelKey": "panels.audio.wallpaper-visualizer-enabled-label",
+    "descriptionKey": "panels.audio.wallpaper-visualizer-enabled-description",
+    "widget": "NToggle",
+    "tab": 14,
+    "tabLabel": "panels.audio.title",
+    "subTab": 3,
+    "subTabLabel": "common.visualizer"
+  },
+  {
+    "labelKey": "panels.audio.wallpaper-visualizer-edges-label",
+    "descriptionKey": "panels.audio.wallpaper-visualizer-edges-description",
+    "widget": "NComboBox",
+    "tab": 14,
+    "tabLabel": "panels.audio.title",
+    "subTab": 3,
+    "subTabLabel": "common.visualizer"
+  },
+  {
+    "labelKey": "panels.audio.wallpaper-visualizer-height-label",
+    "descriptionKey": "panels.audio.wallpaper-visualizer-height-description",
+    "widget": "NValueSlider",
+    "tab": 14,
+    "tabLabel": "panels.audio.title",
+    "subTab": 3,
+    "subTabLabel": "common.visualizer"
+  },
+  {
+    "labelKey": "panels.audio.wallpaper-visualizer-opacity-label",
+    "descriptionKey": "panels.audio.wallpaper-visualizer-opacity-description",
+    "widget": "NValueSlider",
+    "tab": 14,
+    "tabLabel": "panels.audio.title",
+    "subTab": 3,
+    "subTabLabel": "common.visualizer"
+  },
+  {
+    "labelKey": "panels.audio.wallpaper-visualizer-color-label",
+    "descriptionKey": "panels.audio.wallpaper-visualizer-color-description",
+    "widget": "NColorChoice",
+    "tab": 14,
+    "tabLabel": "panels.audio.title",
+    "subTab": 3,
+    "subTabLabel": "common.visualizer"
+  },
+  {
+    "labelKey": "panels.audio.wallpaper-visualizer-depth-label",
+    "descriptionKey": "panels.audio.wallpaper-visualizer-depth-description",
+    "widget": "NToggle",
+    "tab": 14,
+    "tabLabel": "panels.audio.title",
+    "subTab": 3,
+    "subTabLabel": "common.visualizer"
+  },
+  {
     "labelKey": "panels.osd.types-volume-label",
     "descriptionKey": "panels.audio.volumes-output-volume-description",
     "widget": "NValueSlider",
@@ -1544,8 +1598,8 @@
     "subTabLabel": "panels.hooks.title"
   },
   {
-    "labelKey": "panels.hooks.performance-mode-enabled-label",
-    "descriptionKey": "panels.hooks.performance-mode-enabled-description",
+    "labelKey": "panels.hooks.eco-mode-enabled-label",
+    "descriptionKey": "panels.hooks.eco-mode-enabled-description",
     "widget": "HookRow",
     "tab": 0,
     "tabLabel": "common.general",
@@ -1553,8 +1607,8 @@
     "subTabLabel": "panels.hooks.title"
   },
   {
-    "labelKey": "panels.hooks.performance-mode-disabled-label",
-    "descriptionKey": "panels.hooks.performance-mode-disabled-description",
+    "labelKey": "panels.hooks.eco-mode-disabled-label",
+    "descriptionKey": "panels.hooks.eco-mode-disabled-description",
     "widget": "HookRow",
     "tab": 0,
     "tabLabel": "common.general",
@@ -2561,8 +2615,8 @@
     "subTabLabel": "system-monitor.title"
   },
   {
-    "labelKey": "panels.system.frostalia-performance-disable-desktop-widgets-label",
-    "descriptionKey": "panels.system.frostalia-performance-disable-desktop-widgets-description",
+    "labelKey": "panels.system.eco-mode-disable-desktop-widgets-label",
+    "descriptionKey": "panels.system.eco-mode-disable-desktop-widgets-description",
     "widget": "NToggle",
     "tab": 18,
     "tabLabel": "panels.system.title",

@@ -11,10 +11,10 @@ ColumnLayout {
 
   NToggle {
     Layout.fillWidth: true
-    label: I18n.tr("panels.system.frostalia-performance-disable-desktop-widgets-label")
-    description: I18n.tr("panels.system.frostalia-performance-disable-desktop-widgets-description")
-    checked: !Settings.data.frostaliaPerformance.disableDesktopWidgets
-    defaultValue: !Settings.getDefaultValue("frostaliaPerformance.disableDesktopWidgets")
-    onToggled: checked => Settings.data.frostaliaPerformance.disableDesktopWidgets = !checked
+    label: I18n.tr("panels.system.eco-mode-disable-desktop-widgets-label")
+    description: I18n.tr("panels.system.eco-mode-disable-desktop-widgets-description")
+    checked: !Settings.data.ecoMode.disableDesktopWidgets
+    defaultValue: !Settings.getDefaultValue("ecoMode.disableDesktopWidgets")
+    onToggled: checked => Settings.data.ecoMode.disableDesktopWidgets = !checked
   }
 }

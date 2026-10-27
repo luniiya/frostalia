@@ -739,6 +739,19 @@ Singleton {
   }
 
   IpcHandler {
+    target: "ecoMode"
+    function toggle() {
+      PowerProfileService.toggleEcoMode();
+    }
+    function enable() {
+      PowerProfileService.setEcoMode(true);
+    }
+    function disable() {
+      PowerProfileService.setEcoMode(false);
+    }
+  }
+
+  IpcHandler {
     target: "media"
 
     function toggle() {

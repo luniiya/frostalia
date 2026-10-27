@@ -53,7 +53,7 @@ Item {
       night: root.ready && !root.now.isDay
       windSpeedMs: root.ready && root.now.windSpeed !== null ? root.now.windSpeed / 3.6 : 0
       windGustsMs: root.ready && root.now.windGusts !== null ? root.now.windGusts / 3.6 : 0
-      animate: root.skyVisible && root.visible && !PowerProfileService.frostaliaPerformanceMode
+      animate: root.skyVisible && root.visible && !PowerProfileService.ecoMode
     }
   }
 
