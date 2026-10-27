@@ -1,7 +1,7 @@
 import QtQuick
 
 // Base of every Keycap bar face. Faces only draw; the widget keeps its mouse
-// areas, tooltips and menus. NStyleFace sets `kit` (Commons/KeycapKit.qml) and
+// areas, tooltips and menus. NStyleFace sets `kit` (Styles/keycap/Kit.qml) and
 // `host` (the widget or pill) at creation and keeps the state properties bound.
 // No shell singletons here, so tests can load faces with a stand-in kit.
 Item {

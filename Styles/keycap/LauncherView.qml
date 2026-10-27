@@ -2,9 +2,11 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import "../../Helpers/LauncherView.js" as LauncherView
+import "." as Keycap
 
 import qs.Commons
 import qs.Services.UI
+import qs.Modules.Panels.Launcher
 import qs.Widgets
 
 // Keycap app menu, laid out like a keyboard: a long search key on top, the
@@ -20,7 +22,7 @@ Item {
 
   readonly property real s: Style.uiScaleRatio
   readonly property var resultsView: swap.item
-  readonly property var kit: KeycapKit
+  readonly property var kit: Style.kitFor("Styles/keycap/Kit.qml")
 
   readonly property real depth: kit.depth
   readonly property real gap: Style.marginS
@@ -93,7 +95,7 @@ Item {
   // Building blocks --------------------------------------------------------
 
   // A clickable keycap. Children sit on the face and sink with it.
-  component Key: NKeycap {
+  component Key: Keycap.Key {
     id: key
     property bool interactive: true
     property string tooltip
@@ -184,7 +186,7 @@ Item {
     property string keyLabel
     property string hint
     spacing: Style.marginXS
-    NKeycap {
+    Keycap.Key {
       anchors.verticalCenter: parent.verticalCenter
       width: Math.max(height, hintKeyLabel.implicitWidth + Style.marginS * 2)
       height: Math.round(22 * root.s)
@@ -683,7 +685,7 @@ Item {
       }
 
       // Section letter as a little cream key
-      NKeycap {
+      Keycap.Key {
         visible: row.letter !== ""
         width: Math.round(26 * root.s)
         height: width
@@ -812,7 +814,7 @@ Item {
           }
 
           // Enter key on the selected row
-          NKeycap {
+          Keycap.Key {
             visible: row.selected
             Layout.preferredWidth: Math.round((row.hero ? 64 : 34) * root.s)
             Layout.preferredHeight: Math.round(30 * root.s)

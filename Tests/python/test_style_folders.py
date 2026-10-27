@@ -118,6 +118,35 @@ class StyleFolderTests(unittest.TestCase):
                 if not line.lstrip().startswith("//")]
         self.assertNotIn("Component.", "\n".join(code))
 
+    def test_style_files_only_use_types_that_exist(self):
+        # Style files are loaded by URL at runtime, so a stale type name only shows
+        # up as a blank surface and a log warning (e.g. NKeycap after it became Key)
+        widgets = {path.stem for path in (ROOT / "Widgets").glob("N*.qml")}
+        singletons = {path.stem for path in (ROOT / "Commons").glob("*.qml")}
+        for path in sorted(STYLES.rglob("*.qml")):
+            source = re.sub(r"//.*", "", path.read_text())
+            aliases = dict((alias, dir_) for dir_, alias in re.findall(r'^import "([^"]+)" as (\w+)$', source, re.M))
+            for name in sorted(set(re.findall(r"\b(N[A-Z]\w+) \{", source))):
+                with self.subTest(file=str(path.relative_to(ROOT)), type=name):
+                    self.assertIn(name, widgets)
+            for alias, name in sorted(set(re.findall(r"\b(\w+)\.([A-Z]\w+) \{", source))):
+                if alias not in aliases or aliases[alias].endswith(".js"):
+                    continue
+                qmldir = (path.parent / aliases[alias] / "qmldir").read_text()
+                with self.subTest(file=str(path.relative_to(ROOT)), type=alias + "." + name):
+                    self.assertRegex(qmldir, r"(?m)^" + name + r" ")
+            # Shared pieces from Modules/ need their qs.Modules.* import (LauncherEntryIcon)
+            imported = {path.stem for module in re.findall(r"^import qs\.(Modules[\w.]*)$", source, re.M)
+                        for path in (ROOT / module.replace(".", "/")).glob("*.qml")}
+            for name in sorted(set(re.findall(r"^\s*([A-Z]\w+) \{", source, re.M))):
+                if not (path.parent / (name + ".qml")).exists() and any((ROOT / "Modules").rglob(name + ".qml")):
+                    with self.subTest(file=str(path.relative_to(ROOT)), module_type=name):
+                        self.assertIn(name, imported)
+            # Singletons that moved into style folders (e.g. KeycapKit -> Kit)
+            for name in sorted(set(re.findall(r"\b(\w+Kit)\b", source))):
+                with self.subTest(file=str(path.relative_to(ROOT)), singleton=name):
+                    self.assertIn(name, singletons)
+
 
 if __name__ == "__main__":
     unittest.main()
