@@ -1,9 +1,10 @@
 import QtQuick
 
 // One word of a lyric, drawn as a sticker straight on the wallpaper: an ink outline
-// all round (the word drawn eight times on a small circle), a hard shadow down-right
-// (four copies), the fill on top and, while it is sung, the lit colour sweeping in
-// from the left. After SekaiPop's LyricsWord (github.com/Blapples/SekaiPop, GPL-3.0).
+// all round (the word drawn sixteen times on a small circle, few enough samples and the
+// curves go lumpy), a hard shadow down-right (one shifted picture of that outline, so
+// its edge is as clean as the outline's), the fill on top and, while it is sung, the
+// lit colour sweeping in from the left. After SekaiPop's LyricsWord (github.com/Blapples/SekaiPop, GPL-3.0).
 //
 // The item's size is the word plus its outline and shadow, so words lay out in a Row.
 Item {
@@ -42,25 +43,32 @@ Item {
     width: ink.implicitWidth
     height: ink.implicitHeight
 
-    // The hard shadow
-    Repeater {
-      model: 4
-      Glyphs {
-        required property int index
-        x: root.shadowDx + (index % 2 === 0 ? -1 : 1) * root.outline * 0.7
-        y: root.shadowDy + (index < 2 ? -1 : 1) * root.outline * 0.7
-        color: root.inkColor
-      }
+    // The hard shadow: the outline's silhouette, shifted
+    ShaderEffectSource {
+      x: silhouette.x + root.shadowDx
+      y: silhouette.y + root.shadowDy
+      width: silhouette.width
+      height: silhouette.height
+      sourceItem: silhouette
+      smooth: true
     }
 
-    // The outline
-    Repeater {
-      model: 8
-      Glyphs {
-        required property int index
-        x: Math.cos(index * Math.PI / 4) * root.outline
-        y: Math.sin(index * Math.PI / 4) * root.outline
-        color: root.inkColor
+    // The outline, with room for it around the word
+    Item {
+      id: silhouette
+      x: -root.edge
+      y: -root.edge
+      width: box.width + 2 * root.edge
+      height: box.height + 2 * root.edge
+
+      Repeater {
+        model: 16
+        Glyphs {
+          required property int index
+          x: root.edge + Math.cos(index * Math.PI / 8) * root.outline
+          y: root.edge + Math.sin(index * Math.PI / 8) * root.outline
+          color: root.inkColor
+        }
       }
     }
 

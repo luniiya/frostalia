@@ -39,3 +39,26 @@ class LookTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class WaveSettingsTests(unittest.TestCase):
+    def test_wave_settings_are_not_drawn_inside_the_shelf(self):
+        # The popover sits above the shelf; keycap renders the shelf into a layer for its
+        # shadow, which clipped the popover down to a strip under the card
+        shelf = (ROOT / "Modules/EditDesktop/EditShelf.qml").read_text()
+        popover = shelf[shelf.index("id: waveSettings"):]
+        popover = popover[:popover.index("NStyleCard")]
+        self.assertIn("parent: root.parent", popover)
+        self.assertIn("root.y - height", popover)
+
+    def test_effect_tiles_are_opaque(self):
+        # A translucent fill let keycap's shifted shadow copy show through: doubled icon and label
+        shelf = (ROOT / "Modules/EditDesktop/EditShelf.qml").read_text()
+        tile = shelf[shelf.index("component EffectTile"):]
+        fill = next(line for line in tile.splitlines() if line.strip().startswith("color: effect.lit"))
+        self.assertNotRegex(fill, r"[?:]\s*Qt\.alpha\(")
+
+    def test_corner_fillet_is_capped(self):
+        # A fillet as wide as the crest filled in blobs ("cheese") far from the edges
+        shader = (ROOT / "Shaders/frag/edge_wave.frag").read_text()
+        self.assertRegex(shader, r"float fillet\(.*\)\s*\{\s*return min\(.*,\s*0\.15 \* waveHeight\);")

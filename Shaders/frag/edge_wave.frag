@@ -64,6 +64,12 @@ float smoothUnion(float a, float b, float k) {
   return mix(b, a, h) - k * h * (1.0 - h);
 }
 
+// Width of the rounded join between two edges' waves: a share of the lower crest, and
+// capped. Wide joins filled in blobs wherever both waves came close, far from the edge
+float fillet(float crestA, float crestB) {
+  return min(0.35 * min(crestA > 0.0 ? crestA : crestB, crestB), 0.15 * waveHeight);
+}
+
 // Distance from the front wave's crest at `depth` pixels from its edge, `length`
 // pixels long (negative inside the wave), measured across the slope so the rim keeps
 // its width on steep peaks
@@ -98,8 +104,8 @@ void main() {
       continue;
     float h = crest(lanes[i].x, 1.0);
     float backH = crest(fract(lanes[i].x + 0.13), 0.75);
-    front = smoothUnion(front, frontDistance(lanes[i].x, lanes[i].y, lanes[i].z), 0.8 * min(crestHere > 0.0 ? crestHere : h, h));
-    back = smoothUnion(back, backDistance(lanes[i].x, lanes[i].y), 0.8 * min(backCrestHere > 0.0 ? backCrestHere : backH, backH));
+    front = smoothUnion(front, frontDistance(lanes[i].x, lanes[i].y, lanes[i].z), fillet(crestHere, h));
+    back = smoothUnion(back, backDistance(lanes[i].x, lanes[i].y), fillet(backCrestHere, backH));
     crestHere = max(crestHere, h);
     backCrestHere = max(backCrestHere, backH);
     depth = min(depth, lanes[i].y);

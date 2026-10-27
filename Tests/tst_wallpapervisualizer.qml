@@ -232,7 +232,29 @@ TestCase {
       peaks = r.peaks;
     }
     fuzzyCompare(r.values[0], 1, 1e-9);
-    fuzzyCompare(r.values[1], 1, 1e-9);
+    // Lifted well past its share of the loudest band (0.2 / 0.9), but not to the top
+    verify(r.values[1] > 0.45 && r.values[1] < 1, r.values[1]);
+  }
+
+  // Regression: each band was boosted to full height on its own, so neighbours jumped
+  // between nothing and the top and the edge became a comb of spikes
+  function test_equalize_keeps_quiet_bands_under_the_loud_ones() {
+    let peaks = [];
+    let r = null;
+    for (let i = 0; i < 20; i++) {
+      r = WallpaperVisualizer.equalize([0.9, 0.05, 0.05, 0.05], peaks, 1 / 60, 2, 0.02, 0.4);
+      peaks = r.peaks;
+    }
+    for (let j = 1; j < 4; j++)
+      verify(r.values[j] <= 0.05 / (0.9 * 0.4) + 1e-9, r.values[j]);
+  }
+
+  function test_equalize_evens_the_gain_out_across_neighbours() {
+    // Same level everywhere, but one band's peak is far higher: its neighbours share it
+    const r = WallpaperVisualizer.equalize([0.3, 0.3, 0.3, 0.3, 0.3], [0.3, 0.3, 1, 0.3, 0.3], 0, 2, 0.08, 0.01);
+    verify(r.values[1] < r.values[0], "neighbour of the loud band is lower");
+    verify(r.values[2] < r.values[1], "the loud band itself is lowest");
+    fuzzyCompare(r.values[0], r.values[4], 1e-9);
   }
 
   function test_equalize_peaks_decay_by_half_life() {

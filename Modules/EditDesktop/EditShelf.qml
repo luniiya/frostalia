@@ -440,14 +440,18 @@ Rectangle {
   // Wave settings, above the shelf over the waves tile; every change shows on the card right away
   Rectangle {
     id: waveSettings
-    visible: root.settingsOpen
+    // Drawn by the shelf's parent: styles like keycap render the shelf into a layer for its
+    // shadow, and a layer clips whatever sticks out of the shelf
+    parent: root.parent
+    z: 30
+    visible: root.visible && root.settingsOpen
     // Mapped again on each open, once the tiles are laid out
     readonly property real anchorX: root.settingsOpen ? wavesTile.mapToItem(root, 0, 0).x : 0
 
     width: Math.round(640 * Style.uiScaleRatio)
     height: settingsColumn.implicitHeight + Style.marginL * 2
-    x: Math.max(0, Math.min(anchorX, root.width - width))
-    y: -height - Style.marginM
+    x: root.x + Math.max(0, Math.min(anchorX, root.width - width))
+    y: root.y - height - Style.marginM
     radius: Style.radiusL
     // Opaque like the shelf: the sliders sit over the card, whose wallpaper would show through
     color: ShellColors.mSurface
@@ -605,7 +609,8 @@ Rectangle {
       anchors.margins: 6
       anchors.bottomMargin: Style.marginXL
       radius: Style.radiusL
-      color: effect.lit ? ShellColors.mHover : effect.active && effect.badge && !effect.cycles ? Qt.alpha(ShellColors.mPrimary, 0.16) : ShellColors.mSurfaceVariant
+      // Opaque: keycap's shadow is a shifted copy of the tile, and it would show through the icon and label
+      color: effect.lit ? Qt.tint(ShellColors.mSurfaceVariant, ShellColors.mHover) : effect.active && effect.badge && !effect.cycles ? Qt.tint(ShellColors.mSurfaceVariant, Qt.alpha(ShellColors.mPrimary, 0.16)) : ShellColors.mSurfaceVariant
       border.width: effect.lit ? 2 : 0
       border.color: ShellColors.mPrimary
 

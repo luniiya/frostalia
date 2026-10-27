@@ -165,21 +165,34 @@ function hintKey(effect) {
 
 // Per-band auto-gain, so every part of an edge moves: highs carry far less energy than
 // lows and would barely stir next to them. Each band is divided by its own recent peak,
-// which decays by half every `halfLife` seconds; `floor` keeps silence and noise from
-// being blown up, so no sound still means no waves. `peaks` is the previous call's
-// result (or []); `dt` the seconds since it. Returns { values, peaks }.
-function equalize(values, peaks, dt, halfLife, floor) {
+// which decays by half every `halfLife` seconds, evened out with its neighbours' so the
+// gain doesn't jump from band to band (that turned the edge into a comb of spikes). A
+// band is never boosted past the loudest one by more than 1 / `spread`, and `floor`
+// keeps silence and noise from being blown up, so no sound still means no waves.
+// `peaks` is the previous call's result (or []); `dt` the seconds since it.
+// Returns { values, peaks }.
+function equalize(values, peaks, dt, halfLife, floor, spread) {
   var decay = Math.pow(0.5, Math.max(0, dt) / Math.max(halfLife || 2, 0.001));
   var minPeak = floor === undefined ? 0.08 : floor;
-  var out = [];
+  var share = spread === undefined ? 0.4 : Math.max(0.01, Math.min(1, spread));
+  var levels = [];
   var next = [];
+  var loudest = 0;
   for (var i = 0; i < values.length; i++) {
     var v = Number(values[i]);
     v = isFinite(v) ? Math.max(0, Math.min(1, v)) : 0;
     var previous = peaks && isFinite(peaks[i]) ? peaks[i] : 0;
     var peak = Math.max(v, previous * decay, minPeak);
+    levels.push(v);
     next.push(peak);
-    out.push(Math.min(1, v / peak));
+    loudest = Math.max(loudest, peak);
+  }
+  var out = [];
+  for (var j = 0; j < levels.length; j++) {
+    var left = next[Math.max(0, j - 1)];
+    var right = next[Math.min(next.length - 1, j + 1)];
+    var ref = Math.max((left + 2 * next[j] + right) / 4, loudest * share);
+    out.push(Math.min(1, levels[j] / ref));
   }
   return {
     "values": out,

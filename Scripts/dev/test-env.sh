@@ -66,7 +66,8 @@ copy_home() {
 
 start_shell() {
   local cmd
-  cmd="env FROSTALIA_CONFIG_DIR=$DIR/config/ FROSTALIA_CACHE_DIR=$DIR/cache/ dbus-run-session -- qs -p $ROOT --no-duplicate"
+  # No --no-duplicate: the real shell runs this same checkout, and it would count as one
+  cmd="env FROSTALIA_CONFIG_DIR=$DIR/config/ FROSTALIA_CACHE_DIR=$DIR/cache/ dbus-run-session -- qs -p $ROOT"
   nested hyprctl dispatch "hl.dsp.exec_cmd(\"$cmd >$DIR/shell.out 2>&1\")" >/dev/null
   for _ in $(seq 100); do
     if nested qs -p "$ROOT" ipc call state panels >/dev/null 2>&1; then
