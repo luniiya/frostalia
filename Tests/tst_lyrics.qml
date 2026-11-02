@@ -615,4 +615,32 @@ TestCase {
     compare(Lyrics.trackTag("Something Ain't Right (Official MV)", "XG"), "SOMETHING AIN'T RIGHT - XG");
     compare(Lyrics.trackTag("Solo", ""), "SOLO");
   }
+
+  function test_introFade() {
+    const lines = [
+            {
+              "start": 10,
+              "end": 12,
+              "text": "a",
+              "words": []
+            },
+            {
+              "start": 12,
+              "end": 14,
+              "text": "b",
+              "words": []
+            }
+          ];
+    // Paused at the start: the first line is hidden, the dots show alone
+    compare(Lyrics.introFade(lines, 0, 0, 0.45), 0);
+    compare(Lyrics.introFade(lines, 0, 9.5, 0.45), 0);
+    // It fades in while the stack glides it into place
+    verify(Lyrics.introFade(lines, 0, 9.8, 0.45) > 0);
+    verify(Lyrics.introFade(lines, 0, 9.8, 0.45) < 1);
+    compare(Lyrics.introFade(lines, 0, 10, 0.45), 1);
+    // Only the first line, and only before it starts
+    compare(Lyrics.introFade(lines, 1, 0, 0.45), 1);
+    compare(Lyrics.introFade(lines, 0, 13, 0.45), 1);
+    compare(Lyrics.introFade([], 0, 0, 0.45), 1);
+  }
 }

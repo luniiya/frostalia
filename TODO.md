@@ -24,5 +24,8 @@
 ## Notch panel snap
 - Control-center top gap fix (`snapToBarEnds` now also snaps from the screen edge up to inset + radius) was only unit tested. Open the control center and check the top.
 
+## Wallpaper transition vs. lyrics layering
+- The wallpaper transition draws above the desktop widgets, as intended, but the lyrics widget (`DesktopLyrics`) doesn't follow: it stays above or behaves differently. Find out why (layer / `z` order, or lyrics on its own surface) and make it match the other widgets.
+
 ## Housekeeping
 - Nothing from this session is committed. No Co-Authored-By lines on commits.

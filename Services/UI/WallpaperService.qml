@@ -241,7 +241,7 @@ Singleton {
       return;
     }
     const remembered = ShellState.getWallpaperRendererState()[m];
-    showPicture(WallpaperRenderer.startingPicture(list, remembered), m, list);
+    showPicture(WallpaperRenderer.startingPicture(list, remembered, undefined, rendererPath), m, list);
   }
 
   function startRenderer() {

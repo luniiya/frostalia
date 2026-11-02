@@ -691,6 +691,16 @@ function hit(word, t) {
   return Math.max(0, 1 - (t - word.start) / 0.22);
 }
 
+// How much of a line shows besides its pose: before the first line starts, the first
+// line stays hidden under the intro's dots (paused at the start, nothing is sung yet)
+// and fades in as the stack glides it into place, over the last `glide` seconds
+function introFade(lines, index, t, glide) {
+  if (index !== 0 || lines.length === 0 || t >= lines[0].start)
+    return 1;
+  const g = Math.max(0.01, glide);
+  return smooth((t - (lines[0].start - g)) / g);
+}
+
 // Before the first line or in a long break: how far the dots have counted, 0..1, and
 // whether to show them. A break is a gap of at least `minGap` seconds.
 function waiting(lines, t, minGap) {

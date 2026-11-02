@@ -11,6 +11,17 @@ import qs.Commons
 // Controller is on, they stream from Rufin (/api/lyrics/events: the lyrics Rufin shows,
 // timed word by word when it has the timing). For other players, or when the controller
 // is off, they come from LRCLIB (timed by line). Works only while a widget uses it.
+//
+// Rufin only shares its lyrics through its Web Controller (Rufin > Settings > Web
+// Controller, or `web_controller.enabled` in Rufin's settings.json). With it off, Rufin
+// still shows lyrics in its own window, but this service can't reach them and searches
+// LRCLIB (lrclib.net, a public database of timed lyrics) by title and artist instead,
+// which often finds nothing for video-style titles like "Song (Official Music Video) -
+// Artist". So "lyrics broken while Rufin has them" almost always means the controller is off.
+// The controller's access token is created by Rufin the first time the controller starts
+// (secrets.json, "web-controller:token"); enabling it in settings is all that's needed.
+// A Rufin run with its own profile (a dev build with XDG_CONFIG_HOME pointed elsewhere)
+// reads neither of the configs below, so this service can't find its controller.
 Singleton {
   id: root
 
@@ -83,7 +94,8 @@ Singleton {
   QtObject {
     id: rufin
     readonly property string home: Quickshell.env("HOME")
-    // The Flatpak's config first, then a native install's
+    // The Flatpak's config first, then a native install's. The port is the one in
+    // settings: Rufin moves to the next port when it's taken, and is then not found here.
     readonly property var endpoint: {
       const flatpak = Lyrics.rufinEndpoint(flatpakSettings.text());
       return flatpak.enabled ? flatpak : Lyrics.rufinEndpoint(nativeSettings.text());

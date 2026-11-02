@@ -27,8 +27,9 @@ Item {
       required property int index
       readonly property real d: index - root.lyrics.cursor
       readonly property var pose: Lyrics.pose(d)
+      readonly property real shown: pose.opacity * Lyrics.introFade(root.lyrics.lines, index, root.lyrics.t, root.lyrics.glide)
       // Only the few lines near the cursor exist
-      active: Math.abs(d) < 2.2 && pose.opacity > 0.01
+      active: Math.abs(d) < 2.2 && shown > 0.01
 
       x: root.width / 2
       y: root.lyrics.stageY + pose.y * root.lyrics.pixelSize
@@ -39,7 +40,7 @@ Item {
         line: slot.modelData
         t: root.lyrics.t
         d: slot.d
-        fade: slot.pose.opacity
+        fade: slot.shown
         playing: root.lyrics.playing
         current: slot.index === root.lyrics.curIndex
         past: slot.index < root.lyrics.curIndex
@@ -54,12 +55,13 @@ Item {
     }
   }
 
-  // An intro or a long break: three keys light up one by one until the singing is back
+  // An intro or a long break: three keys light up one by one until the singing is back.
+  // Hidden while paused: nothing is counting down then
   Row {
     anchors.horizontalCenter: parent.horizontalCenter
     y: root.lyrics.stageY - height / 2
     spacing: Math.round(root.lyrics.pixelSize * 0.42)
-    visible: root.lyrics.waiting.show
+    visible: root.lyrics.waiting.show && root.lyrics.playing
 
     Repeater {
       model: 3

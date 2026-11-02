@@ -1,4 +1,5 @@
 .pragma library
+.import "StillFrame.js" as StillFrame
 
 // The shell's own wallpaper renderer (Settings > Wallpaper, off by default): which folder
 // and picture to show, which transition plays and how it is timed. The window is
@@ -224,8 +225,11 @@ function step(list, current, delta) {
 
 // The picture a mode starts on: the one it showed last if it is still in the folder,
 // else a random one
-function startingPicture(list, remembered, rand) {
-  if (remembered && (list || []).indexOf(remembered) >= 0)
+// A remembered picture that is already on screen (`shown`) stays even when it isn't in
+// the folder: a picker like lumen shows one from elsewhere for a mode, then switches the
+// color mode, and that switch must not roll a second wallpaper.
+function startingPicture(list, remembered, rand, shown) {
+  if (remembered && (remembered === shown || (list || []).indexOf(remembered) >= 0))
     return remembered;
   return pickRandom(list, [], rand);
 }
@@ -432,5 +436,5 @@ function publishCommand(path, dir) {
   var tmpPng = shellQuote(d + "/current.tmp.png");
   var link = shellQuote(d + "/current");
   var tmpLink = shellQuote(d + "/current.tmp");
-  return "mkdir -p " + shellQuote(d) + " && ln -sfn " + shellQuote(path) + " " + tmpLink + " && mv -Tf " + tmpLink + " " + link + " && magick " + shellQuote(path + "[0]") + " -auto-orient " + tmpPng + " && mv -f " + tmpPng + " " + png;
+  return "mkdir -p " + shellQuote(d) + " && ln -sfn " + shellQuote(path) + " " + tmpLink + " && mv -Tf " + tmpLink + " " + link + " && " + StillFrame.magickFirstFrame(path) + " -auto-orient " + tmpPng + " && mv -f " + tmpPng + " " + png;
 }

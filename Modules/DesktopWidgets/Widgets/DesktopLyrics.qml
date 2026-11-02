@@ -104,7 +104,9 @@ DraggableDesktopWidget {
     }
   ]
   readonly property var lines: demo ? demoLines : LyricsService.lines
-  readonly property real cursor: Lyrics.cursor(lines, t, 0.45)
+  // Seconds the stack takes to glide to the next line
+  readonly property real glide: 0.45
+  readonly property real cursor: Lyrics.cursor(lines, t, glide)
   readonly property int curIndex: Lyrics.lineIndexAt(lines, t)
   readonly property var waiting: Lyrics.waiting(lines, t, 6)
   readonly property string trackTag: Lyrics.trackTag(MediaService.trackTitle, MediaService.trackArtist)

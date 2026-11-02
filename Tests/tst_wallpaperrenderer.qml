@@ -267,6 +267,11 @@ TestCase {
     // Remembered picture gone from the folder: a random one
     compare(WallpaperRenderer.startingPicture(["a", "b"], "gone", seq([0.6])), "b");
     compare(WallpaperRenderer.startingPicture([], "b", seq([0])), "");
+    // Regression: lumen shows a picture from outside the folder for dark, then switches
+    // to dark; the picture on screen stays instead of a second, random change
+    compare(WallpaperRenderer.startingPicture(["/d/a", "/d/b"], "/season/medusa.png", seq([0]), "/season/medusa.png"), "/season/medusa.png");
+    // Not on screen and not in the folder: still a random one
+    compare(WallpaperRenderer.startingPicture(["/d/a", "/d/b"], "/season/medusa.png", seq([0]), "/l/x"), "/d/a");
   }
 
   function test_styleForSwitch() {
@@ -508,6 +513,10 @@ TestCase {
     // The link keeps the original, quoted, and is swapped in whole
     verify(cmd.indexOf("ln -sfn '/w/it'\\''s a.gif' '/c/wallpaper/current.tmp' && mv -Tf '/c/wallpaper/current.tmp' '/c/wallpaper/current'") >= 0);
     // The PNG is the first frame, written beside the published file and moved over it
-    verify(cmd.indexOf("magick '/w/it'\\''s a.gif[0]' -auto-orient '/c/wallpaper/current.tmp.png' && mv -f '/c/wallpaper/current.tmp.png' '/c/wallpaper/current.png'") >= 0);
+    // A GIF's first frame comes from ffmpeg (Helpers/StillFrame.js)
+    verify(cmd.indexOf("ffmpeg -v error -nostdin -threads 1 -i '/w/it'\\''s a.gif' -frames:v 1") >= 0);
+    verify(cmd.indexOf("magick png:- -auto-orient '/c/wallpaper/current.tmp.png' && mv -f '/c/wallpaper/current.tmp.png' '/c/wallpaper/current.png'") >= 0);
+    // Anything else is read by magick, under its memory caps
+    verify(WallpaperRenderer.publishCommand("/w/a.png", "/c").indexOf("MAGICK_MEMORY_LIMIT=1GiB MAGICK_MAP_LIMIT=2GiB MAGICK_DISK_LIMIT=1GiB magick '/w/a.png[0]' -auto-orient") >= 0);
   }
 }

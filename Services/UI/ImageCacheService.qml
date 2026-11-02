@@ -4,6 +4,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
+import "../../Helpers/StillFrame.js" as StillFrame
 import "../../Helpers/sha256.js" as Checksum
 import qs.Commons
 
@@ -358,11 +359,10 @@ Singleton {
   // ImageMagick Processing: Thumbnail
   // -------------------------------------------------
   function startThumbnailProcessing(sourcePath, outputPath, cacheKey) {
-    const srcEsc = sourcePath.replace(/'/g, "'\\''");
     const dstEsc = outputPath.replace(/'/g, "'\\''");
 
     // Use Lanczos filter for high-quality downscaling, subtle unsharp mask, and PNG for lossless output
-    const command = `magick '${srcEsc}' -auto-orient -filter Lanczos -resize '384x384^' -gravity center -extent 384x384 -unsharp 0x0.5 '${dstEsc}'`;
+    const command = `${StillFrame.magickFirstFrame(sourcePath)} -auto-orient -filter Lanczos -resize '384x384^' -gravity center -extent 384x384 -unsharp 0x0.5 '${dstEsc}'`;
 
     runProcess(command, cacheKey, outputPath, sourcePath);
   }
@@ -371,11 +371,10 @@ Singleton {
   // ImageMagick Processing: Large
   // -------------------------------------------------
   function startLargeProcessing(sourcePath, outputPath, width, height, cacheKey) {
-    const srcEsc = sourcePath.replace(/'/g, "'\\''");
     const dstEsc = outputPath.replace(/'/g, "'\\''");
 
     // Use Lanczos filter for high-quality downscaling and PNG for lossless output
-    const command = `magick '${srcEsc}' -auto-orient -filter Lanczos -resize '${width}x${height}^' '${dstEsc}'`;
+    const command = `${StillFrame.magickFirstFrame(sourcePath)} -auto-orient -filter Lanczos -resize '${width}x${height}^' '${dstEsc}'`;
 
     runProcess(command, cacheKey, outputPath, sourcePath);
   }
@@ -384,14 +383,14 @@ Singleton {
   // ImageMagick Processing: Screen Wallpaper
   // -------------------------------------------------
   function startScreenWallpaperProcessing(sourcePath, outputPath, width, height, cacheKey, background) {
-    const srcEsc = sourcePath.replace(/'/g, "'\\''");
     const dstEsc = outputPath.replace(/'/g, "'\\''");
     const tmpEsc = dstEsc.replace(/\.jpg$/, ".tmp.jpg");
     const size = `${width}x${height}`;
 
-    // First frame only (animated GIFs), transparency on black, written next to the cache
-    // file and moved into place so a half-written file is never a cache hit
-    const command = `${background ? "nice -n 19 " : ""}magick '${srcEsc}[0]' -auto-orient -filter Lanczos -resize '${size}^' -gravity center -extent ${size} -background black -flatten -quality 95 '${tmpEsc}' && mv -f '${tmpEsc}' '${dstEsc}'`;
+    // First frame only (animated GIFs, through ffmpeg: Helpers/StillFrame.js), transparency
+    // on black, written next to the cache file and moved into place so a half-written file
+    // is never a cache hit
+    const command = `${StillFrame.magickFirstFrame(sourcePath, background)} -auto-orient -filter Lanczos -resize '${size}^' -gravity center -extent ${size} -background black -flatten -quality 95 '${tmpEsc}' && mv -f '${tmpEsc}' '${dstEsc}'`;
 
     runProcess(command, cacheKey, outputPath, sourcePath);
   }

@@ -124,13 +124,14 @@ Item {
         required property int index
         readonly property real d: index - root.lyrics.cursor
         readonly property var pose: Lyrics.calmPose(d)
+        readonly property real shown: pose.opacity * Lyrics.introFade(root.lyrics.lines, index, root.lyrics.t, root.lyrics.glide)
         readonly property bool current: index === root.lyrics.curIndex
         readonly property bool past: index < root.lyrics.curIndex
-        active: Math.abs(d) < 2.2 && pose.opacity > 0.01
+        active: Math.abs(d) < 2.2 && shown > 0.01
 
         x: stage.width / 2
         y: stage.midY + pose.y * root.pixelSize
-        opacity: pose.opacity
+        opacity: shown
 
         sourceComponent: Item {
           id: lineItem
@@ -218,7 +219,7 @@ Item {
       anchors.horizontalCenter: parent.horizontalCenter
       y: stage.midY - height / 2
       spacing: Math.round(root.pixelSize * 0.3)
-      visible: root.lyrics.waiting.show
+      visible: root.lyrics.waiting.show && root.lyrics.playing
 
       Repeater {
         model: [ShellColors.mPrimary, ShellColors.mSecondary, ShellColors.mTertiary]
