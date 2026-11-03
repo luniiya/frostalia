@@ -289,12 +289,53 @@ class WallpaperTests(unittest.TestCase):
         # the wallpaper visualizer's waves draw only a cut-out of its subject, and the shelf says
         # whether the wallpaper has one. The renderer's windows, its IPC and the radial menu's
         # random-wallpaper action drive the shell's own renderer; its settings tab caches both folders.
+        # The wallpaper picker opens on the current wallpaper and shows its pick with the renderer.
         self.assertEqual(users, {"shell.qml", "Services/Theming/AppThemeService.qml", "Modules/EditDesktop/EditDesktopWindow.qml",
                                  "Modules/WallpaperVisualizer/WallpaperVisualizer.qml", "Modules/WallpaperVisualizer/ScreenWaves.qml",
                                  "Modules/EditDesktop/EditShelf.qml",
                                  "Modules/Background/ShellWallpaper.qml", "Modules/Background/WallpaperLayer.qml",
                                  "Services/Control/IPCService.qml", "Modules/RadialMenu/RadialMenu.qml",
-                                 "Modules/Panels/Settings/Tabs/Wallpaper/GeneralSubTab.qml"})
+                                 "Modules/Panels/Settings/Tabs/Wallpaper/GeneralSubTab.qml",
+                                 "Services/UI/WallpaperPickerService.qml", "Modules/Panels/WallpaperPicker/WallpaperPickerPanel.qml"})
+
+
+class WallpaperPickerTests(unittest.TestCase):
+    """The wallpaper picker: a panel drawn by every style, opened over IPC and screenshotted."""
+
+    def test_every_style_draws_the_picker(self):
+        panel = (ROOT / "Modules/Panels/WallpaperPicker/WallpaperPickerPanel.qml").read_text()
+        self.assertIn('surface: "wallpaperPicker"', panel)
+        for definition in sorted((ROOT / "Styles").glob("*/Definition.qml")):
+            with self.subTest(style=definition.parent.name):
+                match = re.search(r'"wallpaperPicker":\s*"([^"]+)"', definition.read_text())
+                self.assertIsNotNone(match)
+                self.assertTrue((ROOT / match.group(1)).is_file())
+                # The light/dark folder switch
+                self.assertIn("setPickMode(", (ROOT / match.group(1)).read_text())
+
+    def test_panel_is_registered_and_opened_over_ipc(self):
+        main = (ROOT / "Modules/MainScreen/MainScreen.qml").read_text()
+        self.assertIn('objectName: "wallpaperPickerPanel-"', main)
+        ipc = (ROOT / "Services/Control/IPCService.qml").read_text()
+        self.assertEqual(ipc.count('target: "wallpaper"\n'), 1)
+        handler = re.search(r'target: "wallpaper"\n(.*?)\n  }\n', ipc, re.S)
+        self.assertIsNotNone(handler)
+        self.assertIn('getPanel("wallpaperPickerPanel", screen)?.toggle()', handler.group(1))
+        # The Hyprland binds call toggle, random, next and previous
+        for function in ("toggle", "open", "close", "set", "random", "next", "previous"):
+            with self.subTest(function=function):
+                self.assertRegex(handler.group(1), rf"function {function}\(")
+
+    def test_picker_is_screenshotted(self):
+        script = (ROOT / "Scripts/dev/ui-screenshots.sh").read_text()
+        self.assertIn('"wallpaperPicker|wallpaper|toggle|"', script)
+
+    def test_helper_command_is_wired(self):
+        # The service pipes its request into the theming helper's `wallpapers` command
+        service = (ROOT / "Services/UI/WallpaperPickerService.qml").read_text()
+        self.assertIn('$HELPER\\" wallpapers"]', service)
+        main = (ROOT / "Tools/theming/src/main.rs").read_text()
+        self.assertIn('command == "wallpapers"', main)
 
 
 class PowerProfileLabelTests(unittest.TestCase):

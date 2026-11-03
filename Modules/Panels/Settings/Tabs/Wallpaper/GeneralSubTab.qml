@@ -56,6 +56,17 @@ ColumnLayout {
     onButtonClicked: root.openPicker("dark")
   }
 
+  // Runs after each new picture, e.g. Wallust for the terminal colors
+  NTextInput {
+    Layout.fillWidth: true
+    enabled: root.prefs.enabled
+    label: I18n.tr("panels.wallpaper.change-command-label")
+    description: I18n.tr("panels.wallpaper.change-command-description")
+    text: root.prefs.changeCommand
+    defaultValue: Settings.getDefaultValue("wallpaperRenderer.changeCommand")
+    onEditingFinished: root.prefs.changeCommand = text
+  }
+
   NFilePicker {
     id: folderPicker
     title: I18n.tr("panels.wallpaper.select-folder")

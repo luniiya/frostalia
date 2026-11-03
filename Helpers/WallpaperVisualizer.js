@@ -4,7 +4,7 @@
 // and, when the wallpaper has a clear subject, under a cut-out of that subject.
 // Kept free of QML dependencies so it can be unit tested (see Tests/tst_wallpapervisualizer.qml).
 
-var edgeChoices = ["all", "topBottom", "bottom"];
+var edgeChoices = ["all", "topBottom", "leftRight", "top", "bottom", "left", "right"];
 var heightRange = [0.05, 0.5];
 var opacityRange = [0.1, 1];
 // Look of the waves, passed to the shader as is
@@ -16,10 +16,18 @@ var softnessRange = [0.02, 0.3];
 // Which edges carry a wave, as shader flags [top, bottom, left, right]
 function edgeFlags(edges) {
   switch (edges) {
+  case "top":
+    return [1, 0, 0, 0];
   case "bottom":
     return [0, 1, 0, 0];
+  case "left":
+    return [0, 0, 1, 0];
+  case "right":
+    return [0, 0, 0, 1];
   case "topBottom":
     return [1, 1, 0, 0];
+  case "leftRight":
+    return [0, 0, 1, 1];
   default:
     return [1, 1, 1, 1];
   }
@@ -101,7 +109,11 @@ function depthStatus(results, wallpaper, depth) {
 var edgeLabelKeys = {
   "all": "panels.audio.wallpaper-visualizer-edges-all",
   "topBottom": "panels.audio.wallpaper-visualizer-edges-top-bottom",
-  "bottom": "panels.audio.wallpaper-visualizer-edges-bottom"
+  "leftRight": "panels.audio.wallpaper-visualizer-edges-left-right",
+  "top": "panels.audio.wallpaper-visualizer-edges-top",
+  "bottom": "panels.audio.wallpaper-visualizer-edges-bottom",
+  "left": "panels.audio.wallpaper-visualizer-edges-left",
+  "right": "panels.audio.wallpaper-visualizer-edges-right"
 };
 var depthLabelKeys = {
   "off": "panels.desktop-widgets.effect-off",

@@ -1053,6 +1053,10 @@
       "wallpaper-visualizer-edges-bottom": "Bottom",
       "wallpaper-visualizer-edges-description": "Screen edges the waves rise from.",
       "wallpaper-visualizer-edges-label": "Edges",
+      "wallpaper-visualizer-edges-left": "Left",
+      "wallpaper-visualizer-edges-left-right": "Left and right",
+      "wallpaper-visualizer-edges-right": "Right",
+      "wallpaper-visualizer-edges-top": "Top",
       "wallpaper-visualizer-edges-top-bottom": "Top and bottom",
       "wallpaper-visualizer-enabled-description": "Show audio waves on the wallpaper while sound plays.",
       "wallpaper-visualizer-enabled-label": "Wallpaper visualizer",
@@ -2089,6 +2093,8 @@
       "colors-label": "Transition colors",
       "colors-sekai": "SekaiPop (white, pink and cyan)",
       "colors-theme": "Color scheme",
+      "change-command-description": "Shell command run after each new wallpaper, with $WALLPAPER (its path) and $WALLPAPER_MODE (light or dark). Use it to theme the terminal and other apps, e.g. with Wallust. Leave empty for none.",
+      "change-command-label": "Run on wallpaper change",
       "dark-folder-description": "Wallpapers shown while the color mode is dark.",
       "dark-folder-label": "Dark mode folder",
       "duration-description": "How long a transition takes. The iris runs about half as long again.",
@@ -2128,6 +2134,13 @@
       "ring-variant-ring": "Ring",
       "ring-variant-swirl": "Swirl",
       "select-folder": "Select a wallpaper folder",
+      "picker-command-description": "Shell command that sets the wallpaper; $WALLPAPER is the image path.",
+      "picker-command-label": "Set wallpaper command",
+      "picker-desc": "Choose a wallpaper with Super+W (`qs -c frostalia ipc call wallpaper toggle`).",
+      "picker-sort-description": "Initial order of the picker; change it in the picker with Tab.",
+      "picker-sort-label": "Sort wallpapers by",
+      "picker-title": "Wallpaper picker",
+      "tab-picker": "Picker",
       "settings-clear-cache-button": "Clear cache",
       "settings-clear-cache-description": "Clear cached resized wallpapers to free disk space.",
       "settings-clear-cache-label": "Wallpaper cache",
@@ -2799,5 +2812,46 @@
       "poor": "Poor",
       "weak": "Weak"
     }
+  },
+  "wallpaper-picker": {
+    "all-colors": "All colors",
+    "apply-failed": "Couldn't set the wallpaper",
+    "count": "{shown} of {total}",
+    "empty": "No images in {folder}",
+    "families": {
+      "black": "Black",
+      "blue": "Blue",
+      "gray": "Gray",
+      "green": "Green",
+      "orange": "Orange",
+      "pink": "Pink",
+      "purple": "Purple",
+      "red": "Red",
+      "teal": "Teal",
+      "white": "White",
+      "yellow": "Yellow"
+    },
+    "hints": {
+      "apply": "Set",
+      "close": "Close",
+      "colors": "Color",
+      "mode": "Mode",
+      "navigate": "Browse",
+      "sort": "Sort"
+    },
+    "indexing": "Reading colors {done}/{total}",
+    "loading": "Loading wallpapers…",
+    "mode": {
+      "dark": "Dark wallpapers",
+      "light": "Light wallpapers"
+    },
+    "no-match": "No wallpaper matches",
+    "search": "Search wallpapers",
+    "sort": {
+      "date": "Newest",
+      "hue": "Color",
+      "name": "Name"
+    },
+    "title": "Wallpapers"
   }
 }

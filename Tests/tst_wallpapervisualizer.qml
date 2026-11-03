@@ -18,6 +18,26 @@ TestCase {
             e: [1, 1, 0, 0]
           },
           {
+            tag: "left and right",
+            edges: "leftRight",
+            e: [0, 0, 1, 1]
+          },
+          {
+            tag: "top",
+            edges: "top",
+            e: [1, 0, 0, 0]
+          },
+          {
+            tag: "left",
+            edges: "left",
+            e: [0, 0, 1, 0]
+          },
+          {
+            tag: "right",
+            edges: "right",
+            e: [0, 0, 0, 1]
+          },
+          {
             tag: "bottom",
             edges: "bottom",
             e: [0, 1, 0, 0]
@@ -102,8 +122,12 @@ TestCase {
 
   function test_nextEdges() {
     compare(WallpaperVisualizer.nextEdges("all"), "topBottom");
-    compare(WallpaperVisualizer.nextEdges("topBottom"), "bottom");
-    compare(WallpaperVisualizer.nextEdges("bottom"), "all");
+    compare(WallpaperVisualizer.nextEdges("topBottom"), "leftRight");
+    compare(WallpaperVisualizer.nextEdges("leftRight"), "top");
+    compare(WallpaperVisualizer.nextEdges("top"), "bottom");
+    compare(WallpaperVisualizer.nextEdges("bottom"), "left");
+    compare(WallpaperVisualizer.nextEdges("left"), "right");
+    compare(WallpaperVisualizer.nextEdges("right"), "all");
     compare(WallpaperVisualizer.nextEdges("unknown"), "all");
   }
 

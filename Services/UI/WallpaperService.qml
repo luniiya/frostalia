@@ -169,6 +169,7 @@ Singleton {
     upcomingRandom = WallpaperRenderer.pickRandom(list || images, [path]);
     Logger.d("Wallpaper", "Renderer shows", path);
     publish(path);
+    runChangeHook(path, forMode === "light" || forMode === "dark" ? forMode : mode);
     resolveDisplays();
     precacheTimer.restart();
   }
@@ -182,6 +183,21 @@ Singleton {
     publishWanted = path;
     if (!publishProcess.running)
       publishProcess.start(path);
+  }
+
+  // wallpaperRenderer.changeCommand, one at a time; a picture shown while it runs gets
+  // its turn after it
+  property var changeHookWanted: null
+
+  function runChangeHook(path, forMode) {
+    changeHookWanted = WallpaperRenderer.changeHook(prefs.changeCommand, path, forMode);
+    if (changeHookWanted && !changeHookProcess.running)
+      changeHookProcess.startWanted();
+  }
+
+  // The picture last shown for a mode ("" if none)
+  function rememberedFor(forMode) {
+    return ShellState.getWallpaperRendererState()[forMode] || "";
   }
 
   function remember(forMode, path) {
@@ -471,6 +487,26 @@ Singleton {
         Logger.w("Wallpaper", "Could not publish", path, "to", root.publishDir);
       if (root.publishWanted !== path)
         start(root.publishWanted);
+    }
+  }
+
+  Process {
+    id: changeHookProcess
+    function startWanted() {
+      const hook = root.changeHookWanted;
+      root.changeHookWanted = null;
+      environment = hook.environment;
+      command = hook.command;
+      running = true;
+    }
+    stderr: StdioCollector {
+      id: changeHookErr
+    }
+    onExited: exitCode => {
+      if (exitCode !== 0)
+        Logger.w("Wallpaper", "Change command failed:", exitCode, changeHookErr.text.trim());
+      if (root.changeHookWanted)
+        startWanted();
     }
   }
 

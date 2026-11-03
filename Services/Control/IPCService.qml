@@ -850,10 +850,27 @@ Singleton {
     }
   }
 
-  // The shell's wallpaper renderer (Settings > Wallpaper). Changing the picture needs it
-  // on; `get` answers for awww too.
+  // The shell's wallpaper renderer (Settings > Wallpaper) and the wallpaper picker
+  // (Modules/Panels/WallpaperPicker). Changing the picture needs the renderer on; `get`
+  // answers for awww too.
   IpcHandler {
     target: "wallpaper"
+
+    function toggle() {
+      root.screenDetector.withCurrentScreen(screen => {
+        PanelService.getPanel("wallpaperPickerPanel", screen)?.toggle();
+      });
+    }
+    function open() {
+      root.screenDetector.withCurrentScreen(screen => {
+        PanelService.getPanel("wallpaperPickerPanel", screen)?.open();
+      });
+    }
+    function close() {
+      root.screenDetector.withCurrentScreen(screen => {
+        PanelService.getPanel("wallpaperPickerPanel", screen)?.close();
+      });
+    }
 
     // Show a picture (any path; one in the light or dark folder is remembered for that mode)
     function set(path: string): string {

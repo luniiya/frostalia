@@ -726,7 +726,7 @@ Singleton {
     // wallpaper visualizer: audio waves along the screen edges, behind the wallpaper's subject
     property JsonObject wallpaperVisualizer: JsonObject {
       property bool enabled: true
-      property string edges: "all"
+      property string edges: "leftRight"
       property real height: 0.25
       property real opacity: 0.7
       property string color: "primary"
@@ -759,6 +759,9 @@ Singleton {
       property int parallaxAmount: 10
       property int parallaxWorkspaces: 10
       property int parallaxDuration: 450
+      // run with sh -c after a new picture is shown, with $WALLPAPER (its path) and
+      // $WALLPAPER_MODE ("light" or "dark"), e.g. to theme the terminal from it; empty for none
+      property string changeCommand: "wallust run --palette \"$WALLPAPER_MODE\" \"$WALLPAPER\" && LUMEN_WALLPAPER=\"$WALLPAPER\" LUMEN_DARK_MODE=\"$WALLPAPER_MODE\" ~/.config/bin/wallust-refresh.sh"
     }
 
     // brightness
@@ -780,6 +783,14 @@ Singleton {
       property string generationMethod: "tonal-spot"
       property string monitorForColors: ""
       property bool syncGsettings: true
+    }
+
+    // wallpaper picker (Modules/Panels/WallpaperPicker): browses wallpaperRenderer's light
+    // and dark folders and shows the pick with the renderer, or runs applyCommand when it is off
+    property JsonObject wallpaperPicker: JsonObject {
+      // Run with sh -c; $WALLPAPER is the image path
+      property string applyCommand: "awww img \"$WALLPAPER\" --transition-type grow --transition-fps 60 --transition-duration 0.7"
+      property string sortBy: "name"
     }
 
     // templates toggles

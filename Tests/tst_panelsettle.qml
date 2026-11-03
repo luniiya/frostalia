@@ -30,6 +30,20 @@ TestCase {
             expected: "closed"
           },
           {
+            tag: "content loading",
+            panel: panel({
+                           "contentReady": false
+                         }),
+            expected: "opening"
+          },
+          {
+            tag: "content loaded",
+            panel: panel({
+                           "contentReady": true
+                         }),
+            expected: "open"
+          },
+          {
             tag: "growing",
             panel: panel({
                            "sizeAnimationComplete": false

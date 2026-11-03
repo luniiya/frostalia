@@ -31,6 +31,7 @@ import qs.Modules.Panels.Settings
 import qs.Modules.Panels.SetupWizard
 import qs.Modules.Panels.SystemStats
 import qs.Modules.Panels.Tray
+import qs.Modules.Panels.WallpaperPicker
 import qs.Modules.Panels.Weather
 import qs.Services.Compositor
 import qs.Services.Power
@@ -83,7 +84,7 @@ PanelWindow {
   property bool isAnyPanelOpen: PanelService.openedPanel !== null
 
   color: {
-    return Qt.rgba(0, 0, 0, PanelDimmer.opacity(isPanelOpen, isPanelClosing, dimmerOpacity));
+    return Qt.rgba(0, 0, 0, PanelDimmer.opacity(isPanelOpen, isPanelClosing, dimmerOpacity, PanelService.openedPanel?.dimmerOpacity));
   }
 
   Behavior on color {
@@ -249,6 +250,12 @@ PanelWindow {
       bottomRightCorner: backgroundBlur.panelBg ? backgroundBlur.panelBg.bottomRightCornerState : CornerState.Normal
     }
 
+    // Whole screen, behind panels that ask for it (SmartPanel.blurScreen)
+    Region {
+      width: backgroundBlur.screenBlur ? root.width : 0
+      height: backgroundBlur.screenBlur ? root.height : 0
+    }
+
     // Closing panel (coexists with opening panel during transition)
     Region {
       x: backgroundBlur.closingPanelBg ? Math.round(backgroundBlur.closingPanelBg.x) : 0
@@ -373,6 +380,12 @@ PanelWindow {
     SessionMenu {
       id: sessionMenuPanel
       objectName: "sessionMenuPanel-" + (root.screen?.name || "unknown")
+      screen: root.screen
+    }
+
+    WallpaperPickerPanel {
+      id: wallpaperPickerPanel
+      objectName: "wallpaperPickerPanel-" + (root.screen?.name || "unknown")
       screen: root.screen
     }
 
@@ -621,6 +634,8 @@ PanelWindow {
         var region = op.panelRegion;
         return (region && region.visible) ? region.panelItem : null;
       }
+
+      readonly property bool screenBlur: PanelDimmer.screenBlur(root.isPanelOpen, root.isPanelClosing, PanelService.openedPanel?.blurScreen)
 
       // Panel background geometry for the closing panel (may coexist with panelBg)
       readonly property var closingPanelBg: {

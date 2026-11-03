@@ -1,4 +1,4 @@
-use frostalia_theming::{image, palette, quantizer};
+use frostalia_theming::{image, palette, quantizer, wallpapers};
 use serde::Deserialize;
 use std::io::{self, Read};
 use std::path::PathBuf;
@@ -42,12 +42,17 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     let mut args = std::env::args().skip(1);
     let command = args
         .next()
-        .ok_or("expected image, png, palette or source")?;
+        .ok_or("expected image, png, palette, source or wallpapers")?;
     if args.next().is_some() {
         return Err("expected one command; pass request JSON on stdin".into());
     }
     let mut input = String::new();
     io::stdin().read_to_string(&mut input)?;
+    // Streams newline separated JSON as images are indexed (see wallpapers.rs)
+    if command == "wallpapers" {
+        let request: wallpapers::Request = serde_json::from_str(&input)?;
+        return Ok(wallpapers::run(request, &mut io::stdout().lock())?);
+    }
     let output = match command.as_str() {
         "image" | "png" => {
             let request: ImageRequest = serde_json::from_str(&input)?;

@@ -2941,6 +2941,15 @@
     "subTabLabel": "common.general"
   },
   {
+    "labelKey": "panels.wallpaper.change-command-label",
+    "descriptionKey": "panels.wallpaper.change-command-description",
+    "widget": "NTextInput",
+    "tab": 3,
+    "tabLabel": "panels.wallpaper.title",
+    "subTab": 0,
+    "subTabLabel": "common.general"
+  },
+  {
     "labelKey": "panels.wallpaper.random-enabled-label",
     "descriptionKey": "panels.wallpaper.random-enabled-description",
     "widget": "NToggle",
@@ -3002,6 +3011,27 @@
     "tabLabel": "panels.wallpaper.title",
     "subTab": 2,
     "subTabLabel": "panels.wallpaper.tab-parallax"
+  },
+  {
+    "labelKey": "panels.wallpaper.picker-sort-label",
+    "descriptionKey": "panels.wallpaper.picker-sort-description",
+    "widget": "NComboBox",
+    "tab": 3,
+    "tabLabel": "panels.wallpaper.title",
+    "subTab": 3,
+    "subTabLabel": "panels.wallpaper.tab-picker"
+  },
+  {
+    "labelKey": "panels.wallpaper.picker-command-label",
+    "descriptionKey": "panels.wallpaper.picker-command-description",
+    "widget": "NTextInput",
+    "tab": 3,
+    "tabLabel": "panels.wallpaper.title",
+    "subTab": 3,
+    "subTabLabel": "panels.wallpaper.tab-picker",
+    "visibleWhen": [
+      "!Settings.data.wallpaperRenderer.enabled"
+    ]
   },
   {
     "labelKey": "panels.wallpaper.transition-label",

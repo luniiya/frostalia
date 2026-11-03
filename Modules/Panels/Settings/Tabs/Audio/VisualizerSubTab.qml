@@ -127,8 +127,24 @@ ColumnLayout {
         "name": I18n.tr("panels.audio.wallpaper-visualizer-edges-top-bottom")
       },
       {
+        "key": "leftRight",
+        "name": I18n.tr("panels.audio.wallpaper-visualizer-edges-left-right")
+      },
+      {
+        "key": "top",
+        "name": I18n.tr("panels.audio.wallpaper-visualizer-edges-top")
+      },
+      {
         "key": "bottom",
         "name": I18n.tr("panels.audio.wallpaper-visualizer-edges-bottom")
+      },
+      {
+        "key": "left",
+        "name": I18n.tr("panels.audio.wallpaper-visualizer-edges-left")
+      },
+      {
+        "key": "right",
+        "name": I18n.tr("panels.audio.wallpaper-visualizer-edges-right")
       }
     ]
     currentKey: Settings.data.wallpaperVisualizer.edges

@@ -28,6 +28,7 @@ QtObject {
                                   "kdeConnectHome": "Modules/Panels/KdeConnect/MaterialKdeConnectHome.qml",
                                   "launcher": "Styles/keycap/LauncherView.qml",
                                   "sessionMenu": "Styles/keycap/SessionMenuView.qml",
+                                  "wallpaperPicker": "Styles/keycap/WallpaperPickerView.qml",
                                   "lyrics": "Styles/keycap/LyricsView.qml"
                                 })
   // Bar widget faces, keyed by the name a bar widget passes as `faceView`.

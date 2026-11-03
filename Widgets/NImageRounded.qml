@@ -14,6 +14,9 @@ Item {
   property real borderWidth: 0
   property color borderColor: "transparent"
   property int imageFillMode: Image.PreserveAspectCrop
+  // Decode size; (0, 0) decodes at the image's own size. One side 0 keeps the aspect.
+  property size sourceSize: Qt.size(0, 0)
+  readonly property bool _sized: sourceSize.width > 0 || sourceSize.height > 0
 
   readonly property bool _isAnimated: imagePath.toLowerCase().endsWith(".gif")
   readonly property Item imageSource: imageSourceLoader.item
@@ -40,6 +43,7 @@ Item {
       Image {
         visible: false
         source: root.imagePath
+        sourceSize: root._sized ? root.sourceSize : undefined
         mipmap: true
         smooth: true
         asynchronous: true
@@ -53,6 +57,7 @@ Item {
       AnimatedImage {
         visible: false
         source: root.imagePath
+        sourceSize: root._sized ? root.sourceSize : undefined
         mipmap: true
         smooth: true
         asynchronous: true
@@ -81,8 +86,9 @@ Item {
       property var source: root.imageSource ?? _safeFallback
       property real itemWidth: width
       property real itemHeight: height
-      property real sourceWidth: root.imageSource?.sourceSize.width ?? 0
-      property real sourceHeight: root.imageSource?.sourceSize.height ?? 0
+      // The decoded size: a requested sourceSize reports 0 for a side left free
+      property real sourceWidth: root.imageSource?.implicitWidth ?? 0
+      property real sourceHeight: root.imageSource?.implicitHeight ?? 0
       property real cornerRadius: Math.max(0, root.radius - root.borderWidth)
       property real imageOpacity: 1.0
       property int fillMode: root.imageFillMode

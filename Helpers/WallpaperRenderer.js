@@ -425,6 +425,20 @@ function shellQuote(s) {
   return "'" + String(s).replace(/'/g, "'\\''") + "'";
 }
 
+// The user's command for a newly shown picture (wallpaperRenderer.changeCommand), as
+// { command, environment } for a Process; null when there is none to run
+function changeHook(command, path, mode) {
+  if (!command || !String(command).trim() || !path)
+    return null;
+  return {
+    "command": ["sh", "-c", String(command)],
+    "environment": {
+      "WALLPAPER": path,
+      "WALLPAPER_MODE": mode === "light" ? "light" : "dark"
+    }
+  };
+}
+
 // Shell command that publishes the picture on screen for tools outside the shell, in `dir`:
 // `current` links to the original (a GIF stays a GIF) and `current.png` is a flat first frame
 // (what the lock screen draws). Both are swapped in whole, so a reader never sees half a file.

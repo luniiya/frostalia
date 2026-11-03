@@ -83,6 +83,15 @@ Item {
   // Whether blur should be applied behind this panel
   property bool blurEnabled: true
 
+  // How much MainScreen dims the screen while this panel is open; negative uses
+  // Settings general.dimmerOpacity
+  property real dimmerOpacity: -1
+  // MainScreen blurs the whole screen behind this panel, not just its background
+  property bool blurScreen: false
+  // The content draws its own opening animation: the panel shows at full size and
+  // opacity at once instead of growing and fading in
+  property bool ownAnimation: false
+
   // Close with escape key
   property bool closeWithEscape: true
 
@@ -739,7 +748,7 @@ Item {
     enabled: !PanelService.closedImmediately
     NumberAnimation {
       id: opacityAnimation
-      duration: root.isClosing ? Style.animationFaster : Style.animationFast
+      duration: root.isClosing ? Style.animationFaster : root.ownAnimation ? 0 : Style.animationFast
       easing.type: Easing.OutQuad
 
       onRunningChanged: {
@@ -1084,8 +1093,8 @@ Item {
       // Priority: horizontal edges (top/bottom) take precedence over vertical edges (left/right)
       // This prevents diagonal animations when panel is attached to a corner
       // Use reactive values here - they're evaluated BEFORE isPanelVisible becomes true
-      readonly property bool shouldAnimateWidth: !shouldAnimateHeight && (animateFromLeft || animateFromRight)
-      readonly property bool shouldAnimateHeight: animateFromTop || animateFromBottom
+      readonly property bool shouldAnimateWidth: !root.ownAnimation && !shouldAnimateHeight && (animateFromLeft || animateFromRight)
+      readonly property bool shouldAnimateHeight: !root.ownAnimation && (animateFromTop || animateFromBottom)
 
       // Current animated width/height (referenced by x/y for right/bottom positioning)
       readonly property real currentWidth: {
@@ -1373,15 +1382,16 @@ Item {
           // Make panel visible, now only the intended dimension will animate
           root.isPanelVisible = true;
 
-          if (root.animationsDisabled) {
-            // Skip delay when animations are disabled
+          if (root.animationsDisabled || root.ownAnimation) {
+            // Skip delay when animations are disabled or the content animates itself
             root.sizeAnimationComplete = true;
           } else {
             opacityTrigger.start();
           }
 
-          // Start open watchdog timer (skip when animations disabled - everything completes synchronously)
-          if (!root.animationsDisabled) {
+          // Start open watchdog timer (skip when animations disabled or the content animates
+          // itself - the panel is fully shown synchronously)
+          if (!root.animationsDisabled && !root.ownAnimation) {
             root.openWatchdogActive = true;
             openWatchdogTimer.start();
           }

@@ -4,13 +4,15 @@
 // shell (Scripts/dev/ui-screenshots.sh polls `qs -c frostalia ipc call state panels`).
 // Kept free of QML dependencies so it can be unit tested (Tests/tst_panelsettle.qml).
 
-// One SmartPanel's phase: "closed", "opening", "open" or "closing"
+// One SmartPanel's phase: "closed", "opening", "open" or "closing". A panel that
+// loads its content after opening (the wallpaper picker) sets `contentReady`
+// false until it has.
 function phase(panel) {
   if (!panel || !panel.isPanelVisible)
     return "closed";
   if (panel.isClosing)
     return "closing";
-  if (!panel.sizeAnimationComplete || panel.opacity < 1)
+  if (!panel.sizeAnimationComplete || panel.opacity < 1 || panel.contentReady === false)
     return "opening";
   return "open";
 }

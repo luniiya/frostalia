@@ -27,6 +27,7 @@ QtObject {
                                   "kdeConnectHome": "Modules/Panels/KdeConnect/MaterialKdeConnectHome.qml",
                                   "launcher": "Modules/Panels/Launcher/MaterialLauncherView.qml",
                                   "sessionMenu": "Modules/Panels/SessionMenu/MaterialSessionMenuView.qml",
+                                  "wallpaperPicker": "Modules/Panels/WallpaperPicker/MaterialWallpaperPickerView.qml",
                                   "lyrics": "Modules/DesktopWidgets/Widgets/MaterialLyricsView.qml"
                                 })
   // Bar widgets keep the shared look

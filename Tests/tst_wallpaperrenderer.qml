@@ -502,6 +502,24 @@ TestCase {
     compare(WallpaperRenderer.cacheAllOrder([], []), []);
   }
 
+  function test_changeHook_none_without_command_or_path() {
+    compare(WallpaperRenderer.changeHook("", "/w/a.png", "dark"), null);
+    compare(WallpaperRenderer.changeHook("   ", "/w/a.png", "dark"), null);
+    compare(WallpaperRenderer.changeHook("wallust run \"$WALLPAPER\"", "", "dark"), null);
+  }
+
+  function test_changeHook_passes_path_and_mode_in_the_environment() {
+    const hook = WallpaperRenderer.changeHook("wallust run \"$WALLPAPER\"", "/w/it's a.png", "light");
+    compare(hook.command, ["sh", "-c", "wallust run \"$WALLPAPER\""]);
+    compare(hook.environment.WALLPAPER, "/w/it's a.png");
+    compare(hook.environment.WALLPAPER_MODE, "light");
+  }
+
+  function test_changeHook_mode_defaults_to_dark() {
+    compare(WallpaperRenderer.changeHook("true", "/w/a.png", "").environment.WALLPAPER_MODE, "dark");
+    compare(WallpaperRenderer.changeHook("true", "/w/a.png", "dark").environment.WALLPAPER_MODE, "dark");
+  }
+
   function test_publishCommand_empty() {
     compare(WallpaperRenderer.publishCommand("", "/c/wallpaper"), "");
     compare(WallpaperRenderer.publishCommand("/w/a.png", ""), "");
