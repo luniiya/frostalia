@@ -22,7 +22,7 @@ Text {
   property var features: ({})
 
   opacity: enabled ? 1.0 : 0.6
-  font.family: root.family
+  font.family: BubbleLogic.textFamily(root, root.family, Style.fontDefault, Style.fontOled)
   font.weight: Style.fontWeightMedium
   font.pointSize: Math.max(1, root.pointSize * fontScale)
   font.features: root.features

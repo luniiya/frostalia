@@ -28,7 +28,7 @@ Item {
   property color panelBackgroundColor: ShellColors.mSurface
   property color panelBorderColor: ShellColors.mOutline
   property var buttonItem: null
-  property var bubbleContext: null
+  property var anchorBubble: null
   property bool forceAttachToBar: false
 
   // Anchoring properties
@@ -109,13 +109,13 @@ Item {
   readonly property var panelRegion: panelContent.geometryPlaceholder
   readonly property bool touchingBar: panelContent.touchingTopBar || panelContent.touchingBottomBar || panelContent.touchingLeftBar || panelContent.touchingRightBar
 
-  readonly property string barPosition: bubbleContext ? bubbleContext.position : Settings.getBarPositionForScreen(screen?.name)
+  readonly property string barPosition: anchorBubble ? anchorBubble.position : Settings.getBarPositionForScreen(screen?.name)
   readonly property bool barIsVertical: barPosition === "left" || barPosition === "right"
-  readonly property real barHeight: !bubbleContext && barShouldShow ? Style.getBarHeightForScreen(screen?.name) : 0
+  readonly property real barHeight: !anchorBubble && barShouldShow ? Style.getBarHeightForScreen(screen?.name) : 0
   readonly property bool hasBar: modelData && modelData.name ? (Settings.data.bar.monitors.includes(modelData.name) || (Settings.data.bar.monitors.length === 0)) : false
-  readonly property bool isFramed: !bubbleContext && Settings.data.bar.barType === "framed" && hasBar
+  readonly property bool isFramed: !anchorBubble && Settings.data.bar.barType === "framed" && hasBar
   readonly property real frameThickness: Settings.data.bar.frameThickness ?? 12
-  readonly property bool barFloating: !bubbleContext && Settings.data.bar.barType === "floating"
+  readonly property bool barFloating: !anchorBubble && Settings.data.bar.barType === "floating"
   readonly property real barMarginH: (barFloating && barShouldShow) ? Math.ceil(Settings.data.bar.marginHorizontal) : 0
   readonly property real barMarginV: (barFloating && barShouldShow) ? Math.ceil(Settings.data.bar.marginVertical) : 0
   readonly property real attachmentOverlap: 1 // Panel extends into bar area to fix hairline gap with fractional scaling
@@ -175,7 +175,7 @@ Item {
     PanelService.closedImmediately = false;
     // Reset to default - fixes panel being stuck in one position
     root.useButtonPosition = false;
-    root.bubbleContext = null;
+    root.anchorBubble = null;
 
     // Calculate the bar window's position on screen based on bar settings
     // The BarContentWindow uses anchors + margins, so we need to compute its origin
@@ -225,11 +225,11 @@ Item {
     if (buttonItem && typeof buttonItem.mapToItem === "function") {
       try {
         root.buttonItem = buttonItem;
-        root.bubbleContext = BubbleLogic.itemContext(buttonItem);
+        root.anchorBubble = BubbleLogic.itemContext(buttonItem);
         // Map button position within its window (BarContentWindow-local coordinates)
         var buttonLocal = buttonItem.mapToItem(null, 0, 0);
 
-        root.buttonPosition = Qt.point((root.bubbleContext ? root.bubbleContext.x : barWindowX) + buttonLocal.x, (root.bubbleContext ? root.bubbleContext.y : barWindowY) + buttonLocal.y);
+        root.buttonPosition = Qt.point((root.anchorBubble ? root.anchorBubble.x : barWindowX) + buttonLocal.x, (root.anchorBubble ? root.anchorBubble.y : barWindowY) + buttonLocal.y);
         root.buttonWidth = buttonItem.width;
         root.buttonHeight = buttonItem.height;
         root.useButtonPosition = true;
@@ -681,7 +681,7 @@ Item {
       }
     }
 
-    if (root.bubbleContext && root.useButtonPosition) {
+    if (root.anchorBubble && root.useButtonPosition) {
       var bubblePanelPosition = BubbleLogic.panelPosition({
                                                             x: root.buttonPosition.x,
                                                             y: root.buttonPosition.y,
@@ -843,7 +843,7 @@ Item {
     // Screen-dependent attachment properties
     // Allow panel content to override allowAttach (e.g., plugin panels)
     readonly property bool allowAttach: {
-      if (root.bubbleContext)
+      if (root.anchorBubble)
         return false;
       if (contentLoader.item && contentLoader.item.allowAttach !== undefined) {
         return contentLoader.item.allowAttach;
@@ -851,7 +851,7 @@ Item {
       return Settings.data.ui.panelsAttachedToBar || root.forceAttachToBar;
     }
     readonly property bool allowAttachToBar: {
-      if (root.bubbleContext)
+      if (root.anchorBubble)
         return false;
       if (!(Settings.data.ui.panelsAttachedToBar || root.forceAttachToBar)) {
         return false;

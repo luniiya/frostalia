@@ -43,11 +43,12 @@ QtObject {
                                      "XXL": 20,
                                      "XXXL": 26
                                    },
+                                   // One step heavier than stock Material 3: thin weights vanish on low-DPI screens
                                    "fontWeights": {
-                                     "Regular": 400,
-                                     "Medium": 500,
-                                     "SemiBold": 500,
-                                     "Bold": 700
+                                     "Regular": 500,
+                                     "Medium": 600,
+                                     "SemiBold": 700,
+                                     "Bold": 800
                                    },
                                    "fontFamily": "Roboto",
                                    "fixedFontFamily": "monospace",

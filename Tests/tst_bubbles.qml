@@ -128,6 +128,62 @@ TestCase {
                                }));
   }
 
+  // Panels and context menus opened from a bubble keep its context as `anchorBubble`
+  // for positioning; their content must not turn white like the bubble's own.
+  function test_panelsOpenedFromOledBubbleAreNotOled() {
+    var panel = {
+      anchorBubble: {
+        oledMode: true
+      },
+      parent: null
+    };
+    var label = {
+      parent: {
+        parent: panel
+      }
+    };
+    verify(!Bubbles.isOledItem(label));
+    compare(Bubbles.styleFaceUrl(label, "face.qml"), "face.qml");
+  }
+
+  function test_oledBubbleTextUsesMaterialFont() {
+    var bubbleViewport = {
+      bubbleContext: {
+        oledMode: true
+      },
+      parent: null
+    };
+    var label = {
+      parent: bubbleViewport
+    };
+    compare(Bubbles.textFamily(label, "Rubik", "Rubik", "Roboto"), "Roboto");
+    // A widget's custom font is kept
+    compare(Bubbles.textFamily(label, "Iosevka", "Rubik", "Roboto"), "Iosevka");
+    bubbleViewport.bubbleContext.oledMode = false;
+    compare(Bubbles.textFamily(label, "Rubik", "Rubik", "Roboto"), "Rubik");
+  }
+
+  function test_oledBubblesSkipStyleFaces() {
+    var bubbleViewport = {
+      bubbleContext: {
+        oledMode: true
+      },
+      parent: null
+    };
+    var face = {
+      parent: {
+        parent: bubbleViewport
+      }
+    };
+    var faceUrl = "file:///shell/Styles/keycap/Bar/ClockFace.qml";
+    compare(Bubbles.styleFaceUrl(face, faceUrl), "");
+    bubbleViewport.bubbleContext.oledMode = false;
+    compare(Bubbles.styleFaceUrl(face, faceUrl), faceUrl);
+    compare(Bubbles.styleFaceUrl({
+                                   parent: null
+                                 }, faceUrl), faceUrl);
+  }
+
   function test_savedQmlWidgetSequencesAreRendered() {
     var saved = Bubbles.effective(savedBubbles[0], defaults);
     compare(saved.widgets.length, 1);

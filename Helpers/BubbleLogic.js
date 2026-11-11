@@ -33,6 +33,16 @@ function isOledItem(item) {
   return context !== null && context.oledMode === true;
 }
 
+// OLED bubble text uses Material's font unless the widget picked a font of its own.
+function textFamily(item, family, styleFamily, oledFamily) {
+  return isOledItem(item) && family === styleFamily ? oledFamily : family;
+}
+
+// OLED bubbles always keep the shared (Material) look: style faces are skipped.
+function styleFaceUrl(item, url) {
+  return isOledItem(item) ? "" : url;
+}
+
 function panelPosition(button, position, width, height, screenWidth, screenHeight, margin) {
   var x = button.x + (button.width - width) / 2;
   var y = button.y + (button.height - height) / 2;

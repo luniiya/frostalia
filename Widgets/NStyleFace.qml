@@ -1,4 +1,5 @@
 import QtQuick
+import "../Helpers/BubbleLogic.js" as BubbleLogic
 import qs.Commons
 
 // Loads the active style's face for a bar widget (its definition's `barViews`), or
@@ -18,7 +19,7 @@ Loader {
   property var faceData: ({})
   property real depth: Style.faceDepth
 
-  readonly property string url: Style.barViewUrl(view) || (fallbackView ? Style.barViewUrl(fallbackView) : "")
+  readonly property string url: BubbleLogic.styleFaceUrl(root, Style.barViewUrl(view) || (fallbackView ? Style.barViewUrl(fallbackView) : ""))
   readonly property bool loaded: status === Loader.Ready && item !== null
   // Offset the host applies to content it draws itself, so it sinks with the face.
   readonly property real sink: loaded ? item.sink : 0

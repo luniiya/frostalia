@@ -28,16 +28,16 @@ PopupWindow {
   property real targetWidth: 0
   property real targetHeight: 0
 
-  readonly property var bubbleContext: BubbleLogic.itemContext(anchorItem)
-  readonly property string barPosition: bubbleContext ? bubbleContext.position : Settings.getBarPositionForScreen(screen?.name)
+  readonly property var anchorBubble: BubbleLogic.itemContext(anchorItem)
+  readonly property string barPosition: anchorBubble ? anchorBubble.position : Settings.getBarPositionForScreen(screen?.name)
   readonly property real barHeight: Style.getBarHeightForScreen(screen?.name)
 
   readonly property var bubblePlacement: {
-    if (!bubbleContext || !anchorItem || !screen)
+    if (!anchorBubble || !anchorItem || !screen)
       return null;
     var local = anchorItem.mapToItem(null, 0, 0);
-    var originX = bubbleContext.x + local.x;
-    var originY = bubbleContext.y + local.y;
+    var originX = anchorBubble.x + local.x;
+    var originY = anchorBubble.y + local.y;
     var placement = BubbleLogic.panelPosition({
                                                 x: originX + targetOffsetX,
                                                 y: originY + targetOffsetY,

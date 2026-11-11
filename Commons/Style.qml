@@ -33,6 +33,8 @@ Singleton {
   // Waits for the bundled fallback font so it is part of the list.
   readonly property var _installedFonts: uiStyleTokens.fontFallbacks && rubikFont.status === FontLoader.Ready ? Qt.fontFamilies() : null
   readonly property string fontDefault: UiStyles.fontFamily(uiStyleTokens, Settings.data.ui.fontDefault, false, Qt.application.font.family, _installedFonts)
+  // OLED bubbles always use Material's font, whatever the active style
+  readonly property string fontOled: UiStyles.fontFamily(UiStyleRegistry.definitions[UiStyles.defaultStyle].tokens, "", false, Qt.application.font.family, _installedFonts)
   readonly property string fontFixed: UiStyles.fontFamily(uiStyleTokens, Settings.data.ui.fontFixed, true, Qt.application.font.family)
 
   // Helpers shared by the style's own files (the definition's `kit`), or null
