@@ -1,9 +1,11 @@
 import QtQuick
 import Quickshell
 import "../../../Helpers/BubbleLogic.js" as BubbleLogic
+import "../../../Helpers/PluginFace.js" as PluginFace
 import qs.Commons
 import qs.Services.Frostalia
 import qs.Services.UI
+import qs.Widgets
 
 Item {
   id: root
@@ -133,10 +135,68 @@ Item {
     }
   }
 
+  // Plugins get the style's plain face (Keycap: a plain keycap) behind them, and their
+  // own capsule backgrounds are cleared while it shows (Helpers/PluginFace.js).
+  readonly property real capsuleHeight: Style.getCapsuleHeightForScreen(widgetScreen?.name, section)
+  property var _capsuleBindings: []
+
+  function syncPluginCapsules() {
+    _capsuleBindings.forEach(binding => {
+      binding.when = false;
+      binding.destroy();
+    });
+    _capsuleBindings = [];
+    if (!_isPlugin || !loader.item)
+      return;
+    const bindings = [];
+    PluginFace.capsules(loader.item, capsuleHeight, isVerticalBar).forEach(rect => {
+      bindings.push(capsuleClear.createObject(root, {
+                                                "target": rect,
+                                                "property": "color",
+                                                "value": "transparent"
+                                              }));
+      bindings.push(capsuleClear.createObject(root, {
+                                                "target": rect.border,
+                                                "property": "width",
+                                                "value": 0
+                                              }));
+    });
+    _capsuleBindings = bindings;
+  }
+
+  onWidthChanged: if (_isPlugin)
+                    Qt.callLater(syncPluginCapsules)
+  onHeightChanged: if (_isPlugin)
+                     Qt.callLater(syncPluginCapsules)
+
+  Component {
+    id: capsuleClear
+    Binding {
+      when: pluginFace.loaded
+      restoreMode: Binding.RestoreBindingOrValue
+    }
+  }
+
+  NStyleFace {
+    id: pluginFace
+    view: root._isPlugin ? "Plate" : ""
+    host: loader.item
+    hovered: pluginInput.hovered
+    pressed: pluginInput.pressed
+    depth: Style.barFaceDepth(root.widgetScreen?.name, root.section)
+    width: root.isVerticalBar ? root.capsuleHeight : root.width
+    height: root.isVerticalBar ? root.height : root.capsuleHeight
+    anchors.centerIn: parent
+  }
+
   Loader {
     id: loader
     anchors.fill: parent
     asynchronous: true
+    // Plugin content sinks with its face when pressed
+    transform: Translate {
+      y: pluginFace.sink
+    }
     active: root.checkWidgetExists() && (root.reloadCounter >= 0)
 
     // All widgets use setSource() so that screen and widget properties
@@ -188,10 +248,31 @@ Item {
       if (item.hasOwnProperty("onLoaded")) {
         item.onLoaded();
       }
+
+      if (root._isPlugin)
+        Qt.callLater(root.syncPluginCapsules);
     }
 
     Component.onDestruction: {
       root._unregister();
+    }
+  }
+
+  // Hover and press for the plugin face. Above the plugin so it sees events first;
+  // the handlers only watch (passive grabs), so the plugin's own mouse areas still work.
+  Item {
+    id: pluginInput
+    readonly property bool hovered: pluginHover.hovered
+    readonly property bool pressed: pluginPress.active
+    anchors.fill: parent
+    enabled: pluginFace.loaded
+
+    HoverHandler {
+      id: pluginHover
+    }
+    PointHandler {
+      id: pluginPress
+      acceptedButtons: Qt.LeftButton
     }
   }
 

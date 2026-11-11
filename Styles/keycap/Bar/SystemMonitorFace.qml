@@ -1,4 +1,5 @@
 import QtQuick
+import "../KeycapStyle.js" as KeycapStyle
 
 // System monitor: a recessed LCD plate. Sunk into the bar (inner shade, no
 // drop shadow) with faint scanlines and a screw at each end.
@@ -25,7 +26,11 @@ KeycapFace {
       Repeater {
         model: Math.max(0, Math.floor((plate.height - 2 * face.kit.outline) / 3))
         Rectangle {
-          width: plate.width - 2 * face.kit.outline
+          required property int index
+          // Kept inside the rounded corners
+          readonly property real inset: KeycapStyle.cornerInset(plate.radius - face.kit.outline, plate.height - 2 * face.kit.outline, index * 3 + 0.5)
+          x: inset
+          width: plate.width - 2 * face.kit.outline - 2 * inset
           height: 1
           color: face.kit.ink
           opacity: 0.12
@@ -34,11 +39,10 @@ KeycapFace {
     }
 
     // Inner shade along the top wall
-    Rectangle {
-      x: face.kit.outline
-      y: face.kit.outline
-      width: parent.width - 2 * face.kit.outline
-      height: Math.max(2, face.depth)
+    FaceInnerShade {
+      kit: face.kit
+      radius: plate.radius
+      depth: face.depth
       color: face.kit.ink
       opacity: 0.35
     }

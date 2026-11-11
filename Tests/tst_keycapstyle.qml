@@ -13,6 +13,68 @@ TestCase {
     return UiStyles.definition(styles, id).tokens;
   }
 
+  // Regression: the workspace bed's shade was a 2-3px strip asking for a ~12px
+  // radius; Qt clamped it square and its corners poked past the outline.
+  function test_innerShadeFollowsTheInnerCurve() {
+    const shade = KeycapStyle.innerShade(120, 24, 14, 2, 3);
+    compare(shade.x, 2);
+    compare(shade.y, 2);
+    compare(shade.width, 116);
+    // The clipped shape is the full inner rectangle, not the short band
+    compare(shade.height, 20);
+    compare(shade.radius, 10);
+    compare(shade.band, 3);
+    compare(KeycapStyle.innerShade(120, 24, 40, 2, 3).radius, 10);
+    compare(KeycapStyle.innerShade(120, 24, 1, 2, 3).radius, 0);
+    compare(KeycapStyle.innerShade(120, 24, 14, 2, 0).band, 2);
+    compare(KeycapStyle.innerShade(120, 4, 14, 2, 3).band, 0);
+  }
+
+  function test_clockAngles() {
+    const a = KeycapStyle.clockAngles(new Date(2026, 10, 11, 15, 30, 45));
+    fuzzyCompare(a.hour, 105, 1e-9);
+    fuzzyCompare(a.minute, 184.5, 1e-9);
+    compare(a.second, 270);
+    const midnight = KeycapStyle.clockAngles(new Date(2026, 10, 11, 0, 0, 0));
+    compare(midnight.hour, 0);
+    compare(midnight.minute, 0);
+    compare(midnight.second, 0);
+    // Noon is back at the top
+    compare(KeycapStyle.clockAngles(new Date(2026, 10, 11, 12, 0, 0)).hour, 0);
+  }
+
+  function test_bcdBits() {
+    compare(KeycapStyle.bcdBits(9, 4), [true, false, false, true]);
+    compare(KeycapStyle.bcdBits(5, 3), [true, false, true]);
+    compare(KeycapStyle.bcdBits(2, 2), [true, false]);
+    compare(KeycapStyle.bcdBits(0, 4), [false, false, false, false]);
+  }
+
+  function test_crescent() {
+    // 28 px row, 2 px outline: 24 px inner shape, top half drawn
+    compare(KeycapStyle.crescent(28, 2, 4), {
+              "drop": 4,
+              "clip": 12
+            });
+    compare(KeycapStyle.crescent(29, 2, 4).clip, 13);
+    // A deep shade on a thin row stops at the middle
+    compare(KeycapStyle.crescent(10, 2, 9).drop, 3);
+    compare(KeycapStyle.crescent(3, 2, 4), {
+              "drop": 0,
+              "clip": 0
+            });
+  }
+
+  function test_cornerInset() {
+    compare(KeycapStyle.cornerInset(0, 20, 0.5), 0);
+    compare(KeycapStyle.cornerInset(6, 20, 10), 0);
+    compare(KeycapStyle.cornerInset(6, 20, 6), 0);
+    // At the very edge the line moves in by almost the whole radius
+    verify(KeycapStyle.cornerInset(6, 20, 0.5) > 3);
+    fuzzyCompare(KeycapStyle.cornerInset(6, 20, 0.5), KeycapStyle.cornerInset(6, 20, 19.5), 1e-9);
+    verify(KeycapStyle.cornerInset(6, 20, 1) > KeycapStyle.cornerInset(6, 20, 3));
+  }
+
   function test_sink_data() {
     return [
           {

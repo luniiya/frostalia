@@ -29,7 +29,10 @@ QtObject {
                                   "launcher": "Styles/keycap/LauncherView.qml",
                                   "sessionMenu": "Styles/keycap/SessionMenuView.qml",
                                   "wallpaperPicker": "Styles/keycap/WallpaperPickerView.qml",
-                                  "lyrics": "Styles/keycap/LyricsView.qml"
+                                  "lyrics": "Styles/keycap/LyricsView.qml",
+                                  "clockAnalog": "Styles/keycap/ClockAnalogView.qml",
+                                  "clockDigital": "Widgets/Clock/MaterialDigitalClock.qml",
+                                  "clockBinary": "Styles/keycap/ClockBinaryView.qml"
                                 })
   // Bar widget faces, keyed by the name a bar widget passes as `faceView`.
   // "Plate" is the plain keycap used by widgets without a face of their own.

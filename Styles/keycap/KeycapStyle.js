@@ -26,6 +26,67 @@ function shadowOffset(depth, faceSink) {
   return Math.max(0, (Number(depth) || 0) - (Number(faceSink) || 0));
 }
 
+// Inner shade along the top wall of a recessed face: the top `depth` px of the
+// rounded rectangle inside the outline. Clipping that band keeps its ends on the
+// corner curve; a short strip with the same radius would be clamped square and
+// poke past the outline.
+function innerShade(width, height, radius, outline, depth) {
+  const o = Math.max(0, Number(outline) || 0);
+  const w = Math.max(0, (Number(width) || 0) - 2 * o);
+  const h = Math.max(0, (Number(height) || 0) - 2 * o);
+  return {
+    "x": o,
+    "y": o,
+    "width": w,
+    "height": h,
+    "radius": clamp((Number(radius) || 0) - o, 0, Math.min(w, h) / 2),
+    "band": Math.min(h, Math.max(2, Number(depth) || 0))
+  };
+}
+
+// Shade inside a face pushed under the plate: the inner shape minus a copy of it
+// moved down by `drop`, a crescent that is thickest at the top and tapers down the
+// rounded sides. Only the top `clip` px are drawn, where the moved copy stays
+// inside the shape, so it never paints over the outline at the bottom corners.
+function crescent(height, outline, depth) {
+  const h = Math.max(0, (Number(height) || 0) - 2 * Math.max(0, Number(outline) || 0));
+  return {
+    "drop": clamp(Number(depth) || 0, 0, h / 2),
+    "clip": Math.ceil(h / 2)
+  };
+}
+
+// Horizontal inset that keeps a line at `y` inside a rectangle of `height`
+// whose corners have `radius`.
+function cornerInset(radius, height, y) {
+  const r = Math.max(0, Number(radius) || 0);
+  const edge = Math.max(0, Math.min(y, height - y));
+  if (edge >= r)
+    return 0;
+  return r - Math.sqrt(r * r - (r - edge) * (r - edge));
+}
+
+// Clock hand angles in degrees clockwise from 12. Hours and minutes sweep;
+// the second hand ticks.
+function clockAngles(date) {
+  const h = date.getHours();
+  const m = date.getMinutes();
+  const s = date.getSeconds();
+  return {
+    "hour": (h % 12 + m / 60) * 30,
+    "minute": (m + s / 60) * 6,
+    "second": s * 6
+  };
+}
+
+// Bits of one BCD digit, most significant first (the top key of a column).
+function bcdBits(value, bits) {
+  const result = [];
+  for (let i = bits - 1; i >= 0; i--)
+    result.push(((value >> i) & 1) === 1);
+  return result;
+}
+
 function mix(a, b, t) {
   const k = clamp(Number(t) || 0, 0, 1);
   return {

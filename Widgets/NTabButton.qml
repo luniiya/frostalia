@@ -45,6 +45,8 @@ Item {
   RowLayout {
     id: contentLayout
     anchors.centerIn: parent
+    // Rides on the style's face (keycap tabs sink when pressed or selected)
+    anchors.verticalCenterOffset: skin.loaded && skin.item.sink !== undefined ? skin.item.sink : 0
     width: Math.min(implicitWidth, parent.width - Style.margin2S)
     spacing: (root.icon !== "" && root.text !== "") ? Style.marginXS : 0
 

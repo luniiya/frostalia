@@ -19,6 +19,31 @@ def bar_views(style="keycap"):
 
 
 class KeycapStyleTests(unittest.TestCase):
+    def test_selected_tab_stays_pressed_down(self):
+        # A keycap tab is a key latched down while selected, and its label rides on the face
+        skin = (STYLE / "TabButton.qml").read_text()
+        self.assertRegex(skin, r"\bKey \{")
+        self.assertIn("latched: root.control.checked", skin)
+        self.assertIn("pressed: root.control.pressed", skin)
+        self.assertIn("readonly property real sink:", skin)
+        # Pushed under the plate: the selected face is shaded by the wall above it
+        self.assertRegex(skin, r"SunkenShade \{[^}]*opacity: root\.control\.checked")
+        self.assertIn("ringWidth: root.control.checked ? 0", skin)
+        self.assertIn("skin.item.sink", (ROOT / "Widgets/NTabButton.qml").read_text())
+
+    def test_selected_nav_row_sinks_under_the_plate(self):
+        # Settings rail rows: hover pops a key up, the selected row stays pushed under
+        skin = (STYLE / "NavItem.qml").read_text()
+        self.assertIn("latched: root.control.selected", skin)
+        self.assertRegex(skin, r"SunkenShade \{[^}]*opacity: root\.control\.selected")
+        self.assertIn("ringWidth: root.control.selected ? 0", skin)
+        self.assertIn("railIndicator.contentOffset", (ROOT / "Modules/Panels/Settings/SettingsContent.qml").read_text())
+
+    def test_dividers_are_solid(self):
+        # Regression: the old divider faded out at both ends with a gradient
+        for path in [ROOT / "Widgets/NDivider.qml"] + sorted(ROOT.glob("Styles/*/Divider.qml")):
+            self.assertNotIn("Gradient", path.read_text(), path)
+
     def test_material_cards_carry_the_keycap_skin(self):
         # Keycap draws on the Material layouts; these cards get their outline, keyline and
         # hard shadow from the style's Card skin (NStyleCard), and must stay opaque under it.
@@ -54,7 +79,7 @@ class KeycapStyleTests(unittest.TestCase):
 
     def test_every_face_file_is_registered_or_shared(self):
         registered = {pathlib.Path(path).name for path in bar_views().values()}
-        shared = {"KeycapFace.qml", "FaceKey.qml", "FaceGlyph.qml", "FaceSticker.qml", "FaceShape.qml"}
+        shared = {"KeycapFace.qml", "FaceKey.qml", "FaceGlyph.qml", "FaceSticker.qml", "FaceShape.qml", "FaceInnerShade.qml"}
         for path in FACES.glob("*.qml"):
             with self.subTest(path=path.name):
                 self.assertIn(path.name, registered | shared)

@@ -8,6 +8,7 @@ ControlCenterFace 1.0 ControlCenterFace.qml
 DarkModeFace 1.0 DarkModeFace.qml
 EcoModeFace 1.0 EcoModeFace.qml
 FaceGlyph 1.0 FaceGlyph.qml
+FaceInnerShade 1.0 FaceInnerShade.qml
 FaceKey 1.0 FaceKey.qml
 FaceShape 1.0 FaceShape.qml
 FaceSticker 1.0 FaceSticker.qml

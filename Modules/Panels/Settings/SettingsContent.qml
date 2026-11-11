@@ -1035,20 +1035,12 @@ Item {
                 property bool hovering: false
                 property color tabTextColor: ShellColors.mOnSurface
 
-                Rectangle {
+                NNavItem {
                   id: railIndicator
-                  x: 0
-                  y: 0
-                  width: parent.width
-                  height: parent.height
-                  radius: height / 2
-                  color: tabItem.selected ? Qt.tint(ShellColors.mSurfaceVariant, Qt.alpha(ShellColors.mSecondary, 0.22)) : "transparent"
-
-                  NMaterialStateLayer {
-                    hovered: tabItem.hovering
-                    pressed: tabMouseArea.pressed
-                    tint: ShellColors.mOnSurface
-                  }
+                  anchors.fill: parent
+                  selected: tabItem.selected
+                  hovered: tabItem.hovering
+                  pressed: tabMouseArea.pressed
                 }
 
                 Behavior on color {
@@ -1070,6 +1062,8 @@ Item {
                 Item {
                   id: tabEntryRow
                   anchors.fill: parent
+                  anchors.topMargin: railIndicator.contentOffset
+                  anchors.bottomMargin: -railIndicator.contentOffset
                   implicitHeight: Math.max(tabIcon.implicitHeight, tabLabel.implicitHeight)
                   clip: true
 

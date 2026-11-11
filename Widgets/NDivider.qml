@@ -1,30 +1,23 @@
 import QtQuick
-import Quickshell
-import Quickshell.Widgets
 import qs.Commons
 
-Rectangle {
+// A separator line drawn by the style's skin (Styles/<style>/Divider.qml), which
+// also picks its thickness.
+Item {
+  id: root
+
   property bool vertical: false
 
-  width: vertical ? Style.borderS : parent.width
-  height: vertical ? parent.height : Style.borderS
-  gradient: Gradient {
-    orientation: vertical ? Gradient.Vertical : Gradient.Horizontal
-    GradientStop {
-      position: 0.0
-      color: "transparent"
-    }
-    GradientStop {
-      position: 0.1
-      color: ShellColors.mOutline
-    }
-    GradientStop {
-      position: 0.9
-      color: ShellColors.mOutline
-    }
-    GradientStop {
-      position: 1.0
-      color: "transparent"
-    }
+  readonly property real thickness: skin.loaded && skin.item.thickness !== undefined ? skin.item.thickness : Style.borderS
+
+  width: vertical ? thickness : parent.width
+  height: vertical ? parent.height : thickness
+  implicitWidth: vertical ? thickness : 0
+  implicitHeight: vertical ? 0 : thickness
+
+  NStyleSkin {
+    id: skin
+    name: "Divider"
+    control: root
   }
 }

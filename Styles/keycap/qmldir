@@ -1,6 +1,8 @@
 Box 1.0 Box.qml
 Button 1.0 Button.qml
 Card 1.0 Card.qml
+ClockAnalogView 1.0 ClockAnalogView.qml
+ClockBinaryView 1.0 ClockBinaryView.qml
 Definition 1.0 Definition.qml
 Field 1.0 Field.qml
 IconButton 1.0 IconButton.qml
@@ -16,3 +18,6 @@ SliderTrack 1.0 SliderTrack.qml
 TabButton 1.0 TabButton.qml
 Toggle 1.0 Toggle.qml
 WallpaperPickerView 1.0 WallpaperPickerView.qml
+NavItem 1.0 NavItem.qml
+Divider 1.0 Divider.qml
+SunkenShade 1.0 SunkenShade.qml

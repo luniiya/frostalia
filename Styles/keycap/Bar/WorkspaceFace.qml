@@ -16,13 +16,10 @@ KeycapFace {
     scale: face.pop
 
     // Inner shade: the bed's top wall
-    Rectangle {
-      x: face.kit.outline
-      y: face.kit.outline
-      width: parent.width - 2 * face.kit.outline
-      height: Math.max(2, face.depth)
-      topLeftRadius: Math.max(0, bed.radius - face.kit.outline)
-      topRightRadius: Math.max(0, bed.radius - face.kit.outline)
+    FaceInnerShade {
+      kit: face.kit
+      radius: bed.radius
+      depth: face.depth
       color: face.kit.ink
       opacity: 0.45
     }
