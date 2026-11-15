@@ -3,7 +3,8 @@ import "KeycapStyle.js" as KeycapStyle
 
 // Keycap surface: ink outline, thin cream ring, fill and a hard shadow straight
 // down. The face fills the item; the shadow sits `depth` px below it. Pressing
-// (or `latched`) sinks the face into the shadow, release springs back.
+// (or `latched`) sinks the face into the shadow, release springs back. A latched
+// key is under the plate: the wall above shades it and its rim catches no light.
 // Children go on the face and sink with it. Free of shell singletons so tests
 // can load it; callers pass colors and metrics.
 Item {
@@ -87,6 +88,24 @@ Item {
       border.color: root.ringColor
       border.width: root.ringWidth
       visible: root.ringWidth > 0 && width > 2 * root.ringWidth
+      opacity: root.latched ? 0 : 1
+    }
+
+    SunkenShade {
+      outline: root.outlineWidth
+      depth: root.depth + 1
+      color: Qt.alpha(root.inkColor, 0.45)
+      topLeftRadius: root.topLeftRadius
+      topRightRadius: root.topRightRadius
+      bottomLeftRadius: root.bottomLeftRadius
+      bottomRightRadius: root.bottomRightRadius
+      opacity: root.latched ? 1 : 0
+
+      Behavior on opacity {
+        NumberAnimation {
+          duration: root.duration
+        }
+      }
     }
 
     Item {

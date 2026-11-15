@@ -25,8 +25,7 @@ Item {
     ringColor: root.kit.ringFor(baseFill)
     radius: Math.min(root.control.radius, height / 2)
     outlineWidth: root.kit.outline
-    // A sunken face catches no light on its rim
-    ringWidth: root.control.selected ? 0 : root.kit.ring
+    ringWidth: root.kit.ring
     depth: root.kit.depth
     pressedDepth: root.control.selected ? 0 : root.kit.pressedDepth
     hoverLift: root.kit.hoverLift
@@ -39,25 +38,6 @@ Item {
     Behavior on opacity {
       NumberAnimation {
         duration: Style.animationFast
-      }
-    }
-
-    // The plate's edge shading the sunken face
-    SunkenShade {
-      kit: root.kit
-      depth: key.depth + 1
-      color: Qt.alpha(root.kit.ink, 0.45)
-      fillColor: key.face.color
-      topLeftRadius: key.radius
-      topRightRadius: key.radius
-      bottomLeftRadius: key.radius
-      bottomRightRadius: key.radius
-      opacity: root.control.selected ? 1 : 0
-
-      Behavior on opacity {
-        NumberAnimation {
-          duration: Style.animationFast
-        }
       }
     }
   }

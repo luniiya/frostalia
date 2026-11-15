@@ -27,17 +27,22 @@ class KeycapStyleTests(unittest.TestCase):
         self.assertIn("pressed: root.control.pressed", skin)
         self.assertIn("readonly property real sink:", skin)
         # Pushed under the plate: the selected face is shaded by the wall above it
-        self.assertRegex(skin, r"SunkenShade \{[^}]*opacity: root\.control\.checked")
-        self.assertIn("ringWidth: root.control.checked ? 0", skin)
         self.assertIn("skin.item.sink", (ROOT / "Widgets/NTabButton.qml").read_text())
 
     def test_selected_nav_row_sinks_under_the_plate(self):
         # Settings rail rows: hover pops a key up, the selected row stays pushed under
         skin = (STYLE / "NavItem.qml").read_text()
         self.assertIn("latched: root.control.selected", skin)
-        self.assertRegex(skin, r"SunkenShade \{[^}]*opacity: root\.control\.selected")
-        self.assertIn("ringWidth: root.control.selected ? 0", skin)
         self.assertIn("railIndicator.contentOffset", (ROOT / "Modules/Panels/Settings/SettingsContent.qml").read_text())
+
+    def test_everything_pushed_under_gets_the_crescent(self):
+        # A latched Key shades itself; the recessed bar beds use the same crescent
+        key = (STYLE / "Key.qml").read_text()
+        self.assertRegex(key, r"SunkenShade \{[^}]*opacity: root\.latched \? 1 : 0")
+        self.assertIn("opacity: root.latched ? 0 : 1", key)
+        for face in ("WorkspaceFace.qml", "SystemMonitorFace.qml"):
+            self.assertIn("Keycap.SunkenShade {", (FACES / face).read_text(), face)
+        self.assertFalse(list(STYLE.rglob("FaceInnerShade.qml")))
 
     def test_dividers_are_solid(self):
         # Regression: the old divider faded out at both ends with a gradient
@@ -79,7 +84,7 @@ class KeycapStyleTests(unittest.TestCase):
 
     def test_every_face_file_is_registered_or_shared(self):
         registered = {pathlib.Path(path).name for path in bar_views().values()}
-        shared = {"KeycapFace.qml", "FaceKey.qml", "FaceGlyph.qml", "FaceSticker.qml", "FaceShape.qml", "FaceInnerShade.qml"}
+        shared = {"KeycapFace.qml", "FaceKey.qml", "FaceGlyph.qml", "FaceSticker.qml", "FaceShape.qml"}
         for path in FACES.glob("*.qml"):
             with self.subTest(path=path.name):
                 self.assertIn(path.name, registered | shared)
@@ -106,6 +111,16 @@ class KeycapStyleTests(unittest.TestCase):
                     self.assertIn(face, views, f"{name} uses unregistered face {face}")
         # Tray deliberately sits on the plain keycap.
         self.assertIn('view: "Plate"', (ROOT / "Modules/Bar/Widgets/Tray.qml").read_text())
+
+    def test_nothing_sits_above_plugins(self):
+        # Handlers over the plugin left its own MouseArea hovered after the pointer left
+        # (dark hover text on the plate) or kept the timer from opening on click. Hover
+        # and press come from the plugin's own mouse areas instead.
+        lines = (ROOT / "Modules/Bar/Extras/BarWidgetLoader.qml").read_text().splitlines()
+        source = "\n".join(line for line in lines if not line.strip().startswith("//"))
+        for handler in ("PointHandler", "TapHandler", "DragHandler", "HoverHandler"):
+            self.assertNotIn(handler, source)
+        self.assertIn("PluginFace.mouseAreas", source)
 
     def test_faces_are_mostly_unique(self):
         # Each widget has its own idea; only the shared Plate may repeat.

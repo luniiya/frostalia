@@ -115,4 +115,47 @@ TestCase {
     verify(found[1] === wrapper.children[0]);
     compare(PluginFace.capsules(null, 26, false).length, 0);
   }
+
+  function area(pressed, children, hovered) {
+    return {
+      pressed: pressed,
+      containsMouse: !!hovered,
+      acceptedButtons: 1,
+      children: children || []
+    };
+  }
+
+  function test_mouseAreasFindsNestedAreas() {
+    const inner = area(false);
+    const host = {
+      children: [{
+          children: [{
+              children: [inner]
+            }]
+        }, area(true)]
+    };
+    const found = PluginFace.mouseAreas(host);
+    compare(found.length, 2);
+    verify(found.indexOf(inner) >= 0);
+    compare(PluginFace.mouseAreas(null).length, 0);
+    compare(PluginFace.mouseAreas({
+                                    children: [{
+                                        children: []
+                                      }]
+                                  }).length, 0);
+  }
+
+  function test_anyPressed() {
+    verify(!PluginFace.anyPressed([]));
+    verify(!PluginFace.anyPressed(undefined));
+    verify(!PluginFace.anyPressed([area(false), area(false)]));
+    verify(PluginFace.anyPressed([area(false), area(true)]));
+  }
+
+  function test_anyHovered() {
+    verify(!PluginFace.anyHovered([]));
+    verify(!PluginFace.anyHovered(undefined));
+    verify(!PluginFace.anyHovered([area(false), area(true)]));
+    verify(PluginFace.anyHovered([area(false), area(false, [], true)]));
+  }
 }

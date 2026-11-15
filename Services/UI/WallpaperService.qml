@@ -7,6 +7,7 @@ import Quickshell.Io
 import "../../Helpers/SystemWallpaper.js" as SystemWallpaper
 import "../../Helpers/WallpaperRenderer.js" as WallpaperRenderer
 import qs.Commons
+import qs.Services.Location
 import qs.Services.Power
 
 // Which image each screen shows, for theming, the media card, the wallpaper visualizer,
@@ -142,11 +143,19 @@ Singleton {
       showPicture(WallpaperRenderer.step(images, rendererPath, -1), mode);
   }
 
+  // Picks from the light folder while the sun is up at the weather location and from the
+  // dark one after sunset (the shell's color mode when there is no forecast)
   function random() {
     if (!rendererEnabled)
       return;
-    const pick = images.indexOf(upcomingRandom) >= 0 && upcomingRandom !== rendererPath ? upcomingRandom : WallpaperRenderer.pickRandom(images, [rendererPath]);
-    showPicture(pick, mode);
+    let m = WallpaperRenderer.randomMode(Settings.data.colorSchemes.darkMode, modeOverride, LocationService.data.weather, Date.now());
+    let list = m === "dark" ? darkImages : lightImages;
+    if (list.length === 0) {
+      m = mode;
+      list = images;
+    }
+    const pick = list.indexOf(upcomingRandom) >= 0 && upcomingRandom !== rendererPath ? upcomingRandom : WallpaperRenderer.pickRandom(list, [rendererPath]);
+    showPicture(pick, m, list);
   }
 
   // "light", "dark" or "auto" (follow the shell's color mode); false when not understood

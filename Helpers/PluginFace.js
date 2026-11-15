@@ -36,3 +36,33 @@ function capsules(host, capsuleHeight, vertical) {
   visit(host, 1);
   return found;
 }
+
+// Mouse areas the plugin made itself (hover and press come from them, so the loader
+// needs no handler above the plugin that could take its clicks). Looks a few levels deep.
+function mouseAreas(host) {
+  const found = [];
+  if (!host)
+    return found;
+  const visit = (item, level) => {
+    const children = item.children || [];
+    for (let i = 0; i < children.length; i++) {
+      const child = children[i];
+      if (child.pressed !== undefined && child.containsMouse !== undefined && child.acceptedButtons !== undefined)
+        found.push(child);
+      if (level < 4)
+        visit(child, level + 1);
+    }
+  };
+  visit(host, 1);
+  return found;
+}
+
+// True while any of the areas has the left button down.
+function anyPressed(areas) {
+  return (areas || []).some(area => !!area.pressed);
+}
+
+// True while the pointer is over any of the areas.
+function anyHovered(areas) {
+  return (areas || []).some(area => !!area.containsMouse);
+}

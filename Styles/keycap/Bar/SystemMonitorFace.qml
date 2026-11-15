@@ -1,5 +1,6 @@
 import QtQuick
 import "../KeycapStyle.js" as KeycapStyle
+import ".." as Keycap
 
 // System monitor: a recessed LCD plate. Sunk into the bar (inner shade, no
 // drop shadow) with faint scanlines and a screw at each end.
@@ -39,12 +40,11 @@ KeycapFace {
     }
 
     // Inner shade along the top wall
-    FaceInnerShade {
-      kit: face.kit
+    Keycap.SunkenShade {
+      outline: face.kit.outline
       radius: plate.radius
       depth: face.depth
-      color: face.kit.ink
-      opacity: 0.35
+      color: Qt.alpha(face.kit.ink, 0.35)
     }
 
     // Screws

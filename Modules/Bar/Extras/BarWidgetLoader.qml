@@ -177,12 +177,48 @@ Item {
     }
   }
 
+  // Hover and press for the plugin face come from the plugin's own mouse areas. Nothing
+  // sits above the plugin: a handler there either took its clicks or kept its hover
+  // from ever ending (dark hover text left on the plate).
+  property var _pluginAreas: []
+  property bool _pluginHovered: false
+  property bool _pluginPressed: false
+
+  function syncPluginAreas() {
+    _pluginAreas = _isPlugin ? PluginFace.mouseAreas(loader.item) : [];
+    refreshPluginState();
+  }
+
+  function refreshPluginState() {
+    _pluginHovered = PluginFace.anyHovered(_pluginAreas);
+    _pluginPressed = PluginFace.anyPressed(_pluginAreas);
+  }
+
+  Repeater {
+    model: root._pluginAreas
+    delegate: Item {
+      required property var modelData
+      Connections {
+        target: modelData
+        function onContainsMouseChanged() {
+          root.refreshPluginState();
+        }
+        function onPressedChanged() {
+          root.refreshPluginState();
+        }
+      }
+    }
+  }
+
   NStyleFace {
     id: pluginFace
     view: root._isPlugin ? "Plate" : ""
     host: loader.item
-    hovered: pluginInput.hovered
-    pressed: pluginInput.pressed
+    hovered: root._pluginHovered
+    pressed: root._pluginPressed
+    faceData: ({
+                 "hoverFill": true
+               })
     depth: Style.barFaceDepth(root.widgetScreen?.name, root.section)
     width: root.isVerticalBar ? root.capsuleHeight : root.width
     height: root.isVerticalBar ? root.height : root.capsuleHeight
@@ -251,28 +287,11 @@ Item {
 
       if (root._isPlugin)
         Qt.callLater(root.syncPluginCapsules);
+      Qt.callLater(root.syncPluginAreas);
     }
 
     Component.onDestruction: {
       root._unregister();
-    }
-  }
-
-  // Hover and press for the plugin face. Above the plugin so it sees events first;
-  // the handlers only watch (passive grabs), so the plugin's own mouse areas still work.
-  Item {
-    id: pluginInput
-    readonly property bool hovered: pluginHover.hovered
-    readonly property bool pressed: pluginPress.active
-    anchors.fill: parent
-    enabled: pluginFace.loaded
-
-    HoverHandler {
-      id: pluginHover
-    }
-    PointHandler {
-      id: pluginPress
-      acceptedButtons: Qt.LeftButton
     }
   }
 

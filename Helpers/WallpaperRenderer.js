@@ -157,6 +157,46 @@ function modeFor(darkMode, override) {
   return darkMode ? "dark" : "light";
 }
 
+// Open-Meteo local time ("2026-11-15T07:48", in the location's own zone) as epoch ms.
+// `offsetSeconds` is the response's utc_offset_seconds; without it the time is read as local.
+function locationTimeMs(iso, offsetSeconds) {
+  if (!iso)
+    return NaN;
+  if (typeof offsetSeconds === "number" && isFinite(offsetSeconds))
+    return Date.parse(iso + "Z") - offsetSeconds * 1000;
+  return Date.parse(iso);
+}
+
+// Whether the sun is up at the weather location at `nowMs`, from the forecast's daily
+// sunrise and sunset; null when the forecast has none
+function sunUp(weather, nowMs) {
+  var daily = weather && weather.daily;
+  if (!daily || !daily.sunrise || !daily.sunset)
+    return null;
+  var known = false;
+  for (var i = 0; i < daily.sunrise.length && i < daily.sunset.length; i++) {
+    var rise = locationTimeMs(daily.sunrise[i], weather.utc_offset_seconds);
+    var set = locationTimeMs(daily.sunset[i], weather.utc_offset_seconds);
+    if (!isFinite(rise) || !isFinite(set) || set <= rise)
+      continue;
+    known = true;
+    if (nowMs >= rise && nowMs < set)
+      return true;
+  }
+  return known ? false : null;
+}
+
+// The folder a random pick comes from: the IPC override, else light while the sun is up
+// at the weather location and dark after sunset, else the shell's color mode
+function randomMode(darkMode, override, weather, nowMs) {
+  if (override === "light" || override === "dark")
+    return override;
+  var up = sunUp(weather, nowMs);
+  if (up === null)
+    return modeFor(darkMode, "");
+  return up ? "light" : "dark";
+}
+
 // An IPC mode argument: "light", "dark", "auto" (follow the shell), or "" when unknown
 function normalizeMode(arg) {
   var m = String(arg || "").trim().toLowerCase();

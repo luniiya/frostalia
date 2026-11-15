@@ -1,4 +1,5 @@
 import QtQuick
+import ".." as Keycap
 
 // Workspaces, background: a recessed key bed the workspace keys sit in.
 // Darker than the bar keys, with an inner shade along the top edge and no
@@ -16,12 +17,11 @@ KeycapFace {
     scale: face.pop
 
     // Inner shade: the bed's top wall
-    FaceInnerShade {
-      kit: face.kit
+    Keycap.SunkenShade {
+      outline: face.kit.outline
       radius: bed.radius
       depth: face.depth
-      color: face.kit.ink
-      opacity: 0.45
+      color: Qt.alpha(face.kit.ink, 0.45)
     }
   }
 }

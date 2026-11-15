@@ -5,6 +5,7 @@ can open surfaces that only a click opens (tray menus, context menus).
 Usage: Scripts/dev/click.py X Y [left|right|middle|none]
   X, Y are global layout coordinates, as `hyprctl cursorpos` prints them.
   "none" only moves the pointer there (to hover something).
+  FROSTALIA_CLICK_HOLD=<seconds> keeps the button down that long (to look at a pressed state).
 Needs write access to /dev/uinput.
 """
 import fcntl
@@ -56,7 +57,7 @@ def click(x, y, button="left"):
         if code is not None:
             event(fd, EV_KEY, code, 1)
             event(fd, EV_SYN, 0, 0)
-            time.sleep(0.05)
+            time.sleep(float(os.environ.get("FROSTALIA_CLICK_HOLD", "0.05")))
             event(fd, EV_KEY, code, 0)
             event(fd, EV_SYN, 0, 0)
             time.sleep(0.1)

@@ -230,7 +230,46 @@ TestCase {
   }
   }
 
-    function test_volumeLatchesDownWhenMuted() {
+    function plateFill(face) {
+    for (let i = 0; i < face.children.length; i++) {
+      if (face.children[i].fillColor !== undefined)
+        return face.children[i].fillColor;
+    }
+    return undefined;
+  }
+
+  // Plugins color their content for the hover color while hovered; the plate must
+  // be that color then, or their text is dark on a dark plate.
+  function test_pluginPlateTakesHoverFill() {
+    const face = create("Plate", {
+      "faceData": {
+        "hoverFill": true
+      }
+    });
+    try {
+      compare(plateFill(face), kit.fill);
+      face.hovered = true;
+      compare(plateFill(face), kit.hover);
+      face.hovered = false;
+      compare(plateFill(face), kit.fill);
+    } finally {
+      face.destroy();
+    }
+  }
+
+  function test_plainPlateKeepsFillWhenHovered() {
+    const face = create("Plate", {
+      "faceData": {}
+    });
+    try {
+      face.hovered = true;
+      compare(plateFill(face), kit.fill);
+    } finally {
+      face.destroy();
+    }
+  }
+
+  function test_volumeLatchesDownWhenMuted() {
     const face = create("Volume", {
     "faceData": {
     "level": 0.5,

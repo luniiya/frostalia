@@ -182,6 +182,86 @@ TestCase {
     compare(WallpaperRenderer.normalizeMode(data.a), data.e);
   }
 
+  // Paris in November: UTC+1, sun up 07:48-17:29 local
+  readonly property var parisWeather: ({
+                                         "utc_offset_seconds": 3600,
+                                         "daily": {
+                                           "sunrise": ["2026-11-15T07:48", "2026-11-16T07:49"],
+                                           "sunset": ["2026-11-15T17:29", "2026-11-16T17:28"]
+                                         }
+                                       })
+
+  function test_locationTimeMs() {
+    compare(WallpaperRenderer.locationTimeMs("2026-11-15T07:48", 3600), Date.UTC(2026, 10, 15, 6, 48));
+    compare(WallpaperRenderer.locationTimeMs("2026-11-15T07:48", -18000), Date.UTC(2026, 10, 15, 12, 48));
+    compare(WallpaperRenderer.locationTimeMs("2026-11-15T07:48"), new Date(2026, 10, 15, 7, 48).getTime());
+    verify(isNaN(WallpaperRenderer.locationTimeMs("", 0)));
+  }
+
+  function test_sunUp_data() {
+    return [
+          {
+            "tag": "before sunrise",
+            "now": Date.UTC(2026, 10, 15, 6, 0),
+            "expected": false
+          },
+          {
+            "tag": "at sunrise",
+            "now": Date.UTC(2026, 10, 15, 6, 48),
+            "expected": true
+          },
+          {
+            "tag": "midday",
+            "now": Date.UTC(2026, 10, 15, 11, 0),
+            "expected": true
+          },
+          {
+            "tag": "at sunset",
+            "now": Date.UTC(2026, 10, 15, 16, 29),
+            "expected": false
+          },
+          {
+            "tag": "late evening",
+            "now": Date.UTC(2026, 10, 15, 22, 0),
+            "expected": false
+          },
+          {
+            "tag": "next day",
+            "now": Date.UTC(2026, 10, 16, 12, 0),
+            "expected": true
+          }
+        ];
+  }
+
+  function test_sunUp(data) {
+    compare(WallpaperRenderer.sunUp(parisWeather, data.now), data.expected);
+  }
+
+  function test_sunUp_unknown() {
+    compare(WallpaperRenderer.sunUp(null, 0), null);
+    compare(WallpaperRenderer.sunUp({}, 0), null);
+    compare(WallpaperRenderer.sunUp({
+                                      "daily": {
+                                        "sunrise": [""],
+                                        "sunset": [""]
+                                      }
+                                    }, 0), null);
+  }
+
+  function test_randomMode() {
+    const noon = Date.UTC(2026, 10, 15, 11, 0);
+    const night = Date.UTC(2026, 10, 15, 21, 0);
+    // The sun wins over the shell's color mode
+    compare(WallpaperRenderer.randomMode(true, "", parisWeather, noon), "light");
+    compare(WallpaperRenderer.randomMode(false, "", parisWeather, night), "dark");
+    // An IPC override wins over the sun
+    compare(WallpaperRenderer.randomMode(true, "dark", parisWeather, noon), "dark");
+    compare(WallpaperRenderer.randomMode(false, "light", parisWeather, night), "light");
+    // No forecast: the color mode
+    compare(WallpaperRenderer.randomMode(true, "", null, noon), "dark");
+    compare(WallpaperRenderer.randomMode(false, "", null, night), "light");
+  }
+
   function test_folders() {
     compare(WallpaperRenderer.folderFor("light", prefs, "/home/u"), "/home/u/Wall/Light");
     compare(WallpaperRenderer.folderFor("dark", prefs, "/home/u"), "/srv/walls/Dark");

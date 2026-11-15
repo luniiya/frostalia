@@ -19,7 +19,7 @@ KeycapFace {
       anchors.centerIn: parent
       icon: face.host ? face.host.icon : ""
       size: face.host && face.host.buttonSize ? face.host.buttonSize * 0.46 : 9
-      color: face.kit.primaryText
+      color: face.kit.cream
     }
   }
 
